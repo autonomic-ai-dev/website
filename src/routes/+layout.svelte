@@ -2,6 +2,7 @@
   import "../app.css";
   import { onMount } from "svelte";
   import { Menu, X } from "lucide-svelte";
+  import { particles } from "$lib/actions/particles";
   let { children } = $props();
 
   let isMobileMenuOpen = $state(false);
@@ -19,12 +20,8 @@
 
 <div class="min-h-screen relative overflow-hidden bg-slate-50 dark:bg-slate-950 font-sans selection:bg-brand-500/30">
   
-  <!-- Animated Background Blobs -->
-  <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-    <div class="absolute bg-blob-1 w-[800px] h-[800px] rounded-full bg-brand-600/20 mix-blend-screen animate-pulse-glow" style="animation-delay: 0s;"></div>
-    <div class="absolute bg-blob-2 w-[600px] h-[600px] rounded-full bg-accent-600/20 mix-blend-screen animate-pulse-glow" style="animation-delay: 2s;"></div>
-    <div class="absolute bg-blob-3 w-[700px] h-[700px] rounded-full bg-indigo-600/20 mix-blend-screen animate-pulse-glow" style="animation-delay: 4s;"></div>
-  </div>
+  <!-- Dynamic Neural Network Background -->
+  <canvas use:particles class="fixed inset-0 z-0 pointer-events-none opacity-40"></canvas>
 
   <!-- Navigation -->
   <nav class="fixed top-0 w-full z-50 glass border-b-0 border-white/5">
