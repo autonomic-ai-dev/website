@@ -6,14 +6,14 @@
     {
       title: "Introducing the Autonomic AI Ecosystem",
       excerpt: "A deep dive into how we built a self-healing, multi-agent architecture using modern AI and web technologies.",
-      date: "Oct 24, 2026",
+      date: "Jun 20, 2026",
       slug: "introducing-autonomic-ecosystem",
       category: "Engineering"
     },
     {
       title: "How Agent Muscle handles Massive Concurrency",
       excerpt: "Exploring the containerized execution environment that allows Agent Muscle to run dozens of builds in parallel.",
-      date: "Nov 02, 2026",
+      date: "Jun 20, 2026",
       slug: "agent-muscle-concurrency",
       category: "Deep Dive"
     }
