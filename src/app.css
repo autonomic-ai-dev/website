@@ -31,28 +31,23 @@
 
 @layer base {
   :root {
-    --bg-color: #ffffff;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-  }
-  
-  :root.dark {
-    --bg-color: #020617;
+    --bg-color: #0B0F19; /* Deep dark blue matching the screenshot background */
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
   }
   
   body {
     @apply bg-[var(--bg-color)] text-[var(--text-primary)] antialiased transition-colors duration-500;
+    scroll-behavior: smooth;
   }
 }
 
 @utility glass {
-  @apply bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200 dark:border-white/10;
+  @apply bg-slate-900/40 backdrop-blur-md border border-white/10;
 }
 
 @utility glass-card {
-  @apply bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl hover:shadow-brand-500/20 transition-all duration-300;
+  @apply bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl hover:shadow-brand-500/20 transition-all duration-500 hover:-translate-y-1;
 }
 
 @utility text-gradient {

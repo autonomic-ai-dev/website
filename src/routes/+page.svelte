@@ -40,12 +40,13 @@
     <p class="text-slate-400 max-w-2xl">Modeled after biological systems, each agent operates independently yet forms a cohesive, autonomic organism capable of self-healing and complex reasoning.</p>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[200px]">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-fr">
     {#each agents as agent}
       {@const Icon = agent.icon}
       <a 
         href={`/agents/${agent.id}`} 
-        class="glass-card p-8 flex flex-col justify-between group relative overflow-hidden {agent.span}"
+        class="glass-card p-8 flex flex-col justify-between group relative overflow-hidden h-full {agent.span} animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both"
+        style="animation-delay: {50 * agent.id.length}ms;"
       >
         <!-- Background Gradient Hover -->
         <div class="absolute inset-0 bg-gradient-to-br {agent.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
@@ -55,7 +56,7 @@
             <Icon class="text-white" size={24} />
           </div>
           <h3 class="text-2xl font-bold text-white mb-2">{agent.name}</h3>
-          <p class="text-slate-400 group-hover:text-slate-300 transition-colors line-clamp-3 md:line-clamp-none">{agent.description}</p>
+          <p class="text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed">{agent.description}</p>
         </div>
         
         <div class="absolute top-8 right-8 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 -translate-x-2 transition-all duration-300">
@@ -69,7 +70,7 @@
       href="https://agent-ci-dashboard.vercel.app" 
       target="_blank" 
       rel="noopener noreferrer" 
-      class="glass-card p-8 flex flex-col justify-between group relative overflow-hidden md:col-span-2 bg-gradient-to-br from-slate-900 to-slate-800 border-brand-500/30"
+      class="glass-card p-8 flex flex-col justify-between group relative overflow-hidden h-full md:col-span-2 bg-gradient-to-br from-[#0B0F19] to-slate-900 border-brand-500/30 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both delay-300"
     >
       <div class="absolute right-0 top-0 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl group-hover:bg-brand-500/30 transition-colors"></div>
       <div>
