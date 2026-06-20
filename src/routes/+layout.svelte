@@ -47,12 +47,10 @@
   <!-- Navigation -->
   <nav class="fixed top-0 w-full z-50 glass border-b-0 border-white/5">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
-        <span class="font-bold text-xl tracking-tight text-white">Autonomic <span class="text-brand-300 font-medium">AI</span></span>
-      </div>
+      <a href="/" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+        <img src="/logo.png" alt="Autonomic AI Logo" class="w-10 h-10 object-contain rounded-xl shadow-lg shadow-brand-500/20" />
+        <span class="font-bold text-xl tracking-tight text-slate-900 dark:text-white">Autonomic <span class="text-brand-600 dark:text-brand-300 font-medium">AI</span></span>
+      </a>
       
       <div class="hidden md:flex items-center gap-8">
         <a href="/#agents" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white transition-colors">Agents</a>
@@ -124,8 +122,8 @@
   <footer class="relative z-10 glass mt-32 border-t border-white/5 py-12">
     <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
       <div class="flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-brand-400"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        <span class="font-bold text-white">Autonomic AI Dev</span>
+        <img src="/logo.png" alt="Autonomic AI Logo" class="w-6 h-6 object-contain" />
+        <span class="font-bold text-slate-900 dark:text-white">Autonomic AI Dev</span>
       </div>
       <p class="text-slate-400 text-sm">© {new Date().getFullYear()} Autonomic AI Dev. All rights reserved.</p>
       <div class="flex items-center gap-4">
