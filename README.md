@@ -1,42 +1,59 @@
-# sv
+# Autonomic AI Website
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+The official public-facing website and landing page for **Autonomic AI** — a fully autonomous ecosystem of specialized AI agents.
 
-## Creating a project
+Built with [SvelteKit](https://kit.svelte.dev/) and [Tailwind CSS v4](https://tailwindcss.com/).
 
-If you're seeing this, you've probably already done this step. Congrats!
+## 🚀 Getting Started
 
-```sh
-# create a new project
-npx sv create my-app
+### Prerequisites
+
+Make sure you have [Bun](https://bun.sh/) installed on your machine.
+
+### Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/autonomic-ai-dev/website.git
+cd website
+bun install
 ```
 
-To recreate this project with the same configuration:
+### Development Server
 
-```sh
-# recreate this project
-bun x sv@0.16.1 create --template minimal --types ts --add tailwindcss="plugins:none" prettier sveltekit-adapter="adapter:vercel" --install bun landing-page
+Start the local development server:
+
+```bash
+bun run dev
 ```
 
-## Developing
+The site will be available at `http://localhost:5173`.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Production Build
 
-```sh
-npm run dev
+To create a production-optimized build:
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```bash
+bun run build
 ```
 
-## Building
+You can preview the production build locally with:
 
-To create a production version of your app:
-
-```sh
-npm run build
+```bash
+bun run preview
 ```
 
-You can preview the production build with `npm run preview`.
+## 🌐 Deployment
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+This repository is configured for automatic deployments on **Vercel**. Every push to the `master` branch will trigger a production deployment.
+
+- **Live URL:** [https://website-one-chi-50.vercel.app](https://website-one-chi-50.vercel.app)
+
+## 🎨 Tech Stack
+
+- **Framework:** SvelteKit (Svelte 5 Runes)
+- **Styling:** Tailwind CSS v4
+- **Icons:** Lucide Svelte
+- **Animations:** Custom CSS keyframes and glassmorphism styling
+- **Hosting:** Vercel (Edge Network)
