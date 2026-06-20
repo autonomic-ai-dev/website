@@ -52,6 +52,18 @@ This repository is configured for automatic deployments on **Vercel**. Every pus
 
 ## 🎨 Tech Stack
 
+```mermaid
+flowchart TD
+    Client[SvelteKit Client<br>Svelte 5 Runes]
+    Styling[Tailwind CSS v4]
+    Icons[Lucide Svelte]
+    Host[Vercel Edge Network]
+    
+    Client --> Styling
+    Client --> Icons
+    Client --> Host
+```
+
 - **Framework:** SvelteKit (Svelte 5 Runes)
 - **Styling:** Tailwind CSS v4
 - **Icons:** Lucide Svelte
