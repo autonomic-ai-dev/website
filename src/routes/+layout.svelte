@@ -32,7 +32,7 @@
       </a>
       
       <div class="hidden md:flex items-center gap-8">
-        <a href="/#agents" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Agents</a>
+        <a href="/#ecosystem" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Agents</a>
         <a href="/docs" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Docs</a>
         <a href="/blog" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Blog</a>
         <a href="https://agent-ci-dashboard.vercel.app" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-full text-sm font-medium bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all backdrop-blur-md flex items-center gap-2 group">
@@ -60,7 +60,7 @@
     <!-- Mobile Menu Overlay -->
     {#if isMobileMenuOpen}
       <div class="md:hidden absolute top-20 left-0 w-full glass border-b border-slate-200 dark:border-white/10 p-6 flex flex-col gap-6 shadow-2xl animate-in slide-in-from-top-2">
-        <a href="/#agents" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Agents</a>
+        <a href="/#ecosystem" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Agents</a>
         <a href="/docs" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Docs</a>
         <a href="/blog" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Blog</a>
         <a href="https://agent-ci-dashboard.vercel.app" target="_blank" rel="noopener noreferrer" class="px-5 py-3 mt-2 rounded-xl text-center font-bold bg-gradient-to-r from-brand-600 to-accent-600 text-white shadow-lg">
