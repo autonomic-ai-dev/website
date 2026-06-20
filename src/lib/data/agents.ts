@@ -1,4 +1,4 @@
-import { Brain, Heart, Activity, GitBranch, ShieldAlert, Cpu, Layers } from "lucide-svelte";
+import { Brain, Heart, Cpu, Shield, Layers, Eye, MessageSquare, Server, Radio } from "lucide-svelte";
 
 export interface AgentData {
   id: string;
@@ -14,80 +14,102 @@ export interface AgentData {
 
 export const agents: AgentData[] = [
   {
+    id: "body",
+    name: "Agent Body",
+    icon: Server,
+    color: "from-slate-500 to-slate-700",
+    description: "The root supervisor. Daemonizes and monitors all other organs.",
+    longDescription: "Agent Body acts as the master process supervisor for the Autonomic AI ecosystem. It daemonizes the other organs, monitors their process health, intercepts and unifies their logs, and handles automatic restarts if an organ crashes due to an out-of-memory error.",
+    githubLink: "https://github.com/autonomic-ai-dev/agent-body",
+    span: "col-span-1",
+    features: ["Process Supervision", "Daemonization", "Log Unification", "Self-Healing Restarts"]
+  },
+  {
     id: "brain",
     name: "Agent Brain",
     icon: Brain,
     color: "from-indigo-500 to-purple-500",
-    description: "The core intelligence. Handles reasoning, planning, memory, and orchestration of the entire ecosystem.",
-    longDescription: "Agent Brain is the central orchestrator of the Autonomic AI ecosystem. It acts as the cognitive center, receiving inputs from the Perception layer (Agent Eyes), formulating execution plans, and delegating tasks to other specialized agents. It maintains conversational memory and context across sessions.",
+    description: "The core intelligence. Handles memory, context, and MCP routing.",
+    longDescription: "Agent Brain is the memory and routing substrate. It solves context bloat by storing facts in a temporal SQLite knowledge graph and using filterable HNSW vector search to instantly retrieve relevant rules and context. It also acts as the MCP router for standard AI editors.",
     githubLink: "https://github.com/autonomic-ai-dev/agent-brain",
     span: "md:col-span-2 md:row-span-2",
-    features: ["LLM Integration", "Task Delegation", "Memory Management", "Execution Planning"]
-  },
-  {
-    id: "nerves",
-    name: "Agent Nerves",
-    icon: GitBranch,
-    color: "from-emerald-500 to-teal-500",
-    description: "Fast reflex and routing. Connects signals across agents with low latency.",
-    longDescription: "Agent Nerves acts as the high-speed communication bus between all agents in the ecosystem. It uses WebSockets and fast message queues to ensure signals, tasks, and telemetry data are routed to their correct destinations with minimal latency.",
-    githubLink: "https://github.com/autonomic-ai-dev/agent-nerves",
-    span: "col-span-1",
-    features: ["Message Queueing", "Low Latency Routing", "Event Bus", "WebSocket Streams"]
-  },
-  {
-    id: "heart",
-    name: "Agent Heart",
-    icon: Heart,
-    color: "from-rose-500 to-pink-500",
-    description: "System vitality. Monitors agent health, heartbeats, and self-healing.",
-    longDescription: "Agent Heart is responsible for the resilience of the ecosystem. It constantly monitors the heartbeat of all other agents, detects crashes or unresponsiveness, and triggers self-healing protocols to restart or recover failed components automatically.",
-    githubLink: "https://github.com/autonomic-ai-dev/agent-heart",
-    span: "col-span-1",
-    features: ["Health Checks", "Self-Healing", "Crash Recovery", "Uptime Monitoring"]
-  },
-  {
-    id: "muscle",
-    name: "Agent Muscle",
-    icon: Activity,
-    color: "from-orange-500 to-amber-500",
-    description: "Heavy lifting. Executes massive parallel tasks, builds, and intensive compute.",
-    longDescription: "Agent Muscle handles the 'heavy lifting' of the ecosystem. It spawns secure, isolated environments to run builds, tests, or massive data processing tasks concurrently, returning the results back to the Nerves without blocking the cognitive layer.",
-    githubLink: "https://github.com/autonomic-ai-dev/agent-muscle",
-    span: "col-span-1",
-    features: ["Concurrent Execution", "Isolated Containers", "Build Pipelines", "Heavy Compute"]
-  },
-  {
-    id: "immune",
-    name: "Agent Immune",
-    icon: ShieldAlert,
-    color: "from-blue-500 to-cyan-500",
-    description: "Security and defense. Analyzes threats and enforces safety protocols.",
-    longDescription: "Agent Immune is the security guard of the Autonomic ecosystem. It analyzes incoming webhooks, pull requests, and external payloads for malicious patterns, enforcing strict safety protocols to ensure the system cannot be compromised.",
-    githubLink: "https://github.com/autonomic-ai-dev/agent-immune",
-    span: "col-span-1",
-    features: ["Threat Detection", "Payload Validation", "Security Analysis", "Access Control"]
+    features: ["Knowledge Graph", "HNSW Vector Retrieval", "MCP Router", "Temporal Memory"]
   },
   {
     id: "spine",
     name: "Agent Spine",
     icon: Layers,
     color: "from-slate-500 to-slate-400",
-    description: "Structural integrity. Manages base protocols and physical infrastructure.",
-    longDescription: "Agent Spine handles the foundational protocols and infrastructure provisioning required by the other agents. It ensures that the database, caching layers, and external service connections are robust and correctly configured.",
+    description: "Deterministic execution engine. Manages structured DAG workflows.",
+    longDescription: "Agent Spine enforces structured execution through YAML-defined DAG pipelines. It ensures that every step in an AI workflow is deterministic, replayable, and isolated. It supports parallel fan-out, immutable state snapshots, and human-in-the-loop approval gates.",
     githubLink: "https://github.com/autonomic-ai-dev/agent-spine",
     span: "col-span-1",
-    features: ["Infrastructure Provisioning", "Base Protocols", "Database Management", "Service Connections"]
+    features: ["DAG Workflows", "Immutable Snapshots", "Error Handling", "Approval Gates"]
+  },
+  {
+    id: "heart",
+    name: "Agent Heart",
+    icon: Heart,
+    color: "from-rose-500 to-pink-500",
+    description: "Maintenance daemon. Enforces token budgets and runs scheduled GC.",
+    longDescription: "Agent Heart acts as the financial governor and garbage collector of the ecosystem. It strictly enforces token budgets to prevent runaway LLM costs, and runs periodic CRON routines to deduplicate facts, vacuum vector indexes, and clear expired memories.",
+    githubLink: "https://github.com/autonomic-ai-dev/agent-heart",
+    span: "col-span-1",
+    features: ["Token Budgeting", "Garbage Collection", "CRON Maintenance", "Storage Vacuuming"]
+  },
+  {
+    id: "nerves",
+    name: "Agent Nerves",
+    icon: Radio,
+    color: "from-emerald-500 to-teal-500",
+    description: "Async event bus. Coordinates organs via NATS JetStream.",
+    longDescription: "Agent Nerves acts as the high-speed, decentralized communication bus between all organs. It manages a local NATS JetStream server, allowing organs to publish state changes and subscribe to relevant events with guaranteed at-least-once durable delivery.",
+    githubLink: "https://github.com/autonomic-ai-dev/agent-nerves",
+    span: "col-span-1",
+    features: ["NATS JetStream", "Pub/Sub Architecture", "Durable Subscriptions", "WASM Event Filters"]
+  },
+  {
+    id: "muscle",
+    name: "Agent Muscle",
+    icon: Cpu,
+    color: "from-orange-500 to-amber-500",
+    description: "Execution actuator. Runs commands via JSON contracts and fine-tunes models.",
+    longDescription: "Agent Muscle handles physical actuation on the host machine. It executes shell commands enforcing strict JSON output schemas to prevent parsing errors. It also orchestrates local LoRA fine-tuning jobs using pluggable backends like Apple MLX or Candle.",
+    githubLink: "https://github.com/autonomic-ai-dev/agent-muscle",
+    span: "col-span-1",
+    features: ["JSON Output Contracts", "Shell Execution", "LoRA Fine-Tuning", "Dataset Validation"]
+  },
+  {
+    id: "immune",
+    name: "Agent Immune",
+    icon: Shield,
+    color: "from-blue-500 to-cyan-500",
+    description: "Security layer. Scans dependencies and runs sandboxed execution.",
+    longDescription: "Agent Immune protects the ecosystem with three-layer defense: it queries OSV databases for dependency vulnerabilities, enforces seccomp or Firecracker isolation for untrusted LLM code, and audits post-execution memory logs for OOM violations.",
+    githubLink: "https://github.com/autonomic-ai-dev/agent-immune",
+    span: "col-span-1",
+    features: ["OSV Dependency Scanning", "Seccomp Sandboxing", "Firecracker MicroVMs", "Memory Auditing"]
   },
   {
     id: "eyes",
     name: "Agent Eyes",
-    icon: Cpu,
+    icon: Eye,
     color: "from-yellow-400 to-orange-400",
-    description: "Perception and vision. Analyzes visual data and UI elements.",
-    longDescription: "Agent Eyes acts as the sensory input for the ecosystem. It receives visual data, UI screenshots, and external webhooks (like GitHub events), parses them into structured data, and sends the signals to the Brain for processing.",
+    description: "Visual observability. Provides DOM indexing and local VLM inference.",
+    longDescription: "Agent Eyes allows the ecosystem to reason about visual state. It parses UI layouts into DOM indexes, captures Playwright screenshots, computes structural pixel diffs via SSIM, and runs native, local LLaVA vision-language inference to identify visual regressions.",
     githubLink: "https://github.com/autonomic-ai-dev/agent-eyes",
     span: "col-span-1",
-    features: ["Webhook Parsing", "Visual Analysis", "Sensory Input", "Data Structuring"]
+    features: ["DOM Indexing", "SSIM Pixel Diffs", "Local LLaVA VLM", "Playwright Automation"]
+  },
+  {
+    id: "mouth",
+    name: "Agent Mouth",
+    icon: MessageSquare,
+    color: "from-teal-400 to-emerald-400",
+    description: "Communication daemon. Handles webhooks and log summarization.",
+    longDescription: "Agent Mouth routes outbound signals. When an organ triggers a critical event (like a security alert or deployment success), Mouth translates it into semantic payloads for configured webhooks (Slack, Discord). It can also synthesize dense JSON logs into human-readable summaries.",
+    githubLink: "https://github.com/autonomic-ai-dev/agent-mouth",
+    span: "col-span-1",
+    features: ["Webhook Routing", "Log Summarization", "Notification Delivery", "Semantic Formatting"]
   }
 ];

@@ -1,0 +1,288 @@
+---
+title: CLI Reference
+---
+
+# Command Line Interface (CLI)
+
+The Autonomic ecosystem is primarily managed through two main CLIs: `autonomic` (the meta-orchestrator) and `agent-brain` (the local context engine).
+
+## `autonomic` (agent-body)
+
+The `autonomic` CLI manages the lifecycle of the system, acting as a supervisor that orchestrates the individual daemons.
+
+### Initialization
+
+```bash
+autonomic init
+```
+Creates the workspace directory at `~/.autonomic/` and generates the default unified `config.toml`. This command sets up the isolated folders for `logs`, `memory`, `state`, and `broker`.
+
+### Daemon Lifecycle
+
+```bash
+autonomic start [organ_name]
+```
+Boots up the entire multi-organ ecosystem. Daemons are started in dependency order (e.g., `nats-server`, then `agent-nerves`, then `agent-heart`, then the rest). 
+- If `organ_name` is provided, it starts only that specific organ.
+- The `agent-body` process acts as an ongoing supervisor. If an organ exits unexpectedly, it will automatically restart it.
+
+```bash
+autonomic stop [organ_name]
+```
+Gracefully terminates the ecosystem daemons in reverse-dependency order.
+
+```bash
+autonomic restart
+```
+A convenience wrapper to stop and then start all supervised daemons.
+
+### Monitoring
+
+```bash
+autonomic status
+```
+Prints a table of all supervised organs, their current Process IDs (PIDs), whether they are currently running, if their HTTP healthcheck is passing, and the absolute path to their log files.
+
+```bash
+autonomic logs <organ_name>
+```
+Tails the background output logs for the specified organ daemon (equivalent to `tail -f ~/.autonomic/logs/supervisor/<organ>.log`).
+
+```bash
+autonomic doctor
+```
+Verifies the health of your installation. It checks that all 9 organ binaries exist in your PATH, validates your `config.toml`, and checks for legacy configurations.
+
+---
+
+## `agent-brain`
+
+While `agent-brain` runs headlessly as an MCP server, its CLI is used to manage skill packages, index data, and integrate with your code editors.
+
+### Setup and Integration
+
+```bash
+agent-brain install --global
+```
+The most important command for getting started. It installs the `agent-brain` MCP server into your local environment, automatically configuring `mcp.json` or `claude_desktop_config.json` for popular editors (Cursor, VSCode, Claude Desktop, Claude Code).
+
+*Options:*
+- `--all`: Installs for every supported IDE found on the machine.
+- `--reload`: Bumps the binary build signature (useful after running `cargo build` manually).
+
+### Package Management
+
+```bash
+agent-brain add <owner/repo>
+```
+Downloads, installs, and indexes a skill package directly from GitHub. For example, `agent-brain add @nextjs` installs the curated Next.js rules and skills into your local brain.
+
+```bash
+agent-brain package list
+agent-brain package update
+agent-brain package remove <package_name>
+```
+Commands to view, update, and remove your installed skill packages.
+
+### Memory Operations
+
+```bash
+agent-brain index
+```
+Forces a full rebuild of the local Knowledge Graph index in SQLite. Use this if you manually edit skill files or rules on disk.
+
+```bash
+agent-brain sync git
+agent-brain sync cloud
+```
+Synchronizes your `brain.db` bundle to a remote Git repository or an encrypted cloud bucket (S3/R2/MinIO). Perfect for keeping context synchronized between a laptop and a workstation.
+
+### Diagnostics
+
+```bash
+agent-brain briefing
+```
+Outputs a detailed summary of the last `route_task` operation, showing exactly which skills and rules were injected into the agent's context, and the estimated token savings compared to a naive full-index load.
+
+---
+
+## `agent-spine`
+
+`agent-spine` manages stateful YAML workflows, executing complex DAGs with conditional gates. Its CLI provides tools to validate, run, and inspect these workflows.
+
+### Workflow Management
+
+```bash
+agent-spine validate <file.yaml>
+```
+Parses and validates a YAML workflow definition, checking for syntax errors, missing fields, or circular dependencies in the DAG without actually executing anything.
+
+```bash
+agent-spine run <file.yaml>
+```
+Executes a workflow locally. This will dispatch events to the NATS bus, wait for the corresponding organs to process the tasks, and evaluate any conditional logic defined in the YAML.
+
+### Inspection and API
+
+```bash
+agent-spine inspect <run-id>
+```
+Inspects the history and immutable snapshots of a specific execution run.
+
+```bash
+agent-spine serve
+```
+Boots the background daemon and serves the Live Dashboard API on port `3100`, providing real-time visibility into workflow execution.
+
+---
+
+## `agent-heart`
+
+`agent-heart` runs in the background to handle garbage collection, dataset distillation, and cluster health.
+
+### Maintenance
+
+```bash
+agent-heart gc
+```
+Forces a one-time garbage collection sweep across the system. This cleans up orphaned workflow artifacts and prunes stale temporal memories.
+
+```bash
+agent-heart budget
+```
+Accesses predictive token budget tools. It analyzes the retrieval logs generated by `agent-brain` to help operators predict and manage token expenditure.
+
+### Learning and Distillation
+
+```bash
+agent-heart distill
+```
+Compresses and learns from cluster execution traces, synthesizing successful workflows into new `must_apply` rules or skill drafts.
+
+---
+
+## `agent-nerves`
+
+`agent-nerves` serves as the networking and event-bus bridge, interacting directly with the underlying NATS/JetStream infrastructure.
+
+### Traffic and Routing
+
+```bash
+agent-nerves stream
+```
+Inspects and tails NATS/JetStream traffic in real-time. Useful for debugging event dispatch issues between organs.
+
+```bash
+agent-nerves filter
+```
+Registers and manages custom event filters (written in JSON or WASM) to selectively route or drop events before they reach the organs.
+
+```bash
+agent-nerves cluster
+```
+Manages multi-node cluster coordination, allowing you to link multiple Autonomic environments together.
+
+---
+
+## `agent-muscle`
+
+`agent-muscle` handles all heavy lifting, including remote sandboxed execution, LoRA fine-tuning, and GPU interactions.
+
+### Execution
+
+```bash
+agent-muscle run <cmd>
+```
+Runs a specific command and streams the output securely back to the caller.
+
+### Training and ML
+
+```bash
+agent-muscle train
+```
+Triggers a LoRA fine-tuning run using MLX, candle, or auto-detecting the best available ML backend for the host machine.
+
+```bash
+agent-muscle operator
+```
+Interfaces with Kubernetes to manage distributed GPU training operators.
+
+---
+
+## `agent-immune`
+
+`agent-immune` enforces strict security boundaries, dependency checking, and execution isolation.
+
+### Scanning and Verification
+
+```bash
+agent-immune scan <manifest>
+```
+Scans a package manifest (e.g., `package.json`, `Cargo.toml`) for vulnerable dependencies against the OSV database.
+
+```bash
+agent-immune verify-memory
+```
+Verifies that a specific script has no runaway memory growth before allowing it to be used in dataset generation.
+
+### Sandboxing
+
+```bash
+agent-immune sandbox <script>
+```
+Executes a script within a strictly network-isolated sandbox environment.
+
+---
+
+## `agent-eyes`
+
+`agent-eyes` provides visual QA, UI verification, and DOM analysis.
+
+### Visual Analysis
+
+```bash
+agent-eyes capture <url>
+```
+Navigates to the specified URL and captures a headless screenshot.
+
+```bash
+agent-eyes diff <img1> <img2>
+```
+Performs a pixel-perfect differential analysis between two images to detect UI regressions.
+
+```bash
+agent-eyes vlm
+```
+Invokes the native local Vision-Language Model (LLaVA via candle) to describe or verify UI elements.
+
+### DOM Operations
+
+```bash
+agent-eyes dom
+```
+Indexes and searches the current web application's DOM, storing the graph in a local SQLite database for rapid contextual lookup by the agent.
+
+---
+
+## `agent-mouth`
+
+`agent-mouth` manages all external communication, slack approvals, and output summarization.
+
+### Communication
+
+```bash
+agent-mouth send <msg>
+```
+Dispatches a notification message via configured external webhooks (e.g., Slack, Discord).
+
+```bash
+agent-mouth summarize
+```
+Summarizes long command output piped directly from `stdin`. Perfect for digesting massive compiler errors before sending them back to the LLM context.
+
+### Policy Enforcement
+
+```bash
+agent-mouth validate <script>
+```
+Validates a bash command or script against the system's Abstract Syntax Tree (AST) policies before allowing it to be transmitted.

@@ -63,7 +63,7 @@ Heart's garbage collection runs in three phases:
 
 ## Integrated Mode
 
-`autonomic start` supervises Heart as a background daemon. Spine calls `/budget/check` automatically before every pipeline execution. If budget is low, Heart can emit a `budget.low` event through Nerves, which triggers a notification workflow via Ears or a configured `Slack` webhook.
+`autonomic start` supervises Heart as a background daemon. Spine calls `/budget/check` automatically before every pipeline execution. If budget is low, Heart can emit a `budget.low` event through Nerves, which triggers a notification workflow via Mouth or a configured `Slack` webhook.
 
 ## Design Decisions
 

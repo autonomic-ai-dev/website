@@ -24,7 +24,7 @@
   <canvas use:particles class="fixed inset-0 z-0 pointer-events-none opacity-40"></canvas>
 
   <!-- Navigation -->
-  <nav class="fixed top-0 w-full z-50 glass border-b-0 border-white/5">
+    <nav class="fixed top-0 w-full z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur-lg border-b border-slate-200 dark:border-white/10">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
       <a href="/" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
         <img src="/logo.png" alt="Autonomic AI Logo" class="w-10 h-10 object-contain rounded-xl shadow-lg shadow-brand-500/20" />
@@ -32,10 +32,10 @@
       </a>
       
       <div class="hidden md:flex items-center gap-8">
-        <a href="/#ecosystem" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Agents</a>
-        <a href="/docs" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Docs</a>
-        <a href="/blog" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Blog</a>
-        <a href="https://agent-ci-dashboard.vercel.app" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-full text-sm font-medium bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all backdrop-blur-md flex items-center gap-2 group">
+        <a href="/#ecosystem" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">Agents</a>
+        <a href="/docs" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">Docs</a>
+        <a href="/blog" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">Blog</a>
+        <a href="https://agent-ci-dashboard.vercel.app" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-full text-sm font-medium bg-brand-600 hover:bg-brand-500 text-white transition-all flex items-center gap-2 group">
           <span>Mission Control</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
@@ -44,7 +44,7 @@
       <!-- Mobile Controls -->
       <div class="flex items-center gap-2 md:hidden">
         <button 
-          class="p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+          class="p-2 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
           onclick={() => isMobileMenuOpen = !isMobileMenuOpen}
           aria-label="Toggle menu"
         >
@@ -59,7 +59,7 @@
 
     <!-- Mobile Menu Overlay -->
     {#if isMobileMenuOpen}
-      <div class="md:hidden absolute top-20 left-0 w-full glass border-b border-slate-200 dark:border-white/10 p-6 flex flex-col gap-6 shadow-2xl animate-in slide-in-from-top-2">
+      <div class="md:hidden absolute top-20 left-0 w-full bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-white/10 p-6 flex flex-col gap-6 shadow-2xl animate-in slide-in-from-top-2">
         <a href="/#ecosystem" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Agents</a>
         <a href="/docs" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Docs</a>
         <a href="/blog" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Blog</a>

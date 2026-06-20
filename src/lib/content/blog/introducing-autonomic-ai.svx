@@ -11,8 +11,9 @@ Autonomic AI is not another agent framework. It is an operating system for auton
 
 ## The Biological Metaphor, Precisely
 
-The architecture mirrors the human autonomic nervous system — the part that keeps your heart beating and your lungs breathing without conscious thought. We have eight organs:
+The architecture mirrors the human autonomic nervous system — the part that keeps your heart beating and your lungs breathing without conscious thought. We have nine organs:
 
+- **Body** — the supervisor that daemonizes and restarts all other organs
 - **Brain** — context engine, memory, `MCP` routing
 - **Spine** — deterministic workflow `DAG` execution
 - **Heart** — maintenance daemon, `GC` scheduling, token budgeting
@@ -20,7 +21,7 @@ The architecture mirrors the human autonomic nervous system — the part that ke
 - **Muscle** — command execution and `LoRA` fine-tuning
 - **Immune** — dependency scanning, sandboxed execution, memory verification
 - **Eyes** — visual QA, `DOM` indexing, screenshot diffs
-- **Ears** — voice interface for spoken interaction
+- **Mouth** — communication, webhooks, and log summarization
 
 Each organ exposes an `HTTP` API, registers with the event bus, and can be health-checked independently. No single organ failure takes down the whole system.
 
