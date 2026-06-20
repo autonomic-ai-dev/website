@@ -1,11 +1,14 @@
 <script lang="ts">
   import { Brain, Heart, Activity, GitBranch, ShieldAlert, Cpu, Layers } from "lucide-svelte";
   import { agents } from "$lib/data/agents";
+  import { inview } from "$lib/actions/inview";
+  import { spotlight } from "$lib/actions/spotlight";
+  import { tilt } from "$lib/actions/tilt";
 </script>
 
 <!-- Hero Section -->
 <section class="relative pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
-  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-brand-500/30 text-sm font-medium text-brand-300 mb-8 animate-float">
+  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-brand-500/30 text-sm font-medium text-brand-300 mb-8">
     <span class="relative flex h-2 w-2">
       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
       <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
@@ -45,8 +48,10 @@
       {@const Icon = agent.icon}
       <a 
         href={`/agents/${agent.id}`} 
-        class="glass-card p-8 flex flex-col justify-between group relative overflow-hidden h-full {agent.span} animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both"
-        style="animation-delay: {50 * agent.id.length}ms;"
+        use:spotlight
+        use:tilt={{ max: 10, scale: 1.02 }}
+        use:inview={{ delay: 50 * agent.id.length }}
+        class="glass-card spotlight-card p-8 flex flex-col justify-between group relative overflow-hidden h-full {agent.span} reveal-hidden"
       >
         <!-- Background Gradient Hover -->
         <div class="absolute inset-0 bg-gradient-to-br {agent.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
@@ -70,7 +75,10 @@
       href="https://agent-ci-dashboard.vercel.app" 
       target="_blank" 
       rel="noopener noreferrer" 
-      class="glass-card p-8 flex flex-col justify-between group relative overflow-hidden h-full md:col-span-2 bg-gradient-to-br from-[#0B0F19] to-slate-900 border-brand-500/30 animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-both delay-300"
+      use:spotlight
+      use:tilt={{ max: 5, scale: 1.01 }}
+      use:inview={{ delay: 300 }}
+      class="glass-card spotlight-card p-8 flex flex-col justify-between group relative overflow-hidden h-full md:col-span-2 bg-gradient-to-br from-[#0B0F19] to-slate-900 border-brand-500/30 reveal-hidden"
     >
       <div class="absolute right-0 top-0 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl group-hover:bg-brand-500/30 transition-colors"></div>
       <div>
@@ -87,7 +95,7 @@
 
 <!-- Features Section -->
 <section id="features" class="py-24 px-6 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800">
-  <div class="mb-16 text-center">
+  <div use:inview class="mb-16 text-center reveal-hidden">
     <h2 class="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">Built for Autonomy</h2>
     <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">Our agents aren't just scripts. They are continuously running, self-aware services designed for resilience.</p>
   </div>
@@ -130,7 +138,7 @@
 
 <!-- Architecture Flow Section -->
 <section id="architecture" class="py-24 px-6 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800">
-  <div class="mb-16 text-center">
+  <div use:inview class="mb-16 text-center reveal-hidden">
     <h2 class="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">How It Works</h2>
     <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">A continuous loop of perception, cognition, and execution.</p>
   </div>
@@ -182,7 +190,7 @@
   <div class="absolute inset-0 bg-brand-600/5 dark:bg-brand-600/10"></div>
   <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-brand-500/20 blur-[100px] rounded-full pointer-events-none"></div>
   
-  <div class="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
+  <div use:inview class="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center reveal-hidden">
     <h2 class="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white mb-6">Ready to launch?</h2>
     <p class="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl">
       The Autonomic Ecosystem is open source. Fork the agents, set up your Mission Control, and let the AI build your software.
