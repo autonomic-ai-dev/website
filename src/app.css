@@ -46,18 +46,16 @@
   }
 }
 
-@layer utilities {
-  .glass {
-    @apply bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/20 dark:border-white/10;
-  }
-  
-  .glass-card {
-    @apply glass rounded-2xl shadow-xl hover:shadow-brand-500/20 transition-all duration-300;
-  }
-  
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-500 to-accent-500;
-  }
+@utility glass {
+  @apply bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/20 dark:border-white/10;
+}
+
+@utility glass-card {
+  @apply bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-2xl shadow-xl hover:shadow-brand-500/20 transition-all duration-300;
+}
+
+@utility text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-500 to-accent-500;
 }
 
 /* Custom Animations */

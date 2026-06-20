@@ -100,6 +100,7 @@
 
   <div class="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-[200px]">
     {#each agents as agent}
+      {@const Icon = agent.icon}
       <a 
         href={agent.link} 
         target="_blank" 
@@ -111,7 +112,6 @@
         
         <div>
           <div class="w-12 h-12 rounded-xl bg-slate-800/50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-            {@const Icon = agent.icon}
             <Icon class="text-white" size={24} />
           </div>
           <h3 class="text-2xl font-bold text-white mb-2">{agent.name}</h3>
