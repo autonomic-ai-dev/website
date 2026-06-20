@@ -1,12 +1,33 @@
 <script lang="ts">
   import "../app.css";
   import { onMount } from "svelte";
+  import { Menu, X, Sun, Moon } from "lucide-svelte";
   let { children } = $props();
 
+  let isMobileMenuOpen = $state(false);
+  let isDarkMode = $state(true);
+
   onMount(() => {
-    // Force dark mode for that premium feel
-    document.documentElement.classList.add('dark');
+    // Check system preference or localStorage
+    const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    isDarkMode = isDark;
+    updateTheme(isDark);
   });
+
+  function toggleTheme() {
+    isDarkMode = !isDarkMode;
+    updateTheme(isDarkMode);
+  }
+
+  function updateTheme(dark: boolean) {
+    if (dark) {
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
+    }
+  }
 </script>
 
 <svelte:head>
@@ -34,14 +55,64 @@
       </div>
       
       <div class="hidden md:flex items-center gap-8">
-        <a href="#agents" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Agents</a>
-        <a href="#ecosystem" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Ecosystem</a>
-        <a href="https://agent-ci-dashboard.vercel.app" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-full text-sm font-medium bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all backdrop-blur-md flex items-center gap-2 group">
+        <a href="/#agents" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white transition-colors">Agents</a>
+        <a href="/docs" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white transition-colors">Docs</a>
+        <a href="/blog" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white transition-colors">Blog</a>
+        <a href="https://agent-ci-dashboard.vercel.app" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-full text-sm font-medium bg-slate-900/10 dark:bg-white/10 hover:bg-slate-900/20 dark:hover:bg-white/20 text-slate-900 dark:text-white border border-slate-900/10 dark:border-white/10 transition-all backdrop-blur-md flex items-center gap-2 group">
           <span>Mission Control</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
+        <button 
+          onclick={toggleTheme} 
+          class="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-white/10"
+          aria-label="Toggle theme"
+        >
+          {#if isDarkMode}
+            <Sun size={20} />
+          {:else}
+            <Moon size={20} />
+          {/if}
+        </button>
+      </div>
+
+      <!-- Mobile Controls (Theme + Menu) -->
+      <div class="flex items-center gap-2 md:hidden">
+        <button 
+          onclick={toggleTheme} 
+          class="p-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors rounded-full"
+          aria-label="Toggle theme"
+        >
+          {#if isDarkMode}
+            <Sun size={20} />
+          {:else}
+            <Moon size={20} />
+          {/if}
+        </button>
+        <button 
+          class="p-2 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-colors"
+          onclick={() => isMobileMenuOpen = !isMobileMenuOpen}
+          aria-label="Toggle menu"
+        >
+          {#if isMobileMenuOpen}
+            <X size={24} />
+          {:else}
+            <Menu size={24} />
+          {/if}
+        </button>
       </div>
     </div>
+
+    <!-- Mobile Menu Overlay -->
+    {#if isMobileMenuOpen}
+      <div class="md:hidden absolute top-20 left-0 w-full glass border-b border-slate-200 dark:border-white/10 p-6 flex flex-col gap-6 shadow-2xl animate-in slide-in-from-top-2">
+        <a href="/#agents" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Agents</a>
+        <a href="/docs" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Docs</a>
+        <a href="/blog" onclick={() => isMobileMenuOpen = false} class="text-lg font-medium text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-white">Blog</a>
+        <a href="https://agent-ci-dashboard.vercel.app" target="_blank" rel="noopener noreferrer" class="px-5 py-3 mt-2 rounded-xl text-center font-bold bg-gradient-to-r from-brand-600 to-accent-600 text-white shadow-lg">
+          Launch Mission Control
+        </a>
+      </div>
+    {/if}
   </nav>
 
   <!-- Main Content -->
