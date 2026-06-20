@@ -1,0 +1,89 @@
+---
+title: "Agent Muscle: Command Execution and Fine-Tuning Actuator"
+date: "2026-06-21"
+excerpt: "How agent-muscle provides safe subprocess execution with JSON output contracts, dataset validation gates, and pluggable training backends."
+slug: "agent-muscle-actuator-training"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Agent Muscle is the execution arm of Autonomic AI. It runs shell commands, builds artifacts, and fine-tunes models. The design constraint is that every execution must produce structured `JSON` output — no freeform stdout parsing, no exit-code-only error handling.
+
+## Architecture
+
+Muscle has two subsystems: the executor and the trainer.
+
+The executor receives a command specification and runs it in a subprocess:
+
+```json
+{
+  "command": "cargo test",
+  "args": ["--test", "integration", "--", "--nocapture"],
+  "env": {
+    "RUST_LOG": "debug",
+    "DATABASE_URL": "postgres://localhost/test"
+  },
+  "timeout_ms": 300000,
+  "output_schema": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "result": { "type": "string", "enum": ["passed", "failed"] },
+        "duration_ms": { "type": "integer" }
+      }
+    }
+  }
+}
+```
+
+Output is captured as `JSON Lines`. The executor validates that the output conforms to a schema declared in the command spec. If the schema validation fails, the execution is marked as failed even if the process exited zero. This prevents silently accepting malformed output.
+
+The trainer handles `LoRA` fine-tuning. It accepts a dataset specification, a base model reference, and hyperparameters. Training backends are pluggable: `MLX` for `Apple Silicon`, `candle` for `CUDA`, and a generic `K8s` Job backend for cluster training. The dataset validation gate checks that the input data has the expected schema and size bounds before training starts. A `10GB` dataset accidentally pointed at a text file will fail validation, not consume hours of `GPU` time.
+
+```json
+{
+  "model": "mistralai/Mistral-7B-v0.3",
+  "backend": "mlx",
+  "dataset": {
+    "path": "./training-data.jsonl",
+    "schema": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "prompt": { "type": "string" },
+          "completion": { "type": "string" }
+        },
+        "required": ["prompt", "completion"]
+      }
+    },
+    "max_size_mb": 500
+  },
+  "hyperparameters": {
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "learning_rate": 2e-4,
+    "epochs": 3
+  }
+}
+```
+
+## Standalone Mode
+
+`agent-muscle run "cargo test"` executes the command with default timeout and `JSON` output mode. `agent-muscle train --model mistral --dataset ./data.jsonl` runs a `LoRA` fine-tuning session with `MLX` backend, writing checkpoints to `./checkpoints/`.
+
+Muscle can operate as a `CI` step runner — run tests, capture structured output, fail on unexpected output format — without any other organ running.
+
+## Integrated Mode
+
+Connected to the ecosystem, Muscle subscribes to the `execution.*` `JetStream` stream via Nerves. Spine's `Tool` nodes emit execution requests. Results are published back as `execution.completed` events. Heart's budget gate is queried before expensive training jobs start.
+
+Immune integration is critical here: before executing any generated code (code produced by an `LLM` prompt node in spine), spine calls Immune's sandbox check. Only if Immune reports safe does spine dispatch to Muscle.
+
+## Design Decisions
+
+`JSON`-only output is unpopular with developers who want to `echo "done"` and call it a day. We enforce it because every unstructured output in a multi-agent system is a potential parsing failure downstream. Brain's context retrieval, Eyes's visual analysis, and the Mission Control dashboard all consume Muscle output. A freeform stdout string would require brittle regex parsing in each consumer.
+
+Training backends are abstracted behind a trait/interface because hardware configurations vary wildly. A developer on an `M`-series Mac should use `MLX`, while a `CI` runner with an `A100` uses `candle`. The abstraction is leaky — some hyperparameters don't translate across backends — but it covers the 80% use case.

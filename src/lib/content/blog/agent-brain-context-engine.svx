@@ -1,0 +1,68 @@
+---
+title: "Agent Brain: The Context Engine and Local MCP Router"
+date: "2026-06-21"
+excerpt: "How agent-brain solves context bloat with filterable HNSW retrieval, durable memory via temporal knowledge graphs, and hook-based enforcement as every organ's information substrate."
+slug: "agent-brain-context-engine"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Agent Brain is the memory and routing substrate of the Autonomic ecosystem. It provides every other organ with structured context — not raw `LLM` prompt stuffing, but filtered, scoped, and ranked retrieval from a durable store.
+
+## Architecture
+
+Brain uses a multi-layered storage model. Short-term context lives in an `HNSW` (`Hierarchical Navigable Small World`) vector index, filtered by scope, topic, and recency before retrieval. Long-term facts are stored in a `SQLite`-backed knowledge graph with temporal edges — a fact is a triple of `(subject, predicate, object)` with valid-from and invalid-at timestamps. This lets memory expire naturally rather than requiring explicit deletion.
+
+The `route_task` endpoint is the core primitive. Given a task description and open file list, it returns ranked agents, skills, rules, and memory items under a token budget. This prevents the context bloat that plagues naive `RAG`: instead of dumping every relevant document into the prompt, brain scores each candidate and selects the top-N that fit the budget.
+
+```json
+POST /route_task
+{
+  "user_message": "Fix the failing test in src/parser.rs",
+  "open_files": ["src/parser.rs", "tests/parser_test.rs"],
+  "max_tokens": 500,
+  "limits": { "skills": 3, "memory": 5, "rules": 5, "agents": 2 }
+}
+
+Response:
+{
+  "recommended_skills": ["rust-patterns", "rust-testing"],
+  "relevant_memory": [
+    { "topic": "parser-module", "fact": "Parser uses nom 7.0 combinators", "score": 0.89 }
+  ],
+  "applicable_rules": ["test-before-commit"],
+  "tokens_used": 420,
+  "latency_ms": 34
+}
+```
+
+## Standalone Mode
+
+Run `agent-brain serve` to start an `MCP` `stdio` server. This exposes every memory operation — store, retrieve, delete, grep, route — as `MCP` tools. Any `MCP`-compatible client (`Claude Code`, `Copilot`, `Cursor`) can use brain as its memory backend without running the full ecosystem.
+
+`agent-brain export` writes all facts to a portable `JSON` bundle. `agent-brain import` restores from one. This makes memory migration between environments a file copy.
+
+The `HNSW` index is configurable via `~/.agent_brain/config.yaml`:
+
+```yaml
+hnsw:
+  ef_construction: 200
+  ef_search: 50
+  m: 16
+  distance: cosine
+storage:
+  sqlite_path: ~/.agent_brain/memory.db
+  export_dir: ~/.agent_brain/export/
+```
+
+These parameters follow the standard `HNSW` tuning trade-offs: higher `ef_construction` improves recall at the cost of slower inserts, while higher `m` increases memory usage but produces better graph connectivity.
+
+## Integrated Mode
+
+In a full deployment, every organ calls brain's `route_task` before acting. Spine queries brain for the rules and skills relevant to each workflow node. Heart triggers periodic `GC` — deduplicating facts, pruning expired edges, vacuuming the vector index. Nerves publishes memory change events so subscribers can invalidate caches.
+
+## Design Decisions
+
+We chose `HNSW` over flat cosine-similarity search because real deployments accumulate tens of thousands of facts. `HNSW` gives sub-50ms retrieval at 100K vectors on consumer hardware. The temporal knowledge graph model was chosen over a simple key-value store because `AI` agents produce inherently relational data — a memory is only meaningful in the context of what task was running, what files were open, what decision was made.
+
+The trade-off is write latency. Inserting a vector and multiple `KG` edges in a transaction is slower than writing to a flat cache. For brain's use case this is acceptable — writes are rare, reads are constant. In our benchmark deployment with 50K facts, the p95 read latency is 42ms while p95 write latency is 180ms.

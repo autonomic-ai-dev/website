@@ -1,0 +1,72 @@
+---
+title: "Agent Heart: The Background GC Scheduler and Token Budget Gate"
+date: "2026-06-21"
+excerpt: "How agent-heart keeps the ecosystem healthy with scheduled garbage collection, token budget enforcement, and cron-based maintenance routines."
+slug: "agent-heart-maintenance-daemon"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Agent Heart is the maintenance daemon that keeps the Autonomic ecosystem from collapsing under its own weight. Without it, memory grows unbounded, token budgets get exhausted mid-workflow, and stale facts accumulate in the brain's knowledge graph.
+
+## Architecture
+
+Heart runs two kinds of work: scheduled maintenance and on-demand budget checking.
+
+Scheduled maintenance is defined as `cron` expressions in the Heart config. The default schedule includes: agent-brain garbage collection every 6 hours (dedup, prune expired facts, vacuum vector index), health-check pings to every registered organ every 60 seconds, and log rotation for workflow snapshots older than 7 days.
+
+```yaml
+# ~/.autonomic/heart.yaml
+schedules:
+  - name: brain-gc
+    cron: "0 */6 * * *"
+    action: gc
+    params:
+      max_age_days: 90
+      min_confidence: 0.3
+
+  - name: health-ping
+    cron: "* * * * *"
+    action: health_check
+    params:
+      timeout_ms: 5000
+
+  - name: log-rotate
+    cron: "0 0 * * *"
+    action: prune_snapshots
+    params:
+      older_than_days: 7
+
+budget:
+  default_limit: 100000
+  per_organ:
+    brain: 50000
+    spine: 30000
+    eyes: 20000
+```
+
+The token budget gate is a `POST` endpoint at `/budget/check`. Spine calls this before executing a pipeline. Heart evaluates the expected token cost against the current budget — computed from recent `API` usage, remaining quota, and configured limits. If the budget is insufficient, Heart returns a `429` with a `Retry-After` header. This prevents expensive workflows from starting when they can't complete.
+
+## GC Algorithm
+
+Heart's garbage collection runs in three phases:
+
+1. **Expiry scan**: queries brain's `SQLite` store for facts where `invalid_at < now()` and marks them as archived
+2. **Deduplication**: identifies facts with identical `(subject, predicate, object)` triples and merges confidence scores using a weighted average
+3. **Vacuum**: runs `VACUUM` on `SQLite` and rebuilds the `HNSW` index to reclaim space from deleted vectors
+
+## Standalone Mode
+
+`agent-heart gc` runs a one-shot garbage collection cycle. It connects to brain's `SQLite` store, finds facts past their `invalid_at` timestamp, removes orphaned vector embeddings, and runs `VACUUM` on the database. This is useful as a `cron` job even without the full ecosystem.
+
+`agent-heart budget` prints current usage statistics — tokens spent this period, remaining quota, estimated cost per organ.
+
+## Integrated Mode
+
+`autonomic start` supervises Heart as a background daemon. Spine calls `/budget/check` automatically before every pipeline execution. If budget is low, Heart can emit a `budget.low` event through Nerves, which triggers a notification workflow via Ears or a configured `Slack` webhook.
+
+## Design Decisions
+
+Budget enforcement at the workflow level rather than the token level was chosen after observing that per-token accounting introduces unacceptable latency overhead. Checking budget at pipeline granularity adds ~5ms per workflow and catches the expensive cases — a workflow that would consume 50K tokens is stopped before it starts, not mid-execution.
+
+The `cron`-based `GC` schedule is configurable but defaults conservative. Aggressive `GC` (hourly) would keep the knowledge graph smaller at the cost of increased write amplification from brain's fact rewrites. Every 6 hours is a balance point that keeps the database under `500MB` in our benchmark deployments.

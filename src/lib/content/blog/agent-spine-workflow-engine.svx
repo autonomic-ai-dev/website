@@ -1,0 +1,91 @@
+---
+title: "Agent Spine: Deterministic Workflow DAG Engine"
+date: "2026-06-21"
+excerpt: "How agent-spine enforces structured execution through YAML-defined DAG pipelines, immutable snapshots, parallel fan-out, and human-in-the-loop approval gates."
+slug: "agent-spine-workflow-engine"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Agent Spine is the deterministic execution engine that prevents `AI` workflows from turning into spaghetti. Every pipeline is a directed acyclic graph of typed nodes — no cycles, no implicit control flow, no surprises.
+
+## Architecture
+
+A pipeline is defined in `YAML`. Each node has a type, inputs, outputs, and optional error handlers. The node types are:
+
+- **Prompt** — calls an `LLM` with a template and returns structured output
+- **Tool** — executes a shell command or `HTTP` request
+- **Gate** — evaluates a condition and branches (success or skip)
+- **Approval** — pauses execution and sends a notification; resumes only on manual approve or reject
+- **Event** — emits a typed event to the event bus
+- **Subworkflow** — invokes another pipeline, with its own snapshot isolation
+
+At every node boundary, spine takes an immutable snapshot of the workflow state — all inputs, outputs, and metadata up to that point. This enables full replay: given a snapshot, spine can re-execute from any node with identical results.
+
+```json
+{
+  "snapshot_id": "snap_abc123",
+  "run_id": "run_456def",
+  "pipeline": "security-fix-pr",
+  "node": "apply_patch",
+  "inputs": {
+    "payload": { "cve_id": "CVE-2026-1234", "file_path": "src/auth.rs" }
+  },
+  "outputs": {
+    "patch": "diff --git a/src/auth.rs b/src/auth.rs\n--- a/src/auth.rs\n+++ b/src/auth.rs\n@@ -42,6 +42,7 @@"
+  },
+  "timestamp": "2026-06-21T10:00:00Z"
+}
+```
+
+## Error Handling
+
+Every node can declare an `on_error` handler. Unlike try-catch in general-purpose code, spine error handlers are themselves `DAG` nodes — they have access to the failure snapshot and can branch, notify, or retry. A common pattern is a three-attempt retry with exponential backoff before routing to a human approval gate:
+
+```yaml
+nodes:
+  - id: flaky_test
+    type: tool
+    command: cargo test --test integration
+    retry: 3
+    backoff: exponential
+    on_error: [notify_oncall]
+```
+
+## Standalone Mode
+
+`agent-spine run workflow.yaml` executes a pipeline in the current process. Output is written to stdout as `JSON Lines` — one event per state transition. Snapshot files go to `./spine-snapshots/<run-id>/`. This is useful for batch processing, `CI` pipelines, and local testing of workflow logic.
+
+## Integrated Mode
+
+Connected to the ecosystem, spine listens on `:3100` for its event bus. Organs register themselves and publish typed events. A spine workflow can trigger on an event (e.g., `pr.opened`), route through brain for context, call muscle for execution, check immune for security, and end with an approval gate requiring human sign-off. The `BrainRouter` node queries brain's `route_task` to dynamically select which skill or agent to invoke for a given workflow step.
+
+## Design Decisions
+
+The `DAG` constraint is deliberate. In testing, we found that allowing cycles in workflows led to runaway execution — a buggy prompt would loop forever generating and re-generating the same output. A `DAG` with explicit error handlers forces the programmer to think about terminal states. Every pipeline must terminate, either in success or in a named error state.
+
+Parallel fan-out and fan-in are supported natively. A node can emit to multiple downstream nodes that execute concurrently, and a fan-in barrier waits for all branches to complete before proceeding. This mirrors real engineering workflows where linting, testing, and building happen in parallel while deployment waits for all three:
+
+```yaml
+- id: run_all_checks
+  type: fan_out
+  outputs: [lint, test, build]
+
+- id: lint
+  type: tool
+  command: cargo clippy
+
+- id: test
+  type: tool
+  command: cargo test
+
+- id: build
+  type: tool
+  command: cargo build
+
+- id: deploy
+  type: fan_in
+  wait_for: [lint, test, build]
+  type: tool
+  command: cargo deploy
+```

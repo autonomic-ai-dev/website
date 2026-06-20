@@ -1,0 +1,76 @@
+---
+title: "Agent Eyes: Visual QA and Observability Through DOM Intelligence"
+date: "2026-06-21"
+excerpt: "How agent-eyes enables automated visual testing with DOM indexing, screenshot capture, pixel diff analysis, and local LLaVA VLM inference."
+slug: "agent-eyes-observability"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Agent Eyes brings visual observability to the Autonomic ecosystem. It indexes web pages, captures screenshots, computes pixel-level diffs, and runs local vision-language model inference — all as composable tools that spine workflows can chain together.
+
+## Architecture
+
+Eyes operates on web content through four capabilities:
+
+**DOM Indexing.** Given an `HTML` page, Eyes parses the `DOM` tree and extracts a structured index: element positions, computed styles, accessibility attributes, text content, and semantic roles. The index is stored as a `JSON` document that brain can query via `route_task` — enabling context-aware retrieval of `UI` state.
+
+```json
+{
+  "url": "https://app.example.com/dashboard",
+  "timestamp": "2026-06-21T10:00:00Z",
+  "elements": [
+    {
+      "tag": "button",
+      "selector": "#deploy-btn",
+      "text": "Deploy to Production",
+      "rect": { "x": 1200, "y": 80, "width": 180, "height": 40 },
+      "styles": {
+        "background": "#ef4444",
+        "color": "#ffffff",
+        "font-size": "14px"
+      },
+      "aria": {
+        "role": "button",
+        "label": "Deploy to Production"
+      }
+    }
+  ]
+}
+```
+
+**Screenshot Capture.** Eyes uses `Playwright` to render pages and capture full-page screenshots at configurable viewport sizes. Screenshots are stored with a content-hash filename for deduplication. Eyes can capture specific elements by selector, not just the full viewport.
+
+**Pixel Diff.** Given two screenshots (e.g., before and after a code change), Eyes computes a pixel-level diff using the `SSIM` (Structural Similarity Index) algorithm and generates a highlight image showing only the changed regions with a quantitative change percentage. The diff threshold is configurable — a 2% pixel change in layout is typically acceptable, while a 0.5% change in the payment button area triggers an alert.
+
+**Local VLM.** Eyes bundles a local `LLaVA` model (4-bit quantized, ~2GB `VRAM`) for vision-language inference. Given a screenshot and a prompt like "describe the layout of this page" or "find all buttons that lack hover styles," Eyes returns structured observations:
+
+```json
+{
+  "observations": [
+    {
+      "type": "style_issue",
+      "element": ".submit-btn",
+      "description": "Button has no hover state defined",
+      "severity": "warning",
+      "suggestion": "Add :hover { opacity: 0.9; } to .submit-btn"
+    }
+  ]
+}
+```
+
+## Standalone Mode
+
+`agent-eyes describe ./page.html` parses and indexes a local `HTML` file, returning a structured `JSON` index. `agent-eyes capture https://example.com --viewport 1440x900` takes a screenshot. `agent-eyes diff before.png after.png` generates a diff overlay.
+
+These commands work independently and produce files in `./eyes-output/`. Useful for manual visual inspection workflows, `CI` pipeline checks, or accessibility audits.
+
+## Integrated Mode
+
+In a full ecosystem, Eyes integrates with spine workflows for automated `UI` regression testing. A typical pipeline: Muscle builds the frontend, Spine starts a dev server, Eyes captures screenshots at defined routes, Eyes diffs against baseline images stored in brain's knowledge graph, and publishes a `visual.diff.ready` event through Nerves. If the diff exceeds a configurable threshold, the workflow gates on human approval before deployment.
+
+## Design Decisions
+
+Running `LLaVA` locally rather than calling a cloud `VLM` `API` was a deliberate trade-off. Cloud `VLMs` provide better accuracy but introduce latency (2-5 seconds per inference), cost per image, and data privacy concerns — screenshots of internal dashboards should not leave the network. The local model is less capable but runs at 50ms per inference on an `M4 Max` and keeps all data on-device.
+
+`DOM` indexing was added after we realized that pixel diffs alone are insufficient for meaningful visual `QA`. A layout shift might produce a large pixel diff even though the content is correct, while a wrong `CSS` color change might produce a small diff that escapes notice. `DOM` indexing lets Eyes reason about semantic changes: "the button moved 20px right" vs. "the button text changed from 'Save' to 'Delete'."

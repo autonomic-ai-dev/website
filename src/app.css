@@ -31,7 +31,7 @@
 
 @layer base {
   :root {
-    --bg-color: #0B0F19; /* Deep dark blue matching the screenshot background */
+    --bg-color: #0B0F19;
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
   }
@@ -40,6 +40,7 @@
     @apply bg-[var(--bg-color)] text-[var(--text-primary)] antialiased transition-colors duration-500;
     scroll-behavior: smooth;
   }
+
 }
 
 @utility glass {

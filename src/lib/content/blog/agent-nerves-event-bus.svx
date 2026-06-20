@@ -1,0 +1,70 @@
+---
+title: "Agent Nerves: The NATS JetStream Messaging Backbone"
+date: "2026-06-21"
+excerpt: "How agent-nerves provides async event-driven coordination across all organs using NATS JetStream, with typed events, stream bootstrapping, and cluster coordination."
+slug: "agent-nerves-event-bus"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Agent Nerves is the nervous system of Autonomic AI — a `NATS JetStream` bridge that every organ connects to for asynchronous communication. Organs do not call each other directly. They publish events and subscribe to streams.
+
+## Architecture
+
+Nerves initializes a set of preconfigured `JetStream` streams at startup. Each stream maps to an event category: `workflow.*`, `memory.*`, `execution.*`, `security.*`, `visual.*`, `system.*`. Events are `JSON`-typed with a schema version field. Subscribers filter by stream and subject pattern using `NATS`'s hierarchical wildcard syntax (`workflow.started`, `workflow.>.error`).
+
+Every event carries a versioned schema:
+
+```json
+{
+  "version": 1,
+  "id": "evt_abc123",
+  "source": "spine",
+  "subject": "workflow.node.completed",
+  "timestamp": "2026-06-21T10:00:00Z",
+  "data": {
+    "pipeline": "security-fix-pr",
+    "node": "apply_patch",
+    "status": "success",
+    "duration_ms": 2340
+  }
+}
+```
+
+The bridge mode means Nerves is a thin layer over `NATS` — it handles stream bootstrapping, `NATS` connection lifecycle, and graceful reconnection. It does not persist events beyond what `JetStream`'s retention policy defines. It does not transform event payloads.
+
+Streams are configured at startup from a `YAML` manifest:
+
+```yaml
+streams:
+  - name: workflow_events
+    subjects: ["workflow.>"]
+    storage: file
+    retention: limits
+    max_age: 168h
+    max_msgs: 100000
+
+  - name: system_health
+    subjects: ["system.>"]
+    storage: memory
+    retention: interest
+    max_msgs: 1000
+```
+
+## Standalone Mode
+
+`agent-nerves ping` checks `NATS` connectivity and returns server version, cluster status, and stream counts. `agent-nerves status` lists every connected client by organ ID, with last-seen timestamps. These are useful for debugging connectivity issues without running the full ecosystem.
+
+`agent-nerves stream ls` lists all active streams and their current message counts. `agent-nerves stream view <name>` tails recent messages from a stream.
+
+## Integrated Mode
+
+In a full deployment, every organ connects to Nerves on startup. Spine publishes `workflow.started`, `workflow.node.completed`, and `workflow.failed` events. Brain publishes `memory.updated` on fact writes. Muscle publishes `execution.started` and `execution.completed`. Immune publishes `security.scan.completed`. Eyes publishes `visual.diff.ready`.
+
+Consumers subscribe to relevant streams. The Mission Control dashboard subscribes to all `workflow.*` and `system.*` events for real-time `UI` updates. Heart subscribes to `system.health.*` for organ status tracking. The reconnection strategy uses exponential backoff with jitter: 1s, 2s, 4s, 8s, capped at 30s — ensuring the system recovers quickly from transient `NATS` outages without hammering the server.
+
+## Design Decisions
+
+We chose `NATS JetStream` over `RabbitMQ`, `Redis Streams`, and `Kafka`. `RabbitMQ` was eliminated because its queue-based model requires explicit binding configuration for every consumer — too much ceremony for a dynamic organ fleet. `Kafka` was eliminated for the opposite reason: it is over-provisioned for our throughput (hundreds of events per second, not millions). `JetStream` offers `Kafka`-like persistence with `NATS`'s operational simplicity — a single binary, no `Zookeeper`, no partitioning complexity.
+
+The typed event schema with versioning was added after an early incident where a schema change in `workflow.node.completed` silently broke the Mission Control dashboard. Now every event carries a `version` field, and consumers check compatibility on subscription.
