@@ -4,7 +4,7 @@ title: Event Bus
 
 # The Event Bus (agent-nerves)
 
-The Autonomic ecosystem is fundamentally decentralized. The 9 core "organs" do not communicate with each other via direct HTTP calls or shared memory. Instead, they operate as entirely independent processes that communicate asynchronously via a central event bus.
+The Autonomic stack uses an **agent mesh** — independent daemons communicate asynchronously via NATS JetStream, not direct HTTP coupling between every pair.
 
 This event bus is managed by the `agent-nerves` daemon, which acts as a bridge to the underlying [NATS server](https://nats.io/) infrastructure.
 

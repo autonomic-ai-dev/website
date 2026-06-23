@@ -4,7 +4,7 @@ title: Maintenance & Budgeting
 
 # Maintenance (agent-heart)
 
-A self-healing system requires a heartbeat. The `agent-heart` organ is a specialized background daemon responsible for the long-term health, garbage collection, and financial safety of the ecosystem.
+`agent-heart` is the **background controller** — scheduled GC, token budget gates, and long-term memory hygiene for the stack.
 
 ## Garbage Collection (GC)
 

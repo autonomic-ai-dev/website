@@ -4,7 +4,7 @@ title: Supervision & Daemonization
 
 # Supervision (agent-body)
 
-The entire Autonomic ecosystem runs on a foundation of reliability and daemonization provided by `agent-body`. Rather than manually starting individual servers in separate terminal tabs, `agent-body` acts as the master supervisor process.
+The Autonomic stack runs on a **control plane** (`agent-body`) that supervises daemons with health probes and ordered boot — like `kubectl` plus a local supervisor.
 
 ## The Process Tree
 

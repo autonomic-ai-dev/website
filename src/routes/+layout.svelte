@@ -15,7 +15,7 @@
 
 <svelte:head>
   <title>Autonomic AI Dev | Autonomous Agent Ecosystem</title>
-  <meta name="description" content="Autonomic AI Dev builds advanced, self-governing autonomous agents. Explore Brain, Nerves, Heart, Muscle, and the CI dashboard ecosystem." />
+  <meta name="description" content="Autonomic AI — cloud-native infrastructure for AI agents. Control plane, memory store, workflow engine, and agent mesh." />
 </svelte:head>
 
 <div class="min-h-screen relative overflow-hidden bg-slate-50 dark:bg-slate-950 font-sans selection:bg-brand-500/30">

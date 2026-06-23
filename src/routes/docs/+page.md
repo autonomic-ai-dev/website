@@ -8,7 +8,9 @@ Welcome to the **Autonomic AI** documentation.
 
 ## What is Autonomic AI?
 
-Autonomic AI is an open-source Rust-based multi-agent system for self-healing autonomous code maintenance and software lifecycle management. It arranges 9 specialized agent processes ("organs") into a coherent, event-driven system that can plan, execute, verify, and repair code without human supervision.
+Autonomic AI is **cloud-native AI infrastructure** for autonomous software engineering — a local control plane with specialized daemons (codename: *organs*) that plan, execute, verify, and repair code over an event-driven mesh.
+
+See [Cloud-Native Platform](/docs/platform) for the Kubernetes analogy and component mapping.
 
 The project lives at [github.com/autonomic-ai-dev](https://github.com/autonomic-ai-dev).
 

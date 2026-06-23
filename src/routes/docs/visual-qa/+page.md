@@ -4,7 +4,7 @@ title: Visual Observability
 
 # Visual QA (agent-eyes)
 
-Code changes don't just affect tests and logic; they affect the user interface. The `agent-eyes` organ provides the Autonomic ecosystem with visual observability, allowing the agent to "see" the UI changes it makes.
+`agent-eyes` provides **observability for visual state** — DOM indexing, capture, and regression checks for agent-driven UI work.
 
 ## DOM Indexing
 

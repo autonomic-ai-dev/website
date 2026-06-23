@@ -17,12 +17,12 @@
   </div>
   
   <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight">
-    Autonomous systems that <br/>
-    <span class="text-gradient">build, heal, and evolve.</span>
+    Kubernetes for <br/>
+    <span class="text-gradient">AI agents.</span>
   </h1>
   
   <p class="text-lg md:text-xl text-slate-400 max-w-2xl mb-10 leading-relaxed">
-    Autonomic AI Dev is a self-governing ecosystem of specialized AI agents working together to orchestrate massive scale software engineering.
+    Cloud-native AI infrastructure — orchestration, durable memory, mesh networking, and policy for autonomous software engineering. Built in Rust, runs locally.
   </p>
   
   <div class="flex flex-col sm:flex-row items-center gap-4">
@@ -61,6 +61,7 @@
             <Icon class="text-white" size={24} />
           </div>
           <h3 class="text-2xl font-bold text-white mb-2">{agent.name}</h3>
+          <p class="text-xs font-semibold uppercase tracking-wider text-brand-400 mb-2">{agent.cloudNativeRole}</p>
           <p class="text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed">{agent.description}</p>
         </div>
         
