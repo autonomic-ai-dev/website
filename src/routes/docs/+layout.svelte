@@ -35,6 +35,7 @@
     <div class="mb-8">
       <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3">Core Concepts</h3>
       <ul class="flex flex-col gap-2">
+        <li><a href="/docs/platform" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/platform')} text-sm flex items-center gap-2"><Layers size={16} /> Cloud-Native Platform</a></li>
         <li><a href="/docs/architecture" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/architecture')} text-sm flex items-center gap-2"><Layers size={16} /> Architecture</a></li>
         <li><a href="/docs/supervision" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/supervision')} text-sm flex items-center gap-2"><Server size={16} /> Supervision (Body)</a></li>
         <li><a href="/docs/memory" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/memory')} text-sm flex items-center gap-2"><Brain size={16} /> Memory (Brain)</a></li>

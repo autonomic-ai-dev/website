@@ -4,7 +4,7 @@ title: Notifications & Logging
 
 # Communication (agent-mouth)
 
-The final piece of the biological architecture is the ability to speak. `agent-mouth` is the dedicated communication and notification daemon for the Autonomic ecosystem.
+`agent-mouth` is the **I/O gateway** — AST command validation, webhooks, approvals, and log summarization for the Autonomic stack.
 
 ## Webhooks & Integrations
 

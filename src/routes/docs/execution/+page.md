@@ -4,7 +4,7 @@ title: Execution & Actuation
 
 # Execution (agent-muscle)
 
-In an AI system, "thinking" is safe, but "acting" is dangerous. The `agent-muscle` organ is the dedicated execution actuator for the Autonomic ecosystem. It is responsible for translating the decisions made by the `agent-brain` and `agent-spine` into real-world state changes on the host machine.
+`agent-muscle` is the **execution runtime** (kubelet / CRI analog) — structured command execution with JSON contracts on the host.
 
 ## Structured Contracts
 

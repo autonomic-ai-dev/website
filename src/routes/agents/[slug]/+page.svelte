@@ -27,6 +27,7 @@
       
       <div>
         <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-3 tracking-tight">{agent.name}</h1>
+        <p class="text-sm font-semibold uppercase tracking-wider text-brand-500 dark:text-brand-400 mb-2">{agent.cloudNativeRole}</p>
         <p class="text-xl text-slate-600 dark:text-slate-300 font-medium">{agent.description}</p>
       </div>
       
