@@ -209,9 +209,9 @@
   });
 </script>
 
-<div class="flex flex-col md:flex-row min-h-screen pt-20 bg-[#07090e]">
+<div class="flex flex-col md:flex-row min-h-screen pt-0 bg-[#080b10]">
   <!-- Mobile Docs Toggle Bar -->
-  <div class="md:hidden px-6 py-3.5 border-b border-white/10 flex justify-between items-center bg-[#0d1117] sticky top-20 z-40">
+  <div class="md:hidden px-6 py-3.5 border-b border-white/[0.08] flex justify-between items-center bg-[#0d1117] sticky top-16 z-40">
     <div class="flex items-center gap-2">
       <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">DOCS HUB</span>
       {#if activeDocItem}
@@ -221,7 +221,7 @@
     </div>
     <button 
       onclick={() => isMobileDocsMenuOpen = !isMobileDocsMenuOpen}
-      class="p-2 bg-white/5 border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
+      class="p-2 bg-[#161b22] border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
       aria-label="Toggle Navigation"
     >
       {#if isMobileDocsMenuOpen} <X size={18} /> {:else} <Menu size={18} /> {/if}
@@ -229,7 +229,7 @@
   </div>
 
   <!-- Docs Sidebar -->
-  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-72 border-b md:border-b-0 md:border-r border-white/10 p-5 overflow-y-auto shrink-0 bg-[#0a0d14]/90 backdrop-blur-xl z-30 sticky top-20 h-[calc(100vh-5rem)]">
+  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-72 border-b md:border-b-0 md:border-r border-white/[0.08] p-5 overflow-y-auto shrink-0 bg-[#0d1117]/95 backdrop-blur-xl z-30 sticky top-16 h-[calc(100vh-4rem)]">
     <!-- Live Hub Telemetry Pill -->
     <div class="mb-5 pb-4 border-b border-white/[0.08] flex items-center justify-between">
       <div class="flex items-center gap-2">
