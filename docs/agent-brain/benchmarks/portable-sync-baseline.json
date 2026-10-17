@@ -1,0 +1,347 @@
+{
+  "generated_at": "2026-10-15T20:47:54.450185+00:00",
+  "environment": "isolated-fixture",
+  "embedder": "deterministic",
+  "fixture_skills": 500,
+  "eval": {
+    "memory": {
+      "suite": "memory",
+      "cases": 7,
+      "passed": 7,
+      "recall_at_3": 1.0,
+      "failures": []
+    },
+    "skills": {
+      "suite": "skills",
+      "cases": 13,
+      "passed": 13,
+      "recall_at_3": 1.0,
+      "failures": []
+    },
+    "cases": 20,
+    "passed": 20,
+    "recall_at_3": 1.0,
+    "threshold": 0.85,
+    "failures": []
+  },
+  "beam": {
+    "recall": {
+      "memory": {
+        "suite": "memory",
+        "cases": 7,
+        "passed": 6,
+        "recall_at_3": 0.8571428571428571,
+        "failures": [
+          {
+            "suite": "memory",
+            "query": "configure vitest for react testing",
+            "expected_topics": [
+              "testing-framework"
+            ],
+            "got_topics": [
+              "testing",
+              "testing",
+              "testing"
+            ]
+          }
+        ]
+      },
+      "skills": {
+        "suite": "skills",
+        "cases": 13,
+        "passed": 12,
+        "recall_at_3": 0.9230769230769231,
+        "failures": [
+          {
+            "suite": "skills",
+            "query": "write a new cursor agent skill SKILL.md",
+            "expected_topics": [
+              "writing-skills"
+            ],
+            "got_topics": [
+              "mcp-server-patterns"
+            ]
+          }
+        ]
+      },
+      "cases": 20,
+      "passed": 18,
+      "recall_at_3": 0.9,
+      "threshold": 0.85,
+      "failures": [
+        {
+          "suite": "memory",
+          "query": "configure vitest for react testing",
+          "expected_topics": [
+            "testing-framework"
+          ],
+          "got_topics": [
+            "testing",
+            "testing",
+            "testing"
+          ]
+        },
+        {
+          "suite": "skills",
+          "query": "write a new cursor agent skill SKILL.md",
+          "expected_topics": [
+            "writing-skills"
+          ],
+          "got_topics": [
+            "mcp-server-patterns"
+          ]
+        }
+      ]
+    },
+    "temporal": {
+      "suite": "temporal",
+      "cases": 2,
+      "passed": 2,
+      "recall_at_3": 1.0,
+      "failures": []
+    },
+    "must_apply": {
+      "suite": "must_apply",
+      "cases": 2,
+      "passed": 2,
+      "recall_at_3": 1.0,
+      "failures": []
+    },
+    "observation": {
+      "suite": "observation",
+      "cases": 1,
+      "passed": 1,
+      "recall_at_3": 1.0,
+      "failures": []
+    },
+    "jsonl": {
+      "suite": "jsonl",
+      "cases": 5,
+      "passed": 5,
+      "recall_at_3": 1.0,
+      "failures": []
+    },
+    "transcript": {
+      "suite": "transcript",
+      "cases": 8,
+      "passed": 8,
+      "recall_at_3": 1.0,
+      "failures": []
+    },
+    "task_scoped": {
+      "suite": "task_scoped",
+      "cases": 7,
+      "passed": 6,
+      "recall_at_3": 0.8571428571428571,
+      "failures": [
+        {
+          "suite": "task_scoped",
+          "query": "zzzz verification noop without indexed context",
+          "expected_topics": [
+            "task_kind=verification",
+            "escalate=Some(true)"
+          ],
+          "got_topics": [
+            "task_kind=Some(\"verification\")",
+            "escalate=false",
+            "confidence=0.85"
+          ]
+        }
+      ]
+    },
+    "escalation_signal": {
+      "suite": "escalation_signal",
+      "cases": 2,
+      "passed": 2,
+      "recall_at_3": 1.0,
+      "failures": []
+    },
+    "task_scoped_verification": {
+      "suite": "task_scoped_verification",
+      "cases": 2,
+      "passed": 2,
+      "recall_at_3": 1.0,
+      "failures": []
+    },
+    "overall_cases": 49,
+    "overall_passed": 46,
+    "overall_score": 0.9387755102040817,
+    "threshold": 0.85
+  },
+  "latency": {
+    "fixture_skills": 500,
+    "warmup_routes": 5,
+    "turn_cache_hit": {
+      "samples": 25,
+      "min_ms": 0,
+      "p50_ms": 0,
+      "p95_ms": 0,
+      "max_ms": 2
+    },
+    "warm_route": {
+      "samples": 25,
+      "min_ms": 2,
+      "p50_ms": 2,
+      "p95_ms": 2,
+      "max_ms": 2
+    },
+    "turn_cache_hit_p95_threshold_ms": 30,
+    "warm_route_p95_threshold_ms": 100,
+    "passed": true
+  },
+  "supervisor": {
+    "fixture_skills": 500,
+    "scenarios": [
+      {
+        "query": "grep before cat a large log file token efficient",
+        "expect_skill": "token-efficient-ops",
+        "expect_must_apply_topic": null,
+        "skill_hit": true,
+        "must_apply_hit": true,
+        "saved_pct": 99,
+        "latency_ms": 3,
+        "bm25_fast_path_eligible": true,
+        "tokens_used": 233,
+        "must_apply_count": 0
+      },
+      {
+        "query": "read frontend build artifacts from dist folder deployment",
+        "expect_skill": null,
+        "expect_must_apply_topic": "no-read-dist",
+        "skill_hit": true,
+        "must_apply_hit": true,
+        "saved_pct": 99,
+        "latency_ms": 4,
+        "bm25_fast_path_eligible": true,
+        "tokens_used": 300,
+        "must_apply_count": 1
+      },
+      {
+        "query": "use rg head tail instead of cat huge files save tokens",
+        "expect_skill": "token-efficient-ops",
+        "expect_must_apply_topic": null,
+        "skill_hit": true,
+        "must_apply_hit": true,
+        "saved_pct": 99,
+        "latency_ms": 4,
+        "bm25_fast_path_eligible": true,
+        "tokens_used": 233,
+        "must_apply_count": 0
+      }
+    ],
+    "skill_hit_rate": 1.0,
+    "must_apply_rate": 1.0,
+    "avg_saved_pct": 99.0,
+    "bm25_fast_path_rate": 1.0,
+    "warm_route_p95_ms": 3,
+    "skill_hit_threshold": 1.0,
+    "must_apply_threshold": 1.0,
+    "warm_route_p95_threshold_ms": 100,
+    "avg_saved_pct_min": 90,
+    "token_tools": {
+      "scenarios": [
+        {
+          "name": "file_summary",
+          "tool": "file_summary",
+          "savings_pct": 99.58896065766295,
+          "passed": true
+        },
+        {
+          "name": "read_file_head",
+          "tool": "read_file_head",
+          "savings_pct": 97.60316019858004,
+          "passed": true
+        },
+        {
+          "name": "read_file_tail",
+          "tool": "read_file_tail",
+          "savings_pct": 98.98574707735013,
+          "passed": true
+        },
+        {
+          "name": "grep_search",
+          "tool": "grep_search",
+          "savings_pct": 99.83985480168687,
+          "passed": true
+        }
+      ],
+      "avg_savings_pct": 99.00443068382,
+      "savings_min_pct": 80.0,
+      "passed": true
+    },
+    "passed": true
+  },
+  "token_tools": {
+    "scenarios": [
+      {
+        "name": "file_summary",
+        "tool": "file_summary",
+        "savings_pct": 99.58896065766295,
+        "passed": true
+      },
+      {
+        "name": "read_file_head",
+        "tool": "read_file_head",
+        "savings_pct": 97.60316019858004,
+        "passed": true
+      },
+      {
+        "name": "read_file_tail",
+        "tool": "read_file_tail",
+        "savings_pct": 98.98574707735013,
+        "passed": true
+      },
+      {
+        "name": "grep_search",
+        "tool": "grep_search",
+        "savings_pct": 99.83985480168687,
+        "passed": true
+      }
+    ],
+    "avg_savings_pct": 99.00443068382,
+    "savings_min_pct": 80.0,
+    "passed": true
+  },
+  "scale": {
+    "tiers": [
+      {
+        "index_size": 1000,
+        "ann_active": false,
+        "warm_route": {
+          "samples": 25,
+          "min_ms": 3,
+          "p50_ms": 3,
+          "p95_ms": 4,
+          "max_ms": 4
+        },
+        "p95_threshold_ms": 50,
+        "passed": true
+      }
+    ],
+    "p95_threshold_ms": 50,
+    "passed": true
+  },
+  "graphify": {
+    "fixture_skills": 500,
+    "tiers": [
+      {
+        "node_count": 1000,
+        "edge_count": 1141,
+        "ingest_ms": 69,
+        "route_with_code_context": {
+          "samples": 25,
+          "min_ms": 11,
+          "p50_ms": 12,
+          "p95_ms": 13,
+          "max_ms": 13
+        },
+        "code_context_hit_rate": 1.0,
+        "ingest_threshold_ms": 2000,
+        "route_p95_threshold_ms": 65,
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "passed": true
+}

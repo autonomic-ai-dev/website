@@ -1,0 +1,47 @@
+---
+title: "Agent Mouth: AST Command Safety, Slack Approvals, and Real-Time Telemetry"
+date: "2026-10-17"
+excerpt: "How agent-mouth secures autonomous execution with tree-sitter AST validation, manages human-in-the-loop gates via Slack, and translates internal JetStream events into SSE streams."
+slug: "agent-mouth-ingress-api-gateway"
+category: "Security"
+author: "Abhiuday Gupta"
+---
+
+When autonomous AI coding agents execute arbitrary shell commands, safety cannot rely on LLM politeness. An agent instructed to *"clean up temporary build directories"* might generate `rm -rf /tmp/..` or hallucinate dangerous wildcards.
+
+`agent-mouth` is the **Ingress API Gateway** for the Autonomic AI cluster. Every external event, human approval gate, and command validation request flows through `agent-mouth` before reaching execution engines like `agent-muscle` or `agent-spine`.
+
+---
+
+## 1. Pre-Execution Tree-Sitter AST Validation
+
+Instead of naive string matching or regular expressions, `agent-mouth` parses candidate shell commands into a complete Abstract Syntax Tree (AST) using `tree-sitter`:
+
+```bash
+# Verify safe command syntax and target bounds
+agent-mouth validate --command "cargo test --release"
+# => {"valid": true, "ast_tokens": 4, "risk_score": 0.0}
+
+# Intercept dangerous operations before subshell spawn
+agent-mouth validate --command "rm -rf /"
+# => {"valid": false, "error": "Destructive root filesystem operation intercepted", "risk_score": 1.0}
+```
+
+* **Target Guard**: Blocks destructive recursive targets on root, home directory variables (`$HOME`, `~`), and raw block devices (`/dev/sda`).
+* **Syntax Validation**: Intercepts unclosed quotes and shell syntax errors before wasting execution cycles.
+
+---
+
+## 2. Human-in-the-Loop (HITL) Webhook Gates
+
+For critical workflow transitions—such as applying database migrations, rotating secrets, or publishing production releases—the workflow engine (`agent-spine`) pauses at an `ApprovalGate` node and delegates to `agent-mouth`:
+
+1. `agent-mouth` formats a cryptographic approval payload with contextual diffs and dispatches it via a Slack or Discord webhook.
+2. The user inspects the proposed action and clicks **Approve** or **Deny**.
+3. Upon receiving the signed callback, `agent-mouth` unpauses the `tokio` task thread in `agent-spine` to proceed with deterministic execution.
+
+---
+
+## 3. Real-Time Telemetry Streaming
+
+Internal inter-organ events flow over NATS JetStream at high frequency. External frontends (like `agent-ci-dashboard` and the Ratatui terminal HUD `agent-tui`) connect to `agent-mouth`'s Server-Sent Events (SSE) and WebSocket endpoints to visualize pipeline progress in real-time without needing direct broker credentials.
