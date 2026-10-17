@@ -1,25 +1,85 @@
 ---
-title: Execution & Actuation
+title: Execution & Actuation (agent-muscle)
 ---
 
-# Execution (agent-muscle)
+# `agent-muscle` — Execution & Training Runtime
 
-In an AI system, "thinking" is safe, but "acting" is dangerous. The `agent-muscle` organ is the dedicated execution actuator for the Autonomic ecosystem. It is responsible for translating the decisions made by the `agent-brain` and `agent-spine` into real-world state changes on the host machine.
+`agent-muscle` is the physical actuator and training runtime for the Autonomic AI cluster (`kubelet` / `CRI` analog). It decouples the LLM's high-level reasoning from low-level execution. Instead of forcing the model to generate sprawling Python wrappers and parse unbounded stdout streams character-by-character, `agent-muscle` executes commands natively with **tree-sitter AST safety guarding**, **4KB output slicing**, and **hardware-aware GPU orchestration**.
 
-## Structured Contracts
+```mermaid
+flowchart LR
+    LLM["Host Agent / Spine Node"] -->|JSON Exec Signal| Guard["tree-sitter AST Guard\n(Safety Analysis)"]
+    
+    Guard -->|Dangerous Syntax Detected| Block["Immediate Rejection\n(Exit 126: Blocked)"]
+    Guard -->|Safe Syntax| Runner["Subprocess Sandbox\n(Process / Seccomp / MicroVM)"]
+    
+    Runner --> Stream["Stdout / Stderr Pipe"]
+    Stream --> Slicer["4KB Token Slicer\n(Head + Tail Windowing)"]
+    Slicer --> Result["Compact JSON Response\n{exit: 0, duration: 42ms, output: '...'}"]
+    Result --> LLM
 
-Traditional AI agents often run raw bash commands and attempt to parse the unstructured `stdout` using brittle regular expressions. `agent-muscle` rejects this approach.
+    classDef ok fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef danger fill:#ef4444,stroke:#f87171,stroke-width:2px,color:#ffffff;
+    classDef safe fill:#10b981,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    class Guard,Runner,Stream ok;
+    class Block danger;
+    class Slicer,Result safe;
+```
 
-Instead, every execution request sent to `agent-muscle` must specify a **JSON schema contract**. When `agent-muscle` runs a command (e.g., `cargo test --message-format=json`), it captures the output and validates it against the requested schema. If the output does not match the expected structure, the execution is marked as a failure, even if the process exit code was 0.
+---
 
-This strict contract ensures that downstream organs (like `agent-spine` workflows or `agent-eyes` visual QA) receive clean, predictable data payloads rather than unstructured text.
+## Architectural Invariants
 
-## LoRA Fine-Tuning
+### 1. Pre-Execution Tree-Sitter AST Guard
+Before any bash or Python script is spawned in a subshell, `agent-muscle` evaluates the abstract syntax tree using `tree-sitter`. It rejects catastrophic patterns before execution begins:
+- Unbounded deletions (`rm -rf /`, `rm -rf ~`, `rm -rf /*`).
+- Raw block device overwrites (`> /dev/sda`, `dd if=/dev/zero of=...`).
+- Fork bombs and uncontrolled subshell fork loops.
+- Obfuscated base64 payloads evaluated into active shells (`eval $(echo ... | base64 -d)`).
 
-Beyond executing shell commands, `agent-muscle` serves as the training actuator. It can orchestrate local LoRA fine-tuning jobs on Apple Silicon (via MLX) or CUDA GPUs (via Candle). 
+### 2. 4KB Output Slicer (Token Blowout Prevention)
+A single noisy command (`npm test`, `cargo build --verbose`, `find /`) can produce megabytes of stdout. Dumping this into an LLM context window instantly causes rate limit failures and burns through context limits. `agent-muscle` intercepts stdout/stderr with a bounded **4KB Slicer**:
+- Preserves the first 2KB (headers, command start, compilation flags).
+- Inserts a compact truncation token (`[... 142 lines truncated ...]`).
+- Preserves the trailing 2KB (actual error traces, stack lines, exit status).
 
-Before a training run begins, `agent-muscle` validates the training dataset against size constraints and formatting rules, ensuring that malformed data does not waste hours of GPU compute time.
+### 3. Hardware-Aware Training Runtime
+For model fine-tuning and LoRA preference optimization, `agent-muscle` dynamically queries local accelerator hardware:
+- **macOS Apple Silicon**: Leverages Metal Performance Shaders (MPS) and MLX.
+- **Linux GPU Nodes**: Uses CUDA Candle kernels and renders distributed Kubernetes `Job` manifests.
 
-## Remote Actuation
+---
 
-Because `agent-muscle` subscribes to execution requests via the central `agent-nerves` event bus, it doesn't have to run on the same machine as the rest of the ecosystem. You can run `agent-brain` locally on your laptop, while `agent-muscle` runs on a high-powered cloud VM, securely receiving encrypted execution payloads over JetStream.
+## CLI Command Reference
+
+| Command | Flags | Description |
+| :--- | :--- | :--- |
+| **`agent-muscle run`** | `"<command>"`, `--cwd <dir>`, `--timeout <s>` | Runs a command through the AST safety guard and 4KB slicer. |
+| **`agent-muscle status`** | `--json` | Displays actuator configuration, backends, and dataset paths. |
+| **`agent-muscle k8s render-job`** | `--gpu <type>`, `--nodes <N>` | Emits an optimized Kubernetes GPU Job manifest. |
+| **`agent-muscle serve`** | `--port 3103` | Starts the HTTP execution API and JetStream consumer. |
+
+### Example CLI Workflows
+
+```bash
+# 1. Run a command safely with output slicing
+agent-muscle run "cargo test --release" --timeout 120
+
+# 2. Inspect active hardware accelerators (Metal / CUDA)
+agent-muscle status
+
+# 3. Test safety guard against a dangerous payload
+agent-muscle run "rm -rf /"
+# Output: [ERROR 126] Command rejected by AST safety policy: root deletion blocked.
+```
+
+---
+
+## HTTP API & MCP Tools
+
+`agent-muscle` exposes native tools for orchestrators:
+
+- **`muscle_execute_bash`**: Executes a bash command with AST parsing and output slicing.
+- **`muscle_execute_python`**: Runs Python code inside the sandboxed environment.
+- **`POST /execute`**: Raw HTTP endpoint accepting JSON `{ "command": "...", "cwd": "..." }`.
+- **`POST /train/run`**: Dispatches a training job across local or remote GPU queues.

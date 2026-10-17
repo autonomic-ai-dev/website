@@ -1,67 +1,91 @@
 ---
-title: MCP Integration
+title: MCP Gateway Protocol (Dual-Mode Integration)
 ---
 
 # Model Context Protocol (MCP) Integration
 
-The Autonomic ecosystem seamlessly integrates with modern AI coding environments—such as **Cursor**, **Claude Desktop**, **VSCode**, and **Claude Code**—through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
+The Autonomic ecosystem integrates seamlessly with modern AI coding environments—including **Cursor**, **Claude Desktop**, **VSCode**, **Claude Code**, and **Antigravity**—via the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
 
-Instead of replacing your favorite editor, Autonomic acts as the local "brain" for the agent running inside it. The `agent-brain` daemon operates as an MCP server, providing your editor's AI with a curated set of tools, rules, and temporal memory.
+Autonomic supports **Dual-Mode MCP Transport**:
+1. **Standalone Stdio Mode**: Individual organs (like `agent-brain`) run as independent stdio processes spawned directly by the IDE.
+2. **Unified Gateway Mode**: `autonomic serve-mcp` boots as a single master MCP gateway that dynamically aggregates tool definitions across all running daemons over the internal NATS JetStream bus.
 
-## Why use agent-brain with MCP?
+```mermaid
+flowchart TD
+    subgraph Hosts["Host AI Coding Environments"]
+        Cursor["Cursor IDE"]
+        Claude["Claude Desktop / Code"]
+        Anti["Antigravity / Gemini CLI"]
+    end
 
-Most AI coding agents load all available project instructions, documentation, and tools into the context window at once. This leads to three major problems:
-1. **Context Bloat:** Stuffing hundreds of rules degrades the model's reasoning capabilities and wastes tokens.
-2. **Soft Enforcement:** System prompts that say "always use these skills" are frequently ignored by the model.
-3. **Amnesia:** When you correct an agent's behavior, that correction is lost as soon as you start a new chat session.
+    subgraph DualMode["Dual-Mode MCP Transport Layer"]
+        Gateway["Unified Gateway\n(autonomic serve-mcp)"]
+        Direct["Standalone Stdio Proxy\n(agent-brain serve)"]
+    end
 
-`agent-brain` solves this by introducing a **local context engine** that sits between your editor and the model.
+    Hosts -->|stdio / JSON-RPC| Gateway
+    Hosts -->|stdio / JSON-RPC| Direct
 
-### The `route_task` Gate
+    Gateway --> Mesh["NATS JetStream Bus (:4222)"]
+    Direct --> Sock["serve.sock\n(Lock-Free Background Daemon)"]
 
-When you ask your AI assistant to perform a task, the `agent-brain` MCP server enforces a strict Hook Gate:
-1. The model is *forced* to call the `route_task` MCP tool before it can use any other tools (like file editing or terminal execution).
-2. `route_task` takes the user's prompt and queries the local SQLite Knowledge Graph.
-3. It retrieves only the *most relevant* ~500 tokens of rules, skills, and past memories for that specific request.
-4. Once `route_task` completes, the context is returned, and the rest of the tools are unlocked for the agent to use.
+    subgraph Organs["11 Distributed Organs"]
+        Mesh --> Body["agent-body (Catalog)"]
+        Mesh --> Brain["agent-brain (Routing)"]
+        Mesh --> Spine["agent-spine (Workflows)"]
+        Mesh --> Muscle["agent-muscle (Execution)"]
+        Mesh --> Immune["agent-immune (Security)"]
+        Mesh --> Heart["agent-heart (Budget)"]
+        Mesh --> Eyes["agent-eyes (Vision)"]
+        Mesh --> Mouth["agent-mouth (Ingress)"]
+    end
 
-This guarantees that the model receives precisely what it needs to succeed, without overflowing the context window.
-
-## Durable Memory
-
-As you work with the agent in your IDE, you can instruct it to remember specific conventions (e.g., "Always use `Tailwind` for styling in this project").
-
-The agent will call the `store_memory` MCP tool. Instead of saving this to a static markdown file, `agent-brain` stores it in its temporal Knowledge Graph (`brain.db`). 
-- Facts are stored immutably with `valid_from` timestamps.
-- If a rule changes later, the old rule is marked `invalid_at`, preserving the historical context of *why* older code looks the way it does.
-
-The next time you open a new session in your IDE and ask a related question, `route_task` will automatically inject that stored memory into the context.
-
-## Installation and Configuration
-
-You do not need to start the MCP server manually. Your IDE will spawn it automatically when you start a chat session.
-
-To configure your editor to use `agent-brain`, run:
-
-```bash
-agent-brain install --global
+    classDef host fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef transport fill:#0ea5e9,stroke:#0284c7,stroke-width:2px,color:#080b10;
+    classDef organ fill:#10b981,stroke:#047857,stroke-width:2px,color:#ffffff;
+    class Cursor,Claude,Anti host;
+    class Gateway,Direct,Mesh,Sock transport;
+    class Body,Brain,Spine,Muscle,Immune,Heart,Eyes,Mouth organ;
 ```
 
-This command:
-1. Locates the configuration files for supported editors (e.g., `~/.cursor/mcp.json`).
-2. Injects the `agent-brain` MCP server configuration.
-3. Configures the lifecycle hooks that enforce the `route_task` gate.
+---
 
-### Supported Editors
+## The `route_task` Enforcement Gate
 
-- **Cursor:** Automatically configured via `mcp.json`. You may need to restart the editor or toggle the server in Settings -> MCP.
-- **Claude Desktop:** Configured via `claude_desktop_config.json`.
-- **VSCode (with relevant extensions):** Configured via the standard MCP extension path.
-- **Claude Code (CLI):** Supported out-of-the-box.
-- **OpenCode & Codex:** Full integration supported.
+When an agent executes in your IDE, `agent-brain` intercepts the turn using host shell and MCP hooks:
+1. **Interception**: Any attempt to run shell tools or modify files is blocked until `route_task` is called.
+2. **Context Synthesis**: `route_task` evaluates the user's intent and returns a token-bounded (~500 tokens) payload of ranked skills, codebase rules, and verified recipes.
+3. **Unlocking**: Once context is injected, all other tools are unlocked for the agent's turn.
 
-You can explicitly target a single editor:
+---
+
+## Editor Configuration & Quick Install
+
+Configure your development environment with one automated command:
+
 ```bash
+# Global setup: automatically detects and configures Cursor, Claude Desktop, and Claude Code
+agent-brain install --global
+
+# Target specific IDEs individually:
 agent-brain install --cursor
 agent-brain install --claude-desktop
+agent-brain install --opencode
+```
+
+### Manual Configuration Snippet (`~/.cursor/mcp.json`)
+
+```json
+{
+  "mcpServers": {
+    "agent-brain": {
+      "command": "agent-brain",
+      "args": ["serve"]
+    },
+    "autonomic-cluster": {
+      "command": "autonomic",
+      "args": ["serve-mcp", "--all"]
+    }
+  }
+}
 ```

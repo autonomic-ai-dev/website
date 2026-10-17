@@ -140,3 +140,110 @@
 .spotlight-card:hover::after {
   opacity: 1;
 }
+
+/* Aerospace Cybernetic Docs Typography & Components */
+.prose {
+  max-width: 100% !important;
+  color: #cbd5e1 !important;
+}
+
+.prose pre {
+  background-color: #080d1a !important;
+  border: 1px solid rgba(56, 189, 248, 0.15) !important;
+  border-radius: 0.875rem !important;
+  padding: 1.25rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.prose code:not(pre code) {
+  color: #38bdf8 !important;
+  background-color: rgba(14, 165, 233, 0.12) !important;
+  padding: 0.2rem 0.45rem !important;
+  border-radius: 0.35rem !important;
+  font-size: 0.875em !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  border: 1px solid rgba(56, 189, 248, 0.2) !important;
+}
+
+.prose table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.875rem !important;
+  overflow: hidden !important;
+  margin: 1.75rem 0 !important;
+  background: rgba(13, 17, 23, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.prose th {
+  background-color: rgba(14, 165, 233, 0.08) !important;
+  color: #f8fafc !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  padding: 0.85rem 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  text-align: left !important;
+}
+
+.prose td {
+  padding: 0.85rem 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #94a3b8 !important;
+  font-size: 0.9rem !important;
+}
+
+.prose tr:last-child td {
+  border-bottom: none !important;
+}
+
+.prose tr:hover td {
+  background-color: rgba(56, 189, 248, 0.04) !important;
+  color: #f1f5f9 !important;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.prose h1 {
+  font-size: 2.25rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding-bottom: 0.875rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.prose h2 {
+  font-size: 1.45rem !important;
+  margin-top: 2.5rem !important;
+  margin-bottom: 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding-bottom: 0.5rem !important;
+  color: #38bdf8 !important;
+}
+
+.prose h3 {
+  font-size: 1.15rem !important;
+  margin-top: 1.75rem !important;
+  margin-bottom: 0.75rem !important;
+  color: #e2e8f0 !important;
+}
+
+.prose blockquote {
+  border-left-color: #0284c7 !important;
+  background-color: rgba(14, 165, 233, 0.06) !important;
+  padding: 0.875rem 1.25rem !important;
+  border-radius: 0 0.5rem 0.5rem 0 !important;
+  color: #94a3b8 !important;
+  border-left-width: 3px !important;
+}
+
+.mermaid-diagram-container svg {
+  max-width: 100% !important;
+  height: auto !important;
+}

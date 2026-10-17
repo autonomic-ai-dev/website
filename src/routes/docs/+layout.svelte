@@ -1,60 +1,320 @@
 <script lang="ts">
-  import { Menu, X, Book, Download, Terminal, Layers, Radio, Brain, Workflow, Shield, Plug, Server, Cpu, Eye, Heart, MessageSquare, Activity } from "lucide-svelte";
+  import { onMount, tick } from "svelte";
+  import { browser } from "$app/environment";
   import { page } from "$app/stores";
-  let { children } = $props();
+  import {
+    Book,
+    Download,
+    Terminal,
+    Layers,
+    Server,
+    Brain,
+    Workflow,
+    Heart,
+    Radio,
+    Cpu,
+    Shield,
+    Eye,
+    MessageSquare,
+    Activity,
+    Plug,
+    ChevronRight,
+    Search,
+    Menu,
+    X,
+    ExternalLink,
+    Code2,
+    Check
+  } from "lucide-svelte";
 
+  let { children } = $props();
   let pathname = $derived($page.url.pathname);
   let isMobileDocsMenuOpen = $state(false);
+  let searchQuery = $state("");
 
-  const linkClass = (path: string) => 
-    pathname === path
-      ? "text-brand-600 dark:text-brand-400 font-medium"
-      : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+  interface DocItem {
+    href: string;
+    label: string;
+    icon: any;
+    badge: string;
+    description: string;
+  }
+
+  interface DocSection {
+    title: string;
+    items: DocItem[];
+  }
+
+  const docSections: DocSection[] = [
+    {
+      title: "Architecture & Foundation",
+      items: [
+        { href: "/docs", label: "Overview", icon: Book, badge: "Hub", description: "Ecosystem introduction and core philosophy" },
+        { href: "/docs/architecture", label: "Architecture Hub", icon: Layers, badge: "Master", description: "11-organ topology and contracts" },
+        { href: "/docs/installation", label: "Quick Installation", icon: Download, badge: "Brew", description: "Homebrew tap and curl bootstrap" },
+        { href: "/docs/cli", label: "CLI Meta-Interface", icon: Terminal, badge: "Meta", description: "autonomic meta-cli reference" },
+        { href: "/docs/mcp", label: "MCP Gateway Protocol", icon: Plug, badge: "Stdio", description: "Unified serve-mcp gateway" }
+      ]
+    },
+    {
+      title: "Core Organs (Control & Routing)",
+      items: [
+        { href: "/docs/supervision", label: "agent-body", icon: Server, badge: "Supervisor", description: "Master supervisor and launchd daemon" },
+        { href: "/docs/memory", label: "agent-brain", icon: Brain, badge: "Memory", description: "Vector memory, HNSW, verified recipes" },
+        { href: "/docs/maintenance", label: "agent-heart", icon: Heart, badge: "Budget / GC", description: "Token quotas, GC, preventive maintenance" }
+      ]
+    },
+    {
+      title: "Execution & Safety",
+      items: [
+        { href: "/docs/workflows", label: "agent-spine", icon: Workflow, badge: "Workflows", description: "YAML DAG workflow orchestration" },
+        { href: "/docs/execution", label: "agent-muscle", icon: Cpu, badge: "Sandbox", description: "Universal actuator and AST guard" },
+        { href: "/docs/security", label: "agent-immune", icon: Shield, badge: "Admission", description: "Zero-trust OSV scan and microVMs" }
+      ]
+    },
+    {
+      title: "Sensory & Communication",
+      items: [
+        { href: "/docs/event-bus", label: "agent-nerves", icon: Radio, badge: "Mesh", description: "NATS JetStream event backbone" },
+        { href: "/docs/communication", label: "agent-mouth", icon: MessageSquare, badge: "Ingress", description: "AST validator, Slack webhooks, SSE" },
+        { href: "/docs/visual-qa", label: "agent-eyes", icon: Eye, badge: "Observability", description: "DOM index, pixel diff, local VLM" }
+      ]
+    },
+    {
+      title: "Operator Consoles",
+      items: [
+        { href: "/docs/tui", label: "agent-tui", icon: Terminal, badge: "Console", description: "Terminal telemetry HUD in Ratatui" },
+        { href: "/docs/ci-dashboard", label: "agent-ci-dashboard", icon: Activity, badge: "Web HUD", description: "Web mission control and PR batch merge" }
+      ]
+    }
+  ];
+
+  let filteredSections = $derived.by(() => {
+    if (!searchQuery.trim()) return docSections;
+    const q = searchQuery.toLowerCase().trim();
+    return docSections
+      .map(section => ({
+        ...section,
+        items: section.items.filter(item => 
+          item.label.toLowerCase().includes(q) || 
+          item.badge.toLowerCase().includes(q) ||
+          item.description.toLowerCase().includes(q)
+        )
+      }))
+      .filter(section => section.items.length > 0);
+  });
+
+  const activeDocItem = $derived.by(() => {
+    for (const sec of docSections) {
+      for (const item of sec.items) {
+        if (item.href === pathname) return item;
+      }
+    }
+    return null;
+  });
+
+  async function renderMermaidDiagrams() {
+    if (!browser) return;
+    await tick();
+    const blocks = document.querySelectorAll("pre.language-mermaid, pre > code.language-mermaid, div.mermaid");
+    if (blocks.length === 0) return;
+
+    try {
+      const mermaid = (await import("mermaid")).default;
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "dark",
+        securityLevel: "loose",
+        themeVariables: {
+          darkMode: true,
+          background: "#080b11",
+          primaryColor: "#0ea5e9",
+          primaryTextColor: "#f8fafc",
+          primaryBorderColor: "#38bdf8",
+          lineColor: "#64748b",
+          secondaryColor: "#1e293b",
+          tertiaryColor: "#0f172a",
+          fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+        }
+      });
+
+      for (let i = 0; i < blocks.length; i++) {
+        const el = blocks[i] as HTMLElement;
+        if (el.dataset.mermaidRendered === "true") continue;
+        el.dataset.mermaidRendered = "true";
+
+        const code = el.innerText || el.textContent || "";
+        if (!code.trim()) continue;
+
+        const id = `mermaid-svg-${Date.now()}-${i}`;
+        const { svg } = await mermaid.render(id, code.trim());
+        const wrapper = document.createElement("div");
+        wrapper.className = "mermaid-diagram-container my-8 p-6 bg-[#080b11]/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md";
+        wrapper.innerHTML = svg;
+        const target = el.tagName === "CODE" && el.parentElement?.tagName === "PRE" ? el.parentElement : el;
+        target.replaceWith(wrapper);
+      }
+    } catch (e) {
+      console.warn("Mermaid render error:", e);
+    }
+  }
+
+  function addCopyButtons() {
+    if (!browser) return;
+    const preBlocks = document.querySelectorAll("article pre:not(.language-mermaid)");
+    preBlocks.forEach((pre) => {
+      if (pre.querySelector(".copy-code-btn")) return;
+      const btn = document.createElement("button");
+      btn.className = "copy-code-btn absolute top-3 right-3 px-2 py-1 bg-white/10 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 rounded text-xs font-mono transition flex items-center gap-1 opacity-0 group-hover:opacity-100 border border-white/10";
+      btn.innerHTML = "<span>Copy</span>";
+      btn.onclick = () => {
+        const codeEl = pre.querySelector("code") as HTMLElement | null;
+        const text = codeEl?.innerText || (pre as HTMLElement).innerText || "";
+        navigator.clipboard.writeText(text);
+        btn.innerHTML = "<span class='text-emerald-400'>Copied!</span>";
+        setTimeout(() => {
+          btn.innerHTML = "<span>Copy</span>";
+        }, 2000);
+      };
+      (pre as HTMLElement).style.position = "relative";
+      (pre as HTMLElement).classList.add("group");
+      pre.appendChild(btn);
+    });
+  }
+
+  $effect(() => {
+    if (pathname) {
+      renderMermaidDiagrams();
+      addCopyButtons();
+    }
+  });
+
+  onMount(() => {
+    renderMermaidDiagrams();
+    addCopyButtons();
+  });
 </script>
 
-<div class="flex flex-col md:flex-row min-h-screen pt-24">
-  <!-- Mobile Docs Toggle -->
-  <div class="md:hidden px-6 pb-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950 sticky top-20 z-40">
-    <span class="font-bold text-slate-900 dark:text-white">Docs Navigation</span>
-    <button onclick={() => isMobileDocsMenuOpen = !isMobileDocsMenuOpen} class="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md shadow-sm">
-      {#if isMobileDocsMenuOpen} <X size={20} class="text-slate-900 dark:text-white" /> {:else} <Menu size={20} class="text-slate-900 dark:text-white" /> {/if}
+<div class="flex flex-col md:flex-row min-h-screen pt-20 bg-[#07090e]">
+  <!-- Mobile Docs Toggle Bar -->
+  <div class="md:hidden px-6 py-3.5 border-b border-white/10 flex justify-between items-center bg-[#0d1117] sticky top-20 z-40">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">DOCS HUB</span>
+      {#if activeDocItem}
+        <ChevronRight size={14} class="text-slate-500" />
+        <span class="text-xs font-mono text-white truncate max-w-[180px]">{activeDocItem.label}</span>
+      {/if}
+    </div>
+    <button 
+      onclick={() => isMobileDocsMenuOpen = !isMobileDocsMenuOpen}
+      class="p-2 bg-white/5 border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
+      aria-label="Toggle Navigation"
+    >
+      {#if isMobileDocsMenuOpen} <X size={18} /> {:else} <Menu size={18} /> {/if}
     </button>
   </div>
 
   <!-- Docs Sidebar -->
-  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 p-6 overflow-y-auto shrink-0 bg-slate-50 dark:bg-slate-950 z-30 relative">
-    <div class="mb-8">
-      <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3">Getting Started</h3>
-      <ul class="flex flex-col gap-2">
-        <li><a href="/docs" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs')} text-sm flex items-center gap-2"><Book size={16} /> Introduction</a></li>
-        <li><a href="/docs/installation" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/installation')} text-sm flex items-center gap-2"><Download size={16} /> Installation</a></li>
-        <li><a href="/docs/cli" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/cli')} text-sm flex items-center gap-2"><Terminal size={16} /> CLI Reference</a></li>
-      </ul>
+  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-72 border-b md:border-b-0 md:border-r border-white/10 p-5 overflow-y-auto shrink-0 bg-[#0a0d14]/90 backdrop-blur-xl z-30 sticky top-20 h-[calc(100vh-5rem)]">
+    <!-- Live Hub Telemetry Pill -->
+    <div class="mb-5 pb-4 border-b border-white/[0.08] flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+        </span>
+        <span class="text-xs font-mono font-bold text-white tracking-wide">CENTRAL DOCS HUB</span>
+      </div>
+      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">11 ORGANS</span>
     </div>
 
-    <div class="mb-8">
-      <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-3">Core Concepts</h3>
-      <ul class="flex flex-col gap-2">
-        <li><a href="/docs/architecture" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/architecture')} text-sm flex items-center gap-2"><Layers size={16} /> Architecture</a></li>
-        <li><a href="/docs/supervision" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/supervision')} text-sm flex items-center gap-2"><Server size={16} /> Supervision (Body)</a></li>
-        <li><a href="/docs/memory" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/memory')} text-sm flex items-center gap-2"><Brain size={16} /> Memory (Brain)</a></li>
-        <li><a href="/docs/workflows" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/workflows')} text-sm flex items-center gap-2"><Workflow size={16} /> Workflows (Spine)</a></li>
-        <li><a href="/docs/maintenance" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/maintenance')} text-sm flex items-center gap-2"><Heart size={16} /> Maintenance (Heart)</a></li>
-        <li><a href="/docs/event-bus" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/event-bus')} text-sm flex items-center gap-2"><Radio size={16} /> Event Bus (Nerves)</a></li>
-        <li><a href="/docs/execution" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/execution')} text-sm flex items-center gap-2"><Cpu size={16} /> Execution (Muscle)</a></li>
-        <li><a href="/docs/security" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/security')} text-sm flex items-center gap-2"><Shield size={16} /> Security (Immune)</a></li>
-        <li><a href="/docs/visual-qa" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/visual-qa')} text-sm flex items-center gap-2"><Eye size={16} /> Visual QA (Eyes)</a></li>
-        <li><a href="/docs/communication" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/communication')} text-sm flex items-center gap-2"><MessageSquare size={16} /> Communication (Mouth)</a></li>
-        <li><a href="/docs/tui" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/tui')} text-sm flex items-center gap-2"><Terminal size={16} /> Terminal HUD (TUI)</a></li>
-        <li><a href="/docs/ci-dashboard" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/ci-dashboard')} text-sm flex items-center gap-2"><Activity size={16} /> Mission Control (CI)</a></li>
-        <li><a href="/docs/mcp" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/mcp')} text-sm flex items-center gap-2"><Plug size={16} /> MCP Integration</a></li>
-      </ul>
+    <!-- Quick Filter Search -->
+    <div class="relative mb-6">
+      <Search size={14} class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+      <input 
+        type="text" 
+        bind:value={searchQuery}
+        placeholder="Filter organs & guides..."
+        class="w-full bg-[#121622] border border-white/10 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 transition"
+      />
+    </div>
+
+    <!-- Navigation Tree -->
+    <div class="space-y-6">
+      {#each filteredSections as section}
+        <div>
+          <h3 class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold mb-2.5 px-2 flex items-center justify-between">
+            <span>{section.title}</span>
+          </h3>
+          <ul class="space-y-1">
+            {#each section.items as item}
+              {@const Icon = item.icon}
+              {@const isActive = pathname === item.href}
+              <li>
+                <a 
+                  href={item.href} 
+                  onclick={() => isMobileDocsMenuOpen = false} 
+                  class="group flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-sans transition-all {isActive ? 'bg-cyan-500/15 text-cyan-300 font-semibold border border-cyan-500/30 shadow-sm' : 'text-slate-300 hover:text-white hover:bg-white/[0.04]'}"
+                >
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <Icon size={15} class="{isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'} transition-colors shrink-0" />
+                    <span class="truncate">{item.label}</span>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.2 rounded shrink-0 {isActive ? 'bg-cyan-500/20 text-cyan-300' : 'bg-white/[0.05] text-slate-400 group-hover:bg-white/10'}">
+                    {item.badge}
+                  </span>
+                </a>
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/each}
+    </div>
+
+    <!-- External Links Footer in Sidebar -->
+    <div class="mt-8 pt-5 border-t border-white/[0.08] space-y-2">
+      <a 
+        href="https://github.com/autonomic-ai-dev" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="flex items-center justify-between px-2 py-1.5 rounded text-xs font-mono text-slate-400 hover:text-white hover:bg-white/5 transition"
+      >
+        <span>GitHub Monorepo</span>
+        <ExternalLink size={12} />
+      </a>
+      <a 
+        href="https://agent-ci-dashboard.vercel.app" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="flex items-center justify-between px-2 py-1.5 rounded text-xs font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition"
+      >
+        <span>Mission Control</span>
+        <ExternalLink size={12} />
+      </a>
     </div>
   </aside>
 
-  <!-- Docs Content -->
-  <main class="flex-1 p-6 md:p-12 max-w-4xl">
-    <article class="prose prose-slate dark:prose-invert prose-brand max-w-none">
+  <!-- Docs Content Container -->
+  <main class="flex-1 min-w-0 p-6 md:p-12 lg:p-16 max-w-5xl">
+    <!-- Breadcrumb Header -->
+    <div class="mb-8 pb-4 border-b border-white/[0.08] flex items-center justify-between">
+      <nav class="flex items-center gap-2 text-xs font-mono text-slate-400" aria-label="Breadcrumb">
+        <a href="/docs" class="hover:text-white transition">Docs</a>
+        <ChevronRight size={12} class="text-slate-600" />
+        {#if activeDocItem}
+          <span class="text-cyan-400 font-semibold">{activeDocItem.label}</span>
+        {:else}
+          <span class="text-cyan-400 font-semibold">Specification</span>
+        {/if}
+      </nav>
+      <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span>SPEC v1.0.0-beta.3</span>
+      </div>
+    </div>
+
+    <!-- Article Content -->
+    <article class="prose max-w-none">
       {@render children()}
     </article>
   </main>

@@ -1,124 +1,99 @@
 ---
-title: Security
+title: Security & Zero-Trust Admission (agent-immune)
 ---
 
-# Security
+# `agent-immune` — Zero-Trust Security & Admission
 
-Allowing autonomous agents to execute code, access repositories, and communicate externally is inherently dangerous. Autonomic AI is designed with a **defense-in-depth** philosophy — three independent layers that must all be bypassed for an attacker to compromise the system.
+`agent-immune` is the **Open Policy Agent (OPA) & Zero-Trust Admission Controller** for the Autonomic cluster. Because AI agents routinely generate and execute untrusted code, running that code directly on bare-metal host machines represents an existential security risk. `agent-immune` enforces strict admission boundaries, scanning dependencies against the [OSV.dev](https://osv.dev) vulnerability database, wrapping execution in **Firecracker microVMs** or **seccomp-BPF filters**, and aggressively killing runaway processes that exhibit OOM trajectories.
 
-## Layer 1: Dependency & Supply Chain (agent-immune OSV Scanning)
+```mermaid
+flowchart TD
+    Input["Untrusted Script / Patch / Manifest"] --> Intercept["agent-immune Interceptor"]
+    
+    subgraph Layer1["Layer 1: Dependency Fuzzing"]
+        OSV["OSV.dev Concurrent Query Buffer"]
+        VulnCheck{"Known CVE Detected?"}
+    end
 
-Before any code runs, agent-immune scans all dependency trees against the [OSV.dev](https://osv.dev) vulnerability database:
+    subgraph Layer2["Layer 2: Sandboxed Execution"]
+        Sandbox{"Isolation Backend"}
+        Seccomp["seccomp-BPF\n(Network Blackhole)"]
+        Firecracker["Ephemeral Firecracker\nmicroVM (Kernel Isolation)"]
+    end
 
-```bash
-# Automatic during every execution workflow
-agent-immune scan --manifest Cargo.toml
-# Output: CRITICAL: openssl-src 1.1.1 (CVE-2024-1234) — aborting
+    subgraph Layer3["Layer 3: Resource Governance"]
+        Monitor["Real-Time RSS Monitor\n(Growth Rate Tracing)"]
+        OOMCheck{"Leak / OOM Trajectory?"}
+    end
+
+    Intercept --> OSV --> VulnCheck
+    VulnCheck -->|Yes: CVE Found| Abort["Immediate Rejection\n(Emit autonomic.immune.cve)"]
+    VulnCheck -->|No: Clean| Sandbox
+
+    Sandbox -->|Linux / Container| Seccomp
+    Sandbox -->|Strict VM Isolation| Firecracker
+
+    Seccomp --> Monitor
+    Firecracker --> Monitor
+
+    Monitor --> OOMCheck
+    OOMCheck -->|Yes: Leaking| Kill["SIGKILL Subprocess\n(Return Diagnostic Trace)"]
+    OOMCheck -->|No: Normal| Complete["Execution Clean (Exit 0)"]
+
+    classDef ok fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef danger fill:#ef4444,stroke:#f87171,stroke-width:2px,color:#ffffff;
+    classDef safe fill:#10b981,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    class Intercept,OSV,Sandbox,Seccomp,Firecracker,Monitor ok;
+    class Abort,Kill danger;
+    class Complete safe;
 ```
 
-The scan runs at two points:
-- **On workflow start** — the full dependency graph of the target repository is checked
-- **On generated patches** — any `Cargo.toml`, `package.json`, or `requirements.txt` produced by an LLM is scanned before being applied
+---
 
-If a critical or high-severity vulnerability is detected, agent-spine's Gate node routes the workflow to a `security_hold` state, blocking execution until the issue is resolved or explicitly overridden by a human via Slack approval.
+## Architectural Invariants
 
-## Layer 2: Sandboxed Execution (agent-muscle)
+### 1. Concurrent Dependency Fuzzing (OSV.dev)
+Before generated dependencies or lockfiles (`Cargo.toml`, `package.json`, `requirements.txt`) are resolved, `agent-immune` parses the AST and queries the Google OSV.dev vulnerability database using a concurrent `tokio` buffer. If any dependency contains an unpatched critical vulnerability (CVSS > 8.0), admission is immediately blocked and a security hold is placed on the active workflow.
 
-agent-muscle never executes commands directly on the host. Every execution task runs inside one of three sandbox levels, configurable per workflow node:
+### 2. Multi-Backend Sandboxing
+Depending on host operating system capabilities, `agent-immune` dynamically selects the strongest available isolation backend:
+- **`process`**: Lightweight subprocess execution with restricted environment variables and stripped credentials.
+- **`seccomp`**: Uses Linux seccomp-BPF syscall filtering to completely blackhole unauthorized network egress sockets.
+- **`firecracker`**: Boots an ephemeral, hardware-isolated Firecracker microVM in under 150ms, executes the untrusted payload inside the microVM, extracts the result, and immediately destroys the VM.
 
-### none
+### 3. Runaway Memory & Infinite Loop Termination
+Agents frequently generate accidental infinite loops (`while True`) that leak memory until the host crashes. `agent-immune` samples peak Resident Set Size (RSS) and memory gradient curves every 10ms. If memory usage spikes exponentially toward the configured ceiling (e.g., >512MB), it sends an aggressive `SIGKILL`, dumps the memory profile, and returns an actionable diagnostic trace to the LLM so it can rewrite the loop.
 
-Direct subprocess on the host. No isolation beyond the OS process boundary. Suitable for read-only queries (`git log`, `cargo metadata`) where performance matters and the payload is trusted.
+---
 
-### seccomp
-
-A seccomp-bpf filter generated dynamically by agent-immune based on the task's expected syscall surface. The filter is applied before `exec()` — if a generated command attempts a syscall outside its allowed set (e.g., `open()` of `/etc/shadow` during a `cargo build` task), the process is immediately killed with `SIGSYS`.
-
-Filter rules are restrictive by default:
-
-```
-allowed: read, write, openat, mmap, munmap, exit_group, clone, execve
-blocked: connect, bind, ptrace, mount, umount, reboot, iopl
-```
-
-### firecracker
-
-A full microVM via [Firecracker](https://github.com/firecracker-microvm/firecracker). Each execution boots a minimal Linux kernel (~200ms boot time), runs the task, and terminates. The microVM has:
-
-- **No network access** unless explicitly granted by the workflow
-- **Read-only root filesystem** — any writes are discarded on VM exit
-- **Strict memory limit** (default 512 MB, configurable)
-- **Strict CPU limit** (default 1 vCPU, configurable)
-
-Firecracker is the default for any workflow node that modifies external state (e.g., `git push`, `npm publish`, database migrations).
-
-## Layer 3: AST Command Validation (agent-mouth)
-
-Every command generated by an LLM — whether a shell invocation, a GitHub API call, or a Slack message — passes through agent-mouth's tree-sitter-based validator before execution:
-
-1. Parse the command string with tree-sitter grammar matching the target language (Bash, TypeScript, Python, etc.)
-2. Reject any command that fails to parse (malformed syntax)
-3. Walk the AST and check against a blocklist of dangerous patterns: pipes to `sh`, eval wrappers, base64-decoded payloads, `curl ... | bash` patterns
-4. If the command passes AST validation, it is forwarded to agent-muscle for sandboxed execution
-
-If validation fails, the command is never passed to the execution layer. agent-spine logs the rejection and may route to an alternative Prompt node that regenerates the command with the validation error as context.
-
-## Memory Isolation (agent-brain)
-
-agent-brain's context routing enforces strict data access boundaries:
-
-- **Scope-based facts** — every stored fact has a scope (`project`, `session`, `global`) and a scope key. A query for project A's context never returns facts scoped to project B.
-- **Temporal expiration** — facts carry optional `valid_from` and `invalid_at` timestamps. agent-heart runs periodic prune cycles that delete expired facts and archive evicted facts to cold storage.
-- **No raw exposure** — the context routing API (`route_task`) returns ranked, token-budgeted summaries, never raw fact payloads. Sub-agents and workflow nodes cannot enumerate all stored facts.
-- **Confidence gating** — facts below a configurable confidence threshold (default 0.3) are excluded from context retrieval by default.
-
-## Human-in-the-Loop: Slack Approval Gates
-
-Workflows that modify production state can include Approval nodes. When agent-spine reaches an Approval node, it pauses execution and agent-mouth sends a Slack message with:
-
-```
-🔒 Approval Required: Workflow "deploy-frontend" (ID: wf-20240315-abc123)
-  Proposed action: git push origin main
-  Risk level: high
-  Sandbox: firecracker
-  Dependencies: agent-muscle, agent-brain
-  → Type "yes" to approve, "no" to reject
-  → Expires in 30 minutes
-```
-
-Until a human approves, the workflow remains paused. No timeout occurs — an unapproved workflow stays paused indefinitely unless a Slack command cancels it.
-
-## Local-First
-
-Autonomic AI runs entirely locally. No telemetry, no cloud dependency, no external API calls for core functionality:
-
-- **LLM inference** — supports local models via llama.cpp (or any OpenAI-compatible local endpoint)
-- **Vision QA** — uses LLaVA (local, GGUF-quantized) — no screenshots are uploaded to third parties
-- **Dependency scanning** — OSV database is cached locally; updates are pull-only
-- **Event bus** — runs a local NATS server on `127.0.0.1`; no external connectivity required
-
-The only exceptions are agent-mouth's communication channels (Slack, email, GitHub) which require outbound API access — and those channels are behind the AST validation gate.
-
-## Configuration
-
-Sandbox and security behavior is configured in `~/.autonomic/config.toml`:
+## Configuration Reference (`~/.autonomic/config.toml`)
 
 ```toml
 [immune]
-osv_scan_enabled = true
-osv_cache_dir = "~/.autonomic/data/immune/osv-cache"
-sandbox_default = "seccomp"
-command_validation_enabled = true
-
-[muscle]
-default_sandbox = "seccomp"
-firecracker_kernel = "~/.autonomic/data/vmlinux.bin"
-firecracker_rootfs = "~/.autonomic/data/rootfs.ext4"
-
-[mouth]
-ast_validation = true
-slack_approval_channel = "#ops-approvals"
-slack_approval_timeout_minutes = 30
+port = 3106
+sandbox_backend = "process"      # Options: "process", "seccomp", "firecracker"
+network_blackhole = true
+max_memory_rss_mb = 512
+osv_cache_ttl_hours = 24
+auto_abort_on_high_cve = true
 ```
 
-Per-node sandbox overrides are specified in the workflow DAG definition within agent-spine's configuration.
+---
+
+## CLI Command Reference
+
+| Command | Flags | Description |
+| :--- | :--- | :--- |
+| **`agent-immune scan`** | `--manifest <path>`, `--json` | Scans dependency manifests against the OSV.dev CVE database. |
+| **`agent-immune sandbox run`** | `"<cmd>"`, `--backend <type>` | Executes a command inside the zero-trust sandbox. |
+| **`agent-immune verify-memory`** | `--pid <pid>`, `--ceiling-mb <N>` | Attaches real-time RSS monitor to an existing process PID. |
+| **`agent-immune serve`** | `--port 3106` | Starts the admission control HTTP server. |
+
+---
+
+## MCP Tool Reference
+
+`agent-immune` protects agent hosts via the following MCP tools:
+
+- **`immune_scan_manifest`**: Parses and checks a package file for known CVEs.
+- **`immune_sandbox_run`**: Sandboxes an arbitrary script, enforcing strict syscall and memory ceilings.
