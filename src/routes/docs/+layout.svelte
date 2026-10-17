@@ -128,13 +128,19 @@
         themeVariables: {
           darkMode: true,
           background: "#080b11",
-          primaryColor: "#0ea5e9",
+          mainBkg: "#081c2e",
+          nodeBorder: "#38bdf8",
+          primaryColor: "#081c2e",
           primaryTextColor: "#f8fafc",
           primaryBorderColor: "#38bdf8",
-          lineColor: "#64748b",
+          lineColor: "#38bdf8",
           secondaryColor: "#1e293b",
           tertiaryColor: "#0f172a",
-          fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+          edgeLabelBackground: "#0d1117",
+          clusterBkg: "#080d1a",
+          clusterBorder: "rgba(56, 189, 248, 0.3)",
+          fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+          fontSize: "12px"
         }
       });
 

@@ -21,10 +21,10 @@ flowchart TD
     Execution <--> Sensory
     Sensory <--> Interface
 
-    classDef core fill:#0ea5e9,stroke:#0284c7,stroke-width:2px,color:#080b10;
-    classDef exec fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#080b10;
-    classDef sensory fill:#10b981,stroke:#047857,stroke-width:2px,color:#ffffff;
-    classDef iface fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#ffffff;
+    classDef core fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef exec fill:#261606,stroke:#f59e0b,stroke-width:1.5px,color:#f8fafc;
+    classDef sensory fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
+    classDef iface fill:#190e2b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc;
     class Core core;
     class Execution exec;
     class Sensory sensory;

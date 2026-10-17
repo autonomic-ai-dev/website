@@ -40,9 +40,9 @@ flowchart TD
         Mesh --> Mouth["agent-mouth (Ingress)"]
     end
 
-    classDef host fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
-    classDef transport fill:#0ea5e9,stroke:#0284c7,stroke-width:2px,color:#080b10;
-    classDef organ fill:#10b981,stroke:#047857,stroke-width:2px,color:#ffffff;
+    classDef host fill:#0f172a,stroke:#64748b,stroke-width:1.5px,color:#f8fafc;
+    classDef transport fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef organ fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
     class Cursor,Claude,Anti host;
     class Gateway,Direct,Mesh,Sock transport;
     class Body,Brain,Spine,Muscle,Immune,Heart,Eyes,Mouth organ;
