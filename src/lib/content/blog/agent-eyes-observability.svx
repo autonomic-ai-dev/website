@@ -1,6 +1,6 @@
 ---
 title: "Agent Eyes: Visual QA and Observability Through DOM Intelligence"
-date: "2026-06-21"
+date: "2026-10-17"
 excerpt: "How agent-eyes enables automated visual testing with DOM indexing, screenshot capture, pixel diff analysis, and local LLaVA VLM inference."
 slug: "agent-eyes-observability"
 category: "Engineering"

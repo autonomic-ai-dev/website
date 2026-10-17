@@ -11,25 +11,25 @@ flowchart TD
     Daemon["agent-heart serve (:3101)"]
 
     subgraph ScheduledMaintenance["Scheduled Maintenance (tokio-cron)"]
-        Cron["Cron Trigger\n(0 3 * * *)"] --> GC["agent-brain gc\n(Prune invalid_at facts)"]
+        Cron["Cron Trigger<br/>(0 3 * * *)"] --> GC["agent-brain gc<br/>(Prune invalid_at facts)"]
         Cron --> Vac["SQLite VACUUM & Reindex"]
-        Cron --> Distill["Memory Distillation\n(Merge duplicate nodes)"]
+        Cron --> Distill["Memory Distillation<br/>(Merge duplicate nodes)"]
     end
 
     subgraph TokenBudgetGate["Token Budget Gate (/budget/check)"]
-        Spine["agent-spine"] --> Req["POST /budget/check\n{estimated_tokens: 4500}"]
+        Spine["agent-spine"] --> Req["POST /budget/check<br/>(tokens: 4500)"]
         Req --> Evaluator{"Quota Ceiling Check"}
-        Evaluator -->|Under Daily Limit| Allow["Return 200 OK\n(Allow Execution)"]
-        Evaluator -->|Exceeded Limit| Deny["Return 429 Too Many Requests\n(Halt Workflow Safe)"]
+        Evaluator -->|Under Daily Limit| Allow["Return 200 OK<br/>(Allow Execution)"]
+        Evaluator -->|Exceeded Limit| Deny["Return 429 Too Many Requests<br/>(Halt Workflow Safe)"]
     end
 
-    Daemon --> ScheduledMaintenance
-    Daemon --> TokenBudgetGate
+    Daemon --> Cron
+    Daemon --> Req
 
     classDef core fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
     classDef gate fill:#2d0b0e,stroke:#f43f5e,stroke-width:1.5px,color:#f8fafc;
     classDef ok fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
-    class Daemon,ScheduledMaintenance,TokenBudgetGate core;
+    class Daemon,Cron,GC,Vac,Distill,Spine,Req,Evaluator core;
     class Deny gate;
     class Allow ok;
 ```

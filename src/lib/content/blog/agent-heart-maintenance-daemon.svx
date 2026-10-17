@@ -1,6 +1,6 @@
 ---
 title: "Agent Heart: The Background GC Scheduler and Token Budget Gate"
-date: "2026-06-21"
+date: "2026-10-17"
 excerpt: "How agent-heart keeps the ecosystem healthy with scheduled garbage collection, token budget enforcement, and cron-based maintenance routines."
 slug: "agent-heart-maintenance-daemon"
 category: "Engineering"

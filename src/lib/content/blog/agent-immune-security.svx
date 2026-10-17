@@ -1,6 +1,6 @@
 ---
 title: "Agent Immune: Three-Layer Defense for Autonomous Execution"
-date: "2026-06-21"
+date: "2026-10-17"
 excerpt: "How agent-immune protects the ecosystem with OSV dependency scanning, seccomp/Firecracker sandboxing, and OOM detection across three defense layers."
 slug: "agent-immune-security"
 category: "Security"

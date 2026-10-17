@@ -9,11 +9,11 @@ title: Memory & Context Routing (agent-brain)
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Agent as Host Agent (Cursor / Claude)
-    participant Hook as route_gate.py (PreToolUse Hook)
-    participant Proxy as agent-brain (Stdio Proxy)
-    participant Daemon as serve.sock (Background Daemon)
-    participant Store as brain.db (SQLite + HNSW)
+    participant Agent as "Host Agent (Cursor / Claude)"
+    participant Hook as "route_gate.py (PreToolUse Hook)"
+    participant Proxy as "agent-brain (Stdio Proxy)"
+    participant Daemon as "serve.sock (Background Daemon)"
+    participant Store as "brain.db (SQLite + HNSW)"
 
     Agent->>Hook: Invokes MCP / Shell Tool
     Hook->>Hook: Checks turn state (route_task called?)

@@ -1,6 +1,6 @@
 ---
 title: "Agent Nerves: The NATS JetStream Messaging Backbone"
-date: "2026-06-21"
+date: "2026-10-17"
 excerpt: "How agent-nerves provides async event-driven coordination across all organs using NATS JetStream, with typed events, stream bootstrapping, and cluster coordination."
 slug: "agent-nerves-event-bus"
 category: "Engineering"

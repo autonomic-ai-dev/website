@@ -1,0 +1,91 @@
+---
+title: "Agent TUI: Terminal-Native Observability HUD for Autonomous Agents"
+date: "2026-10-17"
+excerpt: "How agent-tui uses Ratatui, Crossterm, and Tokio async channels in Rust to deliver a zero-overhead, sub-millisecond terminal observability console streaming multi-agent telemetry and DAG execution trees."
+slug: "agent-tui-avionics-hud"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+When running long-running autonomous workflows that span multiple daemons, developers need real-time situational awareness without leaving the terminal or tabbing between heavy browser windows. 
+
+**`agent-tui`** is the terminal-native observability HUD for the Autonomic cluster. Engineered entirely in **Rust** using **Ratatui** and **Crossterm**, it renders an aerospace-inspired avionics console inside your terminal, streaming live organ telemetry, vector memory operations, and DAG execution trees with sub-millisecond refresh rates and negligible CPU consumption.
+
+---
+
+## Architectural Principles
+
+### 1. Direct Socket & Event Mesh Streaming
+Unlike web dashboards that poll REST endpoints every few seconds, `agent-tui` establishes an asynchronous push-based connection:
+- Directly connects to the Unix Domain Socket (`~/.autonomic/memory/serve.sock`) for low-latency memory turn events.
+- Subscribes to the NATS JetStream `autonomic.telemetry.*` subject for broadcast events from worker daemons.
+- When no events are in flight, `agent-tui` sleeps on `tokio::select!`, consuming less than 0.1% CPU.
+
+### 2. Double-Buffered Zero-Flicker Rendering
+High-velocity log streams and multi-step DAG executions can cause unbearable screen tearing in standard terminal applications. `agent-tui` uses Ratatui's double-buffered terminal canvas:
+- Computes minimal character diffs between consecutive animation frames.
+- Flushes terminal ANSI escape codes in a single synchronized write buffer.
+- Maintains a smooth 60 FPS refresh rate even during massive compilation runs.
+
+---
+
+## The 5 Avionics Panels
+
+```
+┌─ AUTONOMIC AVIONICS HUD [Darwin ARM64] ─────────── 2026-10-17 08:30:12 UTC ──┐
+│                                                                              │
+│  [ORGAN MESH]              [DAG STEP TREE: run-8924b1a]                      │
+│  ● agent-body     42 MB     ✔ 1. security_scan     [immune]   42ms           │
+│  ● agent-brain    88 MB     ✔ 2. lint_check        [muscle]  120ms           │
+│  ● agent-spine    28 MB     ✔ 3. build_and_test    [muscle]  2.4s            │
+│  ● agent-muscle   14 MB     ⏳ 4. prod_deploy_gate  [mouth]  WAITING (Slack) │
+│  ● agent-immune   19 MB     ○ 5. release_bottle    [muscle]  QUEUED          │
+│  ● agent-heart    12 MB                                                      │
+│                                                                              │
+│  [TOKEN BUDGET: 1.2M / 5.0M] [MEMORY RSS: 243 MB]                            │
+│  [===================>------------------------] 24%                           │
+│                                                                              │
+│  [UNIFIED LOG STREAM]                                                        │
+│  08:30:08 [spine] Execution paused at approval gate: prod_deploy_gate        │
+│  08:30:09 [mouth] Dispatched approval card to Slack channel #deployments     │
+│  08:30:11 [heart] Token budget reservation: 4,500 tokens approved            │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **Avionics Header**: Displays host architecture, system uptime, and active UTC clock.
+2. **Organ Mesh Matrix**: Real-time status indicators (emerald/rose), PIDs, and Resident Set Size (RSS) memory consumption for all eleven daemons.
+3. **DAG Step Tree**: Hierarchical, color-coded visualization of active workflow nodes (`RUNNING`, `SUCCESS`, `FAILED`, `WAITING_APPROVAL`).
+4. **Budget & Resource Gauges**: Visual progress bars showing daily token consumption against configured spending limits.
+5. **Multiplexed Log Stream**: Real-time ANSI-colored log tail with keyboard search and filtering.
+
+---
+
+## Keyboard Command Matrix
+
+Developers can drive the entire console without touching a mouse:
+
+| Key | Function |
+| :--- | :--- |
+| `Tab` / `Shift+Tab` | Cycle active panel focus |
+| `j` / `k` or `↑` / `↓` | Scroll through node trees and log history |
+| `Enter` | Expand selected step to inspect full stdout / stderr traces |
+| `g` | Trigger an immediate manual GC pulse to `agent-heart` |
+| `r` | Rewind execution to the selected snapshot and replay step |
+| `/` | Filter log stream by keyword or organ name |
+| `q` | Detach HUD without terminating running background daemons |
+
+---
+
+## Getting Started
+
+Launch `agent-tui` directly from your command line:
+
+```bash
+# Launch default avionics console
+agent-tui
+
+# Connect to a remote or custom socket
+agent-tui --socket /tmp/autonomic.sock --fps 120
+```
+
+With `agent-tui`, autonomous agent execution transforms from an opaque black box into an observable, deterministic cockpit.

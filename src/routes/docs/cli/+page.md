@@ -51,7 +51,7 @@ Tails the background output logs for the specified organ daemon (equivalent to `
 ```bash
 autonomic doctor
 ```
-Verifies the health of your installation. It checks that all 9 organ binaries exist in your PATH, validates your `config.toml`, and checks for legacy configurations.
+Verifies the health of your installation. It checks that all 11 organ binaries exist in your PATH, validates your `config.toml`, and checks for legacy configurations.
 
 ---
 

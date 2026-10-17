@@ -1,0 +1,91 @@
+---
+title: "Agent CI Dashboard: Web Mission Control & Batch Release Orchestration"
+date: "2026-10-17"
+excerpt: "How agent-ci-dashboard leverages SvelteKit 5 runes, Octokit, and Tailwind CSS to solve multi-repo CI triage, live Actions log inspection, and coordinated batch pull request merging across 11 ecosystem repositories."
+slug: "agent-ci-dashboard-mission-control"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Managing an ecosystem composed of eleven decoupled microservice repositories (`agent-body`, `agent-brain`, `agent-spine`, etc.) poses severe release engineering friction. When a cross-cutting architectural change or protocol upgrade lands, an engineer is forced to manually open eleven separate GitHub browser tabs, refresh CI runs, inspect individual check runs, and click merge eleven times.
+
+**`agent-ci-dashboard`** is the web mission control platform built specifically for multi-repository autonomous swarms. Powered by **SvelteKit 5 runes** and the **GitHub REST & GraphQL API**, it consolidates all eleven repositories into a unified real-time situational dashboard.
+
+---
+
+## The 4-State Check Machine
+
+In standard GitHub views and earlier dashboard iterations, pull requests in a failed state were ambiguously grouped under a generic "Merge Blocked" badge alongside in-progress checks and missing reviews. This forced operators to click into every pull request to determine whether tests had failed or were simply still executing.
+
+`agent-ci-dashboard` replaces this ambiguity with a strict 4-state finite state machine:
+
+```
+[PR Evaluation]
+      │
+      ├── Any Required Check Failed? ──> [Checks Failed (Rose)]
+      │                                   Disabled button: "Checks Failed"
+      │                                   Displays exact failed workflow names
+      │
+      ├── Any Check In-Progress? ──────> [Checks Running (Cyan Spinner)]
+      │                                   Disabled button: "Checks Running"
+      │
+      ├── Blocked / Merge Conflict? ───> [Merge Blocked (Amber)]
+      │                                   Disabled button: "Merge Blocked"
+      │
+      └── All Checks Passed Cleanly ───> [Ready to Merge (Emerald)]
+                                          Enabled button: "Squash & Merge"
+```
+
+1. **`Checks Failed`** (Rose Badge): Immediately surfaces the exact failing workflows (e.g., `Stage test`, `CI`, `Protected paths`). The action button renders as `Checks Failed`.
+2. **`Checks Running`** (Cyan Badge with Spinner): Indicates active GitHub Actions runner execution.
+3. **`Merge Blocked`** (Amber Badge): Triggered when status checks pass but branch protection rules (e.g. required approvals or merge conflicts) prevent merging.
+4. **`Ready to Merge`** (Emerald Badge): All required checks have passed; enables one-click merging.
+
+---
+
+## Embedded Terminal Log Modal
+
+When a check fails, navigating to GitHub's web interface, locating the workflow run, and expanding nested accordion logs wastes minutes. 
+
+`agent-ci-dashboard` embeds an inline terminal modal directly in the card:
+- Clicking any failed check pill queries the GitHub Actions API for that step's raw text log.
+- Parses ANSI terminal escape codes on the fly.
+- Highlights compilation errors, stack traces, and test assertions in a dedicated cybernetic modal.
+
+---
+
+## Coordinated Multi-Repo Batch Merging
+
+When synchronizing dependency upgrades (such as bumping all organs from `v1.0.0-beta.1` to `v1.0.0-beta.2`):
+
+```svelte
+<!-- SvelteKit 5 Rune State -->
+<script lang="ts">
+  let selectedPrs = $state<string[]>([]);
+  let isMergingBatch = $state(false);
+
+  async function mergeSelectedQueue() {
+    isMergingBatch = true;
+    for (const prId of selectedPrs) {
+      await octokit.rest.pulls.merge({ ... });
+    }
+    isMergingBatch = false;
+  }
+</script>
+```
+
+Operators simply check the checkboxes next to verified pull requests and click **Batch Squash & Merge**. The dashboard processes the queue sequentially, monitors merge responses, and triggers automated branch cleanup across all targeted repositories.
+
+---
+
+## Dynamic Ecosystem Baseline Derivation
+
+Rather than relying on hardcoded strings or static configuration files, `agent-ci-dashboard` derives ecosystem baseline tags and repository releases directly from GitHub release streams:
+
+```svelte
+let currentTag = $derived(releases[0]?.tag_name || 'v1.0.0-beta.2');
+```
+
+Whenever a new tag is pushed, the mission control header, sidebar repository list, and breadcrumb navigation update dynamically—ensuring consistent version visibility across the entire engineering team.
+
+By combining SvelteKit 5's reactivity with granular CI check triage, `agent-ci-dashboard` cuts multi-repo release coordination time by over 80%.
