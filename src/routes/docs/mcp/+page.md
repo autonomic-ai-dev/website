@@ -89,3 +89,47 @@ agent-brain install --opencode
   }
 }
 ```
+
+---
+
+## Upstream MCP Server Management
+
+`agent-brain` acts as an MCP gateway and tool router. External MCP servers can be added, tested, and indexed directly through the CLI:
+
+```bash
+# Register an upstream MCP server
+agent-brain mcp add memory-engine -- /usr/local/bin/custom-mcp-server --port 8080
+
+# List registered servers and active tool counts
+agent-brain mcp list
+
+# Test upstream connectivity and verify tool schemas
+agent-brain mcp test memory-engine
+
+# Sync tool vectors into SQLite vector memory
+agent-brain mcp sync
+```
+
+---
+
+## Skill Packages & Curated Registry
+
+Skills and domain policies are managed via the canonical `package` command group:
+
+```bash
+# Canonical package installation
+agent-brain package add @coding-policy
+agent-brain package add @supervisor
+agent-brain package add owner/repo --ref main
+
+# List installed packages and filesystem paths
+agent-brain package list
+
+# Update or remove packages
+agent-brain package update
+agent-brain package remove coding-policy
+
+# Browse curated ecosystem registry
+agent-brain registry list
+```
+

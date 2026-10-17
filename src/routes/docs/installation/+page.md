@@ -34,7 +34,7 @@ brew install agent-tui
 
 ---
 
-## 2. Automated Bootstrap Script (macOS & Linux)
+# 2. Automated Bootstrap Script (macOS & Linux)
 
 For headless CI runners or Linux systems without Homebrew, use the automated installer:
 
@@ -42,12 +42,17 @@ For headless CI runners or Linux systems without Homebrew, use the automated ins
 curl -fsSL https://raw.githubusercontent.com/autonomic-ai-dev/agent-body/master/scripts/install-all-organs.sh | bash
 ```
 
+#### Dynamic Patch Resolution
+The installer aligns with the ecosystem baseline (defaulting to `v1.0.0-beta.3`) while dynamically discovering compatible patch releases per organ (e.g. automatically pulling `v1.0.0-beta.3.1` for `agent-brain` without requiring an ecosystem-wide major bump).
+
 This installer:
 1. Detects host operating system and target architecture (`darwin-arm64`, `linux-x86_64`, `linux-aarch64`).
-2. Downloads notarized release archives from GitHub Releases.
-3. Installs binaries into `~/.local/bin/` (ensuring permissions and `PATH`).
-4. On macOS, automatically clears Gatekeeper quarantine flags (`xattr -dr com.apple.quarantine ~/.local/bin/agent-*`).
-5. Validates installation integrity via `autonomic doctor`.
+2. Queries the GitHub Releases API to resolve the newest compatible patch release per organ for the current baseline.
+3. Downloads notarized release archives from GitHub Releases.
+4. Installs binaries into `~/.local/bin/` (ensuring permissions and `PATH`).
+5. On macOS, automatically clears Gatekeeper quarantine flags (`xattr -dr com.apple.quarantine ~/.local/bin/agent-*`).
+6. Validates installation integrity via `autonomic doctor --quick`.
+7. Bootstraps integration packages using `agent-brain package add @supervisor` and `agent-brain package add @starter`.
 
 ---
 

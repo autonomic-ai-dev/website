@@ -30,7 +30,7 @@ agent-heart [OPTIONS] <COMMAND>
 
 ### `budget`
 
-Predictive token budget management and expenditure monitoring.
+Predictive token budgeting, multi-dimensional governance, and expenditure monitoring.
 
 ```bash
 agent-heart budget <SUBCOMMAND>
@@ -40,18 +40,31 @@ agent-heart budget <SUBCOMMAND>
 
 | Subcommand | Description |
 | :--- | :--- |
-| `status` | Query current daily, weekly, and monthly token expenditure vs limits. |
-| `check` | Probe whether a proposed task prompt will breach budget thresholds before sending to LLM. |
+| `status` | Query current token consumption, WASM fuel metrics, and latency percentiles. |
+| `check` | Probe whether a proposed task phase will breach the multi-dimensional budget vector (`tokens`, `wasm_fuel`, `latency_ms`). |
+
+#### Multi-Dimensional Budget Vector
+`agent-heart` governs resource allocations using a normalized 3-dimensional vector:
+- **Tokens**: Predicted $p95$ and average token consumption against phase ceilings.
+- **WASM Fuel**: Peak memory and fuel consumed by sandboxed execution workers.
+- **Latency (ms)**: Turn response thresholds to prevent runaway synchronous execution.
+
+#### Adaptive PID Throttling
+When consumption approaches threshold limits, `agent-heart` calculates an adaptive `throttle_factor` ($0.1 \le \text{factor} \le 1.0$) using a Proportional-Integral-Derivative (PID) controller, smoothly pacing background task scheduling without hard pipeline halts.
+
+#### MCP Governance Tool
+- `heart_budget_status`: Returns structured JSON containing phase token statistics, global averages, and WASM fuel metrics for connected agent hosts.
 
 #### Examples
 
 ```bash
-# Display live token consumption
+# Display live token consumption and WASM fuel
 agent-heart budget status
 
-# Check if a 128k prompt is allowed under current quotas
+# Check if a task phase complies with budget vector ceilings
 agent-heart budget check
 ```
+
 
 ---
 

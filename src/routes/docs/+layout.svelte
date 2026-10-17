@@ -27,7 +27,7 @@
     Check
   } from "lucide-svelte";
 
-  let { children } = $props();
+  let { children, data } = $props();
   let pathname = $derived($page.url.pathname);
   let isMobileDocsMenuOpen = $state(false);
   let searchQuery = $state("");
@@ -323,7 +323,7 @@
       </nav>
       <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span>SPEC v1.0.0-beta.3</span>
+        <span>SPEC {data?.ecosystemVersion || 'v1.0.0-beta.3'}</span>
       </div>
     </div>
 

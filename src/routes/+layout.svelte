@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { Menu, X, ExternalLink, Activity, ArrowRight } from "lucide-svelte";
   import { particles } from "$lib/actions/particles";
-  let { children } = $props();
+  let { children, data } = $props();
 
   let isMobileMenuOpen = $state(false);
 
@@ -38,7 +38,7 @@
         <div class="flex items-baseline gap-1.5 font-mono">
           <span class="font-bold text-base tracking-tight text-white">AUTONOMIC</span>
           <span class="text-xs text-cyan-400 font-semibold tracking-wider">AI</span>
-          <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/25 hidden sm:inline">v1.0.0-beta.3</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/25 hidden sm:inline">{data?.ecosystemVersion || 'v1.0.0-beta.3'}</span>
         </div>
       </a>
       
