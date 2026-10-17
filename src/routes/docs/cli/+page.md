@@ -1,321 +1,90 @@
 ---
-title: CLI Reference
+title: CLI Reference Overview
 ---
 
-# Command Line Interface (CLI)
+# Autonomic CLI Reference
 
-The Autonomic ecosystem is primarily managed through two main CLIs: `autonomic` (the meta-orchestrator) and `agent-brain` (the local context engine).
+Welcome to the **Autonomic Command Line Interface (CLI) Reference**.
 
-## `autonomic` (agent-body)
-
-The `autonomic` CLI manages the lifecycle of the system, acting as a supervisor that orchestrates the individual daemons.
-
-### Initialization
-
-```bash
-autonomic init
-```
-Creates the workspace directory at `~/.autonomic/` and generates the default unified `config.toml`. This command sets up the isolated folders for `logs`, `memory`, `state`, and `broker`.
-
-### Daemon Lifecycle
-
-```bash
-autonomic start [organ_name]
-```
-Boots up the entire multi-organ ecosystem. Daemons are started in dependency order (e.g., `nats-server`, then `agent-nerves`, then `agent-heart`, then the rest). 
-- If `organ_name` is provided, it starts only that specific organ.
-- The `agent-body` process acts as an ongoing supervisor. If an organ exits unexpectedly, it will automatically restart it.
-
-```bash
-autonomic stop [organ_name]
-```
-Gracefully terminates the ecosystem daemons in reverse-dependency order.
-
-```bash
-autonomic restart
-```
-A convenience wrapper to stop and then start all supervised daemons.
-
-### Monitoring
-
-```bash
-autonomic status
-```
-Prints a table of all supervised organs, their current Process IDs (PIDs), whether they are currently running, if their HTTP healthcheck is passing, and the absolute path to their log files.
-
-```bash
-autonomic logs <organ_name>
-```
-Tails the background output logs for the specified organ daemon (equivalent to `tail -f ~/.autonomic/logs/supervisor/<organ>.log`).
-
-```bash
-autonomic doctor
-```
-Verifies the health of your installation. It checks that all 11 organ binaries exist in your PATH, validates your `config.toml`, and checks for legacy configurations.
+The Autonomic ecosystem provides a unified meta-orchestrator (`autonomic`) alongside dedicated standalone CLI binaries for each autonomous organ. Every CLI is built in **Rust** with `clap` v4, supporting structured flag parsing, POSIX-compliant exit codes, standardized `--help` output, and unified logging.
 
 ---
 
-## `agent-brain`
+## Ecosystem CLI Architecture
 
-While `agent-brain` runs headlessly as an MCP server, its CLI is used to manage skill packages, index data, and integrate with your code editors.
+```mermaid
+flowchart TD
+    subgraph MetaCLI["Meta Supervisor Interface"]
+        Auto["autonomic\n(agent-body control plane)"]
+    end
 
-### Setup and Integration
+    subgraph Organs["Organ-Specific Command Line Binaries"]
+        Brain["agent-brain\n(Memory, MCP Hub, Skills)"]
+        Spine["agent-spine\n(DAG Workflow Runner)"]
+        Muscle["agent-muscle\n(Actuator & LoRA Trainer)"]
+        Heart["agent-heart\n(Budget & GC Maintenance)"]
+        Immune["agent-immune\n(OSV Scanner & Sandbox)"]
+        Mouth["agent-mouth\n(Approval Gate & Webhooks)"]
+        Eyes["agent-eyes\n(DOM Indexer & SSIM Diff)"]
+        Nerves["agent-nerves\n(NATS Mesh & Cluster)"]
+        TUI["agent-tui\n(Ratatui Terminal Avionics)"]
+    end
 
-```bash
-agent-brain install --global
+    Auto --> Brain
+    Auto --> Spine
+    Auto --> Muscle
+    Auto --> Heart
+    Auto --> Immune
+    Auto --> Mouth
+    Auto --> Eyes
+    Auto --> Nerves
+    Auto --> TUI
+
+    classDef meta fill:#081c2e,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef organ fill:#0f172a,stroke:#64748b,stroke-width:1.5px,color:#f8fafc;
+    class MetaCLI meta;
+    class Organs organ;
 ```
-The most important command for getting started. It installs the `agent-brain` MCP server into your local environment, automatically configuring `mcp.json` or `claude_desktop_config.json` for popular editors (Cursor, VSCode, Claude Desktop, Claude Code).
-
-*Options:*
-- `--all`: Installs for every supported IDE found on the machine.
-- `--reload`: Bumps the binary build signature (useful after running `cargo build` manually).
-
-### Package Management
-
-```bash
-agent-brain add <owner/repo>
-```
-Downloads, installs, and indexes a skill package directly from GitHub. For example, `agent-brain add @nextjs` installs the curated Next.js rules and skills into your local brain.
-
-```bash
-agent-brain package list
-agent-brain package update
-agent-brain package remove <package_name>
-```
-Commands to view, update, and remove your installed skill packages.
-
-### Memory Operations
-
-```bash
-agent-brain index
-```
-Forces a full rebuild of the local Knowledge Graph index in SQLite. Use this if you manually edit skill files or rules on disk.
-
-```bash
-agent-brain sync git
-agent-brain sync cloud
-```
-Synchronizes your `brain.db` bundle to a remote Git repository or an encrypted cloud bucket (S3/R2/MinIO). Perfect for keeping context synchronized between a laptop and a workstation.
-
-### Diagnostics
-
-```bash
-agent-brain briefing
-```
-Outputs a detailed summary of the last `route_task` operation, showing exactly which skills and rules were injected into the agent's context, and the estimated token savings compared to a naive full-index load.
 
 ---
 
-## `agent-spine`
+## Universal Conventions
 
-`agent-spine` manages stateful YAML workflows, executing complex DAGs with conditional gates. Its CLI provides tools to validate, run, and inspect these workflows.
+Across all Autonomic binaries, the following conventions apply:
 
-### Workflow Management
+### Global Options
 
-```bash
-agent-spine validate <file.yaml>
-```
-Parses and validates a YAML workflow definition, checking for syntax errors, missing fields, or circular dependencies in the DAG without actually executing anything.
+| Flag | Short | Type | Description |
+| :--- | :--- | :--- | :--- |
+| `--help` | `-h` | Boolean | Prints concise usage instructions, subcommands, and flags. |
+| `--version` | `-V` | Boolean | Prints the binary semantic version and git commit SHA. |
+| `--progress` | — | String | Progress output style: `auto` (default), `plain` (CI), or `quiet`. |
 
-```bash
-agent-spine run <file.yaml>
-```
-Executes a workflow locally. This will dispatch events to the NATS bus, wait for the corresponding organs to process the tasks, and evaluate any conditional logic defined in the YAML.
+### Standard Exit Codes
 
-### Inspection and API
-
-```bash
-agent-spine inspect <run-id>
-```
-Inspects the history and immutable snapshots of a specific execution run.
-
-```bash
-agent-spine serve
-```
-Boots the background daemon and serves the Live Dashboard API on port `3100`, providing real-time visibility into workflow execution.
+| Exit Code | Meaning | Typical Scenario |
+| :---: | :--- | :--- |
+| `0` | **Success** | Command executed without errors. |
+| `1` | **General Error** | Runtime failure, missing prerequisite, or unhandled exception. |
+| `2` | **CLI Syntax Error** | Invalid flags, missing required arguments, or unknown subcommand. |
+| `69` | **Service Unavailable** | Target daemon is offline or refused connection. |
+| `78` | **Configuration Error** | Malformed TOML/YAML configuration or schema validation failure. |
 
 ---
 
-## `agent-heart`
+## CLI Reference Index
 
-`agent-heart` runs in the background to handle garbage collection, dataset distillation, and cluster health.
+Explore the flag-level documentation for each command line utility:
 
-### Maintenance
-
-```bash
-agent-heart gc
-```
-Forces a one-time garbage collection sweep across the system. This cleans up orphaned workflow artifacts and prunes stale temporal memories.
-
-```bash
-agent-heart budget
-```
-Accesses predictive token budget tools. It analyzes the retrieval logs generated by `agent-brain` to help operators predict and manage token expenditure.
-
-### Learning and Distillation
-
-```bash
-agent-heart distill
-```
-Compresses and learns from cluster execution traces, synthesizing successful workflows into new `must_apply` rules or skill drafts.
-
----
-
-## `agent-nerves`
-
-`agent-nerves` serves as the networking and event-bus bridge, interacting directly with the underlying NATS/JetStream infrastructure.
-
-### Traffic and Routing
-
-```bash
-agent-nerves stream
-```
-Inspects and tails NATS/JetStream traffic in real-time. Useful for debugging event dispatch issues between organs.
-
-```bash
-agent-nerves filter
-```
-Registers and manages custom event filters (written in JSON or WASM) to selectively route or drop events before they reach the organs.
-
-```bash
-agent-nerves cluster
-```
-Manages multi-node cluster coordination, allowing you to link multiple Autonomic environments together.
-
----
-
-## `agent-muscle`
-
-`agent-muscle` handles all heavy lifting, including remote sandboxed execution, LoRA fine-tuning, and GPU interactions.
-
-### Execution
-
-```bash
-agent-muscle run <cmd>
-```
-Runs a specific command and streams the output securely back to the caller.
-
-### Training and ML
-
-```bash
-agent-muscle train
-```
-Triggers a LoRA fine-tuning run using MLX, candle, or auto-detecting the best available ML backend for the host machine.
-
-```bash
-agent-muscle operator
-```
-Interfaces with Kubernetes to manage distributed GPU training operators.
-
----
-
-## `agent-immune`
-
-`agent-immune` enforces strict security boundaries, dependency checking, and execution isolation.
-
-### Scanning and Verification
-
-```bash
-agent-immune scan <manifest>
-```
-Scans a package manifest (e.g., `package.json`, `Cargo.toml`) for vulnerable dependencies against the OSV database.
-
-```bash
-agent-immune verify-memory
-```
-Verifies that a specific script has no runaway memory growth before allowing it to be used in dataset generation.
-
-### Sandboxing
-
-```bash
-agent-immune sandbox <script>
-```
-Executes a script within a strictly network-isolated sandbox environment.
-
----
-
-## `agent-eyes`
-
-`agent-eyes` provides visual QA, UI verification, and DOM analysis.
-
-### Visual Analysis
-
-```bash
-agent-eyes capture <url>
-```
-Navigates to the specified URL and captures a headless screenshot.
-
-```bash
-agent-eyes diff <img1> <img2>
-```
-Performs a pixel-perfect differential analysis between two images to detect UI regressions.
-
-```bash
-agent-eyes vlm
-```
-Invokes the native local Vision-Language Model (LLaVA via candle) to describe or verify UI elements.
-
-### DOM Operations
-
-```bash
-agent-eyes dom
-```
-Indexes and searches the current web application's DOM, storing the graph in a local SQLite database for rapid contextual lookup by the agent.
-
----
-
-## `agent-mouth`
-
-`agent-mouth` manages all external communication, slack approvals, and output summarization.
-
-### Communication
-
-```bash
-agent-mouth send <msg>
-```
-Dispatches a notification message via configured external webhooks (e.g., Slack, Discord).
-
-```bash
-agent-mouth summarize
-```
-Summarizes long command output piped directly from `stdin`. Perfect for digesting massive compiler errors before sending them back to the LLM context.
-
-### Policy Enforcement
-
-```bash
-agent-mouth validate <script>
-```
-Validates a bash command or script against the system's Abstract Syntax Tree (AST) policies before allowing it to be transmitted.
-
----
-
-## `agent-tui`
-
-`agent-tui` renders an interactive terminal avionics console for cluster monitoring.
-
-```bash
-agent-tui
-```
-Boots the terminal HUD, connecting to `~/.autonomic/memory/serve.sock`.
-
-```bash
-agent-tui --socket <path> --fps 60
-```
-Connects to a custom socket endpoint with a target refresh rate.
-
----
-
-## `agent-ci-dashboard`
-
-Mission control web dashboard server and CI telemetry relay.
-
-```bash
-cd agent-ci-dashboard && npm run dev
-```
-Starts the local development mission control server at `http://localhost:5173`.
-
-```bash
-npm run build && npm run preview
-```
-Compiles the production SvelteKit 5 build and boots the preview server.
-
+| Binary | Organ | Role | Dedicated Reference |
+| :--- | :--- | :--- | :--- |
+| **`autonomic`** | `agent-body` | Cluster supervision, daemon lifecycle, launchd service management | [`/docs/cli/autonomic`](/docs/cli/autonomic) |
+| **`agent-brain`** | `agent-brain` | Temporal vector memory, HNSW reasoning, MCP server hub, skill packages | [`/docs/cli/agent-brain`](/docs/cli/agent-brain) |
+| **`agent-spine`** | `agent-spine` | Deterministic YAML DAG workflow execution, step replays, validation | [`/docs/cli/agent-spine`](/docs/cli/agent-spine) |
+| **`agent-muscle`** | `agent-muscle` | Sandboxed script execution, Tree-sitter AST validation, LoRA fine-tuning | [`/docs/cli/agent-muscle`](/docs/cli/agent-muscle) |
+| **`agent-heart`** | `agent-heart` | Token budget enforcement, cluster memory distillation, automated GC | [`/docs/cli/agent-heart`](/docs/cli/agent-heart) |
+| **`agent-immune`** | `agent-immune` | OSV vulnerability auditing, network-isolated sandboxing, RSS leak detection | [`/docs/cli/agent-immune`](/docs/cli/agent-immune) |
+| **`agent-mouth`** | `agent-mouth` | Ingress webhook listener, human approval gates, bash AST validation | [`/docs/cli/agent-mouth`](/docs/cli/agent-mouth) |
+| **`agent-eyes`** | `agent-eyes` | Headless Chrome screenshot capture, SSIM pixel diff, spatial DOM indexing | [`/docs/cli/agent-eyes`](/docs/cli/agent-eyes) |
+| **`agent-nerves`** | `agent-nerves` | NATS JetStream event mesh, multi-node clustering, traffic inspection | [`/docs/cli/agent-nerves`](/docs/cli/agent-nerves) |
+| **`agent-tui`** | `agent-tui` | High-frequency terminal avionics HUD, live workflow visualizer, organ matrix | [`/docs/cli/agent-tui`](/docs/cli/agent-tui) |
