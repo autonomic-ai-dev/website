@@ -32,8 +32,8 @@ flowchart LR
     Diff --> Event["autonomic.eyes.regression\n(NATS JetStream Broadcast)"]
     VLM --> Caption["Semantic Layout Audit\n('No overlapping elements detected')"]
 
-    classDef core fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
-    classDef path fill:#10b981,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    classDef core fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef path fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
     class Router core;
     class FastPath,VisualPath,LocalVLM,Search,Event,Caption path;
 ```

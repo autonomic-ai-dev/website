@@ -20,11 +20,13 @@ flowchart TD
     Nerves --> TUI["agent-tui\n(Ratatui Terminal HUD)"]
     Nerves --> CIDash["agent-ci-dashboard\n(Mission Control Web)"]
 
-    classDef core fill:#00f2fe,stroke:#0891b2,stroke-width:2px,color:#080b10;
-    classDef execution fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#080b10;
-    classDef sensory fill:#10b981,stroke:#059669,stroke-width:2px,color:#080b10;
-    classDef interface fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#ffffff;
+    classDef host fill:#0f172a,stroke:#64748b,stroke-width:1.5px,color:#f8fafc;
+    classDef core fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef execution fill:#261606,stroke:#f59e0b,stroke-width:1.5px,color:#f8fafc;
+    classDef sensory fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
+    classDef interface fill:#190e2b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc;
 
+    class User host;
     class Brain,Heart,Body core;
     class Spine,Muscle,Mouth,Immune execution;
     class Nerves,Eyes sensory;

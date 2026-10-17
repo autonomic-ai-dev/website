@@ -26,9 +26,9 @@ flowchart TD
     Daemon --> ScheduledMaintenance
     Daemon --> TokenBudgetGate
 
-    classDef core fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
-    classDef gate fill:#ef4444,stroke:#f87171,stroke-width:2px,color:#ffffff;
-    classDef ok fill:#10b981,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    classDef core fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef gate fill:#2d0b0e,stroke:#f43f5e,stroke-width:1.5px,color:#f8fafc;
+    classDef ok fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
     class Daemon,ScheduledMaintenance,TokenBudgetGate core;
     class Deny gate;
     class Allow ok;

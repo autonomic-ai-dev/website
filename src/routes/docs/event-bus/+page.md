@@ -36,8 +36,8 @@ flowchart TD
 
     Nerves --> Filtering
 
-    classDef mesh fill:#047857,stroke:#10b981,stroke-width:2px,color:#ffffff;
-    classDef broker fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    classDef mesh fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
+    classDef broker fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
     class Broker broker;
     class Nerves,Organs,Filtering mesh;
 ```

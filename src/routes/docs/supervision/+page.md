@@ -26,9 +26,9 @@ flowchart TD
     Organs --> Telemetry["Heartbeat & Health Bus\n(HTTP /health & NATS)"]
     Telemetry --> Body
 
-    classDef core fill:#0ea5e9,stroke:#0284c7,stroke-width:2px,color:#080b10;
-    classDef worker fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#ffffff;
-    classDef bus fill:#10b981,stroke:#047857,stroke-width:2px,color:#080b10;
+    classDef core fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef worker fill:#1e1738,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc;
+    classDef bus fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
     class Body,Config core;
     class Spine,Organs worker;
     class NATS,Nerves,Telemetry bus;

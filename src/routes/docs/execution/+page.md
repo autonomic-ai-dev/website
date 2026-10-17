@@ -18,9 +18,9 @@ flowchart LR
     Slicer --> Result["Compact JSON Response\n{exit: 0, duration: 42ms, output: '...'}"]
     Result --> LLM
 
-    classDef ok fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
-    classDef danger fill:#ef4444,stroke:#f87171,stroke-width:2px,color:#ffffff;
-    classDef safe fill:#10b981,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    classDef ok fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef danger fill:#2d0b0e,stroke:#f43f5e,stroke-width:1.5px,color:#f8fafc;
+    classDef safe fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
     class Guard,Runner,Stream ok;
     class Block danger;
     class Slicer,Result safe;

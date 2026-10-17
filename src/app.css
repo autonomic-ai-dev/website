@@ -285,7 +285,55 @@
   border-left-width: 3px !important;
 }
 
+.mermaid-diagram-container {
+  background: rgba(8, 11, 17, 0.95) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+}
+
 .mermaid-diagram-container svg {
   max-width: 100% !important;
   height: auto !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+
+.mermaid-diagram-container .node text,
+.mermaid-diagram-container .node tspan,
+.mermaid-diagram-container text.nodeLabel {
+  fill: #f8fafc !important;
+  color: #f8fafc !important;
+  font-weight: 500 !important;
+}
+
+.mermaid-diagram-container .node rect,
+.mermaid-diagram-container .node circle,
+.mermaid-diagram-container .node polygon {
+  rx: 8px !important;
+  ry: 8px !important;
+}
+
+.mermaid-diagram-container .edgeLabel {
+  background-color: #0d1117 !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+}
+
+.mermaid-diagram-container .edgeLabel text,
+.mermaid-diagram-container .edgeLabel tspan,
+.mermaid-diagram-container .edgeLabel span {
+  fill: #38bdf8 !important;
+  color: #38bdf8 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  background-color: transparent !important;
+}
+
+.mermaid-diagram-container path.flowchart-link {
+  stroke: #38bdf8 !important;
+  stroke-width: 1.5px !important;
+}
+
+.mermaid-diagram-container .marker {
+  fill: #38bdf8 !important;
+  stroke: #38bdf8 !important;
 }

@@ -25,8 +25,8 @@ flowchart TD
     State --> Gauges
     State --> LogViewer
 
-    classDef tui fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
-    classDef hud fill:#0f172a,stroke:#0ea5e9,stroke-width:2px,color:#f8fafc;
+    classDef tui fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef hud fill:#0f172a,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
     class Socket,EventLoop,State tui;
     class Header,Mesh,DAG,Gauges,LogViewer hud;
 ```

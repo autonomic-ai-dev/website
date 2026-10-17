@@ -23,9 +23,9 @@ flowchart TD
     Deploy --> Snapshot[Append-Only Snapshot Store]
     Rollback --> Snapshot
 
-    classDef exec fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
-    classDef gate fill:#f59e0b,stroke:#fbbf24,stroke-width:2px,color:#080b10;
-    classDef terminal fill:#10b981,stroke:#34d399,stroke-width:2px,color:#ffffff;
+    classDef exec fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef gate fill:#261606,stroke:#f59e0b,stroke-width:1.5px,color:#f8fafc;
+    classDef terminal fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
     class Lint,Scan,Build,Test,Deploy,Rollback exec;
     class Gate gate;
     class Snapshot,Start terminal;
