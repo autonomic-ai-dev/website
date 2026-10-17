@@ -26,6 +26,7 @@
   import { spotlight } from "$lib/actions/spotlight";
   import { tilt } from "$lib/actions/tilt";
 
+  let { data } = $props();
   let activeTab = $state<'brew' | 'cargo' | 'curl'>('brew');
   let copied = $state(false);
 
@@ -211,7 +212,7 @@
           </div>
 
           <div class="pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-500 group-hover:text-cyan-400 transition-colors">
-            <span>{agent.version}</span>
+            <span>{data?.organVersions?.[agent.name] || agent.version}</span>
             <span class="flex items-center gap-1">
               <span>Inspect</span>
               <ArrowRight size={12} class="group-hover:translate-x-1 transition-transform" />

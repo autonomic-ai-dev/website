@@ -1,14 +1,22 @@
 import { error } from '@sveltejs/kit';
 import { agents } from '$lib/data/agents';
 
-export function load({ params }) {
-  const agent = agents.find((a) => a.id === params.slug);
+export async function load({ params, parent }) {
+  const parentData = await parent();
+  const rawAgent = agents.find((a) => a.id === params.slug);
 
-  if (!agent) {
+  if (!rawAgent) {
     throw error(404, 'Agent not found');
   }
+
+  const dynamicVersion = parentData.organVersions?.[rawAgent.name] || rawAgent.version;
+  const agent = {
+    ...rawAgent,
+    version: dynamicVersion
+  };
 
   return {
     agent
   };
 }
+
