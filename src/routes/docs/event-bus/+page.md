@@ -1,39 +1,96 @@
 ---
-title: Event Bus
+title: Event Bus & Service Mesh (agent-nerves)
 ---
 
-# The Event Bus (agent-nerves)
+# `agent-nerves` — Distributed Event Mesh
 
-The Autonomic ecosystem is fundamentally decentralized. The 9 core "organs" do not communicate with each other via direct HTTP calls or shared memory. Instead, they operate as entirely independent processes that communicate asynchronously via a central event bus.
+`agent-nerves` is the **Service Mesh & Distributed Event Bus** (analogous to Istio / Linkerd) for the Autonomic ecosystem. It connects decoupled daemons to a shared **NATS JetStream** message broker, bootstraps the durable `AUTONOMIC` stream, and enforces dynamic WASM event filtering with automatic exponential backoff reconnection.
 
-This event bus is managed by the `agent-nerves` daemon, which acts as a bridge to the underlying [NATS server](https://nats.io/) infrastructure.
+```mermaid
+flowchart TD
+    Broker["Embedded NATS JetStream (:4222)\n(Stream: AUTONOMIC)"]
+    Nerves["agent-nerves (:3102)\n(Service Mesh Gateway)"]
+    
+    Broker <--> Nerves
 
-## Why a Decoupled Pub/Sub Architecture?
+    subgraph Organs["Organ Mesh Pub/Sub"]
+        Spine["agent-spine\n(Workflow State Events)"]
+        Muscle["agent-muscle\n(Execution & Job Signals)"]
+        Immune["agent-immune\n(Security Alerts)"]
+        Eyes["agent-eyes\n(Visual QA Traces)"]
+        TUI["agent-tui\n(Live Telemetry Subscriber)"]
+        CIDash["agent-ci-dashboard\n(Web Mission Control)"]
+    end
 
-Traditional AI agents are monolithic. When an agent wants to run a shell command and parse the output, the entire process happens synchronously within a single context loop. If the terminal command hangs, the agent hangs. If the context window fills up, the agent crashes.
+    Nerves <-->|autonomic.spine.*| Spine
+    Nerves <-->|autonomic.muscle.*| Muscle
+    Nerves <-->|autonomic.immune.*| Immune
+    Nerves <-->|autonomic.eyes.*| Eyes
+    Nerves -->|autonomic.telemetry.*| TUI
+    Nerves -->|autonomic.ci.*| CIDash
 
-By decoupling the architecture using a Pub/Sub event bus, we achieve:
-1. **Resilience:** If the visual QA organ (`agent-eyes`) crashes due to an Out of Memory error, the execution organ (`agent-muscle`) is completely unaffected. `agent-body` will restart `agent-eyes`, which will simply reconnect to the bus and pick up exactly where it left off.
-2. **Scalability:** You can run `agent-muscle` on a high-powered GPU rig in the cloud while running `agent-brain` on your local laptop. As long as both machines are connected to the same NATS cluster, they can communicate seamlessly.
-3. **Observability:** Because every action is an event traversing the bus, you can easily tail the traffic (e.g., using `agent-nerves stream`) to see exactly what the entire system is doing in real-time.
+    subgraph Filtering["Dynamic Event Filters"]
+        Rules["JSON Schema Validation"]
+        WASM["WASM Binary Packet Filter"]
+    end
 
-## How it Works
+    Nerves --> Filtering
 
-The communication flow relies heavily on the NATS JetStream persistence engine.
+    classDef mesh fill:#047857,stroke:#10b981,stroke-width:2px,color:#ffffff;
+    classDef broker fill:#0284c7,stroke:#38bdf8,stroke-width:2px,color:#ffffff;
+    class Broker broker;
+    class Nerves,Organs,Filtering mesh;
+```
 
-1. **Publishing:** When an organ completes a task, it publishes an event. For example, when `agent-muscle` finishes deploying a frontend application, it publishes a `deploy.frontend.success` event.
-2. **Subscribing:** Other organs subscribe to relevant subjects. `agent-eyes` is constantly listening for `deploy.frontend.success` events.
-3. **Action:** When `agent-eyes` receives the event, it knows the deployment is ready, so it automatically navigates to the URL and captures a baseline screenshot.
-4. **State Management:** The `agent-spine` workflow engine observes *all* events on the bus. It uses these events to advance the state of the active Directed Acyclic Graph (DAG) and trigger the next sequential nodes.
+---
 
-### JetStream Persistence
+## Architectural Invariants
 
-We rely on NATS JetStream to provide **durable subscriptions**. 
+### 1. Asynchronous Decoupling via JetStream
+Multi-agent systems composed solely of synchronous HTTP calls inevitably experience cascading deadlocks and timeout failures. Autonomic utilizes **NATS JetStream** to provide durable, at-least-once delivery with persistent message logs. When `agent-muscle` completes a 10-minute training or execution job, it publishes a completion packet to `autonomic.muscle.done`; `agent-spine` consumes the event whenever it is ready.
 
-If an organ is temporarily offline (perhaps it is being restarted by `agent-body` or a new version is being deployed), it will not miss any events. When it reconnects to the NATS cluster, JetStream will deliver the backlog of events that occurred while it was down, ensuring zero data loss and guaranteed at-least-once delivery.
+### 2. Stream Auto-Bootstrapping
+Developers are freed from the operational burden of manually configuring NATS streams and retention policies. On boot, `agent-nerves`:
+- Connects to the local or remote NATS broker.
+- Asserts the existence of the `AUTONOMIC` stream.
+- Configures default retention (`WorkQueue` or `Limits`), maximum message age (7 days), and memory storage tiers.
+- Manages connection drops with jittered exponential backoff.
 
-## Event Filters (JSON & WASM)
+### 3. Dynamic WASM & JSON Event Filtering
+To prevent noisy logs from saturating network interfaces, `agent-nerves` supports dynamic packet filtering:
+- **JSON Rule Filters**: Drops malformed event packets before they reach subscriber queues.
+- **WASM Extensibility**: Loads compiled WebAssembly modules (`~/.autonomic/filters/*.wasm`) to execute custom packet inspection and payload sanitization at wire speed.
 
-The `agent-nerves` CLI allows you to register sophisticated event filters.
+---
 
-These filters can be written in simple JSON schemas or compiled to WebAssembly (WASM) for high-performance parsing. Filters are pushed directly down to the NATS server, ensuring that organs only receive exactly the events they are programmed to handle, preventing network saturation and CPU waste.
+## Subject Hierarchy Matrix
+
+| Subject Pattern | Publisher | Consumers | Purpose |
+| :--- | :--- | :--- | :--- |
+| **`autonomic.spine.run.created`** | `agent-spine` | Dashboard, TUI | Broadcasts newly submitted workflow DAG. |
+| **`autonomic.spine.gate.pause`** | `agent-spine` | `agent-mouth`, Dashboard | Notifies operators of pending HITL approval. |
+| **`autonomic.muscle.train.request`**| `agent-brain` | `agent-muscle` | Dispatches GPU fine-tuning or LoRA training job. |
+| **`autonomic.immune.cve.detected`** | `agent-immune` | `agent-spine`, Mouth | Emergency halt on vulnerability discovery. |
+| **`autonomic.eyes.regression`** | `agent-eyes` | `agent-spine`, TUI | UI visual regression event with SSIM diff. |
+| **`autonomic.telemetry.heartbeat`**| All Organs | `agent-body`, TUI | Real-time PID, memory RSS, and uptime beacon. |
+
+---
+
+## CLI Command Reference
+
+| Command | Flags | Description |
+| :--- | :--- | :--- |
+| **`agent-nerves serve`** | `--port 3102`, `--features wasm` | Boots the service mesh bridge and JetStream monitor. |
+| **`agent-nerves ping`** | `--timeout <s>` | Probes broker reachability and returns round-trip latency. |
+| **`agent-nerves stream tail`** | `--subject <subj>`, `--follow` | Streams live events matching wildcard subject patterns. |
+| **`agent-nerves cluster init`** | `--seed <host:port>` | Scaffolds a multi-node cluster configuration. |
+
+### Example CLI Workflows
+
+```bash
+# 1. Probe the NATS mesh health
+agent-nerves ping
+
+# 2. Tail all security and execution events in real-time
+agent-nerves stream tail --subject "autonomic.*" --follow
+```

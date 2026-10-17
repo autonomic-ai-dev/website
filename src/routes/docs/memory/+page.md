@@ -1,46 +1,104 @@
 ---
-title: Memory & Knowledge Graph
+title: Memory & Context Routing (agent-brain)
 ---
 
-# Memory & Knowledge Graph
+# `agent-brain` — Vector Memory & Context Router
 
-One of the foundational problems with modern AI coding agents is **context bloat**. A typical enterprise codebase has hundreds of specific conventions, rules, and skills. If you load all of these into an LLM's system prompt simultaneously, the model experiences "lost in the middle" syndrome—it burns through tokens and fails to reliably follow the rules.
+`agent-brain` is the memory, routing, and context substrate for the Autonomic ecosystem. It solves the critical problem of **context window saturation and rule adherence drift** by selecting the exact slice of ranked skills, rules, and durable facts (~500 tokens) needed for each LLM turn, backed by a temporal SQLite Knowledge Graph and HNSW vector index.
 
-Furthermore, "soft enforcement" (telling a model "you MUST use this skill first") is notoriously unreliable.
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Agent as Host Agent (Cursor / Claude)
+    participant Hook as route_gate.py (PreToolUse Hook)
+    participant Proxy as agent-brain (Stdio Proxy)
+    participant Daemon as serve.sock (Background Daemon)
+    participant Store as brain.db (SQLite + HNSW)
 
-The Autonomic ecosystem solves this using the `agent-brain` local context engine, powered by a temporal SQLite Knowledge Graph.
+    Agent->>Hook: Invokes MCP / Shell Tool
+    Hook->>Hook: Checks turn state (route_task called?)
+    alt route_task Not Called
+        Hook-->>Agent: BLOCK turn. Inject mandatory route_task directive
+    end
+    Agent->>Proxy: call_tool("route_task", {user_message, cwd})
+    Proxy->>Daemon: Unix Domain Socket stream
+    Daemon->>Store: Vector query + temporal validity filter
+    Store-->>Daemon: Top ranked skills + rules + verified recipes
+    Daemon-->>Agent: Compact Context (~500 tokens) + must_apply constraints
+    Agent->>Agent: Executes verified task
+    Agent->>Proxy: call_tool("store_memory", {topic, fact})
+    Proxy->>Daemon: Commit immutable fact (valid_from = now)
+    Daemon->>Store: Persist to brain.db
+```
 
-## The Temporal Knowledge Graph
+---
 
-Instead of storing system instructions in flat markdown files, `agent-brain` maintains a local SQLite database (`brain.db`). This database is modeled as a Knowledge Graph.
+## Architectural Invariants
 
-### Nodes and Edges
+### 1. Proxy-over-Supervised-Daemon Architecture
+To prevent `database is locked` concurrency errors across concurrent IDE turns (Cursor, OpenCode, Claude Code, Antigravity), `agent-brain serve` runs as an ultra-lightweight stdio proxy connecting to `~/.autonomic/memory/serve.sock`. A single background daemon manages SQLite WAL access and in-memory HNSW vector indexes with zero lock contention.
 
-- **Nodes:** Represent discrete pieces of information: a specific codebase rule, a tool definition, a script execution skill, or a generalized fact.
-- **Edges:** Represent relationships. For example, a `DEPENDS_ON` edge might link a frontend styling rule to the `React` framework node.
+### 2. Adaptive Outcome Scoring & Verified Recipes
+Command executions verified via `agent-brain verify -- <cmd>` or recorded outcomes are automatically attributed to the active turn's `route_log_id`:
+- **Success (`exit 0`)**: Rewards context relevance, reinforcing the pattern in future `route_task` calls and promoting high-confidence recipes into `must_apply` constraints.
+- **Failure (`exit != 0`)**: Instantly squelches the failing command from few-shot recipe recommendations, preventing broken suggestions from propagating.
 
-### Temporal Validity
+### 3. Read Tool Scout Guard
+Reading multi-thousand line files consumes tokens and degrades reasoning. `agent-brain` intercepts oversized file reads and routes the agent to token-bounded scout tools: `file_summary`, `grep_search`, `read_file_head`, and `read_file_tail`.
 
-Every fact and rule stored in the Knowledge Graph is **ADD-only** and immutable. When an agent learns a new rule (via the `store_memory` MCP tool), it is written to the database with a `valid_from` timestamp.
+---
 
-If that rule is later overridden or corrected by the user:
-1. The old rule is NOT deleted. It is marked with an `invalid_at` timestamp.
-2. A new rule is inserted with a new `valid_from` timestamp.
+## MCP Tool Reference
 
-This temporal architecture preserves the *history* of the codebase. It allows the agent to understand *why* older code was written a certain way, preventing it from incorrectly "fixing" legacy code using new conventions without explicit instruction.
+`agent-brain` exposes the following native tools over stdio and socket:
 
-## Filterable HNSW Retrieval
+| MCP Tool | Parameters | Purpose |
+| :--- | :--- | :--- |
+| **`route_task`** | `user_message`, `current_working_directory`, `open_files` | Returns ranked skills, rules, and memory (~500 tokens) for the turn. |
+| **`store_memory`** | `topic`, `fact`, `scope`, `confidence`, `valid_from` | Commits durable facts (under 50 words) to temporal storage. |
+| **`get_context`** | `query`, `limit`, `category` | Explicit vector similarity search against the Knowledge Graph. |
+| **`file_summary`** | `path` | Returns token-compact AST outline of classes, functions, and exports. |
+| **`grep_search`** | `query`, `path`, `regex` | Bounded grep search avoiding massive full-file reads. |
+| **`read_file_head`** | `path`, `lines` | Reads only the initial N lines of a file. |
+| **`read_file_tail`** | `path`, `lines` | Reads only the trailing N lines of a file. |
 
-When the agent receives a prompt from the user, it is forced to call the `route_task` MCP tool. 
+---
 
-`route_task` uses an embedded **Hierarchical Navigable Small World (HNSW)** vector search algorithm to find the most relevant nodes in the Knowledge Graph. 
+## CLI Command Reference
 
-Unlike standard vector databases, `agent-brain` implements *filterable* HNSW. It applies hard scope boundaries (e.g., "only search within the `frontend` scope") *during* the graph traversal, rather than doing an expensive post-filtering step. 
+`agent-brain` provides robust command-line operations for verification and administrative maintenance:
 
-This enables `agent-brain` to retrieve the most relevant ~500 tokens of context in under 50 milliseconds, securely injecting it into the agent's context window before it takes any action.
+```bash
+# 1. Verify a command execution and record outcome in brain.db
+agent-brain verify -- cargo test
 
-## Distillation & Must-Apply Rules
+# 2. Check health of the embedding model and vector index
+agent-brain doctor
 
-Over time, as the system executes workflows and the `agent-heart` background daemon observes behavior, it can synthesize common failure patterns into new rules.
+# 3. Store a durable memory manually via CLI
+agent-brain memory put --topic "ci" --fact "Always pass protected-path-approved label on test changes"
 
-If the agent repeatedly fails at a task because it forgot a specific flag, `agent-heart` can propose a `must_apply` rule. Once approved, this rule is flagged in the Knowledge Graph. Any future `route_task` search that matches the context of that rule will unconditionally inject it, ensuring the agent never makes the same mistake twice.
+# 4. Trigger vector deduplication and temporal vacuum
+agent-brain gc
+
+# 5. Global setup: configure hooks for Cursor, Claude Code, and Antigravity
+agent-brain install --global
+```
+
+---
+
+## Verification Policy (`.verify/verify.toml`)
+
+Projects specify allowable verification commands to ensure untrusted scripts do not poison the knowledge graph:
+
+```toml
+[verify]
+allow_unlisted = false
+timeout_seconds = 120
+
+[verify.commands]
+test = "cargo test --release"
+lint = "cargo clippy -- -D warnings"
+fmt = "cargo fmt -- --check"
+verify_suite = "bash .verify/run.sh"
+```

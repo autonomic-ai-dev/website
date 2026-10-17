@@ -286,3 +286,36 @@ Summarizes long command output piped directly from `stdin`. Perfect for digestin
 agent-mouth validate <script>
 ```
 Validates a bash command or script against the system's Abstract Syntax Tree (AST) policies before allowing it to be transmitted.
+
+---
+
+## `agent-tui`
+
+`agent-tui` renders an interactive terminal avionics console for cluster monitoring.
+
+```bash
+agent-tui
+```
+Boots the terminal HUD, connecting to `~/.autonomic/memory/serve.sock`.
+
+```bash
+agent-tui --socket <path> --fps 60
+```
+Connects to a custom socket endpoint with a target refresh rate.
+
+---
+
+## `agent-ci-dashboard`
+
+Mission control web dashboard server and CI telemetry relay.
+
+```bash
+cd agent-ci-dashboard && npm run dev
+```
+Starts the local development mission control server at `http://localhost:5173`.
+
+```bash
+npm run build && npm run preview
+```
+Compiles the production SvelteKit 5 build and boots the preview server.
+
