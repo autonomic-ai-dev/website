@@ -56,6 +56,12 @@ agent-immune scan ./package.json
 
 # Scan a Rust workspace manifest
 agent-immune scan ./Cargo.toml
+
+# Scan Python dependencies for known CVEs
+agent-immune scan ./requirements.txt
+
+# Scan Go module dependencies
+agent-immune scan ./go.mod
 ```
 
 ---

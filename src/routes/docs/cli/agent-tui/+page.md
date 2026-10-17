@@ -76,6 +76,12 @@ High-frequency colorized event tailer:
 - Real-time display of events published to `AUTONOMIC_EVENTS`.
 - Automatic scrolling with pause-on-navigate capability.
 
+### 6. `USAGE & BUDGET`
+Mission control token spend and budget governor:
+- Real-time token counts: input, output, and cache read hits.
+- Spend vs daily/monthly ceiling gauges with warning thresholds.
+- Organ attribution breakdown matrix and model market share.
+
 ---
 
 ## Keybindings
@@ -87,9 +93,11 @@ High-frequency colorized event tailer:
 | `3` | Switch to **Organ Mesh** tab |
 | `4` | Switch to **Brain Context** tab |
 | `5` | Switch to **Event Stream** tab |
+| `6` / `u` | Switch to **Usage & Budget** tab |
 | `Tab` / `→` | Cycle forward to next tab |
 | `Shift+Tab` / `←` | Cycle backward to previous tab |
 | `↑` / `↓` | Scroll selected items in workflow DAG or event log |
+| `g` | Trigger immediate GC pulse to `agent-heart` |
 | `r` | Force refresh cluster state and telemetry |
 | `q` / `Esc` | Cleanly exit terminal HUD and restore terminal state |
 
@@ -98,9 +106,27 @@ High-frequency colorized event tailer:
 ## Examples
 
 ```bash
-# Launch terminal avionics dashboard
+# Launch terminal avionics dashboard using local socket
 agent-tui
+```
 
+```bash
 # Connect to a remote cluster NATS broker
 AUTONOMIC_NATS_URL="nats://192.168.1.100:4222" agent-tui
 ```
+
+```bash
+# Launch with custom state directory location
+AUTONOMIC_STATE_DIR="/var/lib/autonomic/state" agent-tui
+```
+
+```bash
+# Launch terminal avionics HUD in an isolated tmux pane
+tmux split-window -h "agent-tui"
+```
+
+```bash
+# Run in continuous log view with stdout redirect for CI recording
+agent-tui --help
+```
+

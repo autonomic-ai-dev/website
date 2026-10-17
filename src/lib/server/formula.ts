@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 export interface AutonomicFormulae {
 	autonomic: string;
 	stack: string;
@@ -16,6 +19,49 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 		return cached;
 	}
 
+	// 1. Try local filesystem (development environment)
+	try {
+		const localTapDir = path.resolve(process.cwd(), '../homebrew-tap/Formula');
+		if (fs.existsSync(localTapDir)) {
+			const readVer = (filename: string): string | null => {
+				const p = path.join(localTapDir, filename);
+				if (!fs.existsSync(p)) return null;
+				const content = fs.readFileSync(p, 'utf-8');
+				const match = content.match(/version\s+"([^"]+)"/);
+				return match ? match[1] : null;
+			};
+
+			const autonomic = readVer('autonomic.rb') || '1.0.0-beta.3';
+			const stack = readVer('autonomic-stack.rb') || '1.0.0-beta.3.1';
+			const brain = readVer('agent-brain.rb') || '1.0.0-beta.3.1';
+
+			cached = {
+				autonomic,
+				stack,
+				ecosystemVersion: `v${stack}`,
+				stackVersion: `v${stack}`,
+				organs: {
+					'agent-body': `v${autonomic}`,
+					'agent-brain': `v${brain}`,
+					'agent-spine': `v${autonomic}`,
+					'agent-heart': `v${autonomic}`,
+					'agent-nerves': `v${autonomic}`,
+					'agent-muscle': `v${autonomic}`,
+					'agent-immune': `v${autonomic}`,
+					'agent-eyes': `v${autonomic}`,
+					'agent-mouth': `v${autonomic}`,
+					'agent-tui': `v${autonomic}`,
+					'agent-ci-dashboard': `v${autonomic}`
+				}
+			};
+			lastFetch = now;
+			return cached;
+		}
+	} catch (e) {
+		// Non-fatal, proceed to remote fetch
+	}
+
+	// 2. Fetch from remote GitHub raw files
 	try {
 		const fetchVer = async (file: string): Promise<string | null> => {
 			const res = await fetch(
@@ -44,7 +90,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 		cached = {
 			autonomic: autoVer,
 			stack: stackVer,
-			ecosystemVersion: `v${autoVer}`,
+			ecosystemVersion: `v${stackVer}`,
 			stackVersion: `v${stackVer}`,
 			organs: {
 				'agent-body': `v${autoVer}`,
@@ -66,7 +112,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 		return {
 			autonomic: '1.0.0-beta.3',
 			stack: '1.0.0-beta.3.1',
-			ecosystemVersion: 'v1.0.0-beta.3',
+			ecosystemVersion: 'v1.0.0-beta.3.1',
 			stackVersion: 'v1.0.0-beta.3.1',
 			organs: {
 				'agent-body': 'v1.0.0-beta.3',

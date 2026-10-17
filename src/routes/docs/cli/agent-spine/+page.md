@@ -63,13 +63,16 @@ agent-spine run ~/.autonomic/state/spine/release.yaml --brain
 
 # Meta-routing: select workflow automatically based on user task
 agent-spine run workflow.yaml --meta "Review open PRs and generate changelog"
+
+# Run workflow with offline budget gating disabled
+AUTONOMIC_BUDGET_GATE=0 agent-spine run workflow.yaml
 ```
 
 ---
 
 ### `validate`
 
-Parse and validate a YAML workflow definition against schema rules and cyclic dependency checks.
+Parse and validate a YAML workflow definition against schema rules, budget preconditions, and cyclic dependency checks.
 
 ```bash
 agent-spine validate <WORKFLOW>
@@ -78,9 +81,20 @@ agent-spine validate <WORKFLOW>
 #### Checks Performed
 
 - Validates YAML syntax and structural types.
+- Validates `budget` blocks (`max_cost_usd`, `max_tokens`) and node preconditions (`budget_headroom`, `quota_available`).
 - Detects cyclic dependencies using Kahn's topological sorting algorithm.
 - Verifies that all referenced tool names exist in the organ MCP gateway.
 - Validates timeout values and retry policies.
+
+#### Examples
+
+```bash
+# Validate workflow DAG and preconditions
+agent-spine validate .autonomic/workflows/ci.yaml
+
+# Validate feature release workflow before scheduling
+agent-spine validate workflow.yaml
+```
 
 ---
 

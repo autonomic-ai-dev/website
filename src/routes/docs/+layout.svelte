@@ -63,6 +63,7 @@
         { href: "/docs/workflows", label: "agent-spine", icon: Workflow, badge: "Workflows", description: "Deterministic YAML DAG engine and state replay" },
         { href: "/docs/execution", label: "agent-muscle", icon: Cpu, badge: "Actuator", description: "Sandboxed execution, AST gates, LoRA training" },
         { href: "/docs/maintenance", label: "agent-heart", icon: Heart, badge: "Budget / GC", description: "Token quotas, nightly GC, preventative maintenance" },
+        { href: "/docs/usage-governance", label: "Usage & Budget Governance", icon: Activity, badge: "Governance", description: "Fleet token telemetry, pricing catalog, and cost ceiling gates" },
         { href: "/docs/security", label: "agent-immune", icon: Shield, badge: "Admission", description: "Zero-trust OSV scan, memory leak gate, microVMs" },
         { href: "/docs/visual-qa", label: "agent-eyes", icon: Eye, badge: "Vision / DOM", description: "Spatial DOM indexing, pixel diff, local VLM" },
         { href: "/docs/event-bus", label: "agent-nerves", icon: Radio, badge: "Event Mesh", description: "NATS JetStream event bus and WASM filters" },
@@ -323,7 +324,7 @@
       </nav>
       <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span>SPEC {data?.ecosystemVersion || 'v1.0.0-beta.3'}</span>
+        <span>SPEC {data?.ecosystemVersion || 'v1.0.0-beta.3.1'}</span>
       </div>
     </div>
 

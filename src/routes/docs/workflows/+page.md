@@ -138,7 +138,30 @@ agent-spine run .autonomic/workflows/ci.yaml \
   --detach
 ```
 
-### 4. Human-in-the-Loop (HITL) Approvals
+### 4. Workflow Budget Preconditions & Cost Ceiling Gates
+Workflows can protect against runaway token consumption by specifying top-level budget ceilings and step-level preconditions evaluated against `agent-heart`:
+
+```yaml
+version: "1.0"
+name: "autonomous-feature-development"
+budget:
+  max_cost_usd: 25.00
+  max_tokens: 1000000
+
+nodes:
+  - id: "deep_refactor"
+    action: "brain:execute_refactor"
+    preconditions:
+      # Halts if remaining daily headroom is below $5.00
+      - check: "budget_headroom"
+        min_remaining_usd: 5.00
+      # Verifies provider rate limit / token quota utilization
+      - check: "quota_available"
+        provider: "anthropic"
+        max_utilization_pct: 85.0
+```
+
+### 5. Human-in-the-Loop (HITL) Approvals
 
 When execution reaches an `approval_gate`, `agent-spine` enters the `WAITING_APPROVAL` state and broadcasts a webhook via `agent-mouth`. Operators can approve from Slack or directly via CLI:
 

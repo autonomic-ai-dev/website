@@ -49,8 +49,17 @@ Every PR card surfaces an inline check pill strip. Clicking any check badge imme
 ### 3. Coordinated Batch Merge Engine
 In a microservice ecosystem, synchronizing cross-organ dependency bumps across 11 repositories by clicking PRs individually is tedious. The dashboard enables multi-select batch merging: operators check multiple verified PRs and dispatch a coordinated squash-merge queue with automatic branch deletion.
 
-### 4. Dynamic Ecosystem Version Derivation
-The dashboard dynamically derives the ecosystem baseline and active repository release tags from GitHub API release streams rather than static hardcoded strings. If a repository releases `v1.0.0-beta.3`, the mission control header, sidebar, and repository cards update automatically.
+### 4. GitHub Merge Queue Auto-Enqueue Fallback
+When repositories enforce GitHub Ruleset Merge Queues (`Repository rule violations found Changes must be made through the merge queue`), direct squash-merges are rejected by GitHub. The dashboard intercepts this condition and seamlessly enqueues the pull request via the GitHub GraphQL `enqueuePullRequest` mutation, reporting the queue position in live toast notifications.
+
+### 5. Fleet Usage & Budget Dashboard (`/usage`)
+The dedicated `/usage` route provides holistic visibility into organ-level and model-level consumption:
+- **Total Spend & Token Ingestion**: Aggregates input, output, and cached tokens from `heart.db`.
+- **Cache Hit Rate**: Quantifies token cost reductions achieved through vector deduplication.
+- **Provider Distribution**: Live breakdown of traffic across OpenAI, Anthropic, Gemini, and local models.
+
+### 6. Dynamic Ecosystem Version Derivation
+The dashboard dynamically derives the ecosystem baseline from `autonomic-stack.rb` and active repository release tags rather than static strings. If a repository releases a patch, the mission control header, sidebar, and cards update automatically.
 
 ---
 

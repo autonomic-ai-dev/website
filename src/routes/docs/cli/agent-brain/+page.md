@@ -208,11 +208,20 @@ agent-brain mcp add github -- npx -y @modelcontextprotocol/server-github
 # Register Postgres MCP server with environment variables
 agent-brain mcp add postgres --env DATABASE_URL=postgres://localhost:5432/app -- npx -y @modelcontextprotocol/server-postgres
 
+# Register Linear remote MCP server with OAuth proxy
+agent-brain mcp add linear -- npx -y mcp-remote https://mcp.linear.app/mcp
+
 # Probe connection and view available tools
 agent-brain mcp test github
 
-# Refresh tool catalog
+# Test upstream connectivity and verify argument schema for a specific tool
+agent-brain mcp test linear --tool save_issue
+
+# Refresh tool catalog and index tool descriptions into vector memory
 agent-brain mcp sync
+
+# Display turn telemetry token usage and prompt cache savings
+agent-brain stats --telemetry
 ```
 
 ---
