@@ -31,9 +31,9 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 				return match ? match[1] : null;
 			};
 
-			const autonomic = readVer('autonomic.rb') || '1.0.0-beta.3';
-			const stack = readVer('autonomic-stack.rb') || '1.0.0-beta.3.1';
-			const brain = readVer('agent-brain.rb') || '1.0.0-beta.3.1';
+			const autonomic = readVer('autonomic.rb') || '1.0.0-beta.3.1';
+			const stack = readVer('autonomic-stack.rb') || '1.0.0-beta.3.2';
+			const brain = readVer('agent-brain.rb') || '1.0.0-beta.3.2';
 
 			cached = {
 				autonomic,
@@ -83,9 +83,9 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 			fetchVer('agent-brain.rb')
 		]);
 
-		const autoVer = autonomic || '1.0.0-beta.3';
-		const stackVer = stack || '1.0.0-beta.3.1';
-		const brainVer = brain || '1.0.0-beta.3.1';
+		const autoVer = autonomic || '1.0.0-beta.3.1';
+		const stackVer = stack || '1.0.0-beta.3.2';
+		const brainVer = brain || '1.0.0-beta.3.2';
 
 		cached = {
 			autonomic: autoVer,

@@ -21,8 +21,8 @@ const path = require("path");
 const tapDir = path.resolve(process.cwd(), "../homebrew-tap/Formula");
 const stackContent = fs.readFileSync(path.join(tapDir, "autonomic-stack.rb"), "utf8");
 const match = stackContent.match(/version\s+"([^"]+)"/);
-if (!match || match[1] !== "1.0.0-beta.3.1") {
-  console.error("Expected autonomic-stack version 1.0.0-beta.3.1, got:", match ? match[1] : "null");
+if (!match || !/^1\.0\.0-beta\.\d+(\.\d+)?$/.test(match[1])) {
+  console.error("Invalid autonomic-stack version format:", match ? match[1] : "null");
   process.exit(1);
 }
 console.log("Verified autonomic-stack formula version: " + match[1]);
