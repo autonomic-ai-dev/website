@@ -1,6 +1,6 @@
 ---
 title: "Agent Muscle: Command Execution and Fine-Tuning Actuator"
-date: "2026-06-21"
+date: "2026-10-17"
 excerpt: "How agent-muscle provides safe subprocess execution with JSON output contracts, dataset validation gates, and pluggable training backends."
 slug: "agent-muscle-actuator-training"
 category: "Engineering"

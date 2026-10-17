@@ -1,6 +1,6 @@
 ---
 title: "Agent Spine: Deterministic Workflow DAG Engine"
-date: "2026-06-21"
+date: "2026-10-17"
 excerpt: "How agent-spine enforces structured execution through YAML-defined DAG pipelines, immutable snapshots, parallel fan-out, and human-in-the-loop approval gates."
 slug: "agent-spine-workflow-engine"
 category: "Engineering"

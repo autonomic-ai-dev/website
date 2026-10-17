@@ -1,0 +1,109 @@
+---
+title: "Agent Body: The Swarm Control Plane & Process Supervisor"
+date: "2026-10-17"
+excerpt: "How agent-body acts as the master process supervisor, managing launchd daemons, topological boot pipelines, and zero-downtime microservice recovery across the 11-organ Autonomic cluster."
+slug: "agent-body-control-plane"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Running eleven decoupled autonomous microservices on a single developer machine or remote build node creates a massive operational challenge. If each daemon requires its own terminal tab, manually managed PID files, and complex environment configuration, the developer experience rapidly degrades.
+
+**`agent-body`** is the master control plane and process supervisor for the Autonomic AI cluster. Built in high-performance Rust, it provides the unified `autonomic` meta-CLI, governs the shared `~/.autonomic/` filesystem tree, manages macOS `launchd` LaunchAgents, and boots the entire ecosystem in strict topological dependency order.
+
+---
+
+## The Monolithic vs Micro-Organ Paradigm
+
+Traditional agent frameworks (LangChain, AutoGen, CrewAI) execute all tools, memory layers, and subprocesses within a single monolithic runtime process. When an agent tool encounters a segmentation fault, triggers an unhandled panic, or leaks memory during a multi-gigabyte build, the entire agent session crashes—obliterating in-flight context and abandoning orphan child processes.
+
+`agent-body` inverts this model:
+1. **Isolated Binary Daemons**: Every organ (`agent-brain`, `agent-spine`, `agent-muscle`, `agent-immune`, etc.) runs as an independent, sandboxed operating system process.
+2. **Topological Boot Pipeline**: Daemons are started in strict mathematical sequence based on dependency DAGs:
+   - **Step 1**: Embedded NATS JetStream message broker on port `4222`.
+   - **Step 2**: `agent-nerves` service mesh connects and creates the durable `AUTONOMIC` stream.
+   - **Step 3**: `agent-brain` initializes the temporal SQLite database and HNSW vector index at `~/.autonomic/memory/serve.sock`.
+   - **Step 4**: `agent-spine` boots the YAML workflow DAG orchestrator.
+   - **Step 5**: Concurrent worker daemons (`agent-muscle`, `agent-immune`, `agent-mouth`, `agent-heart`, `agent-eyes`) register with the supervisor.
+3. **Sub-Millisecond Health Probing**: `agent-body` continuously pings each daemon's Unix socket or HTTP `/health` endpoint, collecting memory RSS and CPU utilization.
+
+---
+
+## Native macOS `launchd` Integration
+
+On macOS, developers expect services to start silently upon system login, survive sleep/wake cycles, and gracefully restart if killed:
+
+```bash
+# Register and start the cluster under launchd supervision
+autonomic start --daemon
+
+# Inspect the registered LaunchAgent
+cat ~/Library/LaunchAgents/dev.autonomic.agent-body.plist
+```
+
+When started as a daemon, `agent-body` handles OS signals (`SIGTERM`, `SIGHUP`) deterministically. It signals active DAGs to snapshot their state, drains NATS subscriber queues, and terminates worker processes cleanly without orphan locks.
+
+---
+
+## Dynamic Catalog Discovery (`get_autonomic_catalog`)
+
+To allow external LLM hosts (Cursor IDE, Claude Desktop, Antigravity) to discover active ecosystem capabilities without having to memorize port numbers, `agent-body` exposes the `get_autonomic_catalog` MCP tool:
+
+```json
+{
+  "name": "get_autonomic_catalog",
+  "arguments": {
+    "filter_tier": "all"
+  }
+}
+```
+
+**Catalog Response:**
+```json
+{
+  "cluster_id": "darwin-arm64-local",
+  "version": "v1.0.0-beta.2",
+  "organs": [
+    {
+      "name": "agent-brain",
+      "tier": "core",
+      "status": "HEALTHY",
+      "pid": 48210,
+      "memory_rss_mb": 42.6,
+      "socket": "~/.autonomic/memory/serve.sock",
+      "mcp_tools": ["route_task", "store_memory", "get_context", "file_summary"]
+    },
+    {
+      "name": "agent-spine",
+      "tier": "execution",
+      "status": "HEALTHY",
+      "pid": 48212,
+      "memory_rss_mb": 28.1,
+      "port": 3100,
+      "mcp_tools": ["spine_submit_workflow", "spine_check_status"]
+    }
+  ]
+}
+```
+
+---
+
+## Command Line Workflows
+
+The `autonomic` meta-CLI provides developers with a unified entrypoint:
+
+```bash
+# 1. Run environment diagnostics and port verification
+autonomic doctor
+
+# 2. Boot all 11 daemons
+autonomic start
+
+# 3. View live health and memory consumption matrix
+autonomic status
+
+# 4. Multiplex logs across all organs with colorized prefixes
+autonomic logs -f --organ brain,spine
+```
+
+By isolating process lifecycles behind `agent-body`, the Autonomic ecosystem achieves carrier-grade resilience: an individual daemon crash is treated as a routine self-healing event rather than a fatal session failure.

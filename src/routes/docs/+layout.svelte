@@ -153,15 +153,23 @@
         if (!code.trim()) continue;
 
         const id = `mermaid-svg-${Date.now()}-${i}`;
-        const { svg } = await mermaid.render(id, code.trim());
-        const wrapper = document.createElement("div");
-        wrapper.className = "mermaid-diagram-container my-8 p-6 bg-[#080b11]/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md";
-        wrapper.innerHTML = svg;
-        const target = el.tagName === "CODE" && el.parentElement?.tagName === "PRE" ? el.parentElement : el;
-        target.replaceWith(wrapper);
+        try {
+          const { svg } = await mermaid.render(id, code.trim());
+          const wrapper = document.createElement("div");
+          wrapper.className = "mermaid-diagram-container my-8 p-6 bg-[#080b11]/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md";
+          wrapper.innerHTML = svg;
+          const target = el.tagName === "CODE" && el.parentElement?.tagName === "PRE" ? el.parentElement : el;
+          target.replaceWith(wrapper);
+        } catch (diagErr) {
+          console.warn(`Mermaid render failed for block ${i}:`, diagErr);
+          // Clean up any stray error elements Mermaid injects into document body
+          const strayError = document.getElementById(id) || document.getElementById(`d${id}`);
+          if (strayError) strayError.remove();
+          // Leave the raw code block styled cleanly if render fails
+        }
       }
     } catch (e) {
-      console.warn("Mermaid render error:", e);
+      console.warn("Mermaid global initialization error:", e);
     }
   }
 

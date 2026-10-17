@@ -34,12 +34,13 @@ flowchart TD
         WASM["WASM Binary Packet Filter"]
     end
 
-    Nerves --> Filtering
+    Nerves --> Rules
+    Nerves --> WASM
 
     classDef mesh fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
     classDef broker fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
     class Broker broker;
-    class Nerves,Organs,Filtering mesh;
+    class Nerves,Spine,Muscle,Immune,Eyes,TUI,CIDash,Rules,WASM mesh;
 ```
 
 ---

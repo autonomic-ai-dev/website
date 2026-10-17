@@ -1,6 +1,6 @@
 ---
 title: "Agent Brain: The Context Engine and Local MCP Router"
-date: "2026-06-21"
+date: "2026-10-17"
 excerpt: "How agent-brain solves context bloat with filterable HNSW retrieval, durable memory via temporal knowledge graphs, and hook-based enforcement as every organ's information substrate."
 slug: "agent-brain-context-engine"
 category: "Engineering"

@@ -9,11 +9,11 @@ title: Communication & Ingress Gateway (agent-mouth)
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Host as Client / IDE / Webhook
-    participant Mouth as agent-mouth (:3104)
-    participant Spine as agent-spine (:3100)
-    participant Slack as Operator (Slack / Webhook)
-    participant NATS as NATS JetStream (:4222)
+    participant Host as "Client / IDE / Webhook"
+    participant Mouth as "agent-mouth (:3104)"
+    participant Spine as "agent-spine (:3100)"
+    participant Slack as "Operator (Slack / Webhook)"
+    participant NATS as "NATS JetStream (:4222)"
 
     Host->>Mouth: Ingress Command / DAG Request
     Mouth->>Mouth: tree-sitter AST Validation Check

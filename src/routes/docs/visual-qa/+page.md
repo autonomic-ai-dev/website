@@ -28,14 +28,14 @@ flowchart LR
     Router --> VisualPath
     Router --> LocalVLM
 
-    Index --> Search["dom search\n(Fast CSS / XPath SQL Queries)"]
-    Diff --> Event["autonomic.eyes.regression\n(NATS JetStream Broadcast)"]
-    VLM --> Caption["Semantic Layout Audit\n('No overlapping elements detected')"]
+    Index --> Search["dom search<br/>(Fast CSS / XPath SQL Queries)"]
+    Diff --> Event["autonomic.eyes.regression<br/>(NATS JetStream Broadcast)"]
+    VLM --> Caption["Semantic Layout Audit<br/>('No overlapping elements detected')"]
 
     classDef core fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
     classDef path fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
     class Router core;
-    class FastPath,VisualPath,LocalVLM,Search,Event,Caption path;
+    class Describe,Index,Capture,Diff,VLM,Search,Event,Caption path;
 ```
 
 ---
