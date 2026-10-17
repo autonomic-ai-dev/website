@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Menu, X, Book, Download, Terminal, Layers, Radio, Brain, Workflow, Shield, Plug, Server, Cpu, Eye, Heart, MessageSquare } from "lucide-svelte";
+  import { Menu, X, Book, Download, Terminal, Layers, Radio, Brain, Workflow, Shield, Plug, Server, Cpu, Eye, Heart, MessageSquare, Activity } from "lucide-svelte";
   import { page } from "$app/stores";
   let { children } = $props();
 
@@ -45,6 +45,8 @@
         <li><a href="/docs/security" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/security')} text-sm flex items-center gap-2"><Shield size={16} /> Security (Immune)</a></li>
         <li><a href="/docs/visual-qa" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/visual-qa')} text-sm flex items-center gap-2"><Eye size={16} /> Visual QA (Eyes)</a></li>
         <li><a href="/docs/communication" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/communication')} text-sm flex items-center gap-2"><MessageSquare size={16} /> Communication (Mouth)</a></li>
+        <li><a href="/docs/tui" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/tui')} text-sm flex items-center gap-2"><Terminal size={16} /> Terminal HUD (TUI)</a></li>
+        <li><a href="/docs/ci-dashboard" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/ci-dashboard')} text-sm flex items-center gap-2"><Activity size={16} /> Mission Control (CI)</a></li>
         <li><a href="/docs/mcp" onclick={() => isMobileDocsMenuOpen = false} class="{linkClass('/docs/mcp')} text-sm flex items-center gap-2"><Plug size={16} /> MCP Integration</a></li>
       </ul>
     </div>

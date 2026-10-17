@@ -1,19 +1,79 @@
 <script lang="ts">
-  import { Brain, Heart, Activity, GitBranch, ShieldAlert, Cpu, Layers } from "lucide-svelte";
+  import {
+    Brain,
+    Heart,
+    Activity,
+    GitBranch,
+    ShieldAlert,
+    Cpu,
+    Layers,
+    Terminal,
+    Radio,
+    Copy,
+    Check,
+    ArrowRight,
+    ShieldCheck,
+    Zap,
+    ExternalLink
+  } from "lucide-svelte";
   import { agents } from "$lib/data/agents";
   import { inview } from "$lib/actions/inview";
   import { spotlight } from "$lib/actions/spotlight";
   import { tilt } from "$lib/actions/tilt";
+
+  let activeTab = $state<'brew' | 'cargo' | 'curl'>('brew');
+  let copied = $state(false);
+
+  const commandMap = {
+    brew: "brew tap autonomic-ai-dev/tap && brew install agent-body agent-brain",
+    cargo: "cargo install agent-body agent-brain agent-spine agent-muscle",
+    curl: "curl -fsSL https://autonomic-ai.dev/install.sh | bash"
+  };
+
+  async function copyCommand() {
+    try {
+      await navigator.clipboard.writeText(commandMap[activeTab]);
+      copied = true;
+      setTimeout(() => (copied = false), 2000);
+    } catch (e) {
+      console.error("Clipboard copy failed:", e);
+    }
+  }
 </script>
 
+<!-- Live Telemetry Status Header -->
+<div class="pt-24 px-6 max-w-7xl mx-auto">
+  <div class="p-3 rounded-xl bg-[#0a0e14] border border-cyan-500/20 font-mono text-xs flex flex-wrap items-center justify-between gap-3 shadow-2xl">
+    <div class="flex items-center gap-3">
+      <span class="flex h-2 w-2 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      </span>
+      <span class="text-white font-bold tracking-wider uppercase text-[11px]">AUTONOMIC::MESH</span>
+      <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold text-[10px]">
+        11/11 ORGANS NOMINAL
+      </span>
+      <span class="text-slate-500 hidden sm:inline">•</span>
+      <span class="text-slate-400 hidden sm:inline">RTT: <strong class="text-cyan-400">&lt;0.8ms</strong></span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/25 text-[10px]">
+        DARWIN ARM64 METAL
+      </span>
+      <span class="text-slate-500 hidden md:inline">•</span>
+      <a href="/docs/architecture" class="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1 font-semibold text-[11px]">
+        <span>Architecture Spec</span>
+        <ArrowRight size={12} />
+      </a>
+    </div>
+  </div>
+</div>
+
 <!-- Hero Section -->
-<section class="relative pt-32 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
-  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-brand-500/30 text-sm font-medium text-brand-300 mb-8">
-    <span class="relative flex h-2 w-2">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
-    </span>
-    Ecosystem Online & Active
+<section class="relative pt-12 pb-16 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
+  <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass border border-cyan-500/30 text-xs font-mono font-medium text-cyan-300 mb-6">
+    <Zap size={14} class="text-cyan-400" />
+    <span>Eleven Specialized Organs · Zero Shared State · Local-First</span>
   </div>
   
   <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight">
@@ -21,73 +81,162 @@
     <span class="text-gradient">build, heal, and evolve.</span>
   </h1>
   
-  <p class="text-lg md:text-xl text-slate-400 max-w-2xl mb-10 leading-relaxed">
-    Autonomic AI Dev is a self-governing ecosystem of specialized AI agents working together to orchestrate massive scale software engineering.
+  <p class="text-lg md:text-xl text-slate-400 max-w-3xl mb-8 leading-relaxed font-sans">
+    The bio-digital computing mesh for autonomous software engineering. Built in Rust with deterministic DAG execution, AST-guarded sandboxing, token budgeting, and durable memory.
   </p>
+
+  <!-- Interactive Quickstart Terminal Box -->
+  <div class="w-full max-w-2xl bg-[#080b10] border border-white/10 rounded-xl overflow-hidden font-mono shadow-2xl mb-10 text-left">
+    <div class="bg-[#0d1117] border-b border-white/10 px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <button
+          onclick={() => activeTab = 'brew'}
+          class="px-2.5 py-1 rounded text-xs transition-colors {activeTab === 'brew' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold' : 'text-slate-400 hover:text-white'}"
+        >
+          Homebrew
+        </button>
+        <button
+          onclick={() => activeTab = 'cargo'}
+          class="px-2.5 py-1 rounded text-xs transition-colors {activeTab === 'cargo' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold' : 'text-slate-400 hover:text-white'}"
+        >
+          Cargo
+        </button>
+        <button
+          onclick={() => activeTab = 'curl'}
+          class="px-2.5 py-1 rounded text-xs transition-colors {activeTab === 'curl' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-semibold' : 'text-slate-400 hover:text-white'}"
+        >
+          Curl
+        </button>
+      </div>
+      <button
+        onclick={copyCommand}
+        class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#161b22] hover:bg-white/10 text-slate-300 text-xs transition-colors border border-white/10"
+        title="Copy command to clipboard"
+      >
+        {#if copied}
+          <Check size={12} class="text-emerald-400" />
+          <span class="text-emerald-400 font-semibold">Copied!</span>
+        {:else}
+          <Copy size={12} />
+          <span>Copy</span>
+        {/if}
+      </button>
+    </div>
+    <div class="p-4 text-xs font-mono text-emerald-400 flex items-center gap-2 overflow-x-auto">
+      <span class="text-cyan-400 font-bold select-none">&gt;_</span>
+      <code class="text-slate-200 select-all">{commandMap[activeTab]}</code>
+    </div>
+  </div>
   
   <div class="flex flex-col sm:flex-row items-center gap-4">
-    <a href="#ecosystem" class="px-8 py-4 rounded-full font-bold text-white bg-gradient-to-r from-brand-600 to-accent-600 hover:from-brand-500 hover:to-accent-500 transition-all shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:-translate-y-0.5">
-      Explore the Ecosystem
+    <a href="#ecosystem" class="px-8 py-3.5 rounded-full font-bold text-white bg-gradient-to-r from-brand-600 to-accent-600 hover:from-brand-500 hover:to-accent-500 transition-all shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 hover:-translate-y-0.5 text-sm font-mono">
+      Explore 11-Organ Mesh
     </a>
-    <a href="https://github.com/autonomic-ai-dev" target="_blank" rel="noopener noreferrer" class="px-8 py-4 rounded-full font-bold text-white glass hover:bg-white/10 transition-all border border-white/10 hover:-translate-y-0.5 flex items-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-      GitHub
+    <a href="/docs/architecture" class="px-8 py-3.5 rounded-full font-bold text-white glass hover:bg-white/10 transition-all border border-white/10 hover:-translate-y-0.5 flex items-center gap-2 text-sm font-mono">
+      <span>Architectural Specs</span>
+      <ArrowRight size={14} />
+    </a>
+    <a href="https://github.com/autonomic-ai-dev" target="_blank" rel="noopener noreferrer" class="px-6 py-3.5 rounded-full font-bold text-slate-300 glass hover:bg-white/10 transition-all border border-white/10 hover:-translate-y-0.5 flex items-center gap-2 text-sm font-mono">
+      <ExternalLink size={14} />
+      <span>GitHub</span>
     </a>
   </div>
 </section>
 
-<!-- Ecosystem Bento Grid -->
-<section id="ecosystem" class="py-24 px-6 max-w-7xl mx-auto">
-  <div class="mb-16">
-    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">The Neural Architecture</h2>
-    <p class="text-slate-400 max-w-2xl">Modeled after biological systems, each agent operates independently yet forms a cohesive, autonomic organism capable of self-healing and complex reasoning.</p>
+<!-- 11-Organ Bio-Digital Mesh Bento Grid -->
+<section id="ecosystem" class="py-20 px-6 max-w-7xl mx-auto">
+  <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <div class="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-400 mb-2">Subsystem Topology</div>
+      <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight">The 11-Organ Bio-Digital Mesh</h2>
+    </div>
+    <p class="text-slate-400 max-w-md text-sm font-mono">
+      Each organ is an independent, sandboxed process with memory barriers and verifiable contracts.
+    </p>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-fr">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-5 auto-rows-fr">
     {#each agents as agent}
       {@const Icon = agent.icon}
       <a 
         href={`/agents/${agent.id}`} 
         use:spotlight
-        use:tilt={{ max: 10, scale: 1.02 }}
-        use:inview={{ delay: 50 * agent.id.length }}
-        class="glass-card spotlight-card p-8 flex flex-col justify-between group relative overflow-hidden h-full {agent.span} reveal-hidden"
+        use:tilt={{ max: 8, scale: 1.01 }}
+        use:inview={{ delay: 30 * agent.id.length }}
+        class="glass-card spotlight-card p-6 flex flex-col justify-between group relative overflow-hidden h-full {agent.span} reveal-hidden border border-white/[0.08] hover:border-cyan-500/40 transition-all"
       >
         <!-- Background Gradient Hover -->
         <div class="absolute inset-0 bg-gradient-to-br {agent.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
         
         <div>
-          <div class="w-12 h-12 rounded-xl bg-slate-800/50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-            <Icon class="text-white" size={24} />
+          <!-- Header Strip: Icon, Status Pill, Protocol Tag -->
+          <div class="flex items-center justify-between gap-2 mb-4 font-mono text-[10px]">
+            <div class="w-10 h-10 rounded-xl bg-slate-800/60 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Icon class="text-cyan-400" size={20} />
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap justify-end">
+              <span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>{agent.latency}</span>
+              </span>
+              <span class="px-1.5 py-0.5 rounded bg-[#161b22] text-slate-400 border border-white/10">
+                {agent.protocol}
+              </span>
+            </div>
           </div>
-          <h3 class="text-2xl font-bold text-white mb-2">{agent.name}</h3>
-          <p class="text-slate-400 group-hover:text-slate-300 transition-colors leading-relaxed">{agent.description}</p>
+
+          <h3 class="text-xl font-bold text-white mb-1 font-mono tracking-tight group-hover:text-cyan-300 transition-colors flex items-center gap-1.5">
+            <span>{agent.name}</span>
+          </h3>
+          <div class="text-[11px] font-mono font-semibold text-cyan-400 mb-3">{agent.role}</div>
+          <p class="text-slate-400 group-hover:text-slate-300 transition-colors text-xs leading-relaxed font-sans mb-4">
+            {agent.description}
+          </p>
         </div>
-        
-        <div class="absolute top-8 right-8 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 -translate-x-2 transition-all duration-300">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+
+        <div>
+          <!-- Features tags -->
+          <div class="flex flex-wrap gap-1 mb-3">
+            {#each agent.features.slice(0, 3) as feature}
+              <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-white/[0.04] text-slate-300 border border-white/5">
+                {feature}
+              </span>
+            {/each}
+          </div>
+
+          <div class="pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-500 group-hover:text-cyan-400 transition-colors">
+            <span>{agent.version}</span>
+            <span class="flex items-center gap-1">
+              <span>Inspect</span>
+              <ArrowRight size={12} class="group-hover:translate-x-1 transition-transform" />
+            </span>
+          </div>
         </div>
       </a>
     {/each}
 
-    <!-- Dashboard CTA Card -->
+    <!-- Centralized Architecture Hub Card -->
     <a 
-      href="https://agent-ci-dashboard.vercel.app" 
-      target="_blank" 
-      rel="noopener noreferrer" 
+      href="/docs/architecture" 
       use:spotlight
       use:tilt={{ max: 5, scale: 1.01 }}
-      use:inview={{ delay: 300 }}
-      class="glass-card spotlight-card p-8 flex flex-col justify-between group relative overflow-hidden h-full md:col-span-2 bg-gradient-to-br from-[#0B0F19] to-slate-900 border-brand-500/30 reveal-hidden"
+      use:inview={{ delay: 200 }}
+      class="glass-card spotlight-card p-6 flex flex-col justify-between group relative overflow-hidden h-full md:col-span-2 bg-gradient-to-br from-[#0B0F19] to-slate-900 border-cyan-500/30 reveal-hidden"
     >
-      <div class="absolute right-0 top-0 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl group-hover:bg-brand-500/30 transition-colors"></div>
+      <div class="absolute right-0 top-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-colors"></div>
       <div>
-        <h3 class="text-2xl font-bold text-white mb-2 text-gradient">Mission Control</h3>
-        <p class="text-slate-300">Real-time CI/CD dashboard. Monitor heartbeats, deployments, and raw logs across the entire ecosystem.</p>
+        <div class="flex items-center gap-2 mb-3">
+          <ShieldCheck size={18} class="text-cyan-400" />
+          <span class="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-300">Architecture Specification</span>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-2 font-mono text-gradient">Centralized Architecture Hub</h3>
+        <p class="text-slate-300 text-xs leading-relaxed max-w-lg mb-4">
+          Deep-dive into multi-process supervision, Tree-sitter AST validation gates, UDS socket proxying, token headroom rate-limiters, and executable verification playbooks.
+        </p>
       </div>
-      <div class="mt-8 inline-flex items-center gap-2 font-bold text-brand-400 group-hover:text-brand-300">
-        Launch Dashboard
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      <div class="inline-flex items-center gap-2 font-mono font-bold text-xs text-cyan-400 group-hover:text-cyan-300">
+        <span>Read Architecture Blueprint</span>
+        <ArrowRight size={14} class="group-hover:translate-x-1 transition-transform" />
       </div>
     </a>
   </div>
@@ -96,109 +245,39 @@
 <!-- Features Section -->
 <section id="features" class="py-24 px-6 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800">
   <div use:inview class="mb-16 text-center reveal-hidden">
+    <div class="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-400 mb-2">Resilience Principles</div>
     <h2 class="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">Built for Autonomy</h2>
-    <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">Our agents aren't just scripts. They are continuously running, self-aware services designed for resilience.</p>
+    <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">Continuous, self-aware services designed with zero lock contention and verifiable safety.</p>
   </div>
   
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-    <!-- Feature 1 -->
     <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
       <div class="w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-6">
         <Heart size={28} />
       </div>
-      <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">Self-Healing Infrastructure</h3>
-      <p class="text-slate-600 dark:text-slate-400">Agents monitor each other through heartbeat signals. If an agent goes down, the ecosystem automatically detects the failure and attempts recovery.</p>
+      <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">Token Headroom & Self-Healing</h3>
+      <p class="text-slate-600 dark:text-slate-400">Agent Heart enforces hard token spending limits and garbage-collects vector stores, while Agent Body supervises process lifecycles and restarts fallen daemons.</p>
     </div>
-    <!-- Feature 2 -->
     <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
       <div class="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-6">
         <Activity size={28} />
       </div>
-      <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">Real-Time Telemetry</h3>
-      <p class="text-slate-600 dark:text-slate-400">Stream logs, pipeline states, and system vitals directly to the PWA-enabled Mission Control dashboard via secure WebSockets.</p>
+      <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">Real-Time Telemetry & CI Dashboard</h3>
+      <p class="text-slate-600 dark:text-slate-400">Mission Control streams pipeline states, checks triage, and terminal logs across all eleven repositories directly in the browser and terminal HUD.</p>
     </div>
-    <!-- Feature 3 -->
     <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
       <div class="w-14 h-14 rounded-2xl bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center mb-6">
-        <GitBranch size={28} />
+        <Cpu size={28} />
       </div>
-      <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">Massive Concurrency</h3>
-      <p class="text-slate-600 dark:text-slate-400">Agent Muscle is capable of running dozens of parallel builds, tests, and deployments without bottlenecking the reasoning agents.</p>
+      <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">AST Guard & Sandboxed Execution</h3>
+      <p class="text-slate-600 dark:text-slate-400">Agent Muscle validates Tree-sitter AST syntax before command execution, intercepts malicious patterns, and adaptively compresses voluminous output to bounded 4KB slices.</p>
     </div>
-    <!-- Feature 4 -->
     <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
       <div class="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6">
         <ShieldAlert size={28} />
       </div>
-      <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">Secure by Default</h3>
-      <p class="text-slate-600 dark:text-slate-400">Strict isolation. Agent Immune analyzes all external inputs and PRs for vulnerabilities before they reach the main nervous system.</p>
+      <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">Verified Recipes & Policy Gates</h3>
+      <p class="text-slate-600 dark:text-slate-400">Agent Brain injects battle-tested verified shell recipes into every turn, while Agent Mouth and Immune enforce human approvals and OSV vulnerability scanning.</p>
     </div>
-  </div>
-</section>
-
-<!-- Architecture Flow Section -->
-<section id="architecture" class="py-24 px-6 max-w-7xl mx-auto border-t border-slate-200 dark:border-slate-800">
-  <div use:inview class="mb-16 text-center reveal-hidden">
-    <h2 class="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">How It Works</h2>
-    <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">A continuous loop of perception, cognition, and execution.</p>
-  </div>
-
-  <div class="flex flex-col md:flex-row items-center justify-between relative gap-8 md:gap-4">
-    <!-- Connecting Line for Desktop -->
-    <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-slate-200 dark:bg-slate-800 -translate-y-1/2 z-0"></div>
-
-    <!-- Step 1 -->
-    <div class="relative z-10 flex flex-col items-center text-center w-full md:w-1/4">
-      <div class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-900 border-4 border-slate-50 dark:border-[#0B0F19] shadow-xl flex items-center justify-center mb-6 text-yellow-500">
-        <Cpu size={32} />
-      </div>
-      <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">1. Perception</h4>
-      <p class="text-sm text-slate-600 dark:text-slate-400">Agent Eyes intercepts GitHub Webhooks and visual state.</p>
-    </div>
-
-    <!-- Step 2 -->
-    <div class="relative z-10 flex flex-col items-center text-center w-full md:w-1/4">
-      <div class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-900 border-4 border-slate-50 dark:border-[#0B0F19] shadow-xl flex items-center justify-center mb-6 text-indigo-500">
-        <Brain size={32} />
-      </div>
-      <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">2. Cognition</h4>
-      <p class="text-sm text-slate-600 dark:text-slate-400">Agent Brain forms an execution plan based on the new data.</p>
-    </div>
-
-    <!-- Step 3 -->
-    <div class="relative z-10 flex flex-col items-center text-center w-full md:w-1/4">
-      <div class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-900 border-4 border-slate-50 dark:border-[#0B0F19] shadow-xl flex items-center justify-center mb-6 text-teal-500">
-        <GitBranch size={32} />
-      </div>
-      <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">3. Routing</h4>
-      <p class="text-sm text-slate-600 dark:text-slate-400">Agent Nerves routes the tasks rapidly to the correct worker nodes.</p>
-    </div>
-
-    <!-- Step 4 -->
-    <div class="relative z-10 flex flex-col items-center text-center w-full md:w-1/4">
-      <div class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-900 border-4 border-slate-50 dark:border-[#0B0F19] shadow-xl flex items-center justify-center mb-6 text-orange-500">
-        <Activity size={32} />
-      </div>
-      <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">4. Execution</h4>
-      <p class="text-sm text-slate-600 dark:text-slate-400">Agent Muscle performs the heavy lifting and build tasks.</p>
-    </div>
-  </div>
-</section>
-
-<!-- Bottom CTA -->
-<section class="py-32 px-6 relative overflow-hidden">
-  <div class="absolute inset-0 bg-brand-600/5 dark:bg-brand-600/10"></div>
-  <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-64 bg-brand-500/20 blur-[100px] rounded-full pointer-events-none"></div>
-  
-  <div use:inview class="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center reveal-hidden">
-    <h2 class="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white mb-6">Ready to launch?</h2>
-    <p class="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl">
-      The Autonomic Ecosystem is open source. Fork the agents, set up your Mission Control, and let the AI build your software.
-    </p>
-    
-    <a href="https://agent-ci-dashboard.vercel.app" target="_blank" rel="noopener noreferrer" class="px-10 py-5 rounded-full font-bold text-lg text-white bg-slate-900 dark:bg-white dark:text-slate-900 hover:scale-105 transition-transform shadow-xl flex items-center gap-3 group">
-      Deploy Mission Control
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-    </a>
   </div>
 </section>
