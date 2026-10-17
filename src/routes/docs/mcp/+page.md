@@ -133,3 +133,41 @@ agent-brain package remove coding-policy
 agent-brain registry list
 ```
 
+---
+
+## Universal Upstream Tool Governance (`route_to_mcp`)
+
+The central router `route_to_mcp` equips calling agents with high-performance primitives for managing external MCP servers:
+
+### 1. Pre-Flight Schema Introspection (`describe_tool`)
+Callers can inspect input parameter schemas before dispatching tools, avoiding trial-and-error argument guessing:
+```json
+{
+  "name": "route_to_mcp",
+  "arguments": {
+    "server": "linear",
+    "tool": "save_issue",
+    "describe_tool": true
+  }
+}
+```
+
+### 2. Multi-Tool Batching (`batch`)
+Executes an array of sequential tool calls within a single persistent child process session, eliminating repetitive process spawn and handshake overhead:
+```json
+{
+  "name": "route_to_mcp",
+  "arguments": {
+    "server": "linear",
+    "batch": [
+      { "tool": "save_label", "arguments": { "name": "bug" } },
+      { "tool": "save_issue", "arguments": { "title": "Fix crash", "team": "ENG" } }
+    ]
+  }
+}
+```
+
+### 3. Dynamic Semantic Entity Compaction (`compact_entity`)
+When token limits are constrained, arrays of objects are dynamically compacted to their core identifiers and state fields (`id`, `key`, `title`, `name`, `status`, `state`) before falling back to item omission, maximizing usable context without blowing token budgets.
+
+

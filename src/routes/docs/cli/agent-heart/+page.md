@@ -61,8 +61,17 @@ When consumption approaches threshold limits, `agent-heart` calculates an adapti
 # Display live token consumption and WASM fuel
 agent-heart budget status
 
+# Display budget status formatted as JSON for automation scripts
+agent-heart budget status --json
+
 # Check if a task phase complies with budget vector ceilings
 agent-heart budget check
+
+# Test whether a 15,000 token execution is allowed under current spend limits
+agent-heart budget check --tokens 15000
+
+# Start background maintenance daemon on custom port
+agent-heart serve --port 3101
 ```
 
 

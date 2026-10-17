@@ -51,11 +51,20 @@ Operators can navigate through running DAGs, zoom into failure logs, trigger man
 | Keybinding | Action | Description |
 | :--- | :--- | :--- |
 | **`Tab` / `Shift+Tab`** | Switch Active Panel | Cycles focus between Organ Mesh, DAG Visualizer, and Logs. |
+| **`6` / `u`** | Jump to Tab 6 | Opens dedicated **USAGE & BUDGET** HUD panel. |
 | **`j` / `k`** or **`↑` / `↓`**| Navigate Items | Scrolls through active nodes, PR lists, or log history. |
 | **`Enter`** | Expand Node Details | Opens detailed stdout, stderr, and snapshot metadata for a step. |
 | **`g`** | Trigger Manual GC | Sends an immediate garbage collection signal to `agent-heart`. |
 | **`r`** | Rerun Step | Prompts `agent-spine` to replay execution from previous snapshot. |
 | **`q` / `Esc`** | Detach Console | Gracefully disconnects from socket without stopping background daemons. |
+
+---
+
+## Tab 6: USAGE & BUDGET Mission Control HUD
+Pressing `6` or `u` switches into the mission control usage telemetry HUD:
+- **Token Breakdown**: Displays real-time counts for prompt tokens, completion tokens, cached reads, and total cache hit percentage.
+- **Spend vs Ceiling Gauge**: Visualizes daily and monthly budget utilization with dynamic color-coding (Cyber Green under 80%, Cyber Yellow at warning threshold, Cyber Red on critical breach).
+- **Organ Attribution Matrix**: Tracks exact token expenditure broken down across `agent-brain`, `agent-muscle`, `agent-spine`, and subagents.
 
 ---
 

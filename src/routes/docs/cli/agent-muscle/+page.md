@@ -53,6 +53,12 @@ agent-muscle run [OPTIONS] <COMMAND_STRING>
 ```bash
 # Execute safe build command in a specific repository directory
 agent-muscle run "cargo test --workspace" --cwd /projects/my-app
+
+# Execute with isolated environment variables
+agent-muscle run "npm run build" --cwd ./frontend
+
+# Run interactive script in sandboxed subshell
+agent-muscle run "python3 -c 'import torch; print(torch.cuda.is_available())'"
 ```
 
 ---

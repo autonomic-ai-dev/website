@@ -57,6 +57,9 @@ agent-mouth validate --command "git push origin master --force"
 
 # Validate shell script
 agent-mouth validate --script ./deploy.sh
+
+# Validate safe readonly shell command
+agent-mouth validate --command "cargo test -- -D warnings"
 ```
 
 ---

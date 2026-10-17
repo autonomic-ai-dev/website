@@ -57,11 +57,23 @@ agent-nerves stream <SUBCOMMAND>
 #### Examples
 
 ```bash
+# Ping active NATS broker to test round-trip latency
+agent-nerves ping
+
+# List all registered streams on the JetStream broker
+agent-nerves stream list
+
 # Tail live ecosystem event bus
 agent-nerves stream tail
 
+# Tail real-time model usage telemetry stream from agent-heart
+agent-nerves stream tail events.heart.usage
+
 # Inspect state of the task traces stream
 agent-nerves stream info TASK_TRACES
+
+# Start embedded NATS JetStream server on custom client port
+agent-nerves serve --port 4222
 ```
 
 ---

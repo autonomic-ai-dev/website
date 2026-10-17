@@ -53,6 +53,12 @@ agent-eyes capture [OPTIONS] <URL>
 ```bash
 # Capture homepage screenshot
 agent-eyes capture http://localhost:5173/ -o ./docs/preview.png
+
+# Capture full-page screenshot of documentation
+agent-eyes capture http://localhost:5173/docs -o ./docs/fullpage.png
+
+# Capture specific UI element or selector preview
+agent-eyes capture http://localhost:5173/usage -o ./docs/usage-card.png
 ```
 
 ---
