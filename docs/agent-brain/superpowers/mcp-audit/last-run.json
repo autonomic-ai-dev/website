@@ -1,0 +1,43 @@
+{
+  "started_at": "2026-06-22T17:30:53.553096+00:00",
+  "repo_root": "/Volumes/Seagate/developer/personal/autonomic-ai-dev/agent-brain",
+  "issues": [
+    {
+      "id": "34",
+      "severity": "medium",
+      "title": "Installed hook out of sync with repo",
+      "symptom": "~/.cursor hook behaves differently than repo copy.",
+      "cause": "`agent-brain install --global` not run after hook edits.",
+      "fix": "Sync `route_gate.py` to ~/.cursor and merge hooks.json.",
+      "status": "fixed",
+      "auto_fixable": true,
+      "fixed": true
+    }
+  ],
+  "fixes_applied": [
+    "synced_route_gate_to_cursor",
+    "ran_agent_brain_install_global"
+  ],
+  "checks_passed": [
+    "project_rule_agent_brain",
+    "project_rule_mcp_audit",
+    "repo_hook_has:mcp_agent-brain_route_task",
+    "repo_hook_has:handle_post_tool_use",
+    "repo_hook_has:try_clear_route_gate",
+    "repo_hook_has:route_response_useful",
+    "hooks_json_has:beforeSubmitPrompt",
+    "hooks_json_has:preToolUse",
+    "hooks_json_has:postToolUse",
+    "hooks_json_has:beforeMCPExecution",
+    "hooks_json_has:afterMCPExecution",
+    "mcp_binary_exists",
+    "hook_unit_tests",
+    "hooks_json_has:beforeSubmitPrompt",
+    "hooks_json_has:preToolUse",
+    "hooks_json_has:postToolUse",
+    "hooks_json_has:beforeMCPExecution",
+    "hooks_json_has:afterMCPExecution",
+    "mcp_binary_exists",
+    "hook_unit_tests"
+  ]
+}

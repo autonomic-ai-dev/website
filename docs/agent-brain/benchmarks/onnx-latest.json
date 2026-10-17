@@ -1,0 +1,26 @@
+{
+  "environment": "fixture-2k-onnx",
+  "embedder": "mini",
+  "fixture_db": "docs/benchmarks/fixture-2k.db",
+  "index_size": 2000,
+  "snapshot_skills": 3,
+  "filler_skills": 1997,
+  "warmup_routes": 10,
+  "warm_route": {
+    "samples": 25,
+    "min_ms": 16,
+    "p50_ms": 23,
+    "p95_ms": 83,
+    "max_ms": 107
+  },
+  "turn_cache_hit": {
+    "samples": 25,
+    "min_ms": 0,
+    "p50_ms": 0,
+    "p95_ms": 0,
+    "max_ms": 21
+  },
+  "warm_route_p95_target_ms": 50,
+  "passed_target": false,
+  "note": "Query embed uses ONNX; indexed skill vectors are deterministic (latency proxy, not semantic parity)."
+}

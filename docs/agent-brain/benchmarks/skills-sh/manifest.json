@@ -1,0 +1,10 @@
+{
+  "catalog_note": "skills.sh hosts 730k+ skills. Sync 2000 real skills: skills-sh sync --target 2000 --merge",
+  "required_ids": [
+    "vercel-labs/skills/find-skills",
+    "vercel-labs/agent-skills/vercel-react-best-practices",
+    "vercel-labs/agent-skills/vercel-react-native-skills"
+  ],
+  "discovery_queries": [],
+  "max_skills": 2000
+}

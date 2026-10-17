@@ -1,0 +1,82 @@
+{
+  "fixture_skills": 500,
+  "scenarios": [
+    {
+      "query": "grep before cat a large log file token efficient",
+      "expect_skill": "token-efficient-ops",
+      "expect_must_apply_topic": null,
+      "skill_hit": true,
+      "must_apply_hit": true,
+      "saved_pct": 99,
+      "latency_ms": 2,
+      "bm25_fast_path_eligible": true,
+      "tokens_used": 292,
+      "must_apply_count": 1
+    },
+    {
+      "query": "read frontend build artifacts from dist folder deployment",
+      "expect_skill": null,
+      "expect_must_apply_topic": "no-read-dist",
+      "skill_hit": true,
+      "must_apply_hit": true,
+      "saved_pct": 99,
+      "latency_ms": 4,
+      "bm25_fast_path_eligible": true,
+      "tokens_used": 162,
+      "must_apply_count": 1
+    },
+    {
+      "query": "use rg head tail instead of cat huge files save tokens",
+      "expect_skill": "token-efficient-ops",
+      "expect_must_apply_topic": null,
+      "skill_hit": true,
+      "must_apply_hit": true,
+      "saved_pct": 99,
+      "latency_ms": 3,
+      "bm25_fast_path_eligible": true,
+      "tokens_used": 165,
+      "must_apply_count": 1
+    }
+  ],
+  "skill_hit_rate": 1.0,
+  "must_apply_rate": 1.0,
+  "avg_saved_pct": 99.0,
+  "bm25_fast_path_rate": 1.0,
+  "warm_route_p95_ms": 3,
+  "skill_hit_threshold": 1.0,
+  "must_apply_threshold": 1.0,
+  "warm_route_p95_threshold_ms": 100,
+  "avg_saved_pct_min": 90,
+  "token_tools": {
+    "scenarios": [
+      {
+        "name": "file_summary",
+        "tool": "file_summary",
+        "savings_pct": 99.58896065766295,
+        "passed": true
+      },
+      {
+        "name": "read_file_head",
+        "tool": "read_file_head",
+        "savings_pct": 97.60316019858004,
+        "passed": true
+      },
+      {
+        "name": "read_file_tail",
+        "tool": "read_file_tail",
+        "savings_pct": 98.98574707735013,
+        "passed": true
+      },
+      {
+        "name": "grep_search",
+        "tool": "grep_search",
+        "savings_pct": 99.83985480168687,
+        "passed": true
+      }
+    ],
+    "avg_savings_pct": 99.00443068382,
+    "savings_min_pct": 80.0,
+    "passed": true
+  },
+  "passed": true
+}

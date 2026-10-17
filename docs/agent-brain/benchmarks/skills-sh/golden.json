@@ -1,0 +1,254 @@
+{
+  "cases": [
+    {
+      "query": "vercel react best practices best practices and patterns",
+      "expected_topic": "vercel-react-best-practices",
+      "skill_id": "vercel-labs/agent-skills/vercel-react-best-practices"
+    },
+    {
+      "query": "help me with find skills",
+      "expected_topic": "find-skills",
+      "skill_id": "vercel-labs/skills/find-skills"
+    },
+    {
+      "query": "vercel react native skills best practices and patterns",
+      "expected_topic": "vercel-react-native-skills",
+      "skill_id": "vercel-labs/agent-skills/vercel-react-native-skills"
+    },
+    {
+      "query": "how to use frontend design in my project",
+      "expected_topic": "frontend-design",
+      "skill_id": "anthropics/skills/frontend-design"
+    },
+    {
+      "query": "help me with agent browser",
+      "expected_topic": "agent-browser",
+      "skill_id": "vercel-labs/agent-browser/agent-browser"
+    },
+    {
+      "query": "microsoft foundry best practices and patterns",
+      "expected_topic": "microsoft-foundry",
+      "skill_id": "microsoft/azure-skills/microsoft-foundry"
+    },
+    {
+      "query": "web design guidelines best practices and patterns",
+      "expected_topic": "web-design-guidelines",
+      "skill_id": "vercel-labs/agent-skills/web-design-guidelines"
+    },
+    {
+      "query": "help me with azure ai",
+      "expected_topic": "azure-ai",
+      "skill_id": "microsoft/azure-skills/azure-ai"
+    },
+    {
+      "query": "azure deploy best practices and patterns",
+      "expected_topic": "azure-deploy",
+      "skill_id": "microsoft/azure-skills/azure-deploy"
+    },
+    {
+      "query": "help me with azure diagnostics",
+      "expected_topic": "azure-diagnostics",
+      "skill_id": "microsoft/azure-skills/azure-diagnostics"
+    },
+    {
+      "query": "help me with azure prepare",
+      "expected_topic": "azure-prepare",
+      "skill_id": "microsoft/azure-skills/azure-prepare"
+    },
+    {
+      "query": "help me with azure storage",
+      "expected_topic": "azure-storage",
+      "skill_id": "microsoft/azure-skills/azure-storage"
+    },
+    {
+      "query": "help me with azure validate",
+      "expected_topic": "azure-validate",
+      "skill_id": "microsoft/azure-skills/azure-validate"
+    },
+    {
+      "query": "entra app registration best practices and patterns",
+      "expected_topic": "entra-app-registration",
+      "skill_id": "microsoft/azure-skills/entra-app-registration"
+    },
+    {
+      "query": "azure compliance best practices and patterns",
+      "expected_topic": "azure-compliance",
+      "skill_id": "microsoft/azure-skills/azure-compliance"
+    },
+    {
+      "query": "help me with azure rbac",
+      "expected_topic": "azure-rbac",
+      "skill_id": "microsoft/azure-skills/azure-rbac"
+    },
+    {
+      "query": "azure resource lookup best practices and patterns",
+      "expected_topic": "azure-resource-lookup",
+      "skill_id": "microsoft/azure-skills/azure-resource-lookup"
+    },
+    {
+      "query": "help me with azure aigateway",
+      "expected_topic": "azure-aigateway",
+      "skill_id": "microsoft/azure-skills/azure-aigateway"
+    },
+    {
+      "query": "help me with azure kusto",
+      "expected_topic": "azure-kusto",
+      "skill_id": "microsoft/azure-skills/azure-kusto"
+    },
+    {
+      "query": "remotion best practices best practices and patterns",
+      "expected_topic": "remotion-best-practices",
+      "skill_id": "remotion-dev/skills/remotion-best-practices"
+    },
+    {
+      "query": "azure hosted copilot sdk best practices and patterns",
+      "expected_topic": "azure-hosted-copilot-sdk",
+      "skill_id": "microsoft/azure-skills/azure-hosted-copilot-sdk"
+    },
+    {
+      "query": "help me with azure compute",
+      "expected_topic": "azure-compute",
+      "skill_id": "microsoft/azure-skills/azure-compute"
+    },
+    {
+      "query": "azure cloud migrate best practices and patterns",
+      "expected_topic": "azure-cloud-migrate",
+      "skill_id": "microsoft/azure-skills/azure-cloud-migrate"
+    },
+    {
+      "query": "help me with skill creator",
+      "expected_topic": "skill-creator",
+      "skill_id": "anthropics/skills/skill-creator"
+    },
+    {
+      "query": "help me with ai video generation",
+      "expected_topic": "ai-video-generation",
+      "skill_id": "qu-skills/skills/ai-video-generation"
+    },
+    {
+      "query": "help me with azure quotas",
+      "expected_topic": "azure-quotas",
+      "skill_id": "microsoft/azure-skills/azure-quotas"
+    },
+    {
+      "query": "help me with azure upgrade",
+      "expected_topic": "azure-upgrade",
+      "skill_id": "microsoft/azure-skills/azure-upgrade"
+    },
+    {
+      "query": "help me with video edit",
+      "expected_topic": "video-edit",
+      "skill_id": "agentspace-so/runcomfy-agent-skills/video-edit"
+    },
+    {
+      "query": "help me with image to video",
+      "expected_topic": "image-to-video",
+      "skill_id": "agentspace-so/runcomfy-agent-skills/image-to-video"
+    },
+    {
+      "query": "help me with image edit",
+      "expected_topic": "image-edit",
+      "skill_id": "agentspace-so/runcomfy-agent-skills/image-edit"
+    },
+    {
+      "query": "nano banana 2 best practices and patterns",
+      "expected_topic": "nano-banana-2",
+      "skill_id": "agentspace-so/runcomfy-agent-skills/nano-banana-2"
+    },
+    {
+      "query": "help me with lark doc",
+      "expected_topic": "lark-doc",
+      "skill_id": "larksuite/cli/lark-doc"
+    },
+    {
+      "query": "help me with lark base",
+      "expected_topic": "lark-base",
+      "skill_id": "larksuite/cli/lark-base"
+    },
+    {
+      "query": "help me with lark drive",
+      "expected_topic": "lark-drive",
+      "skill_id": "larksuite/cli/lark-drive"
+    },
+    {
+      "query": "help me with lark im",
+      "expected_topic": "lark-im",
+      "skill_id": "larksuite/cli/lark-im"
+    },
+    {
+      "query": "vercel composition patterns best practices and patterns",
+      "expected_topic": "vercel-composition-patterns",
+      "skill_id": "vercel-labs/agent-skills/vercel-composition-patterns"
+    },
+    {
+      "query": "next best practices best practices and patterns",
+      "expected_topic": "next-best-practices",
+      "skill_id": "vercel-labs/next-skills/next-best-practices"
+    },
+    {
+      "query": "remotion to hyperframes best practices and patterns",
+      "expected_topic": "remotion-to-hyperframes",
+      "skill_id": "heygen-com/hyperframes/remotion-to-hyperframes"
+    },
+    {
+      "query": "help me with deploy to vercel",
+      "expected_topic": "deploy-to-vercel",
+      "skill_id": "vercel-labs/agent-skills/deploy-to-vercel"
+    },
+    {
+      "query": "vercel react view transitions best practices and patterns",
+      "expected_topic": "vercel-react-view-transitions",
+      "skill_id": "vercel-labs/agent-skills/vercel-react-view-transitions"
+    },
+    {
+      "query": "vercel cli with tokens best practices and patterns",
+      "expected_topic": "vercel-cli-with-tokens",
+      "skill_id": "vercel-labs/agent-skills/vercel-cli-with-tokens"
+    },
+    {
+      "query": "git guardrails claude code best practices and patterns",
+      "expected_topic": "git-guardrails-claude-code",
+      "skill_id": "mattpocock/skills/git-guardrails-claude-code"
+    },
+    {
+      "query": "help me with notion api",
+      "expected_topic": "notion-api",
+      "skill_id": "intellectronica/agent-skills/notion-api"
+    },
+    {
+      "query": "stripe best practices best practices and patterns",
+      "expected_topic": "stripe-best-practices",
+      "skill_id": "stripe/ai/stripe-best-practices"
+    },
+    {
+      "query": "help me with review",
+      "expected_topic": "review",
+      "skill_id": "mattpocock/skills/review"
+    },
+    {
+      "query": "enhance prompt best practices and patterns",
+      "expected_topic": "enhance-prompt",
+      "skill_id": "google-labs-code/stitch-skills/enhance-prompt"
+    },
+    {
+      "query": "help me with firebase firestore",
+      "expected_topic": "firebase-firestore",
+      "skill_id": "firebase/agent-skills/firebase-firestore"
+    },
+    {
+      "query": "stitch loop best practices and patterns",
+      "expected_topic": "stitch-loop",
+      "skill_id": "google-labs-code/stitch-skills/stitch-loop"
+    },
+    {
+      "query": "firebase crashlytics best practices and patterns",
+      "expected_topic": "firebase-crashlytics",
+      "skill_id": "firebase/agent-skills/firebase-crashlytics"
+    },
+    {
+      "query": "help me with browser act",
+      "expected_topic": "browser-act",
+      "skill_id": "browser-act/skills/browser-act"
+    }
+  ]
+}

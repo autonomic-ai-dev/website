@@ -1,9 +1,9 @@
 ---
 title: "Introducing Autonomic AI: Biological Architecture for Self-Healing Systems"
-date: "2026-06-21"
-excerpt: "How eight specialized organs compose into a self-healing multi-agent system — and why structure beats intelligence as the core design philosophy."
+date: "2026-10-17"
+excerpt: "How eleven specialized organs compose into a self-healing multi-agent system — and why structure beats intelligence as the core design philosophy."
 slug: "introducing-autonomic-ai"
-category: "Engineering"
+category: "Architecture"
 author: "Abhiuday Gupta"
 ---
 
@@ -11,19 +11,21 @@ Autonomic AI is not another agent framework. It is an operating system for auton
 
 ## The Biological Metaphor, Precisely
 
-The architecture mirrors the human autonomic nervous system — the part that keeps your heart beating and your lungs breathing without conscious thought. We have nine organs:
+The architecture mirrors the human autonomic nervous system — the part that keeps your heart beating and your lungs breathing without conscious thought. The ecosystem is composed of eleven specialized organs:
 
-- **Body** — the supervisor that daemonizes and restarts all other organs
-- **Brain** — context engine, memory, `MCP` routing
-- **Spine** — deterministic workflow `DAG` execution
-- **Heart** — maintenance daemon, `GC` scheduling, token budgeting
-- **Nerves** — async event bus via `NATS JetStream`
-- **Muscle** — command execution and `LoRA` fine-tuning
-- **Immune** — dependency scanning, sandboxed execution, memory verification
-- **Eyes** — visual QA, `DOM` indexing, screenshot diffs
-- **Mouth** — communication, webhooks, and log summarization
+- **Body** — Supervisor, launchd lifecycle controller, and system doctor daemon
+- **Brain** — Local MCP context router, hybrid vector engine, and durable knowledge graph
+- **Spine** — Deterministic workflow DAG engine with immutable state snapshots and HITL gates
+- **Heart** — Background maintenance controller, nightly GC, and token budget gatekeeper
+- **Muscle** — Sandboxed execution runtime, tree-sitter AST validation, and hardware-aware training
+- **Immune** — Zero-trust admission controller, OSV vulnerability scanner, and memory verifier
+- **Nerves** — Distributed event bus and service mesh bridge via NATS JetStream
+- **Eyes** — UI observability, headless DOM SQLite indexing, and local visual QA
+- **Mouth** — Ingress API gateway, pre-execution AST syntax checks, and webhook dispatcher
+- **TUI** — Native terminal mission control HUD built with Ratatui and direct socket streaming
+- **CI Dashboard** — Real-time operations console built with SvelteKit 5 runes and telemetry rollup
 
-Each organ exposes an `HTTP` API, registers with the event bus, and can be health-checked independently. No single organ failure takes down the whole system.
+Each organ exposes an HTTP or stdio API, registers with the event bus, and can be health-checked independently. No single organ failure takes down the whole system.
 
 ## Why Structure Beats Intelligence
 

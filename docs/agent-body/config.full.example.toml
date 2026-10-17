@@ -1,0 +1,101 @@
+# Canonical integrated config for the Autonomic AI stack.
+# Copy to ~/.autonomic/config.toml — same file in standalone and integrated mode.
+#
+# Per-organ sections: [brain], [spine], [heart], [nerves], [muscle], [immune], [eyes], [mouth]
+
+[logging]
+level = "info"
+
+# --- Global agent mode (AGENTS.md composition) ---
+[agents]
+mode = "agent-brain"
+compose_agents_md = true
+
+# --- Whole-workspace git sync (~/.autonomic) ---
+[sync]
+enabled = false
+git.remote = ""
+git.branch = "main"
+git.auto_push = false
+
+# Optional per-organ sync overrides:
+# [sync.brain]
+# enabled = true
+
+# --- Self-update policy (global + per-organ overrides) ---
+[update]
+enabled = true
+auto = false
+interval_hours = 24
+
+[update.brain]
+auto = true
+
+# --- agent-brain (MCP router, memory, hooks) ---
+# Migrated from ~/.agent_brain/config.yaml when present.
+[brain.auto_update]
+enabled = true
+interval_hours = 24
+
+[brain.sync.git]
+remote = ""
+branch = "main"
+auto_push = false
+
+# --- agent-spine (workflows, event bus) ---
+[spine]
+# listen = "127.0.0.1:3100"
+# workflows_dir defaults to ~/.autonomic/state/spine/workflows
+
+# --- agent-heart (scheduled GC, budget gate) ---
+[heart.schedule]
+enabled = true
+cron = "0 3 * * *"
+
+[heart.token_budget]
+enabled = true
+max_tokens_per_route = 8000
+max_wasm_fuel_per_route = 10000000
+wasm_anomaly_multiplier = 4.0
+
+[heart.distillation]
+enabled = true
+cron = "0 0 2 * * 0"
+threshold = 0.75
+
+# Background self-learning critic (inspects verify_outcomes, records anti-patterns/reinforcements)
+[heart.self_learning]
+enabled = true
+cron = "0 */15 * * * *"
+min_outcomes = 1
+lookback_days = 7
+
+# Nightly MLX dataset pipeline & model finetuning
+[heart.finetune]
+enabled = true
+cron = "0 0 4 * * *"
+min_merged_entries = 1
+ui_threshold = 1.0
+memory_threshold_kb = 524288
+
+# --- agent-nerves (NATS bridge, default :3102) ---
+[nerves]
+# port = 3102
+
+# --- agent-muscle (execution, training) ---
+[muscle]
+# listen = "127.0.0.1:3103"
+
+# --- agent-immune (security, sandbox) ---
+[immune]
+sandbox_backend = "process" # process | seccomp | firecracker
+network_blackhole = true
+
+# --- agent-eyes (capture, DOM, optional VLM) ---
+[vlm]
+enabled = false
+model_id = "llava-hf/llava-1.5-7b-hf"
+
+# --- agent-mouth (Slack approvals, webhooks) ---
+[mouth]
+# webhook_url = "https://hooks.slack.com/services/..."

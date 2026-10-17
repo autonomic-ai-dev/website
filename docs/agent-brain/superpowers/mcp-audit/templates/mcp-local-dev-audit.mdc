@@ -1,0 +1,19 @@
+---
+description: LOCAL DEV — run MCP audit when editing agent-brain hooks/MCP/install (private, gitignored)
+globs: agent-brain/**/*
+alwaysApply: false
+---
+
+# Local MCP dev audit (project rule)
+
+This file lives in **`.cursor/rules/mcp-local-dev-audit.mdc`** (gitignored). Cursor loads project rules from `.cursor/rules/` only — not from `~/.cursor/rules/`.
+
+When working on `agent-brain` MCP, hooks, or install code:
+
+1. Call `route_task` at turn start.
+2. Before finishing, run: `python3 docs/superpowers/mcp-audit/audit.py`
+3. Read `docs/superpowers/MCP-INTEGRATION-AUDIT.md` for any new issues; fix in the same session.
+4. Re-run audit until clean or only manual steps remain (restart Cursor).
+5. **Never commit** `docs/superpowers/` or this rule file.
+
+Auto-fix is on by default (`audit.py` syncs hooks and runs `install --global`).

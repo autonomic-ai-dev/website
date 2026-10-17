@@ -234,6 +234,48 @@
   color: #e2e8f0 !important;
 }
 
+.prose, .prose p, .prose li, .prose ul, .prose ol {
+  color: #cbd5e1 !important;
+  font-family: var(--font-sans) !important;
+  line-height: 1.75 !important;
+}
+
+.prose strong, .prose b {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.prose em, .prose i {
+  color: #f1f5f9 !important;
+  font-style: italic !important;
+}
+
+.prose a {
+  color: #38bdf8 !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  font-weight: 600 !important;
+  transition: color 0.15s ease !important;
+}
+
+.prose a:hover {
+  color: #7dd3fc !important;
+}
+
+.prose mark {
+  background-color: rgba(56, 189, 248, 0.25) !important;
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+  padding: 0.15rem 0.35rem !important;
+  border-radius: 0.25rem !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+}
+
+.prose hr {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  margin: 2.5rem 0 !important;
+}
+
 .prose blockquote {
   border-left-color: #0284c7 !important;
   background-color: rgba(14, 165, 233, 0.06) !important;

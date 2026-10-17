@@ -27,27 +27,34 @@
 
 <main class="pt-32 pb-24 px-6 max-w-5xl mx-auto min-h-screen">
   <div class="mb-16">
-    <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-4">Engineering Blog</h1>
-    <p class="text-xl text-slate-600 dark:text-slate-400">Updates, deep dives, and announcements from the Autonomic AI team.</p>
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-mono mb-4">
+      <span>AUTONOMIC DISPATCHES</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Engineering Blog</h1>
+    <p class="text-lg text-slate-400">Deep dives into self-healing architectures, deterministic DAGs, AST security, and multi-agent coordination.</p>
   </div>
 
-  <div class="grid grid-cols-1 gap-8">
+  <div class="grid grid-cols-1 gap-6">
     {#each paginatedPosts as post}
-      <a href={`/blog/${post.slug}`} class="glass-card p-8 group flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
+      <a href={`/blog/${post.slug}`} class="bg-[#0d1117] border border-white/10 hover:border-cyan-500/40 rounded-2xl p-7 group flex flex-col md:flex-row gap-6 items-start md:items-center justify-between transition-all duration-300 hover:shadow-xl hover:shadow-cyan-500/5 hover:-translate-y-0.5">
         <div class="flex-1">
           <div class="flex items-center gap-3 mb-3">
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-500/10 text-brand-600 dark:text-brand-400">{post.category}</span>
-            <div class="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 font-medium">
-              <Calendar size={14} />
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">{post.category}</span>
+            <div class="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+              <Calendar size={13} />
               {post.date}
             </div>
+            {#if post.author}
+              <span class="text-xs text-slate-500 font-mono">•</span>
+              <span class="text-xs text-slate-400 font-mono">{post.author}</span>
+            {/if}
           </div>
-          <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-brand-500 transition-colors">{post.title}</h2>
-          <p class="text-slate-600 dark:text-slate-400 line-clamp-2">{post.excerpt}</p>
+          <h2 class="text-xl md:text-2xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">{post.title}</h2>
+          <p class="text-slate-300 text-sm leading-relaxed line-clamp-2">{post.excerpt}</p>
         </div>
         
-        <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-brand-500 group-hover:text-white transition-all">
-          <ArrowRight size={20} class="group-hover:translate-x-1 transition-transform" />
+        <div class="w-11 h-11 rounded-full bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-400 group-hover:bg-cyan-400 group-hover:text-slate-950 transition-all shrink-0">
+          <ArrowRight size={18} class="group-hover:translate-x-0.5 transition-transform" />
         </div>
       </a>
     {/each}
