@@ -170,4 +170,30 @@ Executes an array of sequential tool calls within a single persistent child proc
 ### 3. Dynamic Semantic Entity Compaction (`compact_entity`)
 When token limits are constrained, arrays of objects are dynamically compacted to their core identifiers and state fields (`id`, `key`, `title`, `name`, `status`, `state`) before falling back to item omission, maximizing usable context without blowing token budgets.
 
+---
+
+## Token-Bounded Filesystem Tools (`agent-brain`)
+
+To prevent catastrophic token expansion from unbounded shell commands (`ls -la`, `find`, `cat`), `agent-brain` provides first-class, token-budgeted filesystem exploration tools:
+
+| Tool | Parameters | Purpose | Native Replacement |
+| :--- | :--- | :--- | :--- |
+| `list_directory` | `path`, `max_entries` (100), `include_hidden` | Lists directory entries with file types, sizes, and modified timestamps. | `ls` / `dir` |
+| `find_files` | `path`, `pattern`, `extension`, `max_depth` (10) | Recursively searches files with wildcard/extension filters and depth caps. | `find` / `glob` |
+| `read_file` | `path`, `start_line`, `end_line`, `max_bytes` | Reads bounded 1-indexed line ranges without loading entire files into memory. | `cat` / `sed` / `awk` |
+| `file_summary` | `path` | Token-efficient file metadata, outline, and 5-line sample. | `wc` / `head` |
+| `grep_search` | `path`, `pattern`, `max_matches` | Regex line search with automatic truncation and oversized-line skipping. | `grep` / `rg` |
+
+---
+
+## In-Gateway AST Validation & Self-Correcting Execution (`agent-body`)
+
+The `agent-body` gateway automatically mediates shell command execution through AST safety analysis:
+
+1. **Automated Gate Fusion**: Calls to `muscle_execute_bash` pass through `agent-mouth` AST safety validation internally. No separate roundtrip is required.
+2. **Deterministic Blocking**: Destructive commands (e.g. `rm -rf /`, fork bombs, unvalidated dynamic evaluation) are rejected with exit code `126` and structured feedback detailing the offending AST pattern.
+3. **Mandatory Self-Correction**: Agents are governed to diagnose and correct rejected commands rather than attempting to bypass safety gates with host commands.
+4. **Resilient Auto-Recovery**: Failed organ sessions are cleanly evicted, ensuring that fallback execution does not latch onto subsequent invocations.
+
+
 
