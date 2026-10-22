@@ -43,7 +43,7 @@ curl -fsSL https://raw.githubusercontent.com/autonomic-ai-dev/agent-body/master/
 ```
 
 #### Dynamic Patch Resolution
-The installer aligns with the ecosystem baseline (defaulting to `v1.0.0-beta.3`) while dynamically discovering compatible patch releases per organ (e.g. automatically pulling `v1.0.0-beta.3.1` for `agent-brain` without requiring an ecosystem-wide major bump).
+The installer aligns with the ecosystem baseline (defaulting to `v1.0.0-beta.3`) while dynamically discovering compatible patch releases per organ (e.g. automatically pulling `v1.0.0-beta.3.11` for `agent-brain` without requiring an ecosystem-wide major bump).
 
 This installer:
 1. Detects host operating system and target architecture (`darwin-arm64`, `linux-x86_64`, `linux-aarch64`).
@@ -52,7 +52,7 @@ This installer:
 4. Installs binaries into `~/.local/bin/` (ensuring permissions and `PATH`).
 5. On macOS, automatically clears Gatekeeper quarantine flags (`xattr -dr com.apple.quarantine ~/.local/bin/agent-*`).
 6. Validates installation integrity via `autonomic doctor --quick`.
-7. Bootstraps integration packages using `agent-brain package add @supervisor` and `agent-brain package add @starter`.
+7. Bootstraps integration packages using `agent-brain registry sync`, `agent-brain package add @agstack`, and `agent-brain package add @starter`.
 
 ---
 

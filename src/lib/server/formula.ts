@@ -83,9 +83,9 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 			fetchVer('agent-brain.rb')
 		]);
 
-		const autoVer = autonomic || '1.0.0-beta.3.1';
-		const stackVer = stack || '1.0.0-beta.3.2';
-		const brainVer = brain || '1.0.0-beta.3.2';
+		const autoVer = autonomic || '1.0.0-beta.3.9';
+		const stackVer = stack || '1.0.0-beta.3.11';
+		const brainVer = brain || '1.0.0-beta.3.11';
 
 		cached = {
 			autonomic: autoVer,
@@ -110,21 +110,21 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 		return cached;
 	} catch (err) {
 		return {
-			autonomic: '1.0.0-beta.3',
-			stack: '1.0.0-beta.3.1',
-			ecosystemVersion: 'v1.0.0-beta.3.1',
-			stackVersion: 'v1.0.0-beta.3.1',
+			autonomic: '1.0.0-beta.3.9',
+			stack: '1.0.0-beta.3.11',
+			ecosystemVersion: 'v1.0.0-beta.3.11',
+			stackVersion: 'v1.0.0-beta.3.11',
 			organs: {
-				'agent-body': 'v1.0.0-beta.3',
-				'agent-brain': 'v1.0.0-beta.3.1',
-				'agent-spine': 'v1.0.0-beta.3',
-				'agent-heart': 'v1.0.0-beta.3',
-				'agent-nerves': 'v1.0.0-beta.3',
-				'agent-muscle': 'v1.0.0-beta.3',
-				'agent-immune': 'v1.0.0-beta.3',
-				'agent-eyes': 'v1.0.0-beta.3',
-				'agent-mouth': 'v1.0.0-beta.3',
-				'agent-tui': 'v1.0.0-beta.3',
+				'agent-body': 'v1.0.0-beta.3.9',
+				'agent-brain': 'v1.0.0-beta.3.11',
+				'agent-spine': 'v1.0.0-beta.3.9',
+				'agent-heart': 'v1.0.0-beta.3.9',
+				'agent-nerves': 'v1.0.0-beta.3.9',
+				'agent-muscle': 'v1.0.0-beta.3.9',
+				'agent-immune': 'v1.0.0-beta.3.9',
+				'agent-eyes': 'v1.0.0-beta.3.9',
+				'agent-mouth': 'v1.0.0-beta.3.9',
+				'agent-tui': 'v1.0.0-beta.3.9',
 				'agent-ci-dashboard': 'v1.0.0-beta.3'
 			}
 		};

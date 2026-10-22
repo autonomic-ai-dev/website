@@ -324,7 +324,7 @@
       </nav>
       <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span>SPEC {data?.ecosystemVersion || 'v1.0.0-beta.3.1'}</span>
+        <span>SPEC {data?.ecosystemVersion || 'v1.0.0-beta.3.11'}</span>
       </div>
     </div>
 
