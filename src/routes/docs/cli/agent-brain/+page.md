@@ -170,10 +170,11 @@ agent-brain package <COMMAND>
 
 ```bash
 # Canonical package installation
-agent-brain package add @coding-policy
+agent-brain package add @agstack
+agent-brain package add @starter
 agent-brain package add anthropics/skills --ref v2.0
 agent-brain package list
-agent-brain package remove coding-policy
+agent-brain package remove starter
 ```
 
 > [!TIP]
@@ -238,8 +239,21 @@ agent-brain registry <COMMAND>
 
 | Subcommand | Syntax | Description |
 | :--- | :--- | :--- |
-| `list` | `agent-brain registry list [--kind KIND]` | List curated packages (`--kind skill_package\|utility\|workflow`). |
-| `sync` | `agent-brain registry sync [--local]` | Refresh registry manifest from remote GitHub source or embedded bundle. |
+| `list` | `agent-brain registry list [--kind KIND]` | List curated packages, utilities, and workflows (`--kind skill_package\|utility\|workflow`). |
+| `sync` | `agent-brain registry sync` | Dynamically synchronize the central registry (`agent-registry`) into local cache, refreshing `registry.json`, curated packages, and workflows. |
+
+#### Examples
+
+```bash
+# Sync central registry repository
+agent-brain registry sync
+
+# List all available curated items
+agent-brain registry list
+
+# List only available workflows
+agent-brain registry list --kind workflow
+```
 
 ---
 

@@ -3,6 +3,8 @@
 **Date:** 2026-06-20
 **Bumps:** agent-spine v0.14.0
 
+**Status (2026-10-20 audit):** Not implemented. The `agent-spine` source has no `readonly_rootfs`, `network_disabled` or Docker sandbox code. Treat this document as a proposal until that code exists.
+
 ## v0.14.0 — Docker Sandbox Execution
 
 ### Problem

@@ -118,7 +118,7 @@ Skills and domain policies are managed via the canonical `package` command group
 
 ```bash
 # Canonical package installation
-agent-brain package add @coding-policy
+agent-brain package add @agstack
 agent-brain package add @supervisor
 agent-brain package add owner/repo --ref main
 
