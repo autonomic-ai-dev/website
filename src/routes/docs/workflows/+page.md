@@ -89,7 +89,7 @@ nodes:
     depends_on: ["build_and_test"]
     channel: "slack"
     title: "Production Release Approval"
-    description: "Approve deployment of v1.0.0-beta.2 bottle to production cluster."
+    description: "Approve deployment of v1.0.0-beta.3.11 bottle to production cluster."
     timeout_minutes: 30
 
   - id: "deploy"
@@ -129,7 +129,7 @@ You can trigger DAGs synchronously or as detached background tasks:
 
 ```bash
 # Execute synchronously with live terminal progress
-agent-spine run .autonomic/workflows/ci.yaml --meta "release-v1.0.0-beta.2"
+agent-spine run .autonomic/workflows/ci.yaml --meta "release-v1.0.0-beta.3.11"
 
 # Execute in background with parameter overrides
 agent-spine run .autonomic/workflows/ci.yaml \
@@ -233,3 +233,41 @@ Polls real-time step progress, stdout snippets, and approval gate status:
 
 ### `spine_list_workflows`
 Lists all available predefined workflow blueprints registered in `.autonomic/workflows/`.
+
+---
+
+## Curated Registry Workflows & Dual-Mode Execution
+
+Workflows defined in the central [**`agent-registry`**](https://github.com/autonomic-ai-dev/agent-registry) automate standard engineering lifecycles and are automatically discovered and indexed by `agent-brain`.
+
+### 1. Curated Workflow Catalog
+
+| Workflow | Alias | Lifecycle Stages |
+| :--- | :--- | :--- |
+| `workflows/bugfix.yaml` | `@bugfix` | Reproduce (failing test) → Isolate → Root Cause Fix → Verify Suite → QualityGate → Review |
+| `workflows/feature.yaml` | `@feature` | Intent Spec → Model Domain → 4-H2 Contract → Implement → Verification Suites → SecurityGate → ReviewGate |
+| `workflows/stacked-pr.yaml` | `@stacked-pr` | Inspect Git Stack → Atomic Chunking → Verification Gate → PR Description Generation → Approval Gate |
+| `workflows/release-notes.yaml` | `@release-notes` | Collect Git Commit Diff → Draft Notes (Diátaxis Format) → Review Gate → Publish Release |
+| `workflows/mcp-health-check.yaml` | `@mcp-health-check` | Audit MCP Tool Schemas → Gateway Probe → Verify Turn Routing → Output Health Matrix |
+
+### 2. Automatic Synchronization & Vector Indexing
+
+Running `agent-brain registry sync` dynamically pulls the latest workflows from `agent-registry`:
+
+```bash
+agent-brain registry sync
+```
+
+This operation clones or updates `~/.autonomic/memory/registry-cache/repo/workflows/` and **automatically indexes** each workflow into the SQLite knowledge graph and vector database. When an agent calls `route_task` with a task like "fix this failing test" or "prepare a stacked pull request", the relevant workflow blueprint is ranked and injected into the agent's turn context.
+
+### 3. Dual-Mode Execution
+
+Workflows support execution across both supervised and lightweight environments:
+
+- **With `agent-spine` (Deterministic DAG Engine):**
+  ```bash
+  agent-spine run ~/.autonomic/memory/registry-cache/workflows/bugfix.yaml --meta "issue-128"
+  ```
+  Provides append-only snapshot rollbacks, concurrency isolation, and Slack/Discord approval gates.
+- **Without `agent-spine` (Autonomous Agent Orchestration):**
+  When running in a minimal environment or directly inside an AI agent session (Cursor, Claude Code, Antigravity), agents read the workflow YAML topology directly and execute nodes step-by-step using local tools or `./scripts/run-workflow.sh run workflows/<name>.yaml`, guaranteeing reproducibility even without a running spine daemon.

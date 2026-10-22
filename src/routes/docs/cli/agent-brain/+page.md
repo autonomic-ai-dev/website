@@ -240,12 +240,12 @@ agent-brain registry <COMMAND>
 | Subcommand | Syntax | Description |
 | :--- | :--- | :--- |
 | `list` | `agent-brain registry list [--kind KIND]` | List curated packages, utilities, and workflows (`--kind skill_package\|utility\|workflow`). |
-| `sync` | `agent-brain registry sync` | Dynamically synchronize the central registry (`agent-registry`) into local cache, refreshing `registry.json`, curated packages, and workflows. |
+| `sync` | `agent-brain registry sync` | Dynamically pull the central registry (`agent-registry`) into local cache, update package manifests, and automatically index workflows into SQLite. |
 
 #### Examples
 
 ```bash
-# Sync central registry repository
+# Sync central registry repository and auto-index workflows into SQLite
 agent-brain registry sync
 
 # List all available curated items
@@ -253,7 +253,13 @@ agent-brain registry list
 
 # List only available workflows
 agent-brain registry list --kind workflow
+
+# Install the gold-standard agstack engineering package
+agent-brain package add @agstack
 ```
+
+> [!NOTE]
+> `agent-brain registry sync` automatically executes vector indexing across all discovered workflow files (`workflows/*.yaml`) without requiring a separate manual indexing command. Packages like `@agstack` are decoupled from binary compilation and downloaded on demand to keep binary sizes minimal.
 
 ---
 
