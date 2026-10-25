@@ -53,14 +53,27 @@
 <div class="pt-8 px-6 max-w-7xl mx-auto">
   <div class="p-3 rounded-xl bg-[#0d1117]/90 border border-cyan-500/25 font-mono text-xs flex flex-wrap items-center justify-between gap-3 shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
     <div class="flex items-center gap-3">
-      <span class="flex h-2 w-2 relative">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-      </span>
-      <span class="text-white font-bold tracking-wider uppercase text-[11px]">AUTONOMIC::MESH</span>
-      <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold text-[10px]">
-        2/2 COMPONENTS IN SCOPE
-      </span>
+      <a 
+        href="https://autonomic-ai.openstatus.dev" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="flex items-center gap-2 group cursor-pointer"
+      >
+        <span class="flex h-2 w-2 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-white font-bold tracking-wider uppercase text-[11px] group-hover:text-cyan-300 transition-colors">AUTONOMIC::STATUS</span>
+      </a>
+      <a 
+        href="https://autonomic-ai.openstatus.dev" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold text-[10px] hover:bg-emerald-500/25 transition-colors flex items-center gap-1"
+      >
+        <span>LIVE (OPENSTATUS)</span>
+        <ExternalLink size={10} />
+      </a>
       <span class="text-slate-600 hidden sm:inline">|</span>
       <span class="text-slate-400 hidden sm:inline">MESH RTT: <strong class="text-cyan-400 font-mono">&lt;0.8ms</strong></span>
     </div>

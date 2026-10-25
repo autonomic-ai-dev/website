@@ -56,6 +56,13 @@
           <span>//</span>
           <span>CLI Reference</span>
         </a>
+        <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+          <span>//</span>
+          <span class="flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Status</span>
+          </span>
+        </a>
         <a href="/blog" class="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
           <span>//</span>
           <span>Dispatches</span>
@@ -116,6 +123,10 @@
           <span class="text-cyan-500">&gt;</span>
           <span>CLI Reference</span>
         </a>
+        <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" onclick={() => isMobileMenuOpen = false} class="text-emerald-400 hover:text-emerald-300 py-1.5 flex items-center gap-2">
+          <span class="text-emerald-500">&gt;</span>
+          <span>OpenStatus (Live)</span>
+        </a>
         <a href="/blog" onclick={() => isMobileMenuOpen = false} class="text-slate-300 hover:text-cyan-400 py-1.5 flex items-center gap-2">
           <span class="text-cyan-500">&gt;</span>
           <span>Blog Dispatches</span>
@@ -158,19 +169,29 @@
         <span class="text-slate-400 text-[11px]">HOMEOSTATIC RUNTIME</span>
       </div>
 
-      <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#161b22] border border-white/[0.08] text-[10px] text-slate-400">
+      <a 
+        href="https://autonomic-ai.openstatus.dev" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#161b22] border border-white/[0.08] hover:border-emerald-500/40 text-[10px] text-slate-400 hover:text-emerald-300 transition-colors"
+      >
         <span class="relative flex h-1.5 w-1.5">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
         </span>
-        <span class="text-emerald-400 font-semibold">2/2 COMPONENTS IN SCOPE</span>
+        <span class="text-emerald-400 font-semibold">ALL SYSTEMS OPERATIONAL</span>
         <span class="text-slate-600">·</span>
-        <span>LATENCY: &lt;0.8ms</span>
-      </div>
+        <span>OPENSTATUS</span>
+        <ExternalLink size={10} />
+      </a>
 
       <div class="flex items-center gap-6 text-slate-400">
         <a href="/docs" class="hover:text-cyan-400 transition-colors">Docs</a>
         <a href="/docs/cli" class="hover:text-cyan-400 transition-colors">CLI</a>
+        <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition-colors flex items-center gap-1">
+          <span>Status</span>
+          <ExternalLink size={10} />
+        </a>
         <a href="/blog" class="hover:text-cyan-400 transition-colors">Blog</a>
         <a href="https://github.com/autonomic-ai-dev" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors flex items-center gap-1">
           <span>GitHub</span>

@@ -270,6 +270,18 @@
     <!-- External Links Footer in Sidebar -->
     <div class="mt-8 pt-5 border-t border-white/[0.08] space-y-2">
       <a 
+        href="https://autonomic-ai.openstatus.dev" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="flex items-center justify-between px-2 py-1.5 rounded text-xs font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition"
+      >
+        <span class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>OpenStatus (Live)</span>
+        </span>
+        <ExternalLink size={12} />
+      </a>
+      <a 
         href="https://github.com/autonomic-ai-dev" 
         target="_blank" 
         rel="noopener noreferrer" 
