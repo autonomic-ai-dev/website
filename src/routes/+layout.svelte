@@ -35,7 +35,7 @@
         <span class="tracking-tight text-white font-headline font-bold">Autonomic AI</span>
         <span class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-medium text-cyan-300 bg-cyan-950/60 border border-cyan-500/30">
           <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-          v1.0.0-rc1 Online
+          {data?.ecosystemVersion || 'v1.0.0-rc2'} Online
         </span>
       </a>
 
@@ -92,15 +92,16 @@
         <!-- Links -->
         <nav class="flex flex-wrap items-center gap-6 font-mono text-xs">
           <a class="text-cyan-400 font-medium hover:text-cyan-300 transition-colors duration-150" href="/docs/architecture">Architecture</a>
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/#spec">Spec & Invariants</a>
+          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/#spec">Invariants</a>
+          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/docs">Docs</a>
           <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/docs/cli">CLI Reference</a>
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/docs">Documentation</a>
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">System Status</a>
+          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">Status</a>
+          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="https://github.com/autonomic-ai-dev/agent-registry" target="_blank" rel="noopener noreferrer">GitHub</a>
         </nav>
       </div>
       <!-- Bottom Row -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-slate-500 font-mono text-[11px]">
-        <p>© 2026 Autonomic AI. Autonomous Agent Engineering OS. All systems operational.</p>
+        <p>© 2026 Autonomic AI. Autonomous Agent Engineering OS ({data?.ecosystemVersion || 'v1.0.0-rc2'}). All systems operational.</p>
         <p class="text-slate-500">Built for agentic precision.</p>
       </div>
     </div>

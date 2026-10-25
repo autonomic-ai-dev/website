@@ -21,6 +21,8 @@
     Shield
   } from "lucide-svelte";
 
+  let { data } = $props();
+  let version = $derived(data?.ecosystemVersion || 'v1.0.0-rc2');
   let activeTab = $state<'brew' | 'spine' | 'brain' | 'cargo'>('brew');
   let copied = $state(false);
 
@@ -33,7 +35,7 @@
       ],
       notes: [
         "✔ Tapped autonomic-ai-dev/tap (Formulae: agent-brain, agent-spine)",
-        "✔ Installed pre-compiled universal binaries",
+        "✔ Installed pre-compiled macOS Apple Silicon (arm64) universal binaries",
         "✔ Doctor: binary, MCP schema, codesign, and hooks verified clean"
       ]
     },
@@ -51,12 +53,12 @@
     },
     brain: {
       commands: [
-        "agent-brain install --editor cursor",
+        "agent-brain install --global",
         "agent-brain package add @testing",
         "agent-brain briefing"
       ],
       notes: [
-        "✔ Configured MCP stdio server + editor read-gates in Cursor",
+        "✔ Configured MCP stdio server + editor read-gates in user/global scope",
         "✔ Reindexed curated @testing playbooks into local vector store",
         "✔ Route briefing: active token budget 4,120 / 32,000 tokens"
       ]
@@ -504,13 +506,13 @@
       <div class="mt-5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>Tested on macOS &amp; Linux</span>
+          <span>macOS Apple Silicon (ARM64)</span>
           <span>•</span>
           <span class="text-cyan-300">100% Rust Core</span>
           <span>•</span>
           <span>Local-first &amp; Zero Ambient Context Leakage</span>
         </div>
-        <span class="text-slate-500">Rust &gt;= 1.80 / Brew 4.x</span>
+        <span class="text-slate-500">macOS 13+ (arm64) / Brew 4.x</span>
       </div>
     </div>
   </section>
