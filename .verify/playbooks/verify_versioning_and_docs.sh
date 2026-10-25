@@ -21,7 +21,7 @@ const path = require("path");
 const tapDir = path.resolve(process.cwd(), "../homebrew-tap/Formula");
 const stackContent = fs.readFileSync(path.join(tapDir, "autonomic-stack.rb"), "utf8");
 const match = stackContent.match(/version\s+"([^"]+)"/);
-if (!match || !/^1\.0\.0-beta\.\d+(\.\d+)?$/.test(match[1])) {
+if (!match || !/^1\.0\.0(-[a-zA-Z0-9.]+)?$/.test(match[1])) {
   console.error("Invalid autonomic-stack version format:", match ? match[1] : "null");
   process.exit(1);
 }
@@ -35,7 +35,7 @@ grep -rn "Model Usage & Budget Governance" src/routes/docs/ || {
 }
 
 echo "==> [Playbook: Versioning & Docs] Verifying extended CLI reference examples..."
-for organ in autonomic agent-brain agent-heart agent-spine agent-nerves agent-tui agent-muscle agent-immune agent-eyes agent-mouth; do
+for organ in autonomic agent-brain agent-spine; do
   file="src/routes/docs/cli/$organ/+page.md"
   if [ -f "$file" ]; then
     count=$(grep -c '```bash' "$file" || true)

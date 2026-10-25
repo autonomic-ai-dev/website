@@ -261,60 +261,60 @@
   
   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
     
-    <!-- Principle 1: Token Headroom & Self-Healing -->
+    <!-- Principle 1: Vector Memory & Semantic Routing -->
     <div class="p-7 rounded-xl bg-[#0d1117]/85 border border-white/[0.08] hover:border-cyan-500/30 transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
       <div class="flex items-center justify-between mb-5">
         <div class="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/25 text-cyan-400 flex items-center justify-center">
-          <Heart size={24} />
+          <Brain size={24} />
         </div>
         <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#161b22] text-slate-400 border border-white/[0.08]">
-          agent-heart · agent-body
+          agent-brain
         </span>
       </div>
-      <h3 class="text-xl font-bold text-white mb-2 font-mono">Token Headroom & Self-Healing</h3>
-      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">Agent Heart enforces hard token spending limits and garbage-collects vector stores, while Agent Body supervises process lifecycles and restarts fallen daemons.</p>
+      <h3 class="text-xl font-bold text-white mb-2 font-mono">Vector Memory & Semantic Routing</h3>
+      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">agent-brain enforces strict read gates and injects durable facts, verified recipes, and relevant skills under strict token bounds into every coding turn.</p>
     </div>
 
-    <!-- Principle 2: Real-Time Telemetry & CI Dashboard -->
+    <!-- Principle 2: Deterministic DAG Workflows -->
     <div class="p-7 rounded-xl bg-[#0d1117]/85 border border-white/[0.08] hover:border-emerald-500/30 transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
       <div class="flex items-center justify-between mb-5">
         <div class="w-12 h-12 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 flex items-center justify-center">
-          <Activity size={24} />
+          <Layers size={24} />
         </div>
         <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#161b22] text-slate-400 border border-white/[0.08]">
-          agent-brain · agent-spine
+          agent-spine
         </span>
       </div>
-      <h3 class="text-xl font-bold text-white mb-2 font-mono">Real-Time Telemetry & Avionics HUD</h3>
-      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">Both components keep their telemetry local. Read agent-brain route logs with `agent-brain briefing`, and inspect agent-spine runs from the agent-spine CLI.</p>
+      <h3 class="text-xl font-bold text-white mb-2 font-mono">Deterministic DAG Workflows</h3>
+      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">agent-spine structures execution through declarative YAML pipelines, providing parallel fan-out, immutable execution snapshots, and replayable step state.</p>
     </div>
 
-    <!-- Principle 3: AST Guard & Sandboxed Execution -->
+    <!-- Principle 3: Token Headroom & Read Gate Isolation -->
     <div class="p-7 rounded-xl bg-[#0d1117]/85 border border-white/[0.08] hover:border-indigo-500/30 transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
       <div class="flex items-center justify-between mb-5">
         <div class="w-12 h-12 rounded-lg bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 flex items-center justify-center">
-          <Cpu size={24} />
+          <Zap size={24} />
         </div>
         <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#161b22] text-slate-400 border border-white/[0.08]">
-          agent-muscle · agent-immune
+          agent-brain
         </span>
       </div>
-      <h3 class="text-xl font-bold text-white mb-2 font-mono">AST Guard & Sandboxed Execution</h3>
-      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">Agent Muscle validates Tree-sitter AST syntax before command execution, intercepts malicious patterns, and adaptively compresses voluminous output to bounded 4KB slices.</p>
+      <h3 class="text-xl font-bold text-white mb-2 font-mono">Token Headroom & Read Gates</h3>
+      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">Hard read gates block prompt pollution. agent-brain scores each candidate across skills, memory, and rules to keep context reads strictly budgeted.</p>
     </div>
 
-    <!-- Principle 4: Verified Recipes & Policy Gates -->
+    <!-- Principle 4: Human-in-the-Loop Approval Gates -->
     <div class="p-7 rounded-xl bg-[#0d1117]/85 border border-white/[0.08] hover:border-amber-500/30 transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
       <div class="flex items-center justify-between mb-5">
         <div class="w-12 h-12 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-400 flex items-center justify-center">
-          <ShieldAlert size={24} />
+          <ShieldCheck size={24} />
         </div>
         <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#161b22] text-slate-400 border border-white/[0.08]">
-          agent-brain · agent-mouth
+          agent-spine
         </span>
       </div>
-      <h3 class="text-xl font-bold text-white mb-2 font-mono">Verified Recipes & Policy Gates</h3>
-      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">Agent Brain injects battle-tested verified shell recipes into every turn, while Agent Mouth and Immune enforce human approvals and OSV vulnerability scanning.</p>
+      <h3 class="text-xl font-bold text-white mb-2 font-mono">Approval Gates & Verification</h3>
+      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">Crucial milestones pause for approval before destructive actions, while deterministic .verify/ test suites attest 100% clean passes before landing.</p>
     </div>
   </div>
 </section>
