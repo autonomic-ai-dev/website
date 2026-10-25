@@ -264,15 +264,15 @@
     </div>
   </section>
 
-  <!-- SECTION: FEATURE BENTO GRID (THE AUTONOMIC ORGAN SYSTEM) -->
-  <section class="max-w-6xl mx-auto px-6 py-20" id="organs">
+  <!-- SECTION: FEATURE BENTO GRID (THE DUAL-ENGINE ARCHITECTURE) -->
+  <section class="max-w-6xl mx-auto px-6 py-20" id="architecture">
     <div class="text-center max-w-2xl mx-auto mb-16">
       <div class="inline-flex items-center gap-1 text-cyan-400 text-xs font-mono font-semibold uppercase tracking-wider mb-2">
         <span class="material-symbols-outlined text-sm">hub</span>
         Modular Architecture of Autonomous Agents
       </div>
       <h2 class="text-3xl sm:text-4xl font-headline font-bold text-white tracking-tight mb-4">
-        The Autonomic Architecture
+        The Dual-Engine Architecture
       </h2>
       <p class="text-slate-400 text-sm sm:text-base">
         Deconstructed, specialized system modules replacing generic non-deterministic LLM loops with verified software engineering disciplines.

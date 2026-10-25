@@ -3,36 +3,22 @@
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import {
-    Book,
-    Download,
-    Terminal,
-    Layers,
+    ChevronRight,
+    ExternalLink,
+    FileText,
     Brain,
     Workflow,
-    ChevronRight,
-    Search,
+    Layers,
+    Book,
     Menu,
-    X,
-    ExternalLink,
-    Code2,
-    Check,
-    Copy,
-    Shield,
-    Sparkles,
-    FileText,
-    Activity,
-    Cpu,
-    GitBranch,
-    CheckCircle2,
-    Command
+    X
   } from "lucide-svelte";
 
   let { children, data } = $props();
   let pathname = $derived($page.url.pathname);
   let isMobileDocsMenuOpen = $state(false);
-  let searchQuery = $state("");
 
-  // Determine active mode based on URL
+  // Determine active section based on URL
   let isCliSection = $derived(pathname.startsWith("/docs/cli"));
   let activeTab = $state<'docs' | 'cli'>('docs');
 
@@ -42,81 +28,6 @@
     } else {
       activeTab = 'docs';
     }
-  });
-
-  interface DocItem {
-    href: string;
-    label: string;
-    icon: any;
-    badge?: string;
-    subtext?: string;
-  }
-
-  interface DocSection {
-    title: string;
-    items: DocItem[];
-  }
-
-  const guideSections: DocSection[] = [
-    {
-      title: "Getting Started",
-      items: [
-        { href: "/docs", label: "Introduction & Overview", icon: Book, badge: "Overview" },
-        { href: "/docs/architecture", label: "Dual-Engine Architecture", icon: Layers, badge: "Topology" },
-        { href: "/docs/installation", label: "Quickstart Installation", icon: Download, badge: "macOS ARM" }
-      ]
-    },
-    {
-      title: "Core Architecture",
-      items: [
-        { href: "/docs/memory", label: "agent-brain", icon: Brain, badge: "Reasoning", subtext: "Token-bounded MCP router, durable vector memory, multi-host rule gates." },
-        { href: "/docs/workflows", label: "agent-spine", icon: Workflow, badge: "Execution", subtext: "Declarative YAML DAGs, milestone approval gates, zero-human-block execution." }
-      ]
-    },
-    {
-      title: "Registry & Workflows",
-      items: [
-        { href: "/workflows", label: "Workflows & Skill Packs", icon: Layers, badge: "Hub" }
-      ]
-    }
-  ];
-
-  const cliSections: DocSection[] = [
-    {
-      title: "Core Engines",
-      items: [
-        { href: "/docs/cli", label: "CLI Reference Manual", icon: Terminal, badge: "Overview" },
-        { href: "/docs/cli/agent-brain", label: "agent-brain CLI", icon: Brain, badge: "6 cmds" },
-        { href: "/docs/cli/agent-spine", label: "agent-spine CLI", icon: Workflow, badge: "4 cmds" }
-      ]
-    }
-  ];
-
-  let currentSections = $derived(activeTab === 'cli' ? cliSections : guideSections);
-
-  let filteredSections = $derived.by(() => {
-    if (!searchQuery.trim()) return currentSections;
-    const q = searchQuery.toLowerCase().trim();
-    return currentSections
-      .map(section => ({
-        ...section,
-        items: section.items.filter(item => 
-          item.label.toLowerCase().includes(q) || 
-          (item.badge && item.badge.toLowerCase().includes(q)) ||
-          (item.subtext && item.subtext.toLowerCase().includes(q))
-        )
-      }))
-      .filter(section => section.items.length > 0);
-  });
-
-  const allSections = [...guideSections, ...cliSections];
-  const activeDocItem = $derived.by(() => {
-    for (const sec of allSections) {
-      for (const item of sec.items) {
-        if (item.href === pathname) return item;
-      }
-    }
-    return null;
   });
 
   async function renderMermaidDiagrams() {
@@ -215,14 +126,14 @@
 
 <div class="flex flex-col lg:flex-row min-h-screen bg-[#0a0a0c] text-slate-300 font-body">
   
-  <!-- Mobile Docs Toggle Bar -->
+  <!-- Mobile Navigation Header -->
   <div class="lg:hidden px-6 py-3.5 border-b border-white/[0.08] flex justify-between items-center bg-slate-950 sticky top-20 z-40">
     <div class="flex items-center gap-2">
       <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">{activeTab === 'cli' ? 'CLI REFERENCE' : 'DOCUMENTATION'}</span>
-      {#if activeDocItem}
-        <ChevronRight size={14} class="text-slate-500" />
-        <span class="text-xs font-mono text-white truncate max-w-[180px]">{activeDocItem.label}</span>
-      {/if}
+      <ChevronRight size={14} class="text-slate-500" />
+      <span class="text-xs font-mono text-white truncate max-w-[180px]">
+        {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Overview' : 'Overview'}
+      </span>
     </div>
     <button 
       onclick={() => isMobileDocsMenuOpen = !isMobileDocsMenuOpen}
@@ -233,130 +144,236 @@
     </button>
   </div>
 
-  <!-- LEFT SIDEBAR: Nav Tree (Stitch Layout) -->
-  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-72 shrink-0 sticky top-20 h-auto lg:h-[calc(100vh-5rem)] overflow-y-auto px-5 py-6 border-b lg:border-b-0 lg:border-r border-white/[0.06] text-xs font-body bg-slate-950/80 backdrop-blur-xl z-30">
+  <!-- LEFT SIDEBAR: Pixel-Perfect Stitch Navigation Tree -->
+  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-64 shrink-0 sticky top-20 h-auto lg:h-[calc(100vh-5rem)] overflow-y-auto px-5 py-6 border-b lg:border-b-0 lg:border-r border-white/[0.06] text-xs font-body bg-[#0a0a0c] z-30">
     
-    <!-- Engine Status Pill -->
-    <div class="mb-5 p-2.5 rounded-xl bg-slate-900/90 border border-white/[0.08] flex items-center justify-between shadow-inner">
-      <div class="flex items-center gap-2">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-        </span>
-        <span class="font-mono text-[11px] text-slate-300 font-medium">Autonomous Engine {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
+    {#if activeTab === 'cli'}
+      <!-- CLI Reference Mode: Exact Match for Stitch Screenshot 1 (tL3yHC) -->
+      
+      <!-- Dual Engine Status Badge -->
+      <div class="mb-6 p-2.5 rounded-xl bg-slate-900/80 border border-white/[0.08] flex items-center justify-between whitespace-nowrap shadow-inner">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
+          <span class="font-mono text-xs text-slate-300 font-medium">Rust Crates {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
+        </div>
+        <span class="text-[10px] font-mono font-bold tracking-wider text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800/60 uppercase">LIVE</span>
       </div>
-      <span class="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/20">LIVE</span>
-    </div>
 
-    <!-- Section Switcher Tabs: Docs vs CLI -->
-    <div class="grid grid-cols-2 gap-1 p-1 bg-slate-900/90 rounded-xl border border-slate-800 mb-5 font-mono text-xs">
-      <a 
-        href="/docs" 
-        onclick={() => activeTab = 'docs'}
-        class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg transition-all text-center {activeTab === 'docs' ? 'bg-cyan-950/80 text-cyan-300 font-semibold border border-cyan-500/30 shadow-sm' : 'text-slate-400 hover:text-slate-200'}"
-      >
-        <Book size={13} />
-        <span>Docs</span>
-      </a>
-      <a 
-        href="/docs/cli" 
-        onclick={() => activeTab = 'cli'}
-        class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg transition-all text-center {activeTab === 'cli' ? 'bg-cyan-950/80 text-cyan-300 font-semibold border border-cyan-500/30 shadow-sm' : 'text-slate-400 hover:text-slate-200'}"
-      >
-        <Terminal size={13} />
-        <span>CLI Reference</span>
-      </a>
-    </div>
-
-    <!-- Quick Filter Search Input -->
-    <div class="relative mb-5">
-      <Search size={14} class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-      <input 
-        type="text" 
-        bind:value={searchQuery}
-        placeholder={activeTab === 'cli' ? "Filter CLI commands..." : "Filter guides..."}
-        class="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 transition"
-      />
-    </div>
-
-    <!-- Navigation Tree Sections -->
-    <div class="space-y-6">
-      {#each filteredSections as section}
+      <div class="space-y-6">
+        <!-- Section: CORE ENGINES -->
         <div>
-          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-            <span>{section.title}</span>
+          <div class="px-1 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400">
+            <span>CORE ENGINES</span>
           </div>
-          <ul class="space-y-1">
-            {#each section.items as item}
-              {@const Icon = item.icon}
-              {@const isActive = pathname === item.href}
-              <li>
-                <a 
-                  href={item.href} 
-                  onclick={() => isMobileDocsMenuOpen = false} 
-                  class="group flex flex-col p-2.5 rounded-xl text-xs transition-all {isActive ? 'bg-cyan-950/40 text-cyan-300 font-medium border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)]' : 'text-slate-300 hover:text-white hover:bg-white/[0.03]'}"
-                >
-                  <div class="flex items-center justify-between w-full">
-                    <div class="flex items-center gap-2">
-                      <Icon size={14} class="{isActive ? 'text-cyan-400' : 'text-slate-400 group-hover:text-cyan-400'} transition-colors shrink-0" />
-                      <span class="font-headline font-medium">{item.label}</span>
-                    </div>
-                    {#if item.badge}
-                      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded shrink-0 {isActive ? 'bg-cyan-500/20 text-cyan-300' : 'bg-slate-900 text-slate-400 group-hover:bg-slate-800'}">
-                        {item.badge}
-                      </span>
-                    {/if}
-                  </div>
-                  {#if item.subtext}
-                    <p class="text-[10px] text-slate-500 mt-1 pl-5.5 leading-relaxed truncate">
-                      {item.subtext}
-                    </p>
-                  {/if}
-                </a>
-              </li>
-            {/each}
+          <div class="space-y-1.5">
+            <a 
+              href="/docs/cli/agent-brain" 
+              class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all {pathname === '/docs/cli/agent-brain' || pathname === '/docs/cli' ? 'bg-cyan-950/30 text-cyan-300 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.08)]' : 'text-slate-300 hover:bg-slate-900 border border-white/[0.06] hover:border-white/10'}"
+            >
+              <div class="flex items-center gap-2 font-mono">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                <span class="text-white font-mono text-xs">agent-brain</span>
+              </div>
+              <span class="text-[11px] font-mono text-cyan-400/80">6 cmds</span>
+            </a>
+
+            <a 
+              href="/docs/cli/agent-spine" 
+              class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all {pathname === '/docs/cli/agent-spine' ? 'bg-indigo-950/30 text-indigo-300 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.08)]' : 'text-slate-300 hover:bg-slate-900 border border-white/[0.06] hover:border-white/10'}"
+            >
+              <div class="flex items-center gap-2 font-mono">
+                <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                <span class="text-slate-300 font-mono text-xs">agent-spine</span>
+              </div>
+              <span class="text-[11px] font-mono text-indigo-400/70">4 cmds</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Section: AGENT-BRAIN COMMANDS -->
+        <div>
+          <div class="px-1 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+            <Brain size={13} class="text-cyan-400" />
+            <span>AGENT-BRAIN COMMANDS</span>
+          </div>
+          <ul class="space-y-1.5 font-mono text-xs">
+            <li><a href="/docs/cli/agent-brain#serve" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">serve</span> <span class="text-slate-500 font-sans text-xs">Daemon mode</span></a></li>
+            <li><a href="/docs/cli/agent-brain#route_task" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">route_task</span> <span class="text-slate-500 font-sans text-xs">AST routing</span></a></li>
+            <li><a href="/docs/cli/agent-brain#doctor" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">doctor</span> <span class="text-slate-500 font-sans text-xs">Diagnostics</span></a></li>
+            <li><a href="/docs/cli/agent-brain#index" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">index</span> <span class="text-slate-500 font-sans text-xs">HNSW vectors</span></a></li>
+            <li><a href="/docs/cli/agent-brain#package" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">registry</span> <span class="text-slate-500 font-sans text-xs">MCP bindings</span></a></li>
+            <li><a href="/docs/cli/agent-brain#stats" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">stats</span> <span class="text-slate-500 font-sans text-xs">Token telemetry</span></a></li>
           </ul>
         </div>
-      {/each}
 
-      <!-- Quick Command Index for CLI mode -->
-      {#if activeTab === 'cli'}
-        <div class="pt-4 border-t border-white/[0.06] space-y-4">
-          <div>
-            <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-cyan-400/90 flex items-center gap-1.5">
-              <Brain size={13} />
-              <span>agent-brain Commands</span>
-            </div>
-            <ul class="space-y-1 font-mono text-[11px]">
-              <li><a href="/docs/cli/agent-brain#serve" class="block px-2.5 py-1 rounded text-slate-400 hover:text-cyan-300 hover:bg-white/[0.03] transition-colors">serve <span class="text-slate-600 font-sans">Daemon mode</span></a></li>
-              <li><a href="/docs/cli/agent-brain#route_task" class="block px-2.5 py-1 rounded text-slate-400 hover:text-cyan-300 hover:bg-white/[0.03] transition-colors">route_task <span class="text-slate-600 font-sans">Turn gating</span></a></li>
-              <li><a href="/docs/cli/agent-brain#install" class="block px-2.5 py-1 rounded text-slate-400 hover:text-cyan-300 hover:bg-white/[0.03] transition-colors">install <span class="text-slate-600 font-sans">Host hooks</span></a></li>
-              <li><a href="/docs/cli/agent-brain#doctor" class="block px-2.5 py-1 rounded text-slate-400 hover:text-cyan-300 hover:bg-white/[0.03] transition-colors">doctor <span class="text-slate-600 font-sans">Diagnostics</span></a></li>
-              <li><a href="/docs/cli/agent-brain#package" class="block px-2.5 py-1 rounded text-slate-400 hover:text-cyan-300 hover:bg-white/[0.03] transition-colors">package <span class="text-slate-600 font-sans">Skill packs</span></a></li>
-            </ul>
+        <!-- Section: AGENT-SPINE COMMANDS -->
+        <div>
+          <div class="px-1 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+            <Workflow size={13} class="text-indigo-400" />
+            <span>AGENT-SPINE COMMANDS</span>
           </div>
+          <ul class="space-y-1.5 font-mono text-xs">
+            <li><a href="/docs/cli/agent-spine#run" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">run</span> <span class="text-slate-500 font-sans text-xs">Execute DAG</span></a></li>
+            <li><a href="/docs/cli/agent-spine#validate" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">validate</span> <span class="text-slate-500 font-sans text-xs">Invariants</span></a></li>
+            <li><a href="/docs/cli/agent-spine#init" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">init</span> <span class="text-slate-500 font-sans text-xs">Scaffold YAML</span></a></li>
+            <li><a href="/docs/cli/agent-spine#status" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">status</span> <span class="text-slate-500 font-sans text-xs">Sealed audits</span></a></li>
+          </ul>
+        </div>
 
-          <div>
-            <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-indigo-400/90 flex items-center gap-1.5">
-              <Workflow size={13} />
-              <span>agent-spine Commands</span>
-            </div>
-            <ul class="space-y-1 font-mono text-[11px]">
-              <li><a href="/docs/cli/agent-spine#run" class="block px-2.5 py-1 rounded text-slate-400 hover:text-indigo-300 hover:bg-white/[0.03] transition-colors">run <span class="text-slate-600 font-sans">Execute DAG</span></a></li>
-              <li><a href="/docs/cli/agent-spine#validate" class="block px-2.5 py-1 rounded text-slate-400 hover:text-indigo-300 hover:bg-white/[0.03] transition-colors">validate <span class="text-slate-600 font-sans">Invariants</span></a></li>
-              <li><a href="/docs/cli/agent-spine#init" class="block px-2.5 py-1 rounded text-slate-400 hover:text-indigo-300 hover:bg-white/[0.03] transition-colors">init <span class="text-slate-600 font-sans">Scaffold YAML</span></a></li>
-              <li><a href="/docs/cli/agent-spine#status" class="block px-2.5 py-1 rounded text-slate-400 hover:text-indigo-300 hover:bg-white/[0.03] transition-colors">status <span class="text-slate-600 font-sans">Audits</span></a></li>
-            </ul>
+        <!-- Strict Dual-Engine Invariant Footer -->
+        <div class="pt-5 border-t border-white/[0.08] text-slate-400 text-xs">
+          <span class="text-slate-300 font-medium block mb-1">Dual-Engine Invariant</span>
+          <p class="text-slate-400 leading-relaxed text-[11px]">Strict bifurcation: cognitive routing (<span class="text-cyan-400 font-mono">brain</span>) and deterministic state execution (<span class="text-indigo-400 font-mono">spine</span>).</p>
+        </div>
+      </div>
+
+    {:else}
+      <!-- Documentation Mode: Exact Match for Stitch Screenshot 2 (gsyzPI) -->
+
+      <!-- Engine Status Pill -->
+      <div class="mb-6 p-2.5 rounded-xl bg-slate-900/80 border border-white/[0.08] flex items-center justify-between whitespace-nowrap shadow-inner">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+          <span class="font-mono text-xs text-slate-300 font-medium">Autonomous Engine {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
+        </div>
+        <span class="text-[10px] font-mono font-bold tracking-wider text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60 uppercase">LIVE</span>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Section: GETTING STARTED -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>Getting Started</span>
+          </div>
+          <ul class="space-y-1">
+            <li>
+              <a 
+                href="/docs" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'}"
+              >
+                <Book size={14} class="text-cyan-400" />
+                <span>Introduction & Overview</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/installation" 
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors {pathname === '/docs/installation' ? 'text-cyan-300 font-medium' : ''}"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-500 font-mono">⚡</span>
+                  <span>Quickstart Execution</span>
+                </div>
+                <span class="text-[10px] font-mono text-slate-500">2 min</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/architecture" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors {pathname === '/docs/architecture' ? 'text-cyan-300 font-medium' : ''}"
+              >
+                <Layers size={14} class="text-indigo-400" />
+                <span>CLI Runtime & Doctor</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section: CORE ARCHITECTURE -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>Core Architecture</span>
+          </div>
+          <ul class="space-y-2">
+            <li>
+              <a 
+                href="/docs/memory" 
+                class="group flex flex-col p-2.5 rounded-xl border border-white/[0.08] bg-slate-900/40 hover:border-cyan-500/40 transition-all {pathname === '/docs/memory' ? 'border-cyan-500/50 bg-cyan-950/20' : ''}"
+              >
+                <div class="flex items-center gap-2 text-cyan-400 font-mono font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                  <span>agent-brain</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
+                  Token-bounded MCP router, durable vector memory, multi-host rule gates.
+                </p>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/workflows" 
+                class="group flex flex-col p-2.5 rounded-xl border border-white/[0.08] bg-slate-900/40 hover:border-indigo-500/40 transition-all {pathname === '/docs/workflows' ? 'border-indigo-500/50 bg-indigo-950/20' : ''}"
+              >
+                <div class="flex items-center gap-2 text-indigo-400 font-mono font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                  <span>agent-spine</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
+                  Declarative YAML DAGs, milestone approval gates, zero-human-block execution.
+                </p>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section: AGSTACK SDLC -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>AGSTACK SDLC</span>
+          </div>
+          <ul class="space-y-1">
+            <li>
+              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors">
+                <Layers size={14} class="text-cyan-400" />
+                <span>agstack Mode & Matrix</span>
+              </a>
+            </li>
+            <li>
+              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors">
+                <Book size={14} class="text-slate-400" />
+                <span>Minimalist Entrepreneurship</span>
+              </a>
+            </li>
+            <li>
+              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors">
+                <span class="text-yellow-400 font-mono">★</span>
+                <span>Garry Tan gstack Review Engine</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section: VERIFICATION & INVARIANTS -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>Verification & Invariants</span>
+          </div>
+          <ul class="space-y-1">
+            <li>
+              <a href="/#spec" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors font-mono text-[11px]">
+                <span class="text-cyan-400 font-bold">.verify/</span>
+                <span>Deterministic Harness</span>
+              </a>
+            </li>
+            <li>
+              <a href="/#spec" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors">
+                <span class="text-emerald-400 font-mono">🛡</span>
+                <span>Boundary Isolation Protocol</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Quick docs feedback helper -->
+        <div class="pt-6 border-t border-white/[0.06] text-slate-400">
+          <div class="flex items-center gap-2">
+            <span class="text-indigo-400 font-mono">ℹ</span>
+            <span class="text-[11px]">Strict dual-engine invariant applied.</span>
           </div>
         </div>
-      {/if}
-
-      <!-- Strict Dual-Engine Invariant Footer -->
-      <div class="pt-6 border-t border-white/[0.06] text-slate-500 text-[11px]">
-        <span class="text-slate-400 font-medium block mb-1">Dual-Engine Invariant</span>
-        Strict bifurcation: cognitive routing (<span class="text-cyan-400 font-mono">brain</span>) and deterministic state execution (<span class="text-indigo-400 font-mono">spine</span>).
       </div>
-    </div>
+    {/if}
+
   </aside>
 
   <!-- MAIN DOCUMENTATION CANVAS -->
@@ -368,11 +385,9 @@
           {activeTab === 'cli' ? 'CLI Reference' : 'Docs'}
         </a>
         <ChevronRight size={12} class="text-slate-600" />
-        {#if activeDocItem}
-          <span class="text-cyan-400 font-medium">{activeDocItem.label}</span>
-        {:else}
-          <span class="text-cyan-400 font-medium">Specification</span>
-        {/if}
+        <span class="text-cyan-400 font-medium">
+          {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : 'Introduction & Overview'}
+        </span>
       </nav>
       <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>

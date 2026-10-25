@@ -102,7 +102,7 @@
       <!-- Primary Nav Links -->
       <nav class="hidden md:flex items-center gap-7 font-headline text-sm font-medium">
         <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname === '/' ? 'text-cyan-400 font-semibold' : 'text-slate-300'}" href="/#platform">Platform</a>
-        <a class="text-slate-300 transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" href="/#organs">Organs</a>
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/docs/architecture') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/docs/architecture">Architecture</a>
         <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/workflows') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/workflows">Workflows</a>
         <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/docs') && !$page.url.pathname.startsWith('/docs/cli') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/docs">Docs</a>
         <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/docs/cli') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/docs/cli">CLI Reference</a>
