@@ -7,17 +7,8 @@
     Download,
     Terminal,
     Layers,
-    Server,
     Brain,
     Workflow,
-    Heart,
-    Radio,
-    Cpu,
-    Shield,
-    Eye,
-    MessageSquare,
-    Activity,
-    Plug,
     ChevronRight,
     Search,
     Menu,
@@ -32,6 +23,18 @@
   let isMobileDocsMenuOpen = $state(false);
   let searchQuery = $state("");
 
+  // Determine initial mode based on URL
+  let isCliSection = $derived(pathname.startsWith("/docs/cli"));
+  let activeTab = $state<'docs' | 'cli'>('docs');
+
+  $effect(() => {
+    if (isCliSection) {
+      activeTab = 'cli';
+    } else {
+      activeTab = 'docs';
+    }
+  });
+
   interface DocItem {
     href: string;
     label: string;
@@ -45,36 +48,41 @@
     items: DocItem[];
   }
 
-  const docSections: DocSection[] = [
+  const guideSections: DocSection[] = [
     {
       title: "Get Started",
       items: [
         { href: "/docs", label: "Core Concepts", icon: Book, badge: "Concepts", description: "Ecosystem introduction and core philosophy" },
         { href: "/docs/architecture", label: "Architecture Topology", icon: Layers, badge: "Two Components", description: "agent-brain and agent-spine: scope, contracts, and runtime" },
-        { href: "/docs/installation", label: "Quick Installation", icon: Download, badge: "Install", description: "Homebrew tap and curl bootstrap" },
+        { href: "/docs/installation", label: "Quick Installation", icon: Download, badge: "Install", description: "Homebrew tap and cargo bootstrap" },
       ]
     },
     {
-      title: "Manuals",
+      title: "Organ Manuals",
       items: [
-        { href: "/docs/memory", label: "agent-brain", icon: Brain, badge: "Memory", description: "Vector memory, HNSW reasoning, curated skills, MCP hub" },
+        { href: "/docs/memory", label: "agent-brain", icon: Brain, badge: "Memory & MCP", description: "Vector memory, HNSW reasoning, curated skills, MCP hub" },
         { href: "/docs/workflows", label: "agent-spine", icon: Workflow, badge: "Workflows", description: "Deterministic YAML DAG engine and state replay" },
-      ]
-    },
-    {
-      title: "CLI Reference",
-      items: [
-        { href: "/docs/cli", label: "CLI Reference Hub", icon: Terminal, badge: "Overview", description: "CLI ecosystem overview and universal flags" },
-        { href: "/docs/cli/agent-brain", label: "agent-brain", icon: Brain, badge: "Brain CLI", description: "Memory, MCP hub, skills, and routing CLI" },
-        { href: "/docs/cli/agent-spine", label: "agent-spine", icon: Workflow, badge: "Spine CLI", description: "YAML workflow runner and DAG validator" },
       ]
     }
   ];
 
+  const cliSections: DocSection[] = [
+    {
+      title: "CLI Reference Hub",
+      items: [
+        { href: "/docs/cli", label: "CLI Overview", icon: Terminal, badge: "Overview", description: "CLI ecosystem overview, universal flags, and environment" },
+        { href: "/docs/cli/agent-brain", label: "agent-brain CLI", icon: Brain, badge: "Brain CLI", description: "Memory, MCP hub, skills, and routing CLI commands" },
+        { href: "/docs/cli/agent-spine", label: "agent-spine CLI", icon: Workflow, badge: "Spine CLI", description: "YAML workflow runner and DAG validator commands" },
+      ]
+    }
+  ];
+
+  let currentSections = $derived(activeTab === 'cli' ? cliSections : guideSections);
+
   let filteredSections = $derived.by(() => {
-    if (!searchQuery.trim()) return docSections;
+    if (!searchQuery.trim()) return currentSections;
     const q = searchQuery.toLowerCase().trim();
-    return docSections
+    return currentSections
       .map(section => ({
         ...section,
         items: section.items.filter(item => 
@@ -86,8 +94,9 @@
       .filter(section => section.items.length > 0);
   });
 
+  const allSections = [...guideSections, ...cliSections];
   const activeDocItem = $derived.by(() => {
-    for (const sec of docSections) {
+    for (const sec of allSections) {
       for (const item of sec.items) {
         if (item.href === pathname) return item;
       }
@@ -109,19 +118,19 @@
         securityLevel: "loose",
         themeVariables: {
           darkMode: true,
-          background: "#080b11",
-          mainBkg: "#081c2e",
-          nodeBorder: "#38bdf8",
-          primaryColor: "#081c2e",
+          background: "#0a0a0c",
+          mainBkg: "#0d1117",
+          nodeBorder: "#06b6d4",
+          primaryColor: "#0d1117",
           primaryTextColor: "#f8fafc",
-          primaryBorderColor: "#38bdf8",
-          lineColor: "#38bdf8",
+          primaryBorderColor: "#06b6d4",
+          lineColor: "#06b6d4",
           secondaryColor: "#1e293b",
           tertiaryColor: "#0f172a",
           edgeLabelBackground: "#0d1117",
           clusterBkg: "#080d1a",
-          clusterBorder: "rgba(56, 189, 248, 0.3)",
-          fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+          clusterBorder: "rgba(6, 182, 212, 0.3)",
+          fontFamily: "Fira Code, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
           fontSize: "12px"
         }
       });
@@ -138,16 +147,14 @@
         try {
           const { svg } = await mermaid.render(id, code.trim());
           const wrapper = document.createElement("div");
-          wrapper.className = "mermaid-diagram-container my-8 p-6 bg-[#080b11]/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md";
+          wrapper.className = "mermaid-diagram-container my-8 p-6 bg-slate-950/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md";
           wrapper.innerHTML = svg;
-          const target = el.tagName === "CODE" && el.parentElement?.tagName === "PRE" ? el.parentElement : el;
-          target.replaceWith(wrapper);
-        } catch (diagErr) {
-          console.warn(`Mermaid render failed for block ${i}:`, diagErr);
-          // Clean up any stray error elements Mermaid injects into document body
-          const strayError = document.getElementById(id) || document.getElementById(`d${id}`);
-          if (strayError) strayError.remove();
-          // Leave the raw code block styled cleanly if render fails
+          const preParent = el.tagName === "CODE" ? el.parentElement : el;
+          if (preParent && preParent.parentNode) {
+            preParent.parentNode.replaceChild(wrapper, preParent);
+          }
+        } catch (err) {
+          console.warn("Mermaid render error for block:", err);
         }
       }
     } catch (e) {
@@ -161,7 +168,7 @@
     preBlocks.forEach((pre) => {
       if (pre.querySelector(".copy-code-btn")) return;
       const btn = document.createElement("button");
-      btn.className = "copy-code-btn absolute top-3 right-3 px-2 py-1 bg-white/10 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 rounded text-xs font-mono transition flex items-center gap-1 opacity-0 group-hover:opacity-100 border border-white/10";
+      btn.className = "copy-code-btn absolute top-3 right-3 px-2 py-1 bg-slate-800/80 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 rounded text-xs font-mono transition flex items-center gap-1 opacity-0 group-hover:opacity-100 border border-slate-700/80 cursor-pointer";
       btn.innerHTML = "<span>Copy</span>";
       btn.onclick = () => {
         const codeEl = pre.querySelector("code") as HTMLElement | null;
@@ -191,11 +198,11 @@
   });
 </script>
 
-<div class="flex flex-col md:flex-row min-h-screen pt-0 bg-[#080b10]">
+<div class="flex flex-col md:flex-row min-h-screen bg-[#0a0a0c]">
   <!-- Mobile Docs Toggle Bar -->
-  <div class="md:hidden px-6 py-3.5 border-b border-white/[0.08] flex justify-between items-center bg-[#0d1117] sticky top-16 z-40">
+  <div class="md:hidden px-6 py-3.5 border-b border-white/[0.08] flex justify-between items-center bg-slate-950 sticky top-20 z-40">
     <div class="flex items-center gap-2">
-      <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">DOCS HUB</span>
+      <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">{activeTab === 'cli' ? 'CLI REFERENCE' : 'DOCUMENTATION'}</span>
       {#if activeDocItem}
         <ChevronRight size={14} class="text-slate-500" />
         <span class="text-xs font-mono text-white truncate max-w-[180px]">{activeDocItem.label}</span>
@@ -203,7 +210,7 @@
     </div>
     <button 
       onclick={() => isMobileDocsMenuOpen = !isMobileDocsMenuOpen}
-      class="p-2 bg-[#161b22] border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
+      class="p-2 bg-slate-900 border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
       aria-label="Toggle Navigation"
     >
       {#if isMobileDocsMenuOpen} <X size={18} /> {:else} <Menu size={18} /> {/if}
@@ -211,27 +218,36 @@
   </div>
 
   <!-- Docs Sidebar -->
-  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-72 border-b md:border-b-0 md:border-r border-white/[0.08] p-5 overflow-y-auto shrink-0 bg-[#0d1117]/95 backdrop-blur-xl z-30 sticky top-16 h-[calc(100vh-4rem)]">
-    <!-- Live Hub Telemetry Pill -->
-    <div class="mb-5 pb-4 border-b border-white/[0.08] flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-        </span>
-        <span class="text-xs font-mono font-bold text-white tracking-wide">CENTRAL DOCS HUB</span>
-      </div>
-      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">2 COMPONENTS</span>
+  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-80 border-b md:border-b-0 md:border-r border-slate-800/80 p-5 overflow-y-auto shrink-0 bg-slate-950/70 backdrop-blur-xl z-30 sticky top-24 h-[calc(100vh-6rem)]">
+    
+    <!-- Section Switcher Tabs: Docs vs CLI -->
+    <div class="grid grid-cols-2 gap-1 p-1 bg-slate-900/90 rounded-xl border border-slate-800 mb-5 font-mono text-xs">
+      <a 
+        href="/docs" 
+        onclick={() => activeTab = 'docs'}
+        class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg transition-all text-center {activeTab === 'docs' ? 'bg-cyan-950/80 text-cyan-300 font-semibold border border-cyan-500/30 shadow-sm' : 'text-slate-400 hover:text-slate-200'}"
+      >
+        <Book size={13} />
+        <span>Docs</span>
+      </a>
+      <a 
+        href="/docs/cli" 
+        onclick={() => activeTab = 'cli'}
+        class="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg transition-all text-center {activeTab === 'cli' ? 'bg-cyan-950/80 text-cyan-300 font-semibold border border-cyan-500/30 shadow-sm' : 'text-slate-400 hover:text-slate-200'}"
+      >
+        <Terminal size={13} />
+        <span>CLI Reference</span>
+      </a>
     </div>
 
     <!-- Quick Filter Search -->
-    <div class="relative mb-6">
+    <div class="relative mb-5">
       <Search size={14} class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
       <input 
         type="text" 
         bind:value={searchQuery}
-        placeholder="Filter organs & guides..."
-        class="w-full bg-[#121622] border border-white/10 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 transition"
+        placeholder={activeTab === 'cli' ? "Filter CLI commands..." : "Filter guides & architecture..."}
+        class="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 transition"
       />
     </div>
 
@@ -250,13 +266,13 @@
                 <a 
                   href={item.href} 
                   onclick={() => isMobileDocsMenuOpen = false} 
-                  class="group flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-sans transition-all {isActive ? 'bg-cyan-500/15 text-cyan-300 font-semibold border border-cyan-500/30 shadow-sm' : 'text-slate-300 hover:text-white hover:bg-white/[0.04]'}"
+                  class="group flex items-center justify-between px-3 py-2 rounded-xl text-xs font-sans transition-all {isActive ? 'bg-cyan-500/15 text-cyan-300 font-semibold border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.1)]' : 'text-slate-300 hover:text-white hover:bg-slate-900/60'}"
                 >
                   <div class="flex items-center gap-2.5 min-w-0">
                     <Icon size={15} class="{isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'} transition-colors shrink-0" />
                     <span class="truncate">{item.label}</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.2 rounded shrink-0 {isActive ? 'bg-cyan-500/20 text-cyan-300' : 'bg-white/[0.05] text-slate-400 group-hover:bg-white/10'}">
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded shrink-0 {isActive ? 'bg-cyan-500/20 text-cyan-300' : 'bg-slate-900 text-slate-400 group-hover:bg-slate-800'}">
                     {item.badge}
                   </span>
                 </a>
@@ -267,36 +283,27 @@
       {/each}
     </div>
 
-    <!-- External Links Footer in Sidebar -->
-    <div class="mt-8 pt-5 border-t border-white/[0.08] space-y-2">
+    <!-- External Links Footer in Sidebar (OpenStatus & Monorepo only) -->
+    <div class="mt-8 pt-5 border-t border-slate-800/80 space-y-2">
       <a 
         href="https://autonomic-ai.openstatus.dev" 
         target="_blank" 
         rel="noopener noreferrer" 
-        class="flex items-center justify-between px-2 py-1.5 rounded text-xs font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition"
+        class="flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-mono text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 transition border border-emerald-500/20"
       >
-        <span class="flex items-center gap-1.5">
+        <span class="flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>OpenStatus (Live)</span>
         </span>
         <ExternalLink size={12} />
       </a>
       <a 
-        href="https://github.com/autonomic-ai-dev" 
+        href="https://github.com/autonomic-ai-dev/agent-registry" 
         target="_blank" 
         rel="noopener noreferrer" 
-        class="flex items-center justify-between px-2 py-1.5 rounded text-xs font-mono text-slate-400 hover:text-white hover:bg-white/5 transition"
+        class="flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs font-mono text-slate-400 hover:text-white hover:bg-slate-900 transition"
       >
         <span>GitHub Monorepo</span>
-        <ExternalLink size={12} />
-      </a>
-      <a 
-        href="https://agent-ci-dashboard.vercel.app" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        class="flex items-center justify-between px-2 py-1.5 rounded text-xs font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition"
-      >
-        <span>Mission Control</span>
         <ExternalLink size={12} />
       </a>
     </div>
@@ -305,9 +312,11 @@
   <!-- Docs Content Container -->
   <main class="flex-1 min-w-0 p-6 md:p-12 lg:p-16 max-w-5xl">
     <!-- Breadcrumb Header -->
-    <div class="mb-8 pb-4 border-b border-white/[0.08] flex items-center justify-between">
+    <div class="mb-8 pb-4 border-b border-slate-800/80 flex items-center justify-between">
       <nav class="flex items-center gap-2 text-xs font-mono text-slate-400" aria-label="Breadcrumb">
-        <a href="/docs" class="hover:text-white transition">Docs</a>
+        <a href={activeTab === 'cli' ? "/docs/cli" : "/docs"} class="hover:text-white transition">
+          {activeTab === 'cli' ? 'CLI Reference' : 'Docs'}
+        </a>
         <ChevronRight size={12} class="text-slate-600" />
         {#if activeDocItem}
           <span class="text-cyan-400 font-semibold">{activeDocItem.label}</span>
@@ -317,7 +326,7 @@
       </nav>
       <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span>SPEC {data?.ecosystemVersion || 'v1.0.0-beta.3.11'}</span>
+        <span>SPEC v1.0.0-rc1</span>
       </div>
     </div>
 
