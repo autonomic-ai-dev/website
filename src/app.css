@@ -40,6 +40,10 @@
   font-family: var(--font-label);
 }
 
+@utility font-mono {
+  font-family: var(--font-mono);
+}
+
 @layer base {
   :root {
     --bg-color: #0a0a0c;
@@ -53,6 +57,11 @@
     font-family: var(--font-body);
     antialiased: true;
     scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-headline);
+    letter-spacing: -0.02em;
   }
 
   :not(pre) > code {
@@ -215,24 +224,26 @@
 .prose {
   max-width: 100% !important;
   color: #8b949e !important;
+  font-family: var(--font-body) !important;
 }
 
 .prose pre {
-  background-color: #080b10 !important;
+  background-color: #0d1117 !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 0.75rem !important;
   padding: 1.25rem !important;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+  font-family: var(--font-mono) !important;
 }
 
 .prose code:not(pre code) {
-  color: #00f2fe !important;
-  background-color: rgba(0, 242, 254, 0.1) !important;
+  color: #06b6d4 !important;
+  background-color: rgba(6, 182, 212, 0.1) !important;
   padding: 0.15rem 0.4rem !important;
   border-radius: 0.35rem !important;
   font-size: 0.875em !important;
   font-family: var(--font-mono) !important;
-  border: 1px solid rgba(0, 242, 254, 0.2) !important;
+  border: 1px solid rgba(6, 182, 212, 0.2) !important;
 }
 
 .prose table {
@@ -248,7 +259,7 @@
 }
 
 .prose th {
-  background-color: rgba(0, 242, 254, 0.06) !important;
+  background-color: rgba(6, 182, 212, 0.06) !important;
   color: #f0f6fc !important;
   font-family: var(--font-mono) !important;
   font-size: 0.75rem !important;
@@ -264,6 +275,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
   color: #8b949e !important;
   font-size: 0.875rem !important;
+  font-family: var(--font-body) !important;
 }
 
 .prose tr:last-child td {
@@ -271,11 +283,12 @@
 }
 
 .prose tr:hover td {
-  background-color: rgba(0, 242, 254, 0.04) !important;
+  background-color: rgba(6, 182, 212, 0.04) !important;
   color: #f0f6fc !important;
 }
 
 .prose h1, .prose h2, .prose h3, .prose h4 {
+  font-family: var(--font-headline) !important;
   color: #f0f6fc !important;
   font-weight: 700 !important;
   letter-spacing: -0.02em !important;
@@ -294,7 +307,7 @@
   margin-bottom: 1rem !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
   padding-bottom: 0.5rem !important;
-  color: #00f2fe !important;
+  color: #06b6d4 !important;
 }
 
 .prose h3 {
@@ -306,7 +319,7 @@
 
 .prose, .prose p, .prose li, .prose ul, .prose ol {
   color: #8b949e !important;
-  font-family: var(--font-sans) !important;
+  font-family: var(--font-body) !important;
   line-height: 1.75 !important;
 }
 
@@ -316,7 +329,7 @@
 }
 
 .prose a {
-  color: #00f2fe !important;
+  color: #06b6d4 !important;
   text-decoration: underline !important;
   text-underline-offset: 3px !important;
   font-weight: 500 !important;

@@ -1,16 +1,76 @@
 <script lang="ts">
   import "../app.css";
   import { onMount } from "svelte";
+  import { page } from "$app/stores";
   let { children, data } = $props();
 
   onMount(() => {
     document.documentElement.classList.add('dark');
   });
+
+  const structuredData = $derived({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Autonomic AI",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS Apple Silicon (ARM64)",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "softwareVersion": data?.ecosystemVersion || "v1.0.0-rc2",
+        "description": "Autonomous AI agent engineering operating system featuring agent-brain (HNSW vector memory & MCP hub) and agent-spine (deterministic YAML DAG runner)."
+      },
+      {
+        "@type": "Organization",
+        "name": "Autonomic AI",
+        "url": "https://autonomic-ai.dev",
+        "logo": "https://autonomic-ai.dev/logo.png",
+        "sameAs": [
+          "https://github.com/autonomic-ai-dev/agent-registry",
+          "https://autonomic-ai.openstatus.dev"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "name": "Autonomic AI",
+        "url": "https://autonomic-ai.dev"
+      }
+    ]
+  });
 </script>
 
 <svelte:head>
-  <title>Autonomic AI — Autonomous AI Agent Engineering OS</title>
-  <meta name="description" content="Autonomic AI: agent-brain, agent-spine, and agstack. Right skill, right memory, right time, for AI coding agents." />
+  <title>Autonomic AI — Autonomous AI Agent Operating System & MCP Router</title>
+  <meta name="description" content="Autonomic AI is the operating system for autonomous engineering agents. Features agent-brain (HNSW vector memory, turn routing, skill registry) and agent-spine (deterministic YAML DAG runner)." />
+  <meta name="keywords" content="autonomous AI agents, AI agent memory, MCP router, agent-brain, agent-spine, agstack, AI engineering OS, deterministic workflows, Model Context Protocol, Rust AI CLI" />
+  <meta name="author" content="Autonomic AI Team" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="theme-color" content="#0a0a0c" />
+  <link rel="canonical" href="https://autonomic-ai.dev{$page.url.pathname}" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://autonomic-ai.dev{$page.url.pathname}" />
+  <meta property="og:site_name" content="Autonomic AI" />
+  <meta property="og:title" content="Autonomic AI — Autonomous AI Agent Operating System & MCP Router" />
+  <meta property="og:description" content="Deterministic DAG workflows, HNSW vector memory, and intelligent MCP routing for AI coding agents." />
+  <meta property="og:image" content="https://autonomic-ai.dev/logo.png" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@autonomic_ai" />
+  <meta name="twitter:creator" content="@autonomic_ai" />
+  <meta name="twitter:title" content="Autonomic AI — Autonomous AI Agent Operating System" />
+  <meta name="twitter:description" content="Deterministic DAG workflows, HNSW vector memory, and intelligent MCP routing for AI coding agents." />
+  <meta name="twitter:image" content="https://autonomic-ai.dev/logo.png" />
+
+  <!-- Schema.org JSON-LD -->
+  {@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 </svelte:head>
 
 <div class="bg-[#0a0a0c] text-slate-100 font-body selection:bg-cyan-500/30 selection:text-cyan-200 antialiased relative min-h-screen overflow-x-hidden">
@@ -30,7 +90,7 @@
       <!-- Brand Logo + Wordmark & Live Status -->
       <a class="font-headline text-base font-bold tracking-tight text-white flex items-center gap-3 group" href="/">
         <div class="relative w-8 h-8 rounded-lg overflow-hidden ring-1 ring-cyan-500/30 p-0.5 bg-slate-900 flex items-center justify-center">
-          <img alt="Autonomic AI" class="w-full h-full object-contain" src="/logo.png" />
+          <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.png" />
         </div>
         <span class="tracking-tight text-white font-headline font-bold">Autonomic AI</span>
         <span class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-medium text-cyan-300 bg-cyan-950/60 border border-cyan-500/30">
@@ -41,11 +101,11 @@
 
       <!-- Primary Nav Links -->
       <nav class="hidden md:flex items-center gap-7 font-headline text-sm font-medium">
-        <a class="text-slate-300 transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" href="/#platform">Platform</a>
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname === '/' ? 'text-cyan-400 font-semibold' : 'text-slate-300'}" href="/#platform">Platform</a>
         <a class="text-slate-300 transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" href="/#organs">Organs</a>
-        <a class="text-slate-300 transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" href="/#workflows">Workflows</a>
-        <a class="text-slate-300 transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" href="/docs">Docs</a>
-        <a class="text-slate-300 transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" href="/docs/cli">CLI Reference</a>
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/workflows') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/workflows">Workflows</a>
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/docs') && !$page.url.pathname.startsWith('/docs/cli') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/docs">Docs</a>
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/docs/cli') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/docs/cli">CLI Reference</a>
         <a class="text-emerald-400 font-semibold transition-colors duration-200 hover:text-emerald-300 flex items-center gap-1.5" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
           <span>Status</span>
@@ -57,7 +117,7 @@
         <a 
           href="https://github.com/autonomic-ai-dev/agent-registry" 
           target="_blank" 
-          rel="noopener noreferrer"
+          rel="noopener noreferrer" 
           class="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800 text-xs font-mono text-slate-300 hover:text-white hover:border-cyan-500/40 transition-all duration-200 active:scale-95"
         >
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -81,7 +141,7 @@
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-900">
         <div class="flex items-center gap-3">
           <div class="w-7 h-7 rounded-lg overflow-hidden ring-1 ring-cyan-500/30 p-0.5 bg-slate-900 flex items-center justify-center">
-            <img alt="Autonomic AI" class="w-full h-full object-contain" src="/logo.png" />
+            <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.png" />
           </div>
           <span class="font-headline text-sm font-bold text-white">Autonomic AI</span>
           <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="ml-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-950/60 transition">
@@ -91,7 +151,8 @@
         </div>
         <!-- Links -->
         <nav class="flex flex-wrap items-center gap-6 font-mono text-xs">
-          <a class="text-cyan-400 font-medium hover:text-cyan-300 transition-colors duration-150" href="/docs/architecture">Architecture</a>
+          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/docs/architecture">Architecture</a>
+          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/workflows">Workflows</a>
           <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/#spec">Invariants</a>
           <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/docs">Docs</a>
           <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/docs/cli">CLI Reference</a>
