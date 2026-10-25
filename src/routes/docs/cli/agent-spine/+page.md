@@ -22,7 +22,6 @@ agent-spine [OPTIONS] <COMMAND>
 | :--- | :--- | :--- | :--- |
 | `--help` | `-h` | Boolean | Print help and command usage. |
 | `--version` | `-V` | Boolean | Print installed `agent-spine` version. |
-| `--progress` | — | `auto\|plain\|quiet` | Progress output rendering mode. |
 
 ---
 
@@ -83,7 +82,7 @@ agent-spine validate <WORKFLOW>
 - Validates YAML syntax and structural types.
 - Validates `budget` blocks (`max_cost_usd`, `max_tokens`) and node preconditions (`budget_headroom`, `quota_available`).
 - Detects cyclic dependencies using Kahn's topological sorting algorithm.
-- Verifies that all referenced tool names exist in the organ MCP gateway.
+- Verifies that all referenced tool names exist in the configured MCP servers.
 - Validates timeout values and retry policies.
 
 #### Examples
@@ -185,7 +184,7 @@ Start the Model Context Protocol (MCP) server over standard I/O (stdio).
 agent-spine mcp-serve [OPTIONS]
 ```
 
-Provides tool interfaces (`spine_submit_workflow`, `spine_list_workflows`, `spine_check_status`) for agent-body and external agent hosts.
+Provides tool interfaces (`spine_submit_workflow`, `spine_list_workflows`, `spine_check_status`) for external agent hosts such as Cursor and Claude Code.
 
 ---
 

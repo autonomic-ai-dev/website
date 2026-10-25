@@ -26,13 +26,15 @@
   import { spotlight } from "$lib/actions/spotlight";
   import { tilt } from "$lib/actions/tilt";
 
+  const inScope = agents.filter((agent) => agent.id === "brain" || agent.id === "spine");
+
   let { data } = $props();
   let activeTab = $state<'brew' | 'cargo' | 'curl'>('brew');
   let copied = $state(false);
 
   const commandMap = {
-    brew: "brew tap autonomic-ai-dev/tap && brew install autonomic-stack",
-    cargo: "cargo install autonomic agent-brain agent-spine agent-muscle",
+    brew: "brew tap autonomic-ai-dev/tap && brew install agent-brain agent-spine",
+    cargo: "cargo install agent-brain agent-spine",
     curl: "curl -fsSL https://autonomic-ai.dev/install.sh | bash"
   };
 
@@ -57,7 +59,7 @@
       </span>
       <span class="text-white font-bold tracking-wider uppercase text-[11px]">AUTONOMIC::MESH</span>
       <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold text-[10px]">
-        11/11 ORGANS NOMINAL
+        2/2 COMPONENTS IN SCOPE
       </span>
       <span class="text-slate-600 hidden sm:inline">|</span>
       <span class="text-slate-400 hidden sm:inline">MESH RTT: <strong class="text-cyan-400 font-mono">&lt;0.8ms</strong></span>
@@ -79,7 +81,7 @@
 <section class="relative pt-16 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center text-center">
   <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#161b22] border border-cyan-500/30 text-xs font-mono font-medium text-cyan-300 mb-6 shadow-[0_0_12px_rgba(0,242,254,0.15)]">
     <Zap size={14} class="text-cyan-400" />
-    <span>Eleven Autonomous Organs · Zero Shared State · Local-First</span>
+    <span>Two Components · No Shared Library · Local-First</span>
   </div>
   
   <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight font-sans">
@@ -137,7 +139,7 @@
   <!-- Hero Action Buttons -->
   <div class="flex flex-col sm:flex-row items-center gap-3.5">
     <a href="#ecosystem" class="px-6 py-3 rounded-lg text-xs font-mono font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-400 to-emerald-400 text-[#080b10] hover:shadow-[0_0_20px_rgba(0,242,254,0.4)] transition-all">
-      Explore 11-Organ Mesh
+      Read the architecture
     </a>
     <a href="/docs/architecture" class="px-6 py-3 rounded-lg text-xs font-mono font-bold uppercase tracking-wider bg-[#161b22] hover:bg-[#21262d] text-white border border-white/10 hover:border-cyan-400/40 transition-all flex items-center gap-2">
       <span>Architecture Specs</span>
@@ -150,20 +152,20 @@
   </div>
 </section>
 
-<!-- 11-Organ Bio-Digital Mesh Bento Grid -->
+<!-- Two-component scope grid -->
 <section id="ecosystem" class="py-20 px-6 max-w-7xl mx-auto">
   <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
     <div>
       <div class="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-400 mb-2">// Subsystem Topology</div>
-      <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight">The 11-Organ Bio-Digital Mesh</h2>
+      <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight">Two Components, One Job Each</h2>
     </div>
     <p class="text-[#8b949e] max-w-md text-xs font-mono leading-relaxed">
-      Each organ is an independent, sandboxed process communicating over high-throughput NATS JetStream and Unix Domain Sockets.
+      agent-brain supplies the right skills, rules, and memory for each turn. agent-spine runs deterministic workflows. Each is a local process, and neither depends on a shared library.
     </p>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-fr">
-    {#each agents as agent}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
+    {#each inScope as agent}
       {@const Icon = agent.icon}
       <a 
         href={`/agents/${agent.id}`} 
@@ -280,11 +282,11 @@
           <Activity size={24} />
         </div>
         <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-[#161b22] text-slate-400 border border-white/[0.08]">
-          agent-ci-dashboard · agent-tui
+          agent-brain · agent-spine
         </span>
       </div>
       <h3 class="text-xl font-bold text-white mb-2 font-mono">Real-Time Telemetry & Avionics HUD</h3>
-      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">Mission Control streams pipeline states, checks triage, and terminal logs across all eleven repositories directly in the browser and terminal HUD.</p>
+      <p class="text-[#8b949e] text-xs leading-relaxed font-sans">Both components keep their telemetry local. Read agent-brain route logs with `agent-brain briefing`, and inspect agent-spine runs from the agent-spine CLI.</p>
     </div>
 
     <!-- Principle 3: AST Guard & Sandboxed Execution -->

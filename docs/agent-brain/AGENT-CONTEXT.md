@@ -17,9 +17,9 @@ Hard gates (hooks/plugins) block other agent-brain MCP tools until `route_task` 
 
 Session digests and team memory surface **only** through `route_task`.
 
-## Prefer agent-body for organ work
+## Prefer agent-spine for multi-step workflows
 
-Multi-step execute / workflow / budget / sandbox / UI / approval tasks: use **`route_to_mcp` → `agent-body`** (or `autonomic …`) instead of improvising with Shell. `route_task` may return `suggested_tools` for body gateway tools (`muscle_*`, `spine_*`, `heart_*`, …). Enable with `agent-brain doctor --fix`.
+Multi-step workflow tasks with approval gates: run them with **`agent-spine run`** (see the agent-spine CLI reference) instead of improvising the steps. Use `route_to_mcp` only for an upstream MCP server that `route_task` lists in `suggested_tools`.
 
 ## Tool map (common)
 
@@ -32,7 +32,7 @@ Multi-step execute / workflow / budget / sandbox / UI / approval tasks: use **`r
 | Persist a convention | `store_memory` |
 | Multi-agent note | `write_scratchpad` / `read_scratchpad` |
 | Bounded git | `brain_git_log`, `brain_git_diff`, `brain_git_compare` |
-| Upstream MCP / organs | Prefer `route_to_mcp` → **agent-body** when `suggested_tools` lists it |
+| Upstream MCP servers | Prefer `route_to_mcp` when `suggested_tools` lists a configured server |
 
 Code-nav tools (`query_codebase`, `get_symbol_definition`, …) need a build with `--features extras`.
 

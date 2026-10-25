@@ -2,6 +2,8 @@
 title: MCP Gateway Protocol (Dual-Mode Integration)
 ---
 
+> **Out of scope.** This page describes the agent-body MCP gateway from the earlier eleven-organ design. For the MCP tools agent-brain exposes, see the [agent-brain CLI reference](/docs/cli/agent-brain).
+
 # Model Context Protocol (MCP) Integration
 
 The Autonomic ecosystem integrates seamlessly with modern AI coding environments—including **Cursor**, **Claude Desktop**, **VSCode**, **Claude Code**, and **Antigravity**—via the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).

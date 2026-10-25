@@ -2,6 +2,8 @@
 title: agent-immune CLI Reference
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-immune` CLI Reference
 
 `agent-immune` provides zero-trust security, admission control, and runtime defense for the Autonomic ecosystem. It audits project dependencies against the Open Source Vulnerabilities (OSV) database, executes untrusted scripts inside network-isolated sandboxes, and verifies memory leak gates before dataset commits.

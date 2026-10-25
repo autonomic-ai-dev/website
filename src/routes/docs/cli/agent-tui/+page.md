@@ -2,6 +2,8 @@
 title: agent-tui CLI Reference
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-tui` CLI Reference
 
 `agent-tui` is the terminal avionics console and live telemetry dashboard for the Autonomic AI ecosystem. Built in Rust with **Ratatui** and **Crossterm**, it provides low-latency monitoring of cluster health, DAG workflow progression, vector memory queries, and real-time NATS event streams directly in your shell.

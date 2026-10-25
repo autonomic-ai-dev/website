@@ -2,6 +2,8 @@
 title: agent-mouth CLI Reference
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-mouth` CLI Reference
 
 `agent-mouth` is the ingress gateway, AST validation guard, and external communication bridge for the Autonomic ecosystem. It manages outbound operator notifications (Slack, Discord, webhooks), evaluates commands against human-in-the-loop approval policies, and validates bash scripts using AST parsing.

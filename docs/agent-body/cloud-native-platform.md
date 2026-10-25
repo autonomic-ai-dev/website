@@ -1,5 +1,7 @@
 # Cloud-Native AI Infrastructure
 
+> **Out of scope.** This document describes agent-body and the earlier eleven-organ design, which is not part of the current scope. Autonomic AI is agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 **Autonomic AI is Kubernetes for AI agents** — a local-first control plane that gives agentic workloads what containers got in 2014: orchestration, durable state, memory, mesh networking, policy, and observability.
 
 In 2014, containers existed but were painful to operate until Kubernetes standardized lifecycle, config, storage, and networking. LLM agents today hit the same wall: powerful runtimes with no shared control plane, no durable memory contract, and no conformance story.

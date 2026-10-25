@@ -2,6 +2,8 @@
 title: Event Bus & Service Mesh (agent-nerves)
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-nerves` — Distributed Event Mesh
 
 `agent-nerves` is the **Service Mesh & Distributed Event Bus** (analogous to Istio / Linkerd) for the Autonomic ecosystem. It connects decoupled daemons to a shared **NATS JetStream** message broker, bootstraps the durable `AUTONOMIC` stream, and enforces dynamic WASM event filtering with automatic exponential backoff reconnection.

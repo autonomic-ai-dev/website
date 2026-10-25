@@ -2,6 +2,8 @@
 title: Mission Control Dashboard (agent-ci-dashboard)
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-ci-dashboard` — Web Mission Control
 
 `agent-ci-dashboard` is the web-based mission control and release orchestration dashboard for the Autonomic AI cluster. Built with **SvelteKit 5 runes**, **Tailwind CSS**, and **Octokit**, it provides real-time situational triage across all 11 ecosystem repositories, interactive CI check inspection, inline terminal log viewing, and one-click batch pull request merging.

@@ -2,6 +2,8 @@
 title: Supervision & Control Plane (agent-body)
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-body` — The Autonomic Control Plane
 
 `agent-body` serves as the **Control Plane & Process Supervisor** (`kubectl` / `systemd` analog) for the Autonomic AI cluster. Built in high-performance Rust, it provides the **`autonomic`** meta-CLI, governs the shared `~/.autonomic/` filesystem workspace, and acts as the local process supervisor for all isolated organ daemons.

@@ -155,7 +155,7 @@
           <Activity size={14} />
           <span>Ecosystem Blueprint</span>
         </div>
-        <p class="text-xs text-slate-300 mb-3 font-sans">Learn how {agent.name} interfaces with the 10 other autonomous organs in the mesh.</p>
+        <p class="text-xs text-slate-300 mb-3 font-sans">Learn how {agent.name} fits with the other Autonomic AI component.</p>
         <div class="text-xs font-mono font-bold text-cyan-400 group-hover:text-cyan-300 flex items-center gap-1">
           <span>Read Architecture Spec</span>
           <ArrowRight size={12} class="group-hover:translate-x-0.5 transition-transform" />

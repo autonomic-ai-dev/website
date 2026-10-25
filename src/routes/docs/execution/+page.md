@@ -2,6 +2,8 @@
 title: Execution & Actuation (agent-muscle)
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-muscle` — Execution & Training Runtime
 
 `agent-muscle` is the physical actuator and training runtime for the Autonomic AI cluster (`kubelet` / `CRI` analog). It decouples the LLM's high-level reasoning from low-level execution. Instead of forcing the model to generate sprawling Python wrappers and parse unbounded stdout streams character-by-character, `agent-muscle` executes commands natively with **tree-sitter AST safety guarding**, **4KB output slicing**, and **hardware-aware GPU orchestration**.

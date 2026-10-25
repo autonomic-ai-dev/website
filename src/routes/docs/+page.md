@@ -2,82 +2,63 @@
 title: Introduction to Autonomic AI
 ---
 
-# Autonomic AI — Distributed Autonomous Agent Runtime
+# Autonomic AI: Right Skill, Right Memory, Right Time
 
-Welcome to the **Autonomic AI** Documentation Hub.
+Autonomic AI is two components, both written in **Rust** and both local-first:
 
-Autonomic AI is an open-source, bio-digital autonomous agent ecosystem engineered in **Rust** with hardware acceleration for Apple Silicon and Linux GPU clusters. Modeled after biological homeostasis, **eleven specialized autonomous organs** operate as decoupled microservices communicating over Unix Domain Sockets and high-throughput **NATS JetStream** messaging.
+- **agent-brain** decides which skills, rules, and memories an AI coding agent sees on each turn, within a token budget.
+- **agent-spine** runs deterministic YAML workflows with explicit state and approval gates, so the LLM works inside steps you define.
 
 ```mermaid
-flowchart TD
-    subgraph Tiers["The 4 Functional Tiers"]
-        Core["Core Control & Routing\n(Body · Brain · Heart)"]
-        Execution["Execution & Sandboxing\n(Spine · Muscle · Immune)"]
-        Sensory["Sensory & Mesh\n(Nerves · Eyes · Mouth)"]
-        Interface["Operator Interfaces\n(TUI · CI Dashboard)"]
-    end
-
-    Core <--> Execution
-    Execution <--> Sensory
-    Sensory <--> Interface
+flowchart LR
+    Host["Host agent (Cursor, Claude Code, Codex, Gemini, OpenCode)"] -->|route_task / MCP| Brain["agent-brain (skills, rules, memory per turn)"]
+    Spine["agent-spine (YAML DAG workflows, approval gates)"] -->|optional events| Nats["NATS (AUTONOMIC_NATS_URL)"]
 
     classDef core fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
     classDef exec fill:#261606,stroke:#f59e0b,stroke-width:1.5px,color:#f8fafc;
-    classDef sensory fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
-    classDef iface fill:#190e2b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc;
-    class Core core;
-    class Execution exec;
-    class Sensory sensory;
-    class Interface iface;
+    class Brain core;
+    class Spine exec;
 ```
 
 ---
 
-## The Monolithic Agent Problem
+## The problem
 
-Traditional AI coding frameworks (LangChain, AutoGen, CrewAI, monolithic agent prompts) collapse under complex, long-running software engineering tasks:
-1. **Context Window Thrashing**: Loading entire tool catalogs, codebase rules, and conversation histories simultaneously exhausts LLM context windows and induces hallucinations.
-2. **Cascading Failure**: A crash in a single command execution tool or an out-of-memory bug terminates the entire agent session, wiping away in-flight state.
-3. **Improvised Control Flow**: Ad-hoc probabilistic `while` loops lack determinism, time-travel debugging, and auditability.
-4. **Unbounded Financial Quota Burn**: An agent caught in an infinite retry loop can run up thousands of dollars in cloud API bills overnight.
+Coding agents slow down and cost more as their context grows. Loading every skill, rule, and past conversation into each prompt causes drift, hallucinated steps, and large token bills. Ad-hoc retry loops have no bound on cost or behaviour.
 
----
+## The approach
 
-## The Autonomic Solution: Structure Beats Intelligence
+- **Route before acting.** agent-brain returns a ranked, budgeted set of context for each turn. Host hooks block brain tools until the agent has routed the turn.
+- **Deterministic workflows.** agent-spine's workflows define the steps and the gates. The LLM does the work inside each step.
+- **Local first.** Databases, indexes, and logs live under `~/.autonomic/`. Nothing leaves your machine unless you configure NATS or a remote model API.
 
-Autonomic treats agent engineering as a **distributed systems problem**. It isolates responsibilities across eleven purpose-built organs:
+## What the numbers show
 
-| Organ | Tier | Core Specialization | Interface |
-| :--- | :--- | :--- | :--- |
-| **`agent-body`** | **Core** | Control plane supervisor, launchd manager, catalog discovery | UDS / CLI (`autonomic`) |
-| **`agent-brain`** | **Core** | Temporal SQLite memory, HNSW vector search, recipe routing | Stdio / MCP (`route_task`) |
-| **`agent-heart`** | **Core** | Daily token budget ceilings, anomaly detection, nightly GC | HTTP `:3101` / MCP |
-| **`agent-spine`** | **Execution** | Deterministic YAML DAG engine, immutable snapshot store | HTTP `:3100` / CLI |
-| **`agent-muscle`** | **Execution** | Tree-sitter AST safety guard, 4KB slicer, K8s GPU runner | HTTP `:3103` / MCP |
-| **`agent-immune`** | **Execution** | OSV CVE vulnerability scan, seccomp/Firecracker microVM | HTTP `:3106` / MCP |
-| **`agent-mouth`** | **Sensory** | Ingress API gateway, Slack approval gates, SSE streams | HTTP `:3104` / MCP |
-| **`agent-nerves`** | **Sensory** | NATS JetStream event bus, stream bootstrap, WASM filters | NATS `:4222` / `:3102` |
-| **`agent-eyes`** | **Sensory** | Spatial DOM index in SQLite, SSIM diffs, local LLaVA VLM | HTTP `:3105` / MCP |
-| **`agent-tui`** | **Interface** | Terminal avionics HUD, live DAG visualizer in Ratatui | TTY Console (`agent-tui`) |
-| **`agent-ci-dashboard`**| **Interface** | Mission control web telemetry, PR checks, batch merges | SvelteKit 5 Web App |
+- Warm-cache route p95 is 24 ms on a synthetic 1,000-item index.
+- Recall@3 on the 20-case CI eval is 0.95.
+- Route latency has a long tail in real use. This is under investigation.
 
 ---
 
 ## Quickstart
 
-Install the ecosystem via Homebrew and start the cluster:
-
 ```bash
-# 1. Install via Homebrew
 brew tap autonomic-ai-dev/tap
-brew install autonomic-stack
+brew install agent-brain agent-spine
 
-# 2. Initialize ~/.autonomic workspace
-autonomic init
-
-# 3. Boot the organ cluster
-autonomic start
-
-# 4. Launch the terminal HUD
-agent-tui
+agent-brain install --global
+agent-brain doctor
+agent-spine init
 ```
+
+See [Installation & Deployment](/docs/installation) for details, including NATS settings and building from source.
+
+---
+
+## Where to go next
+
+- [Architecture](/docs/architecture): how the two components fit together.
+- [agent-brain](/docs/memory): the memory and routing component.
+- [agent-spine](/docs/workflows): the workflow component.
+- [CLI reference](/docs/cli): commands for both components.
+- [MCP](/docs/mcp): the tools agent-brain exposes to hosts.

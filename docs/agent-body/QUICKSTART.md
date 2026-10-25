@@ -1,5 +1,7 @@
 # ⚡ Quickstart: Prove It Works (30 minutes)
 
+> **Out of scope.** This document describes agent-body and the earlier eleven-organ design, which is not part of the current scope. Autonomic AI is agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 > **For the skeptic.** This guide takes you from zero to measurable proof that
 > Autonomic AI makes lightweight local models work better — in under 30 minutes.
 >

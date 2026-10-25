@@ -2,6 +2,8 @@
 title: Security & Zero-Trust Admission (agent-immune)
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-immune` — Zero-Trust Security & Admission
 
 `agent-immune` is the **Open Policy Agent (OPA) & Zero-Trust Admission Controller** for the Autonomic cluster. Because AI agents routinely generate and execute untrusted code, running that code directly on bare-metal host machines represents an existential security risk. `agent-immune` enforces strict admission boundaries, scanning dependencies against the [OSV.dev](https://osv.dev) vulnerability database, wrapping execution in **Firecracker microVMs** or **seccomp-BPF filters**, and aggressively killing runaway processes that exhibit OOM trajectories.

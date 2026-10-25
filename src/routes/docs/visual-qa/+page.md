@@ -2,6 +2,8 @@
 title: Visual Observability & QA (agent-eyes)
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-eyes` — Visual Observability & DOM Auditing
 
 `agent-eyes` provides **UI state extraction, visual regression testing, and on-device vision intelligence** for autonomous agents. Re-parsing a massive HTML payload on every LLM turn wastes context window limits; raw pixel diffs are brittle to 1px padding shifts. `agent-eyes` solves both by indexing semantic DOM state into local SQLite databases, running SSIM structural diffs, and performing zero-data-leak local VLM inference via Candle.

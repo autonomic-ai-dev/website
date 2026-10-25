@@ -2,6 +2,8 @@
 title: agent-nerves CLI Reference
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-nerves` CLI Reference
 
 `agent-nerves` is the event messaging backbone and inter-organ communication mesh for the Autonomic ecosystem. Built on high-performance **NATS JetStream**, it guarantees at-least-once message delivery, stream persistence, WASM event filters, and multi-node cluster topology.

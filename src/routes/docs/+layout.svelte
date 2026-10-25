@@ -50,42 +50,23 @@
       title: "Get Started",
       items: [
         { href: "/docs", label: "Core Concepts", icon: Book, badge: "Concepts", description: "Ecosystem introduction and core philosophy" },
-        { href: "/docs/architecture", label: "Architecture Topology", icon: Layers, badge: "11 Organs", description: "Decoupled bio-digital organ contracts and runtime" },
+        { href: "/docs/architecture", label: "Architecture Topology", icon: Layers, badge: "Two Components", description: "agent-brain and agent-spine: scope, contracts, and runtime" },
         { href: "/docs/installation", label: "Quick Installation", icon: Download, badge: "Install", description: "Homebrew tap and curl bootstrap" },
-        { href: "/docs/mcp", label: "MCP Gateway Protocol", icon: Plug, badge: "Stdio/HTTP", description: "Unified serve-mcp gateway and tool routing" }
       ]
     },
     {
-      title: "Manuals (Organs)",
+      title: "Manuals",
       items: [
-        { href: "/docs/supervision", label: "agent-body", icon: Server, badge: "Supervisor", description: "Master supervisor, lifecycle, launchd daemon" },
         { href: "/docs/memory", label: "agent-brain", icon: Brain, badge: "Memory", description: "Vector memory, HNSW reasoning, curated skills, MCP hub" },
         { href: "/docs/workflows", label: "agent-spine", icon: Workflow, badge: "Workflows", description: "Deterministic YAML DAG engine and state replay" },
-        { href: "/docs/execution", label: "agent-muscle", icon: Cpu, badge: "Actuator", description: "Sandboxed execution, AST gates, LoRA training" },
-        { href: "/docs/maintenance", label: "agent-heart", icon: Heart, badge: "Budget / GC", description: "Token quotas, nightly GC, preventative maintenance" },
-        { href: "/docs/usage-governance", label: "Usage & Budget Governance", icon: Activity, badge: "Governance", description: "Fleet token telemetry, pricing catalog, and cost ceiling gates" },
-        { href: "/docs/security", label: "agent-immune", icon: Shield, badge: "Admission", description: "Zero-trust OSV scan, memory leak gate, microVMs" },
-        { href: "/docs/visual-qa", label: "agent-eyes", icon: Eye, badge: "Vision / DOM", description: "Spatial DOM indexing, pixel diff, local VLM" },
-        { href: "/docs/event-bus", label: "agent-nerves", icon: Radio, badge: "Event Mesh", description: "NATS JetStream event bus and WASM filters" },
-        { href: "/docs/communication", label: "agent-mouth", icon: MessageSquare, badge: "Approval", description: "AST validator, Slack webhooks, SSE streams" },
-        { href: "/docs/tui", label: "agent-tui", icon: Terminal, badge: "Console", description: "Terminal telemetry HUD in Ratatui" },
-        { href: "/docs/ci-dashboard", label: "agent-ci-dashboard", icon: Activity, badge: "Web HUD", description: "Web mission control and PR batch merge" }
       ]
     },
     {
       title: "CLI Reference",
       items: [
         { href: "/docs/cli", label: "CLI Reference Hub", icon: Terminal, badge: "Overview", description: "CLI ecosystem overview and universal flags" },
-        { href: "/docs/cli/autonomic", label: "autonomic (agent-body)", icon: Server, badge: "Meta CLI", description: "Cluster supervisor and service orchestrator" },
         { href: "/docs/cli/agent-brain", label: "agent-brain", icon: Brain, badge: "Brain CLI", description: "Memory, MCP hub, skills, and routing CLI" },
         { href: "/docs/cli/agent-spine", label: "agent-spine", icon: Workflow, badge: "Spine CLI", description: "YAML workflow runner and DAG validator" },
-        { href: "/docs/cli/agent-muscle", label: "agent-muscle", icon: Cpu, badge: "Muscle CLI", description: "Actuator, LoRA trainer, and execution runner" },
-        { href: "/docs/cli/agent-heart", label: "agent-heart", icon: Heart, badge: "Heart CLI", description: "Budget checker, GC cleaner, and maintenance" },
-        { href: "/docs/cli/agent-immune", label: "agent-immune", icon: Shield, badge: "Immune CLI", description: "OSV vulnerability scanner and sandbox runner" },
-        { href: "/docs/cli/agent-mouth", label: "agent-mouth", icon: MessageSquare, badge: "Mouth CLI", description: "Approval gates, AST validator, and notifications" },
-        { href: "/docs/cli/agent-eyes", label: "agent-eyes", icon: Eye, badge: "Eyes CLI", description: "DOM indexing, screenshot diff, and visual QA" },
-        { href: "/docs/cli/agent-nerves", label: "agent-nerves", icon: Radio, badge: "Nerves CLI", description: "NATS broker, clustering, and stream tailing" },
-        { href: "/docs/cli/agent-tui", label: "agent-tui", icon: Terminal, badge: "TUI CLI", description: "Ratatui terminal avionics console flags" }
       ]
     }
   ];
@@ -240,7 +221,7 @@
         </span>
         <span class="text-xs font-mono font-bold text-white tracking-wide">CENTRAL DOCS HUB</span>
       </div>
-      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">11 ORGANS</span>
+      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">2 COMPONENTS</span>
     </div>
 
     <!-- Quick Filter Search -->

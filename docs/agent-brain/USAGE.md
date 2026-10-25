@@ -290,7 +290,6 @@ When `.verify/` exists in the repository, `agent-brain verify` matches against a
 | `AGENT_BRAIN_ALLOW_PYTHON_SHELL` | `0` | Set `1` to override Python Shell deny policy (`python -c` / heredoc / piped stdin) |
 | `AGENT_BRAIN_AUTO_UPDATE_DELAY_SEC` | `300` | Delay before background auto-update checks |
 | `AGENT_BRAIN_AUTO_UPDATE_DEFER_SECS` | `60` | Defer applying updates while MCP server is actively handling requests |
-| `AUTONOMIC_SELF_LEARNING` | `0` | Set `1` to activate background trajectory critic loop in agent-heart |
 | `RUST_LOG` | `agent_brain=info` | Log level (stderr only) |
 
 ## Route gate (enforcement)

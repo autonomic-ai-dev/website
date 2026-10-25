@@ -1,5 +1,7 @@
 # Air-Gapped Installation Guide
 
+> **Out of scope.** This document describes agent-body and the earlier eleven-organ design, which is not part of the current scope. Autonomic AI is agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 For enterprise environments with strict network policies or fully disconnected environments, Autonomic AI can be installed entirely offline. The ecosystem requires zero external network calls after the initial bundle is downloaded.
 
 ## Overview
