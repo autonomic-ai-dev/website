@@ -2,6 +2,8 @@
 title: Agent TUI — Terminal Observability HUD (agent-tui)
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-tui` — Terminal Observability HUD
 
 `agent-tui` is the terminal-native observability console for the Autonomic AI ecosystem. Built with **Ratatui** and **Crossterm** in Rust, it renders an aerospace-grade avionics HUD inside the developer's terminal, streaming live organ telemetry, memory graph vitals, and DAG execution traces with sub-millisecond refresh rates and zero CPU overhead.

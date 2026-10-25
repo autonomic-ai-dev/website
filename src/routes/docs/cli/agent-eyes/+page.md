@@ -2,6 +2,8 @@
 title: agent-eyes CLI Reference
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-eyes` CLI Reference
 
 `agent-eyes` provides spatial DOM indexing, visual regression testing, and multimodal observability for the Autonomic ecosystem. It drives headless Chrome instances to capture screenshots, performs pixel-level and Structural Similarity (SSIM) image diffing, and queries local Vision-Language Models (VLM).

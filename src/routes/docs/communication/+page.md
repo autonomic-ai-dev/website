@@ -2,6 +2,8 @@
 title: Communication & Ingress Gateway (agent-mouth)
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-mouth` — Ingress Gateway & AST Policy Validator
 
 `agent-mouth` serves as the **Ingress API Gateway, AST Command Validator, and Human-in-the-Loop Notification Hub** for the Autonomic AI cluster. All external requests—whether originating from Cursor IDE, webhooks, or external REST clients—pass through `agent-mouth` before reaching internal daemons like `agent-spine` or `agent-muscle`.

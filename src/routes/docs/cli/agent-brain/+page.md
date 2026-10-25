@@ -114,7 +114,7 @@ agent-brain doctor [OPTIONS]
 | Flag | Type | Description |
 | :--- | :--- | :--- |
 | `--fix` | Boolean | Re-sign macOS binary, align `mcp.json`, and regenerate hook symlinks. |
-| `--mcp` | Boolean | Audit `agent-body` gateway schemas and execute `tools/list` probe. |
+| `--mcp` | Boolean | Audit the `agent-body` gateway schemas and execute a `tools/list` probe, if an agent-body gateway is configured. |
 
 ---
 

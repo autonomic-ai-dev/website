@@ -4,90 +4,87 @@ title: Installation & Deployment
 
 # Installation & Deployment
 
-The Autonomic AI Ecosystem distributes pre-compiled, Developer ID–notarized binaries for **macOS (Apple Silicon M-Series)** and **Linux (x86_64 / aarch64)**.
+Autonomic AI is two components: **agent-brain** and **agent-spine**. Homebrew provides pre-built binaries for **macOS (Apple Silicon)**. Building from source works on any platform Rust supports.
 
 ---
 
-## 1. Homebrew (macOS — Recommended)
-
-The fastest and most reliable way to install and maintain the entire organ cluster on macOS is via the official Homebrew tap:
+## 1. Homebrew (macOS, recommended)
 
 ```bash
-# 1. Tap the official Autonomic formula registry
 brew tap autonomic-ai-dev/tap
-
-# 2. Install the full cluster suite (all 11 organs + CLI)
-brew install autonomic-stack
-
-# Or install individual organ daemons independently:
-brew install agent-body
-brew install agent-brain
-brew install agent-spine
-brew install agent-muscle
-brew install agent-immune
-brew install agent-heart
-brew install agent-nerves
-brew install agent-mouth
-brew install agent-eyes
-brew install agent-tui
+brew install agent-brain agent-spine
 ```
+
+Update both with:
+
+```bash
+brew upgrade agent-brain agent-spine
+```
+
+`agent-spine update` prints this command. It does not download releases itself.
 
 ---
 
-# 2. Automated Bootstrap Script (macOS & Linux)
-
-For headless CI runners or Linux systems without Homebrew, use the automated installer:
+## 2. Connect agent-brain to your editors
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/autonomic-ai-dev/agent-body/master/scripts/install-all-organs.sh | bash
+agent-brain install --global   # configure MCP and host hooks for supported editors
+agent-brain doctor             # check the install
 ```
 
-#### Dynamic Patch Resolution
-The installer aligns with the ecosystem baseline (defaulting to `v1.0.0-beta.3`) while dynamically discovering compatible patch releases per organ (e.g. automatically pulling `v1.0.0-beta.3.11` for `agent-brain` without requiring an ecosystem-wide major bump).
-
-This installer:
-1. Detects host operating system and target architecture (`darwin-arm64`, `linux-x86_64`, `linux-aarch64`).
-2. Queries the GitHub Releases API to resolve the newest compatible patch release per organ for the current baseline.
-3. Downloads notarized release archives from GitHub Releases.
-4. Installs binaries into `~/.local/bin/` (ensuring permissions and `PATH`).
-5. On macOS, automatically clears Gatekeeper quarantine flags (`xattr -dr com.apple.quarantine ~/.local/bin/agent-*`).
-6. Validates installation integrity via `autonomic doctor --quick`.
-7. Bootstraps integration packages using `agent-brain registry sync`, `agent-brain package add @agstack`, and `agent-brain package add @starter`.
+`agent-brain doctor --fix` repairs common problems it can detect. Restart your editor after installing so it picks up the new MCP server.
 
 ---
 
-## 3. Workspace Initialization & Launch
-
-Once installed, initialize your local environment and boot the cluster:
+## 3. Set up agent-spine
 
 ```bash
-# 1. Scaffold ~/.autonomic/ configuration and data directories
-autonomic init
-
-# 2. Run system doctor to verify environment, ports, and permissions
-autonomic doctor
-
-# 3. Boot the cluster as background daemons
-autonomic start
-
-# 4. Inspect running organ matrix
-autonomic status
+agent-spine init
 ```
+
+`init` creates agent-spine's state directory under `~/.autonomic/state/spine` and writes an example workflow.
 
 ---
 
-## 4. Building from Source
+## 4. Where settings and data live
 
-To compile from source using modern Rust (1.82+):
+| Item | Location | Override |
+| :--- | :--- | :--- |
+| agent-brain settings (`config.yaml`) | `~/.autonomic/memory/` | `AGENT_BRAIN_HOME` |
+| agent-brain database and route logs | `~/.autonomic/memory/` | `AGENT_BRAIN_HOME` |
+| agent-spine state | `~/.autonomic/state/spine/` | none |
+| agent-spine execution logs | `~/.autonomic/logs/spine/` | none |
+
+Everything stays on your machine unless you configure a NATS server or a remote model API.
+
+---
+
+## 5. Optional: NATS for agent-spine events
+
+agent-spine publishes workflow events to NATS only if you set `AUTONOMIC_NATS_URL`. Credentials come from the environment:
 
 ```bash
-# Clone the repository
-git clone https://github.com/autonomic-ai-dev/autonomic-ai-dev.git
-cd autonomic-ai-dev
-
-# Build all organs in release mode
-cargo build --release --workspace
-
-# Copy binaries to your system PATH
-cp target/release/agent-* ~/.local/bin/
+export AUTONOMIC_NATS_URL=nats://127.0.0.1:4222
+export AUTONOMIC_NATS_USER=...           # optional
+export AUTONOMIC_NATS_PASSWORD=...       # optional
+export AUTONOMIC_NATS_TLS=1              # optional; add AUTONOMIC_NATS_CA, _CERT, _KEY as needed
+export AUTONOMIC_NATS_INSECURE=1         # optional; skips user and password
 ```
+
+The credentials-file fallback from earlier releases has been removed.
+
+---
+
+## 6. Build from source
+
+The repositories are private for now, so you need access to clone them.
+
+```bash
+git clone git@github.com:autonomic-ai-dev/agent-brain.git
+cargo build --release --manifest-path agent-brain/agent-brain/Cargo.toml --bin agent-brain
+
+git clone git@github.com:autonomic-ai-dev/agent-spine.git
+cargo build --release --manifest-path agent-spine/agent-spine/Cargo.toml
+```
+
+Copy the resulting binaries from `target/release/` into a directory on your `PATH`.

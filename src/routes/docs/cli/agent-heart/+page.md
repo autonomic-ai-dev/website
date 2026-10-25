@@ -2,6 +2,8 @@
 title: agent-heart CLI Reference
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-heart` CLI Reference
 
 `agent-heart` maintains metabolic balance, financial budgets, and knowledge hygiene across the Autonomic ecosystem. It monitors turn-by-turn LLM token consumption, enforces cost ceilings, runs automated garbage collection over SQLite databases, and triggers memory distillation.

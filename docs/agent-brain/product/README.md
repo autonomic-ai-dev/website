@@ -39,8 +39,8 @@ flowchart LR
   S --> B[agent-brain route_task]
   B --> SP[agent-spine DAG]
   SP --> A[Cursor / Claude Agent nodes]
-  A --> M[agent-muscle run tests]
-  A --> I[agent-immune lint]
+  A --> M[run tests]
+  A --> I[lint]
   SP --> V[Verify + ApprovalGate]
   V --> MEM[store_memory]
 ```

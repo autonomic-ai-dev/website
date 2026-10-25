@@ -2,6 +2,8 @@
 title: agent-muscle CLI Reference
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-muscle` CLI Reference
 
 `agent-muscle` is the execution actuator and fine-tuning engine of the Autonomic ecosystem. It provides sandboxed shell execution with Tree-sitter AST validation, stream chunk slicing, Apple Silicon MLX LoRA training, and Kubernetes GPU operator interfaces.

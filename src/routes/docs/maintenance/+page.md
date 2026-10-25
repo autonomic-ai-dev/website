@@ -2,6 +2,8 @@
 title: Maintenance & Quota Controller (agent-heart)
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `agent-heart` — Maintenance & Quota Controller
 
 `agent-heart` acts as the autonomic circulatory and maintenance governor for the ecosystem. It continuously enforces **token spending ceilings**, prevents infinite LLM loop bankruptcies, and schedules background **garbage collection (GC)** routines to prevent memory index bloat.

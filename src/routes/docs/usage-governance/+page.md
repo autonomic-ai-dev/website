@@ -2,6 +2,8 @@
 title: Model Usage & Budget Governance
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # Model Usage & Budget Governance
 
 Autonomous AI systems operating continuously across multiple repositories and subagents require strict **token governance, spend attribution, and runtime cost controls**. Without preventative safeguards, cascading agent retries and unthrottled prompts can quickly exhaust API quotas or incur unexpected cloud spend.

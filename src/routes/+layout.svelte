@@ -14,7 +14,7 @@
 
 <svelte:head>
   <title>Autonomic AI Dev | Autonomous Agent Ecosystem</title>
-  <meta name="description" content="Autonomic AI is an aerospace-grade, bio-digital computing mesh of 11 autonomous organs engineered in Rust with hardware acceleration." />
+  <meta name="description" content="Autonomic AI: agent-brain and agent-spine. Right skill, right memory, right time, for AI coding agents. Local-first and built in Rust." />
 </svelte:head>
 
 <div class="min-h-screen relative overflow-hidden bg-[#080b10] text-[#f0f6fc] font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
@@ -106,7 +106,7 @@
       <div class="md:hidden bg-[#0d1117] border-b border-white/[0.08] p-6 flex flex-col gap-4 shadow-2xl animate-in slide-in-from-top-2 font-mono text-sm">
         <a href="/#ecosystem" onclick={() => isMobileMenuOpen = false} class="text-slate-300 hover:text-cyan-400 py-1.5 flex items-center gap-2">
           <span class="text-cyan-500">&gt;</span>
-          <span>Ecosystem Organs</span>
+          <span>Components</span>
         </a>
         <a href="/docs" onclick={() => isMobileMenuOpen = false} class="text-slate-300 hover:text-cyan-400 py-1.5 flex items-center gap-2">
           <span class="text-cyan-500">&gt;</span>
@@ -163,7 +163,7 @@
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
         </span>
-        <span class="text-emerald-400 font-semibold">11/11 ORGANS NOMINAL</span>
+        <span class="text-emerald-400 font-semibold">2/2 COMPONENTS IN SCOPE</span>
         <span class="text-slate-600">·</span>
         <span>LATENCY: &lt;0.8ms</span>
       </div>

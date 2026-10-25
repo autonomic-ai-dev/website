@@ -10,6 +10,6 @@ Mirror of `agent-brain/.github/workflows/ci.yml` for sibling organ repos.
 
 ## Applied to
 
-`agent-spine`, `agent-muscle`, `agent-body`, `agent-heart`, `agent-mouth`, `agent-immune`, `agent-nerves`, `agent-eyes`, `agent-tui` (tui uses `src/**` at repo root).
+`agent-brain`. The other repositories from the earlier eleven-organ design are out of scope.
 
 Keep the crate-name regex in the filter step aligned with the `on.push.paths` list.

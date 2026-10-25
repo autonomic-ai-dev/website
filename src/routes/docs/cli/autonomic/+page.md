@@ -2,6 +2,8 @@
 title: autonomic CLI Reference
 ---
 
+> **Out of scope.** This page describes a component from the earlier eleven-organ design. Autonomic AI currently consists of agent-brain and agent-spine only. See [Architecture](/docs/architecture).
+
 # `autonomic` CLI Reference
 
 The `autonomic` binary is the primary meta-orchestrator and cluster supervisor for the Autonomic AI ecosystem. Provided by **`agent-body`**, it manages daemon lifecycles, health probes, launchd background services, process monitoring, and editor MCP installation.
