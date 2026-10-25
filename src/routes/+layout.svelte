@@ -135,29 +135,29 @@
   </div>
 
   <!-- Shared Component: Footer -->
-  <footer class="w-full bg-slate-950 border-t border-slate-800/80 relative z-10 text-xs font-body text-slate-400 mt-20">
-    <div class="w-full max-w-7xl mx-auto px-6 py-12 flex flex-col gap-8">
+  <footer class="w-full bg-[#06070a] border-t border-white/[0.08] relative z-10 text-xs font-body text-slate-400 mt-20">
+    <div class="w-full max-w-7xl mx-auto px-6 py-10 flex flex-col gap-6">
       <!-- Top Row: Logo, Status Pill, Nav Links -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-900">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.06]">
         <div class="flex items-center gap-3">
           <div class="w-7 h-7 rounded-lg overflow-hidden ring-1 ring-cyan-500/30 p-0.5 bg-slate-900 flex items-center justify-center">
             <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.png" />
           </div>
-          <span class="font-headline text-sm font-bold text-white">Autonomic AI</span>
-          <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="ml-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-950/60 transition">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span class="font-headline text-sm font-bold text-white tracking-tight">Autonomic AI</span>
+          <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="ml-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono bg-emerald-950/30 text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 transition">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             All systems operational • OpenStatus
           </a>
         </div>
         <!-- Links -->
         <nav class="flex flex-wrap items-center gap-6 font-mono text-xs">
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/docs/architecture">Architecture</a>
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/workflows">Workflows</a>
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/#spec">Invariants</a>
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/docs">Docs</a>
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="/docs/cli">CLI Reference</a>
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">Status</a>
-          <a class="text-slate-400 hover:text-cyan-300 transition-colors duration-150" href="https://github.com/autonomic-ai-dev/agent-registry" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/architecture">Architecture</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/workflows">Workflows</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/#spec">Invariants</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs">Docs</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/cli">CLI Reference</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">Status</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://github.com/autonomic-ai-dev/agent-registry" target="_blank" rel="noopener noreferrer">GitHub</a>
         </nav>
       </div>
       <!-- Bottom Row -->

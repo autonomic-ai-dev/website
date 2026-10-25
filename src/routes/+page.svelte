@@ -542,7 +542,7 @@
           </div>
           <h3 class="text-base font-headline font-bold text-white mb-2">Immutability First</h3>
           <p class="text-slate-400 text-xs leading-relaxed font-body">
-            Once an organ step validates, artifacts are cryptographically hashed and sealed. No background modifications allowed.
+            Once a workflow step validates, artifacts are cryptographically hashed and sealed. No background modifications allowed.
           </p>
         </div>
         <div class="mt-6 pt-4 border-t border-slate-800/80 text-[11px] font-mono text-cyan-400 flex items-center gap-1">

@@ -1,533 +1,537 @@
 <script lang="ts">
   import {
-    Workflow,
-    Package,
-    ShieldCheck,
     Terminal,
     Search,
     Copy,
     Check,
     Layers,
-    ChevronDown,
-    ChevronUp,
-    ExternalLink,
-    Play,
+    ArrowRight,
+    Workflow,
+    Shield,
     Sparkles,
     Cpu,
     GitBranch,
-    FileCode,
-    CheckCircle2
+    CheckCircle2,
+    Lock,
+    ExternalLink
   } from "lucide-svelte";
 
   let searchQuery = $state("");
-  let selectedCategory = $state<"all" | "workflow" | "package">("all");
-  let expandedId = $state<string | null>(null);
+  let selectedCategory = $state<string>("all");
+  let activeTerminalTab = $state<"cli" | "yaml" | "seal">("cli");
   let copiedId = $state<string | null>(null);
 
-  interface RegistryItem {
+  interface WorkflowItem {
     id: string;
     title: string;
-    type: "workflow" | "package";
-    badge: string;
-    organ: "agent-spine" | "agent-brain";
+    version: string;
+    category: "Engineering SDLC" | "Startup Playbook" | "Verification & Design" | "Debugging & Hygiene";
+    engine: "agent-spine" | "agent-brain" | "Dual-Engine";
+    statusBadge: string;
     description: string;
-    command: string;
+    stages: string[];
     tags: string[];
-    steps?: string[];
+    command: string;
+    latency: string;
+    seal: string;
+    tokenBound: string;
+    featured?: boolean;
     yaml?: string;
-    author?: string;
   }
 
-  const items: RegistryItem[] = [
+  const workflows: WorkflowItem[] = [
     {
-      id: "engineering-safety",
-      title: "engineering-safety.yaml",
-      type: "workflow",
-      badge: "Safety Gate",
-      organ: "agent-spine",
-      description: "Invariant verification, AST blast-radius calculation, and immutable snapshot gate before agent commits.",
-      command: "agent-spine run workflows/engineering-safety.yaml",
-      tags: ["Safety", "Invariants", "AST Check", "Deterministic"],
-      steps: ["Claim Verification", "Verify Harness (.verify/)", "Blast Radius Check", "Tamper-Proof Receipt"],
-      yaml: `name: engineering-safety
-version: 1.0.0
-description: Pre-flight and post-execution invariant verification
+      id: "stacked-pr",
+      title: "stacked-pr",
+      version: "v1.4.0",
+      category: "Engineering SDLC",
+      engine: "agent-spine",
+      statusBadge: "Verified DAG",
+      featured: true,
+      description: "Multi-phase feature implementation with git worktrees, incremental compile checks, and branch verification.",
+      stages: ["Branch Worktree", "AST Compile", "Smoke Tests", "Sealed PR"],
+      tags: ["#agent-spine", "#git", "#isolated-branch", "#auto-verify"],
+      command: "agent-spine run --workflow stacked-pr",
+      latency: "~42s",
+      seal: "sha256:9f8a...31c",
+      tokenBound: "12k",
+      yaml: `name: stacked-pr
+version: 1.4.0
+description: Multi-phase feature implementation with git worktrees
 steps:
-  - id: check-invariants
-    command: agent-brain verify -- cargo test --quiet
+  - id: branch-worktree
+    command: git worktree add ../feature-branch HEAD
     allow_failure: false
-  - id: ast-blast-radius
-    command: agent-spine validate .verify/invariants.yaml
+  - id: ast-compile
+    command: bun run check && cargo check --quiet
     allow_failure: false
-  - id: tamper-proof-receipt
-    command: agent-brain record-outcome --status success`
+  - id: smoke-tests
+    command: agent-brain verify -- bun test
+    allow_failure: false
+  - id: sealed-pr
+    command: agent-spine record-receipt --seal-type sha256`
     },
     {
-      id: "deep-code-review",
-      title: "deep-code-review.yaml",
-      type: "workflow",
-      badge: "Multi-Agent Review",
-      organ: "agent-spine",
-      description: "Structured multi-agent review pipeline analyzing architecture, test coverage, safety vulnerabilities, and slop.",
-      command: "agent-spine run workflows/deep-code-review.yaml",
-      tags: ["Code Review", "Architecture", "Zero Regressions"],
-      steps: ["Diff Extraction", "Security Audit", "Design Critique", "Review Report"],
-      yaml: `name: deep-code-review
-version: 1.0.0
-description: Multi-perspective architecture and security code review
-steps:
-  - id: git-diff-analysis
-    command: git diff HEAD~1
-  - id: security-audit
-    command: agent-spine run-tool security-audit
-  - id: architecture-critique
-    command: agent-spine run-tool architect`
+      id: "minimalist-entrepreneur",
+      title: "minimalist-entrepreneur",
+      version: "v1.0.0",
+      category: "Startup Playbook",
+      engine: "agent-spine",
+      statusBadge: "Lean MVP",
+      description: "Automated MVP validation, customer interview synthesis, and landing page scaffolding based on Sahil Lavingia's playbook.",
+      stages: ["Problem Hypo", "Market Signals", "Landing Scaffold", "Stripe Hook"],
+      tags: ["#market-fit", "#MVP", "#lean"],
+      command: "agent-spine run --workflow minimalist-entrepreneur",
+      latency: "~1m 15s",
+      seal: "sha256:e8f9...4b2",
+      tokenBound: "24k"
     },
     {
-      id: "feature-from-spec",
-      title: "feature-from-spec.yaml",
-      type: "workflow",
-      badge: "Spec to PR",
-      organ: "agent-spine",
-      description: "Converts natural language specification into TDD scaffolding, implementation passes, and verified pull request.",
-      command: "agent-spine run workflows/feature-from-spec.yaml",
-      tags: ["TDD", "Automation", "PR Lifecycle"],
-      steps: ["Parse Spec", "TDD Scaffold", "Implementation Pass", "Verify & PR"],
-      yaml: `name: feature-from-spec
-version: 1.0.0
-description: End-to-end spec-to-PR pipeline with test-driven gates
-steps:
-  - id: requirements-contract
-    command: agent-spine run-tool requirements-spec
-  - id: test-scaffold
-    command: cargo test --no-run
-  - id: verify-suite
-    command: agent-brain verify -- cargo test`
+      id: "gstack",
+      title: "gstack",
+      version: "v2.0.0",
+      category: "Engineering SDLC",
+      engine: "agent-spine",
+      statusBadge: "CEO Audit",
+      description: "Rigorous code review, product architecture audit, and design critique simulating Garry Tan's startup engineering evaluation.",
+      stages: ["Repo Scan", "Architectural Audit", "Garry Tan Review", "Action Plan"],
+      tags: ["#review", "#audit", "#architecture"],
+      command: "agent-spine run --workflow gstack",
+      latency: "~25s",
+      seal: "sha256:9a32...8b9",
+      tokenBound: "18k"
     },
     {
-      id: "root-cause-analysis",
-      title: "root-cause-analysis.yaml",
-      type: "workflow",
-      badge: "Auto Triage",
-      organ: "agent-spine",
-      description: "Automated bug reproduction, stacktrace triage, git bisection, and atomic regression test generation.",
-      command: "agent-spine run workflows/root-cause-analysis.yaml",
-      tags: ["Debugging", "Git Bisect", "Forensics"],
-      steps: ["Reproduction Test", "Git Bisect", "Root Cause Pinpoint", "Regression Test"],
-      yaml: `name: root-cause-analysis
-version: 1.0.0
-description: Automated bug reproduction and git bisection
-steps:
-  - id: isolate-failure
-    command: agent-spine run-tool forensics
-  - id: bisect-commit
-    command: git bisect start HEAD origin/main`
+      id: "pixel-perfect-ui",
+      title: "pixel-perfect-ui",
+      version: "v1.2.0",
+      category: "Verification & Design",
+      engine: "Dual-Engine",
+      statusBadge: "Visual QA",
+      description: "Headless browser snapshot diffing against Stitch designs with strict tolerance thresholds and zero visual regression.",
+      stages: ["Headless Capture", "Stitch API Export", "Tolerance Diff", "Visual Pass"],
+      tags: ["#agent-brain", "#agent-spine", "#headless-diff"],
+      command: "agent-spine run --workflow pixel-perfect-ui",
+      latency: "~35s",
+      seal: "sha256:3d4e...11f",
+      tokenBound: "8k"
     },
     {
-      id: "database-migration",
-      title: "database-migration.yaml",
-      type: "workflow",
-      badge: "Zero Downtime",
-      organ: "agent-spine",
-      description: "Zero-downtime database schema migration workflow with dry-run locks and automated rollback test harness.",
-      command: "agent-spine run workflows/database-migration.yaml",
-      tags: ["Database", "SQL", "Rollback Safe"],
-      steps: ["Schema Diff", "Lock Contention Check", "Migration Dry Run", "Data Parity Test"],
-      yaml: `name: database-migration
-version: 1.0.0
-description: Zero-downtime database schema migration
-steps:
-  - id: schema-check
-    command: agent-spine run-tool db-check
-  - id: rollback-dryrun
-    command: agent-spine run-tool test-rollback`
-    },
-    {
-      id: "brutal-refactor",
-      title: "brutal-refactor.yaml",
-      type: "workflow",
-      badge: "Unslop Engine",
-      organ: "agent-spine",
-      description: "Strict unslop and code refactoring engine that eliminates dead abstractions with zero behavioral drift.",
-      command: "agent-spine run workflows/brutal-refactor.yaml",
-      tags: ["Refactoring", "Unslop", "Clean Code"],
-      steps: ["State Snapshot", "Unslop Extraction", "Behavioral Parity Test", "Telemetry Check"],
-      yaml: `name: brutal-refactor
-version: 1.0.0
-description: High-precision dead code elimination and zero drift refactor
-steps:
-  - id: pre-refactor-baseline
-    command: agent-brain verify -- cargo test
-  - id: remove-slop
-    command: agent-spine run-tool unslop`
-    },
-    {
-      id: "agstack-pkg",
-      title: "@agstack",
-      type: "package",
-      badge: "Official Core Pack",
-      organ: "agent-brain",
-      author: "Abhiuday Gupta",
-      description: "Universal engineering process: 43 playbooks, strict verification (.verify/), immutability, and zero comment slop.",
-      command: "agent-brain package add @agstack",
-      tags: ["Core Playbooks", "Verification", "Zero Slop", "Default Bootstrap"]
-    },
-    {
-      id: "matt-skills-pkg",
-      title: "@matt-skills",
-      type: "package",
-      badge: "Curated Pack",
-      organ: "agent-brain",
-      author: "Matt Pocock",
-      description: "Matt Pocock skills for real engineers — design-first thinking, TDD, specifications, review, and issue triage.",
-      command: "agent-brain package add @matt-skills",
-      tags: ["TDD", "Specs", "Design Review", "TypeScript"]
-    },
-    {
-      id: "gstack-pkg",
-      title: "@gstack",
-      type: "package",
-      badge: "Curated Pack",
-      organ: "agent-brain",
-      author: "Garry Tan",
-      description: "Garry Tan gstack — YC office hours, CEO review, engineering review, design review, devex review, and autoplan.",
-      command: "agent-brain package add @gstack",
-      tags: ["YC Office Hours", "CEO Review", "Design Critique"]
-    },
-    {
-      id: "minimalist-entrepreneur-pkg",
-      title: "@minimalist-entrepreneur",
-      type: "package",
-      badge: "Curated Pack",
-      organ: "agent-brain",
-      author: "Sahil Lavingia",
-      description: "The Minimalist Entrepreneur skills — community building, validation, processize, MVP, first customers, and pricing.",
-      command: "agent-brain package add @minimalist-entrepreneur",
-      tags: ["Validation", "Community", "MVP", "SaaS Pricing"]
-    },
-    {
-      id: "rust-pkg",
-      title: "@rust",
-      type: "package",
-      badge: "Curated Pack",
-      organ: "agent-brain",
-      author: "ECC Affaan",
-      description: "Rust patterns, borrow checker safety, zero-cost abstractions, criterion benchmarks, and strict test harness.",
-      command: "agent-brain package add @rust",
-      tags: ["Rust", "Safety", "Performance", "Clippy"]
-    },
-    {
-      id: "release-notes-workflow",
-      title: "@release-notes",
-      type: "workflow",
-      badge: "Changelog Engine",
-      organ: "agent-spine",
-      description: "Extracts semantic commit differentials, classifies user-facing updates, and writes formatted GitHub release notes.",
-      command: "agent-spine run @release-notes",
-      tags: ["Git Diffs", "Changelog", "SemVer"],
-      steps: ["Git Log Extract", "Semantic Categorization", "Changelog Output"]
-    },
-    {
-      id: "stacked-pr-workflow",
-      title: "@stacked-pr",
-      type: "workflow",
-      badge: "Git Stack",
-      organ: "agent-spine",
-      description: "Manages dependent PR chains and rebase operations across complex multi-branch engineering tasks.",
-      command: "agent-spine run @stacked-pr",
-      tags: ["Git", "Stacked Diffs", "Rebase"],
-      steps: ["Branch Chain Inspect", "Dependency Graph", "Stacked Push"]
-    },
-    {
-      id: "mcp-health-check-workflow",
-      title: "@mcp-health-check",
-      type: "workflow",
-      badge: "Diagnostics",
-      organ: "agent-spine",
-      description: "Live ping, latency benchmark, and schema assertion across all registered upstream Model Context Protocol daemons.",
-      command: "agent-spine run @mcp-health-check",
-      tags: ["MCP", "Diagnostics", "Latency Benchmark"],
-      steps: ["MCP Handshake", "Ping Latency Check", "Tool Schema Assertion"]
+      id: "root-cause-fix",
+      title: "root-cause-fix",
+      version: "v1.1.0",
+      category: "Debugging & Hygiene",
+      engine: "agent-brain",
+      statusBadge: "Zero Burn",
+      description: "Traceback isolation, AST mutation testing, and regression test sealing to prevent infinite retry burn loops.",
+      stages: ["Traceback Isolate", "AST Mutation", "Falsification Test", "Seal Fix"],
+      tags: ["#diagnostics", "#AST", "#anti-burn"],
+      command: "agent-spine run --workflow root-cause-fix",
+      latency: "~18s",
+      seal: "sha256:0a2b...55d",
+      tokenBound: "6k"
     }
   ];
 
-  let filteredItems = $derived.by(() => {
-    let result = items;
+  let filteredWorkflows = $derived.by(() => {
+    let list = workflows;
     if (selectedCategory !== "all") {
-      result = result.filter(item => item.type === selectedCategory);
+      list = list.filter(w => w.category === selectedCategory);
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      result = result.filter(item => 
-        item.title.toLowerCase().includes(q) ||
-        item.description.toLowerCase().includes(q) ||
-        item.tags.some(t => t.toLowerCase().includes(q)) ||
-        item.command.toLowerCase().includes(q)
+      list = list.filter(w => 
+        w.title.toLowerCase().includes(q) ||
+        w.description.toLowerCase().includes(q) ||
+        w.tags.some(t => t.toLowerCase().includes(q)) ||
+        w.command.toLowerCase().includes(q)
       );
     }
-    return result;
+    return list;
   });
 
-  function copyCommand(id: string, text: string) {
-    navigator.clipboard.writeText(text);
-    copiedId = id;
-    setTimeout(() => {
-      if (copiedId === id) copiedId = null;
-    }, 2000);
-  }
-
-  function toggleExpand(id: string) {
-    expandedId = expandedId === id ? null : id;
+  function copyText(id: string, text: string) {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      copiedId = id;
+      setTimeout(() => {
+        if (copiedId === id) copiedId = null;
+      }, 2000);
+    }
   }
 </script>
 
 <svelte:head>
-  <title>Workflows & Skill Packages — Autonomic AI Registry</title>
-  <meta name="description" content="Explore deterministic DAG workflows for agent-spine and curated skill packages for agent-brain. Zero hallucination, tamper-proof receipts." />
-  <meta property="og:title" content="Workflows & Skill Packages — Autonomic AI Registry" />
-  <meta property="og:description" content="Deterministic DAG workflows for agent-spine and curated skill packages for agent-brain." />
+  <title>Workflows &amp; Skill Packs Registry — Autonomic AI</title>
+  <meta name="description" content="Declarative DAG state machines executed by agent-spine with milestone approvals, cryptographic SHA-256 seals, and zero-human-block determinism." />
+  <meta property="og:title" content="Workflows &amp; Skill Packs Registry — Autonomic AI" />
+  <meta property="og:description" content="Explore deterministic multi-step engineering workflows and curated skill packs for the dual-engine architecture." />
   <link rel="canonical" href="https://autonomic-ai.dev/workflows" />
 </svelte:head>
 
-<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
+<div class="min-h-screen text-slate-100 font-body selection:bg-cyan-500/25 selection:text-cyan-300">
   
-  <!-- Breadcrumb & Cluster HUD Cockpit -->
-  <section class="rounded-2xl bg-slate-950/80 border border-cyan-500/20 p-6 shadow-2xl relative overflow-hidden mb-10">
-    <div class="absolute -top-24 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+  <!-- ==================== HERO SECTION ==================== -->
+  <section class="relative pt-8 pb-14 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
       
-      <div class="space-y-2">
-        <div class="flex flex-wrap items-center gap-2 text-xs font-mono text-slate-400">
-          <span class="text-cyan-400 font-semibold tracking-wider uppercase">autonomic-os</span>
-          <span class="text-slate-600">//</span>
-          <span class="text-slate-300">registry</span>
-          <span class="text-slate-600">//</span>
-          <span class="px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-500/30">workflows & packages</span>
-        </div>
-        
-        <h1 class="text-2xl sm:text-3xl font-headline font-bold text-white tracking-tight">
-          Workflows & Registry Hub
-        </h1>
-        <p class="text-sm font-body text-slate-300 max-w-2xl leading-relaxed">
-          Deterministic DAG orchestrations executed by <code class="font-mono text-cyan-300">agent-spine</code> and curated skill packages synced by <code class="font-mono text-cyan-300">agent-brain</code>. Built for reproducible engineering with verified receipts.
-        </p>
+      <!-- Top Pill Badge -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-xs font-mono text-cyan-300 mb-6 shadow-[0_0_20px_rgba(6,182,212,0.1)]">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+        </span>
+        <span>⚡ Deterministic Multi-Step Workflows</span>
       </div>
 
-      <!-- Live Quickstart Command Card -->
-      <div class="rounded-xl bg-slate-900/90 border border-slate-800 p-4 shrink-0 font-mono text-xs w-full lg:w-96 shadow-lg">
-        <div class="flex items-center justify-between text-slate-400 mb-2">
-          <span class="flex items-center gap-1.5 text-cyan-400 font-medium">
-            <Terminal size={14} />
-            <span>EXECUTE WORKFLOW</span>
-          </span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-500/30">agent-spine</span>
+      <!-- Main Headline -->
+      <h1 class="font-headline font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight text-white max-w-4xl leading-[1.15]">
+        Workflows &amp; <span class="bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">Skill Packs</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="mt-4 text-base sm:text-lg text-slate-400 max-w-2xl font-normal leading-relaxed">
+        Declarative DAG state machines executed by <code class="font-mono text-cyan-400 bg-slate-900 px-1.5 py-0.5 rounded border border-cyan-500/20 text-sm">agent-spine</code> with milestone approvals, cryptographic SHA-256 seals, and zero-human-block determinism.
+      </p>
+
+      <!-- Terminal Runner Cockpit Box -->
+      <div class="mt-8 w-full max-w-2xl bg-slate-900/90 border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl backdrop-blur-xl transition-all hover:border-cyan-500/30 text-left">
+        <!-- Terminal Header Bar -->
+        <div class="flex items-center justify-between px-4 py-2.5 bg-slate-950/90 border-b border-white/[0.06]">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+            <span class="ml-2 font-mono text-xs text-slate-400">bash • spine-daemon-session</span>
+          </div>
+          <!-- Terminal Tabs -->
+          <div class="flex items-center gap-1 font-mono text-[11px]">
+            <button 
+              onclick={() => activeTerminalTab = 'cli'} 
+              class="px-2.5 py-0.5 rounded transition {activeTerminalTab === 'cli' ? 'bg-slate-800 text-cyan-300 border border-cyan-500/30' : 'text-slate-500 hover:text-slate-300'}"
+            >
+              CLI invocation
+            </button>
+            <button 
+              onclick={() => activeTerminalTab = 'yaml'} 
+              class="px-2.5 py-0.5 rounded transition {activeTerminalTab === 'yaml' ? 'bg-slate-800 text-cyan-300 border border-cyan-500/30' : 'text-slate-500 hover:text-slate-300'}"
+            >
+              YAML Spec
+            </button>
+            <button 
+              onclick={() => activeTerminalTab = 'seal'} 
+              class="px-2.5 py-0.5 rounded transition {activeTerminalTab === 'seal' ? 'bg-slate-800 text-cyan-300 border border-cyan-500/30' : 'text-slate-500 hover:text-slate-300'}"
+            >
+              Verification Seal
+            </button>
+          </div>
         </div>
-        <div class="bg-black/60 rounded-lg p-2.5 text-slate-300 border border-white/5 flex items-center justify-between group">
-          <span class="truncate pr-2 text-cyan-200">$ agent-spine run @engineering-safety</span>
-          <button 
-            onclick={() => copyCommand('quickstart', 'agent-spine run workflows/engineering-safety.yaml')}
-            class="text-slate-400 hover:text-cyan-300 transition p-1"
-            title="Copy command"
-            aria-label="Copy quickstart command"
-          >
-            {#if copiedId === 'quickstart'}
-              <Check size={14} class="text-emerald-400" />
-            {:else}
-              <Copy size={14} />
-            {/if}
-          </button>
+
+        <!-- Terminal Body -->
+        <div class="p-4 sm:p-5 font-mono text-xs sm:text-sm bg-[#08080a]">
+          {#if activeTerminalTab === 'cli'}
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-2 overflow-x-auto text-slate-300">
+                <span class="text-cyan-400 select-none">$</span>
+                <span class="text-indigo-400 font-semibold">agent-spine</span>
+                <span class="text-slate-400">run</span>
+                <span class="text-cyan-300">--workflow</span>
+                <span class="text-emerald-400">stacked-pr</span>
+                <span class="text-slate-500">--verify-rules</span>
+                <span class="text-slate-400">.invariants</span>
+              </div>
+              <button 
+                onclick={() => copyText('hero-cmd', 'agent-spine run --workflow stacked-pr --verify-rules .invariants')}
+                class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800/80 transition"
+                title="Copy Command"
+              >
+                {#if copiedId === 'hero-cmd'}
+                  <Check size={16} class="text-emerald-400" />
+                {:else}
+                  <Copy size={16} />
+                {/if}
+              </button>
+            </div>
+          {:else if activeTerminalTab === 'yaml'}
+            <div class="text-slate-300 space-y-1 text-xs">
+              <span class="text-slate-500"># Declarative DAG Orchestration</span><br/>
+              <span class="text-cyan-400">name:</span> stacked-pr<br/>
+              <span class="text-cyan-400">version:</span> 1.4.0<br/>
+              <span class="text-cyan-400">milestones:</span><br/>
+              &nbsp;&nbsp;- <span class="text-indigo-300">id:</span> worktree-isolate<br/>
+              &nbsp;&nbsp;- <span class="text-indigo-300">id:</span> ast-compile-gate<br/>
+              &nbsp;&nbsp;- <span class="text-indigo-300">id:</span> verify-proof-sealing
+            </div>
+          {:else}
+            <div class="text-slate-300 space-y-1 text-xs">
+              <span class="text-slate-500"># Tamper-Proof Cryptographic Receipt</span><br/>
+              <span class="text-emerald-400">status:</span> SEALED_INVARIANT_VERIFIED<br/>
+              <span class="text-cyan-400">hash:</span> sha256:9f8a31c5040e3b624a492161dc2581691361<br/>
+              <span class="text-indigo-300">engine:</span> agent-spine v1.0.0-rc2 (ARM64 Apple Silicon)
+            </div>
+          {/if}
         </div>
       </div>
+
+      <!-- Feature Guarantee Pillars -->
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-slate-400">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+          <span>Production Pipelines</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+          <span>DAG State Transitions</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Zero-Drift Guarantee</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+          <span>SHA-256 Sealed</span>
+        </div>
+      </div>
+
     </div>
   </section>
 
-  <!-- Controls: Filter Pills & Search Input -->
-  <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
-    
-    <!-- Category Filter Tabs -->
-    <div class="inline-flex p-1.5 rounded-xl bg-slate-950/80 border border-white/10 shadow-lg w-full sm:w-auto">
-      <button 
-        onclick={() => selectedCategory = 'all'} 
-        class="flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-mono font-semibold transition flex items-center justify-center gap-1.5 {selectedCategory === 'all' ? 'bg-cyan-950/90 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'text-slate-400 hover:text-white'}"
-      >
-        <Layers size={13} />
-        <span>All Items ({items.length})</span>
-      </button>
-
-      <button 
-        onclick={() => selectedCategory = 'workflow'} 
-        class="flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-mono font-semibold transition flex items-center justify-center gap-1.5 {selectedCategory === 'workflow' ? 'bg-cyan-950/90 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'text-slate-400 hover:text-white'}"
-      >
-        <Workflow size={13} />
-        <span>DAG Workflows ({items.filter(i => i.type === 'workflow').length})</span>
-      </button>
-
-      <button 
-        onclick={() => selectedCategory = 'package'} 
-        class="flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-mono font-semibold transition flex items-center justify-center gap-1.5 {selectedCategory === 'package' ? 'bg-cyan-950/90 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'text-slate-400 hover:text-white'}"
-      >
-        <Package size={13} />
-        <span>Skill Packages ({items.filter(i => i.type === 'package').length})</span>
-      </button>
-    </div>
-
-    <!-- Live Search Filter -->
-    <div class="relative w-full sm:w-80">
-      <Search size={15} class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
-      <input 
-        type="text" 
-        bind:value={searchQuery}
-        placeholder="Search workflows, packages, tags..."
-        class="w-full bg-slate-950/80 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 shadow-inner transition"
-      />
-      {#if searchQuery}
+  <!-- ==================== FILTER & SEARCH BAR ==================== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+    <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 p-2 rounded-2xl bg-slate-900/60 border border-white/[0.08] backdrop-blur-md">
+      
+      <!-- Filter Tabs -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0 font-mono text-xs scrollbar-none">
         <button 
-          onclick={() => searchQuery = ""}
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs font-mono"
+          onclick={() => selectedCategory = 'all'}
+          class="px-3.5 py-1.5 rounded-xl font-medium transition whitespace-nowrap {selectedCategory === 'all' ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'}"
         >
-          ✕
+          All Workflows ({workflows.length})
         </button>
-      {/if}
+        <button 
+          onclick={() => selectedCategory = 'Engineering SDLC'}
+          class="px-3.5 py-1.5 rounded-xl font-medium transition whitespace-nowrap {selectedCategory === 'Engineering SDLC' ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'}"
+        >
+          Engineering SDLC
+        </button>
+        <button 
+          onclick={() => selectedCategory = 'Startup Playbook'}
+          class="px-3.5 py-1.5 rounded-xl font-medium transition whitespace-nowrap {selectedCategory === 'Startup Playbook' ? 'bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'}"
+        >
+          Startup Playbook
+        </button>
+        <button 
+          onclick={() => selectedCategory = 'Verification & Design'}
+          class="px-3.5 py-1.5 rounded-xl font-medium transition whitespace-nowrap {selectedCategory === 'Verification & Design' ? 'bg-teal-950/80 text-teal-300 border border-teal-500/30 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'}"
+        >
+          Verification &amp; Design
+        </button>
+        <button 
+          onclick={() => selectedCategory = 'Debugging & Hygiene'}
+          class="px-3.5 py-1.5 rounded-xl font-medium transition whitespace-nowrap {selectedCategory === 'Debugging & Hygiene' ? 'bg-amber-950/80 text-amber-300 border border-amber-500/30 shadow-sm' : 'text-slate-400 hover:text-white hover:bg-slate-800/40'}"
+        >
+          Debugging &amp; Hygiene
+        </button>
+      </div>
+
+      <!-- Live Search Box -->
+      <div class="relative w-full lg:w-72 shrink-0">
+        <Search size={15} class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+        <input 
+          type="text" 
+          bind:value={searchQuery}
+          placeholder="Filter workflows or tags..."
+          class="w-full bg-slate-950/80 border border-white/[0.08] rounded-xl pl-10 pr-4 py-2 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition"
+        />
+        {#if searchQuery}
+          <button 
+            onclick={() => searchQuery = ""}
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs font-mono"
+          >
+            ✕
+          </button>
+        {/if}
+      </div>
+
     </div>
-  </div>
+  </section>
 
-  <!-- Bento Grid of Registry Items -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {#each filteredItems as item}
-      <div class="rounded-2xl bg-slate-950/70 border border-white/10 hover:border-cyan-500/30 transition-all duration-300 p-6 flex flex-col justify-between shadow-xl group hover:shadow-cyan-500/5 hover:-translate-y-0.5">
-        <div>
-          <!-- Card Header: Title & Badges -->
-          <div class="flex items-start justify-between gap-3 mb-3">
-            <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {item.type === 'workflow' ? 'bg-cyan-500/10 border border-cyan-500/30 text-cyan-400' : 'bg-indigo-500/10 border border-indigo-500/30 text-indigo-400'}">
-                {#if item.type === 'workflow'}
-                  <Workflow size={16} />
-                {:else}
-                  <Package size={16} />
-                {/if}
+  <!-- ==================== BENTO GRID OF WORKFLOWS ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      {#each filteredWorkflows as item}
+        <div class="group relative rounded-2xl bg-slate-900/40 border border-white/[0.08] p-6 hover:border-cyan-500/40 transition-all duration-300 flex flex-col justify-between shadow-xl hover:shadow-[0_0_30px_rgba(6,182,212,0.1)] {item.featured ? 'md:col-span-2' : ''}">
+          <div class="space-y-4">
+            
+            <!-- Card Header & Badges -->
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-md bg-cyan-950/50 border border-cyan-500/30 text-xs font-mono font-medium text-cyan-300">
+                  {item.category}
+                </span>
+                <span class="text-xs font-mono text-slate-500">•</span>
+                <span class="px-2 py-0.5 rounded bg-slate-950 border border-white/[0.06] text-[11px] font-mono text-slate-300">
+                  {item.engine}
+                </span>
               </div>
-              <h3 class="font-headline font-bold text-base text-white truncate group-hover:text-cyan-300 transition-colors">
-                {item.title}
-              </h3>
+              <span class="flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-950/30 border border-emerald-500/30 px-2 py-0.5 rounded">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> {item.statusBadge}
+              </span>
             </div>
-            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full shrink-0 {item.type === 'workflow' ? 'bg-cyan-950/60 text-cyan-300 border border-cyan-500/30' : 'bg-indigo-950/60 text-indigo-300 border border-indigo-500/30'}">
-              {item.badge}
-            </span>
-          </div>
 
-          <!-- Description -->
-          <p class="text-xs font-body text-slate-300 leading-relaxed mb-4">
-            {item.description}
-          </p>
+            <!-- Title & Description -->
+            <div>
+              <h3 class="text-xl font-headline font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center gap-2">
+                {item.title}
+                <span class="text-xs font-mono font-normal text-slate-500">{item.version}</span>
+              </h3>
+              <p class="mt-2 text-sm text-slate-400 leading-relaxed font-body">
+                {item.description}
+              </p>
+            </div>
 
-          <!-- Steps or Author Pill -->
-          {#if item.steps}
-            <div class="mb-4 space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
-              <div class="text-[10px] font-mono uppercase tracking-wider text-slate-500 flex items-center justify-between">
-                <span>DAG Transition Pipeline</span>
-                <span class="text-cyan-400">{item.steps.length} Gates</span>
+            <!-- Mini DAG Step Flow Visualizer -->
+            <div class="p-3.5 rounded-xl bg-slate-950/80 border border-white/[0.06]">
+              <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+                <span>DAG Execution Sequence</span>
+                <span class="text-cyan-400">{item.stages.length} Stages</span>
               </div>
-              <div class="flex flex-wrap items-center gap-1.5">
-                {#each item.steps as step, idx}
-                  <span class="inline-flex items-center gap-1 text-[11px] font-mono text-slate-300 bg-slate-900 px-2 py-0.5 rounded">
-                    <span class="text-cyan-400 text-[10px]">{idx + 1}.</span> {step}
-                  </span>
+              <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-mono scrollbar-none">
+                {#each item.stages as stage, idx}
+                  <div class="px-2.5 py-1 rounded bg-slate-900 border border-white/[0.08] text-slate-300 whitespace-nowrap {idx === item.stages.length - 1 ? 'border-cyan-500/40 text-cyan-300 bg-cyan-950/40 shadow-[0_0_8px_rgba(6,182,212,0.2)]' : ''}">
+                    {stage}
+                  </div>
+                  {#if idx < item.stages.length - 1}
+                    <ArrowRight size={13} class="text-slate-600 shrink-0" />
+                  {/if}
                 {/each}
               </div>
             </div>
-          {:else if item.author}
-            <div class="mb-4 flex items-center justify-between text-xs font-mono bg-black/40 px-3 py-2 rounded-xl border border-white/5">
-              <span class="text-slate-400">Curator</span>
-              <span class="text-cyan-300 font-semibold">{item.author}</span>
+
+            <!-- Tags -->
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              {#each item.tags as tag}
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-950 border border-white/[0.06] text-slate-400">
+                  {tag}
+                </span>
+              {/each}
             </div>
-          {/if}
 
-          <!-- Tag Pills -->
-          <div class="flex flex-wrap gap-1.5 mb-5">
-            {#each item.tags as tag}
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900/80 text-slate-400 border border-slate-800">
-                {tag}
-              </span>
-            {/each}
-          </div>
-        </div>
-
-        <!-- Card Footer: Command & Inspection Trigger -->
-        <div class="pt-4 border-t border-white/5 space-y-3">
-          <!-- Command Prompt Box with Copy -->
-          <div class="flex items-center justify-between bg-black/60 rounded-xl px-3 py-2 border border-white/10 group/cmd">
-            <code class="text-xs font-mono text-cyan-300 truncate pr-2 select-all">
-              {item.command}
-            </code>
-            <button 
-              onclick={() => copyCommand(item.id, item.command)}
-              class="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition shrink-0"
-              title="Copy Command"
-              aria-label="Copy command"
-            >
-              {#if copiedId === item.id}
-                <Check size={14} class="text-emerald-400" />
-              {:else}
-                <Copy size={14} />
-              {/if}
-            </button>
           </div>
 
-          <!-- Expandable YAML Spec Preview for Workflows -->
-          {#if item.yaml}
-            <div>
+          <!-- Card Footer Terminal & Metadata -->
+          <div class="mt-6 pt-4 border-t border-white/[0.06] space-y-3">
+            <div class="flex items-center justify-between p-2 rounded-xl bg-slate-950/90 border border-white/[0.08] font-mono text-xs">
+              <div class="truncate text-slate-300">
+                <span class="text-cyan-400">$</span> {item.command}
+              </div>
               <button 
-                onclick={() => toggleExpand(item.id)}
-                class="w-full flex items-center justify-between text-[11px] font-mono text-slate-400 hover:text-cyan-300 transition py-1"
+                onclick={() => copyText(item.id, item.command)}
+                class="shrink-0 ml-2 p-1 text-slate-400 hover:text-cyan-400 transition"
+                title="Copy CLI Command"
               >
-                <span>{expandedId === item.id ? 'Hide DAG YAML' : 'Inspect YAML Spec'}</span>
-                {#if expandedId === item.id}
-                  <ChevronUp size={13} />
+                {#if copiedId === item.id}
+                  <Check size={14} class="text-emerald-400" />
                 {:else}
-                  <ChevronDown size={13} />
+                  <Copy size={14} />
                 {/if}
               </button>
-              
-              {#if expandedId === item.id}
-                <div class="mt-2 p-3 bg-black/80 rounded-xl border border-cyan-500/20 font-mono text-[11px] text-slate-300 overflow-x-auto max-h-48">
-                  <pre class="bg-transparent border-0 p-0 m-0"><code>{item.yaml}</code></pre>
-                </div>
-              {/if}
             </div>
-          {/if}
+            
+            <div class="flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-400 gap-2">
+              <span>Latency: <strong class="text-white">{item.latency}</strong></span>
+              <span>Seal: <code class="text-indigo-400 font-mono">{item.seal}</code></span>
+              <span>Token Bound: <strong class="text-cyan-300">{item.tokenBound}</strong></span>
+            </div>
+          </div>
+
+        </div>
+      {/each}
+
+    </div>
+  </main>
+
+  <!-- ==================== DUAL-ENGINE INVARIANT ARCHITECTURE BANNER ==================== -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pb-20">
+    <div class="relative rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-white/[0.08] p-8 sm:p-12 overflow-hidden shadow-2xl">
+      
+      <!-- Inner Glow Blobs -->
+      <div class="absolute -top-24 -left-24 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Banner Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-white/[0.08] relative z-10">
+        <div>
+          <div class="flex items-center gap-2 font-mono text-xs text-cyan-400 tracking-wider uppercase mb-1.5">
+            <Lock size={13} />
+            <span>System Invariant Blueprint</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-headline font-bold text-white tracking-tight">
+            The Dual-Engine SDLC Invariant Guarantee
+          </h2>
+        </div>
+        <div class="px-3 py-1 rounded-full bg-slate-900 border border-white/[0.08] text-xs font-mono text-slate-300">
+          STRICT DETERMINISM
         </div>
       </div>
-    {/each}
-  </div>
 
-  <!-- Bottom CTA: How to Submit to the Registry -->
-  <section class="mt-16 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-slate-950/80 to-indigo-950/40 border border-cyan-500/20 p-8 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
-    <div class="space-y-2">
-      <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono text-cyan-300 bg-cyan-950/80 border border-cyan-500/30">
-        <Sparkles size={13} />
-        <span>OPEN REGISTRY SPECIFICATION</span>
+      <!-- Balanced Engine Columns -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 relative z-10">
+        
+        <!-- Engine 1: agent-brain -->
+        <div class="p-6 rounded-2xl bg-slate-950/60 border border-cyan-500/20 relative group hover:border-cyan-500/40 transition">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2 font-mono">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
+              <span class="text-white font-bold text-sm">agent-brain</span>
+            </div>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">Cognitive Layer</span>
+          </div>
+          <h4 class="text-base font-headline font-bold text-white mb-2">Cognitive Routing &amp; Skill Synthesis</h4>
+          <p class="text-xs font-body text-slate-400 leading-relaxed mb-4">
+            Token-bounded MCP router, durable vector memory, dynamic AST context bounds, and cross-session semantic search. Synthesizes task goals into bounded executable definitions.
+          </p>
+          <div class="flex flex-wrap gap-2 text-[10px] font-mono text-cyan-300">
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-cyan-500/20">MCP 2.0 PROTOCOL</span>
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-cyan-500/20">TOKEN BOUNDED</span>
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-cyan-500/20">AST BOUNDARIES</span>
+          </div>
+        </div>
+
+        <!-- Engine 2: agent-spine -->
+        <div class="p-6 rounded-2xl bg-slate-950/60 border border-indigo-500/20 relative group hover:border-indigo-500/40 transition">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2 font-mono">
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]"></span>
+              <span class="text-white font-bold text-sm">agent-spine</span>
+            </div>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-500/30">Execution Layer</span>
+          </div>
+          <h4 class="text-base font-headline font-bold text-white mb-2">Deterministic Execution Engine</h4>
+          <p class="text-xs font-body text-slate-400 leading-relaxed mb-4">
+            Milestone approval gates, sandboxed git worktrees, immutable state transitions, and zero-human-block execution. State changes execute through mathematical runtime verification.
+          </p>
+          <div class="flex flex-wrap gap-2 text-[10px] font-mono text-indigo-300">
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-indigo-500/20">MATHEMATICAL DAGS</span>
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-indigo-500/20">SEALED RECEIPTS</span>
+            <span class="px-2 py-0.5 rounded bg-slate-900 border border-indigo-500/20">STRICT REPRODUCIBILITY</span>
+          </div>
+        </div>
+
       </div>
-      <h3 class="text-xl font-headline font-bold text-white">Publish your DAG workflow or skill package</h3>
-      <p class="text-xs font-body text-slate-300 max-w-xl">
-        Every workflow in the Autonomic Registry is version-pinned, deterministic, and executes in an isolated harness. Submit your package to <code class="font-mono text-cyan-300">agent-registry/registry.json</code> via Pull Request.
-      </p>
-    </div>
-    <div class="flex items-center gap-3 shrink-0">
-      <a 
-        href="https://github.com/autonomic-ai-dev/agent-registry" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-semibold text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-300 hover:from-cyan-300 hover:to-indigo-200 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all duration-200 active:scale-95"
-      >
-        <span>Contribute on GitHub</span>
-        <ExternalLink size={14} />
-      </a>
-      <a 
-        href="/docs/workflows" 
-        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono text-slate-300 hover:text-white bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 transition"
-      >
-        <span>Workflow Docs</span>
-      </a>
+
+      <!-- Sealed Receipt Banner Bottom -->
+      <div class="mt-8 pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono text-slate-500 gap-3 relative z-10">
+        <div class="flex items-center gap-2 text-cyan-400">
+          <Shield size={14} />
+          <span>Cryptographically Sealed Receipt: SHA-256 verified • Autonomic System Engine</span>
+        </div>
+        <div class="text-[11px] text-slate-500">
+          Pinned to v1.0.0-rc2 Runtime
+        </div>
+      </div>
+
     </div>
   </section>
 
