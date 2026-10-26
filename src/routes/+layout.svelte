@@ -30,7 +30,7 @@
         "url": "https://autonomic-ai.dev",
         "logo": "https://autonomic-ai.dev/logo.png",
         "sameAs": [
-          "https://github.com/autonomic-ai-dev/agent-registry",
+          "https://github.com/autonomic-ai-dev",
           "https://autonomic-ai.openstatus.dev"
         ]
       },
@@ -112,10 +112,10 @@
         </a>
       </nav>
 
-      <!-- Trailing Action: GitHub Monorepo Link -->
+      <!-- Trailing Action: GitHub Org Link -->
       <div class="flex items-center gap-3">
         <a 
-          href="https://github.com/autonomic-ai-dev/agent-registry" 
+          href="https://github.com/autonomic-ai-dev" 
           target="_blank" 
           rel="noopener noreferrer" 
           class="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800 text-xs font-mono text-slate-300 hover:text-white hover:border-cyan-500/40 transition-all duration-200 active:scale-95"
@@ -157,7 +157,7 @@
           <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs">Docs</a>
           <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/cli">CLI Reference</a>
           <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">Status</a>
-          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://github.com/autonomic-ai-dev/agent-registry" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://github.com/autonomic-ai-dev" target="_blank" rel="noopener noreferrer">GitHub</a>
         </nav>
       </div>
       <!-- Bottom Row -->

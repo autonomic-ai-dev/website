@@ -630,7 +630,7 @@
 
       <div class="pt-6 border-t border-white/[0.06] space-y-3 font-mono text-xs text-slate-400">
         <a 
-          href="https://github.com/autonomic-ai-dev/agent-registry" 
+          href="https://github.com/autonomic-ai-dev/website" 
           target="_blank" 
           rel="noopener noreferrer" 
           class="flex items-center justify-between hover:text-white transition"
