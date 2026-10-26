@@ -10,8 +10,10 @@
     Workflow,
     Layers,
     Book,
+    Terminal,
     Menu,
-    X
+    X,
+    Shield
   } from "lucide-svelte";
 
   let { children, data } = $props();
@@ -30,6 +32,9 @@
   }
   let tocItems = $state<TocItem[]>([]);
   let activeTocId = $state<string>("");
+  let mainScrollContainer = $state<HTMLElement | null>(null);
+  let isScrollingFromClick = false;
+  let scrollTimeout: any = null;
 
   $effect(() => {
     if (isCliSection) {
@@ -45,7 +50,9 @@
       const handleHashChange = () => {
         activeHash = window.location.hash;
         if (window.location.hash) {
-          activeTocId = window.location.hash.replace('#', '');
+          const h = window.location.hash.replace('#', '');
+          activeTocId = h;
+          scrollToHeading(h);
         }
       };
       window.addEventListener("hashchange", handleHashChange);
@@ -54,6 +61,117 @@
       };
     }
   });
+
+  function extractToc() {
+    if (!browser) return;
+    const article = document.querySelector("article");
+    if (!article) return;
+
+    const headings = article.querySelectorAll("h2, h3");
+    const items: TocItem[] = [];
+
+    headings.forEach((heading, idx) => {
+      let rawText = heading.textContent?.replace(/^#+\s*/, "").replace(/`/g, "").trim() || "";
+      if (!rawText) return;
+
+      const lower = rawText.toLowerCase();
+      // Filter out low-level repetitive subheadings
+      if (["options", "arguments", "examples", "subcommands", "checks performed", "options for package add"].includes(lower)) {
+        return;
+      }
+
+      let id = heading.id;
+      if (!id) {
+        const parentSection = heading.closest("section");
+        if (parentSection && parentSection.id && !items.some(i => i.id === parentSection.id)) {
+          id = parentSection.id;
+          heading.id = id;
+        } else {
+          id = rawText
+            .toLowerCase()
+            .replace(/[^a-z0-9_]+/g, "-")
+            .replace(/(^-|-$)+/g, "");
+          heading.id = id;
+        }
+      }
+
+      items.push({
+        id,
+        text: rawText,
+        level: heading.tagName.toLowerCase() === "h2" ? 2 : 3
+      });
+    });
+
+    tocItems = items;
+    if (items.length > 0) {
+      if (window.location.hash) {
+        const target = window.location.hash.replace("#", "");
+        if (items.some(i => i.id === target)) {
+          activeTocId = target;
+          setTimeout(() => scrollToHeading(target), 200);
+          return;
+        }
+      }
+      if (!activeTocId) {
+        activeTocId = items[0].id;
+      }
+    }
+  }
+
+  function handleScroll() {
+    if (!browser || !mainScrollContainer || isScrollingFromClick) return;
+    const article = document.querySelector("article");
+    if (!article) return;
+
+    const headings = article.querySelectorAll("h2[id], h3[id], section[id]");
+    if (headings.length === 0) return;
+
+    const mainRect = mainScrollContainer.getBoundingClientRect();
+    let currentActiveId = "";
+
+    for (let i = 0; i < headings.length; i++) {
+      const h = headings[i] as HTMLElement;
+      if (!tocItems.some(item => item.id === h.id)) continue;
+
+      const rect = h.getBoundingClientRect();
+      const offset = rect.top - mainRect.top;
+      if (offset <= 140) {
+        currentActiveId = h.id;
+      } else {
+        break;
+      }
+    }
+
+    if (currentActiveId && currentActiveId !== activeTocId) {
+      activeTocId = currentActiveId;
+      activeHash = `#${currentActiveId}`;
+    }
+  }
+
+  function scrollToHeading(id: string) {
+    if (!browser || !mainScrollContainer) return;
+    const el = document.getElementById(id);
+    if (el) {
+      isScrollingFromClick = true;
+      activeTocId = id;
+      activeHash = `#${id}`;
+      history.pushState(null, "", `#${id}`);
+
+      const mainRect = mainScrollContainer.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const targetTop = mainScrollContainer.scrollTop + (elRect.top - mainRect.top) - 30;
+
+      mainScrollContainer.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: "smooth"
+      });
+
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isScrollingFromClick = false;
+      }, 700);
+    }
+  }
 
   async function renderMermaidDiagrams() {
     if (!browser) return;
@@ -136,101 +254,16 @@
     });
   }
 
-  function extractToc() {
-    if (!browser) return;
-    const article = document.querySelector("article");
-    if (!article) return;
-
-    const headings = article.querySelectorAll("h2, h3");
-    const items: TocItem[] = [];
-
-    headings.forEach((heading, idx) => {
-      let id = heading.id;
-      if (!id) {
-        const parentSection = heading.closest("section");
-        if (parentSection && parentSection.id && !items.some(i => i.id === parentSection.id)) {
-          id = parentSection.id;
-          heading.id = id;
-        } else {
-          const raw = heading.textContent || `heading-${idx}`;
-          id = raw
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/(^-|-$)+/g, "");
-          heading.id = id;
-        }
-      }
-
-      items.push({
-        id,
-        text: heading.textContent?.replace(/^#+\s*/, "").trim() || "",
-        level: heading.tagName.toLowerCase() === "h2" ? 2 : 3
-      });
-    });
-
-    tocItems = items;
-    if (items.length > 0 && !activeTocId) {
-      if (window.location.hash) {
-        activeTocId = window.location.hash.replace("#", "");
-      } else {
-        activeTocId = items[0].id;
-      }
-    }
-  }
-
-  function scrollToHeading(id: string) {
-    if (!browser) return;
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      history.pushState(null, "", `#${id}`);
-      activeTocId = id;
-      activeHash = `#${id}`;
-    }
-  }
-
-  let cleanupObserver: (() => void) | undefined;
-
-  function setupIntersectionObserver() {
-    if (!browser) return;
-    if (cleanupObserver) {
-      cleanupObserver();
-      cleanupObserver = undefined;
-    }
-    const article = document.querySelector("article");
-    if (!article) return;
-    const headings = article.querySelectorAll("h2, h3, section[id]");
-    if (headings.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const id = entry.target.id;
-            if (id) {
-              activeTocId = id;
-              break;
-            }
-          }
-        }
-      },
-      {
-        rootMargin: "-90px 0px -70% 0px",
-        threshold: 0
-      }
-    );
-
-    headings.forEach((h) => observer.observe(h));
-    cleanupObserver = () => observer.disconnect();
-  }
-
   $effect(() => {
     if (pathname) {
       tick().then(() => {
         renderMermaidDiagrams();
         addCopyButtons();
         extractToc();
-        setupIntersectionObserver();
+        isMobileDocsMenuOpen = false;
+        if (mainScrollContainer) {
+          mainScrollContainer.scrollTop = 0;
+        }
       });
     }
   });
@@ -240,23 +273,20 @@
       renderMermaidDiagrams();
       addCopyButtons();
       extractToc();
-      setupIntersectionObserver();
     });
-    return () => {
-      if (cleanupObserver) cleanupObserver();
-    };
   });
 </script>
 
-<div class="flex flex-col lg:flex-row min-h-screen bg-[#0a0a0c] text-slate-300 font-body">
+<!-- FIXED APPLICATION FRAMEWORK: Below fixed header (top-20 sm:top-24 to bottom-0) -->
+<div class="fixed inset-x-0 bottom-0 top-20 sm:top-24 flex flex-col lg:flex-row overflow-hidden bg-[#0a0a0c] text-slate-300 font-body">
   
-  <!-- Mobile Navigation Header -->
-  <div class="lg:hidden px-6 py-3.5 border-b border-white/[0.08] flex justify-between items-center bg-slate-950 sticky top-20 z-40">
+  <!-- Mobile Navigation Header Bar -->
+  <div class="lg:hidden px-6 py-3 border-b border-white/[0.08] flex justify-between items-center bg-slate-950 shrink-0 z-40">
     <div class="flex items-center gap-2">
       <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">{activeTab === 'cli' ? 'CLI REFERENCE' : 'DOCUMENTATION'}</span>
       <ChevronRight size={14} class="text-slate-500" />
       <span class="text-xs font-mono text-white truncate max-w-[180px]">
-        {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Overview' : 'Overview'}
+        {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Overview' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : 'Overview'}
       </span>
     </div>
     <button 
@@ -268,159 +298,101 @@
     </button>
   </div>
 
-  <!-- LEFT SIDEBAR: Pixel-Perfect Stitch Navigation Tree -->
-  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-64 shrink-0 sticky top-20 h-auto lg:h-[calc(100vh-5rem)] overflow-y-auto px-5 py-6 border-b lg:border-b-0 lg:border-r border-white/[0.06] text-xs font-body bg-[#0a0a0c] z-30">
+  <!-- LEFT SIDEBAR: Fixed, independent scroll, page navigation tree -->
+  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-64 xl:w-72 shrink-0 h-full overflow-y-auto px-5 py-6 border-b lg:border-b-0 lg:border-r border-white/[0.06] text-xs font-body bg-[#0a0a0c] z-30">
     
     {#if activeTab === 'cli'}
-      <!-- CLI Reference Mode: Clean Navigation Tree without Redundant Top Container -->
+      <!-- CLI Reference Mode: Page Navigation Only (Command headings moved to Right Sidebar) -->
       <div class="space-y-6">
-        <!-- Section: CORE ENGINES -->
+        <!-- Section: CLI REFERENCE -->
         <div>
-          <div class="px-1 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400">
-            <span>CORE ENGINES</span>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>CLI Reference</span>
           </div>
-          <div class="space-y-1.5">
-            <a 
-              href="/docs/cli/agent-brain" 
-              onclick={() => activeHash = ''}
-              class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all {pathname === '/docs/cli/agent-brain' && (!activeHash || activeHash === '') ? 'bg-cyan-950/40 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.12)]' : 'text-slate-300 hover:bg-slate-900 border border-white/[0.06] hover:border-white/10'}"
-            >
-              <div class="flex items-center gap-2 font-mono">
-                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                <span class="text-white font-mono text-xs">agent-brain</span>
-              </div>
-              <span class="text-[11px] font-mono text-cyan-400/80">6 cmds</span>
-            </a>
-
-            <a 
-              href="/docs/cli/agent-spine" 
-              onclick={() => activeHash = ''}
-              class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all {pathname === '/docs/cli/agent-spine' && (!activeHash || activeHash === '') ? 'bg-indigo-950/40 text-indigo-300 border border-indigo-500/40 shadow-[0_0_15px_rgba(99,102,241,0.12)]' : 'text-slate-300 hover:bg-slate-900 border border-white/[0.06] hover:border-white/10'}"
-            >
-              <div class="flex items-center gap-2 font-mono">
-                <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
-                <span class="text-slate-300 font-mono text-xs">agent-spine</span>
-              </div>
-              <span class="text-[11px] font-mono text-indigo-400/70">4 cmds</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Section: AGENT-BRAIN COMMANDS -->
-        <div>
-          <div class="px-1 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-            <Brain size={13} class="text-cyan-400" />
-            <span>AGENT-BRAIN COMMANDS</span>
-          </div>
-          <ul class="space-y-1 font-mono text-xs">
+          <ul class="space-y-1">
             <li>
               <a 
-                href="/docs/cli/agent-brain#serve" 
-                onclick={() => activeHash = '#serve'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#serve' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+                href="/docs/cli" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/cli' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
               >
-                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">serve</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Daemon mode</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/cli/agent-brain#route_task" 
-                onclick={() => activeHash = '#route_task'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#route_task' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
-              >
-                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">route_task</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">AST routing</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/cli/agent-brain#doctor" 
-                onclick={() => activeHash = '#doctor'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#doctor' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
-              >
-                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">doctor</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Diagnostics</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/cli/agent-brain#index" 
-                onclick={() => activeHash = '#index'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#index' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
-              >
-                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">index</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">HNSW vectors</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/cli/agent-brain#package" 
-                onclick={() => activeHash = '#package'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#package' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
-              >
-                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">registry</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">MCP bindings</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/cli/agent-brain#stats" 
-                onclick={() => activeHash = '#stats'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#stats' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
-              >
-                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">stats</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Token telemetry</span>
+                <Terminal size={14} class="text-cyan-400" />
+                <span>CLI Overview</span>
               </a>
             </li>
           </ul>
         </div>
 
-        <!-- Section: AGENT-SPINE COMMANDS -->
+        <!-- Section: CORE ENGINES -->
         <div>
-          <div class="px-1 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-            <Workflow size={13} class="text-indigo-400" />
-            <span>AGENT-SPINE COMMANDS</span>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>Dual Engines</span>
           </div>
-          <ul class="space-y-1 font-mono text-xs">
+          <ul class="space-y-2">
             <li>
               <a 
-                href="/docs/cli/agent-spine#run" 
-                onclick={() => activeHash = '#run'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-spine' && activeHash === '#run' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+                href="/docs/cli/agent-brain" 
+                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/cli/agent-brain' ? 'border-cyan-500/50 bg-cyan-950/40 shadow-[0_0_15px_rgba(6,182,212,0.12)]' : 'border-white/[0.08] bg-slate-900/40 hover:border-cyan-500/40 hover:bg-slate-900/70'}"
               >
-                <span class="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">run</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Execute DAG</span>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-cyan-400 font-mono font-medium">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                    <span>agent-brain</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-cyan-400/80 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/20">6 cmds</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
+                  Reasoning, vector memory, AST router, and MCP gateway.
+                </p>
               </a>
             </li>
             <li>
               <a 
-                href="/docs/cli/agent-spine#validate" 
-                onclick={() => activeHash = '#validate'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-spine' && activeHash === '#validate' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+                href="/docs/cli/agent-spine" 
+                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/cli/agent-spine' ? 'border-indigo-500/50 bg-indigo-950/40 shadow-[0_0_15px_rgba(99,102,241,0.12)]' : 'border-white/[0.08] bg-slate-900/40 hover:border-indigo-500/40 hover:bg-slate-900/70'}"
               >
-                <span class="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">validate</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Invariants</span>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-indigo-400 font-mono font-medium">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                    <span>agent-spine</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-indigo-400/80 bg-indigo-950/60 px-1.5 py-0.5 rounded border border-indigo-500/20">4 cmds</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
+                  Deterministic DAG runner, milestone gates, and state replay.
+                </p>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section: DOCUMENTATION HUB -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>Documentation Hub</span>
+          </div>
+          <ul class="space-y-1">
+            <li>
+              <a href="/docs" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+                <Book size={14} class="text-slate-400" />
+                <span>Docs Home</span>
               </a>
             </li>
             <li>
-              <a 
-                href="/docs/cli/agent-spine#init" 
-                onclick={() => activeHash = '#init'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-spine' && activeHash === '#init' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
-              >
-                <span class="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">init</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Scaffold YAML</span>
+              <a href="/docs/architecture" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+                <Layers size={14} class="text-indigo-400" />
+                <span>Architecture</span>
               </a>
             </li>
             <li>
-              <a 
-                href="/docs/cli/agent-spine#status" 
-                onclick={() => activeHash = '#status'}
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-spine' && activeHash === '#status' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
-              >
-                <span class="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">status</span> 
-                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Sealed audits</span>
+              <a href="/docs/agstack" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+                <Layers size={14} class="text-cyan-400" />
+                <span>AGSTACK SDLC</span>
+              </a>
+            </li>
+            <li>
+              <a href="/registry" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+                <Workflow size={14} class="text-cyan-400" />
+                <span>Registry & Workflows</span>
               </a>
             </li>
           </ul>
@@ -429,12 +401,12 @@
         <!-- Strict Dual-Engine Invariant Footer -->
         <div class="pt-5 border-t border-white/[0.08] text-slate-400 text-xs">
           <span class="text-slate-300 font-medium block mb-1">Dual-Engine Invariant</span>
-          <p class="text-slate-400 leading-relaxed text-[11px]">Strict bifurcation: cognitive routing (<span class="text-cyan-400 font-mono">brain</span>) and deterministic state execution (<span class="text-indigo-400 font-mono">spine</span>).</p>
+          <p class="text-slate-400 leading-relaxed text-[11px]">Cognitive routing (<span class="text-cyan-400 font-mono">brain</span>) and deterministic state execution (<span class="text-indigo-400 font-mono">spine</span>).</p>
         </div>
       </div>
 
     {:else}
-      <!-- Documentation Mode: Clean Navigation Tree without Redundant Top Container -->
+      <!-- Documentation Mode: Navigation Tree -->
       <div class="space-y-6">
         <!-- Section: GETTING STARTED -->
         <div>
@@ -469,7 +441,7 @@
                 class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/architecture' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
               >
                 <Layers size={14} class="text-indigo-400" />
-                <span>CLI Runtime & Doctor</span>
+                <span>Dual-Engine Topology</span>
               </a>
             </li>
           </ul>
@@ -478,7 +450,7 @@
         <!-- Section: CORE ARCHITECTURE -->
         <div>
           <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-            <span>Core Architecture</span>
+            <span>Core Engines</span>
           </div>
           <ul class="space-y-2">
             <li>
@@ -488,7 +460,7 @@
               >
                 <div class="flex items-center gap-2 text-cyan-400 font-mono font-medium">
                   <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                  <span>agent-brain</span>
+                  <span>agent-brain Manual</span>
                 </div>
                 <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
                   Token-bounded MCP router, durable vector memory, multi-host rule gates.
@@ -502,7 +474,7 @@
               >
                 <div class="flex items-center gap-2 text-indigo-400 font-mono font-medium">
                   <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                  <span>agent-spine</span>
+                  <span>agent-spine Manual</span>
                 </div>
                 <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
                   Declarative YAML DAGs, milestone approval gates, zero-human-block execution.
@@ -528,15 +500,42 @@
               </a>
             </li>
             <li>
-              <a href="/registry#minimalist-entrepreneur" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+              <a href="/registry" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
                 <Book size={14} class="text-slate-400" />
                 <span>Minimalist Entrepreneurship</span>
               </a>
             </li>
             <li>
-              <a href="/registry#gstack" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+              <a href="/registry" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
                 <span class="text-yellow-400 font-mono">★</span>
                 <span>Garry Tan gstack Review Engine</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section: CLI REFERENCE -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>CLI Reference</span>
+          </div>
+          <ul class="space-y-1">
+            <li>
+              <a href="/docs/cli" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+                <Terminal size={14} class="text-cyan-400" />
+                <span>CLI Overview</span>
+              </a>
+            </li>
+            <li>
+              <a href="/docs/cli/agent-brain" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all font-mono text-[11px]">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                <span>agent-brain CLI</span>
+              </a>
+            </li>
+            <li>
+              <a href="/docs/cli/agent-spine" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all font-mono text-[11px]">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                <span>agent-spine CLI</span>
               </a>
             </li>
           </ul>
@@ -563,7 +562,7 @@
           </ul>
         </div>
 
-        <!-- Quick docs feedback helper -->
+        <!-- Footer invariant -->
         <div class="pt-6 border-t border-white/[0.06] text-slate-400">
           <div class="flex items-center gap-2">
             <span class="text-indigo-400 font-mono">ℹ</span>
@@ -575,52 +574,76 @@
 
   </aside>
 
-  <!-- MAIN DOCUMENTATION CANVAS -->
-  <main class="flex-1 min-w-0 px-6 sm:px-10 lg:px-12 py-8 max-w-4xl mx-auto overflow-hidden">
-    <!-- Breadcrumb Header -->
-    <div class="mb-6 pb-4 border-b border-white/[0.08] flex items-center justify-between">
-      <nav class="flex items-center gap-2 text-xs font-mono text-slate-400" aria-label="Breadcrumb">
-        <a href={activeTab === 'cli' ? "/docs/cli" : "/docs"} class="hover:text-cyan-400 transition">
-          {activeTab === 'cli' ? 'CLI Reference' : 'Docs'}
-        </a>
-        <ChevronRight size={12} class="text-slate-600" />
-        <span class="text-cyan-400 font-medium">
-          {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : pathname.endsWith('/memory') ? 'agent-brain Manual' : pathname.endsWith('/workflows') ? 'agent-spine Manual' : 'Introduction & Overview'}
-        </span>
-      </nav>
-      <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span>SPEC {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
+  <!-- MAIN DOCUMENTATION CANVAS: The ONLY scrollable element in documentation views -->
+  <main 
+    bind:this={mainScrollContainer}
+    onscroll={handleScroll}
+    class="flex-1 h-full overflow-y-auto px-6 sm:px-10 lg:px-12 py-8 bg-[#0a0a0c] selection:bg-cyan-500/20 selection:text-cyan-300"
+  >
+    <div class="max-w-4xl mx-auto">
+      
+      <!-- Breadcrumb Header -->
+      <div class="mb-6 pb-4 border-b border-white/[0.08] flex items-center justify-between">
+        <nav class="flex items-center gap-2 text-xs font-mono text-slate-400" aria-label="Breadcrumb">
+          <a href={activeTab === 'cli' ? "/docs/cli" : "/docs"} class="hover:text-cyan-400 transition">
+            {activeTab === 'cli' ? 'CLI Reference' : 'Docs'}
+          </a>
+          <ChevronRight size={12} class="text-slate-600" />
+          <span class="text-cyan-400 font-medium">
+            {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : pathname.endsWith('/memory') ? 'agent-brain Manual' : pathname.endsWith('/workflows') ? 'agent-spine Manual' : 'Introduction & Overview'}
+          </span>
+        </nav>
+        <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>SPEC {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Article Content -->
-    <article class="prose max-w-none">
-      {@render children()}
-    </article>
+      <!-- Article Content -->
+      <article class="prose max-w-none">
+        {@render children()}
+      </article>
+
+      <!-- Embedded Documentation Footer -->
+      <footer class="mt-20 pt-8 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500 pb-16">
+        <p>© 2026 Autonomic AI. Autonomous Agent Engineering OS ({data?.ecosystemVersion || 'v1.0.0-rc2'}). All systems operational.</p>
+        <div class="flex items-center gap-4">
+          <a href="/registry" class="hover:text-cyan-400 transition">Registry</a>
+          <a href="/docs/architecture" class="hover:text-cyan-400 transition">Architecture</a>
+          <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition">Status</a>
+        </div>
+      </footer>
+
+    </div>
   </main>
 
-  <!-- RIGHT RAIL: Table of Contents & Quick Links (Stitch Design) -->
-  <aside class="w-72 xl:w-80 shrink-0 hidden xl:block sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto px-6 py-8 border-l border-white/[0.06] text-xs font-body">
+  <!-- RIGHT RAIL: Fixed, independent scroll, dynamic heading/command list -->
+  <aside class="w-72 xl:w-80 shrink-0 hidden xl:block h-full overflow-y-auto px-6 py-8 border-l border-white/[0.06] text-xs font-body bg-[#0a0a0c]">
     <div class="space-y-6">
       <div>
-        <div class="px-2 mb-3 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-          <FileText size={13} class="text-cyan-400" />
-          <span>ON THIS PAGE</span>
+        <div class="px-2 mb-3 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <FileText size={13} class="text-cyan-400" />
+            <span>ON THIS PAGE</span>
+          </div>
+          {#if tocItems.length > 0}
+            <span class="text-[10px] font-mono text-slate-500 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">{tocItems.length}</span>
+          {/if}
         </div>
+
         {#if tocItems.length > 0}
-          <ul class="space-y-1.5 text-slate-400 text-xs font-body">
+          <ul class="space-y-1 text-slate-400 text-xs font-body">
             {#each tocItems as item}
-              <li class="{item.level === 3 ? 'pl-3.5 border-l border-white/10 ml-1.5 my-1' : ''}">
+              <li class="{item.level === 3 ? 'pl-3 border-l border-white/10 ml-2 my-0.5' : ''}">
                 <button
                   type="button"
                   onclick={() => scrollToHeading(item.id)}
-                  class="text-left w-full break-words leading-relaxed py-0.5 transition-colors cursor-pointer group flex items-start gap-1.5 {activeTocId === item.id ? 'text-cyan-300 font-medium' : 'text-slate-400 hover:text-slate-200'}"
+                  class="text-left w-full break-words leading-relaxed py-1 px-2 rounded-md transition-all cursor-pointer group flex items-start gap-1.5 {activeTocId === item.id ? 'bg-cyan-950/50 text-cyan-300 font-medium border-l-2 border-cyan-400 shadow-[inset_0_0_8px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'}"
                 >
                   {#if activeTocId === item.id}
                     <span class="text-cyan-400 font-mono text-[10px] mt-0.5">›</span>
                   {/if}
-                  <span class="flex-1">{item.text}</span>
+                  <span class="flex-1 {item.level === 3 ? 'font-mono text-[11px]' : ''}">{item.text}</span>
                 </button>
               </li>
             {/each}
