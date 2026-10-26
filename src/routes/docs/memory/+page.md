@@ -56,6 +56,18 @@ To guarantee that autonomous agents adhere to strict engineering standards, `age
 4. **Trap Warning Promotion**: When verification fails (`agent-brain verify`), the negative outcome promotes the memory into a prominent `TRAP WARNING: <fact>` directive in future turns.
 5. **Dynamic Workflow Auto-Indexing**: Curated workflows (`@bugfix`, `@feature`, `@stacked-pr`, `@release-notes`) are automatically indexed into SQLite on registry sync and surfaced as verified recipes.
 
+### 5. Elastic Token Budgeting & Decoupled Memory Recall
+Routing adapts dynamically to task complexity while preventing memory starvation:
+- **Elastic Token Budgeting**: Rather than a rigid token ceiling, the token budget dynamically scales by task kind to minimize token consumption on quick verification while allocating headroom for deep architectural work:
+  - `Verification`: 350 tokens
+  - `Review`: 550 tokens
+  - `Implementing`: 600 tokens
+  - `Debugging`: 650 tokens
+  - `Architecture`: 700 tokens
+- **Decoupled Memory Recall**: Memory score floor thresholds are decoupled from high-matching rule scores, and 120 tokens are explicitly reserved in Pass 1 to prevent skills and rules from starving memory retrieval (`relevant_memory: []`).
+- **`agstack-mode` Prioritization & Config Toggle**: On engineering turns, `agstack-mode` is prioritized into slot #1 in `recommended_skills`. This priority can be toggled via `~/.autonomic/memory/config.yaml` (`routing: prefer_agstack: false`) or the `AGENT_BRAIN_PREFER_AGSTACK=0` environment variable.
+- **Silent Watcher Ambient Guidance**: When `AGENT_BRAIN_SILENT_WATCHER=1` is configured, prompt-submit hooks automatically inject verified recipes and critical invariants ambiently without requiring active agent tool calls.
+
 ---
 
 ## MCP Tool Reference
