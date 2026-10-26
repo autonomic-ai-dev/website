@@ -19,10 +19,36 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 		return cached;
 	}
 
-	// 1. Try local filesystem (development environment)
+	// 0. Environment variable override
+	const envVersion = process.env.AUTONOMIC_VERSION || process.env.VITE_AUTONOMIC_VERSION;
+	if (envVersion) {
+		const cleanVer = envVersion.replace(/^v/, '');
+		cached = {
+			autonomic: cleanVer,
+			stack: cleanVer,
+			ecosystemVersion: `v${cleanVer}`,
+			stackVersion: `v${cleanVer}`,
+			organs: {
+				'agent-brain': `v${cleanVer}`,
+				'agent-spine': `v${cleanVer}`,
+				'agstack': `v${cleanVer}`
+			}
+		};
+		lastFetch = now;
+		return cached;
+	}
+
+	// 1. Try local filesystem (local development monorepo workspace)
 	try {
-		const localTapDir = path.resolve(process.cwd(), '../homebrew-tap/Formula');
-		if (fs.existsSync(localTapDir)) {
+		const searchPaths = [
+			path.resolve(process.cwd(), '../homebrew-tap/Formula'),
+			path.resolve(process.cwd(), 'homebrew-tap/Formula'),
+			path.resolve('/Volumes/Seagate/developer/personal/autonomic-ai-dev/homebrew-tap/Formula')
+		];
+
+		const localTapDir = searchPaths.find((p) => fs.existsSync(p));
+
+		if (localTapDir) {
 			const readVer = (filename: string): string | null => {
 				const p = path.join(localTapDir, filename);
 				if (!fs.existsSync(p)) return null;
@@ -31,27 +57,19 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 				return match ? match[1] : null;
 			};
 
-			const autonomic = readVer('autonomic.rb') || '1.0.0-beta.3.1';
-			const stack = readVer('autonomic-stack.rb') || '1.0.0-beta.3.2';
-			const brain = readVer('agent-brain.rb') || '1.0.0-beta.3.2';
+			const stack = readVer('autonomic-stack.rb') || '1.0.0-rc2';
+			const brain = readVer('agent-brain.rb') || stack;
+			const spine = readVer('agent-spine.rb') || stack;
 
 			cached = {
-				autonomic,
+				autonomic: stack,
 				stack,
 				ecosystemVersion: `v${stack}`,
 				stackVersion: `v${stack}`,
 				organs: {
-					'agent-body': `v${autonomic}`,
 					'agent-brain': `v${brain}`,
-					'agent-spine': `v${autonomic}`,
-					'agent-heart': `v${autonomic}`,
-					'agent-nerves': `v${autonomic}`,
-					'agent-muscle': `v${autonomic}`,
-					'agent-immune': `v${autonomic}`,
-					'agent-eyes': `v${autonomic}`,
-					'agent-mouth': `v${autonomic}`,
-					'agent-tui': `v${autonomic}`,
-					'agent-ci-dashboard': `v${autonomic}`
+					'agent-spine': `v${spine}`,
+					'agstack': `v${stack}`
 				}
 			};
 			lastFetch = now;
@@ -61,71 +79,64 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 		// Non-fatal, proceed to remote fetch
 	}
 
-	// 2. Fetch from remote GitHub raw files
+	// 2. Fetch from remote GitHub raw files (tries main then master)
 	try {
 		const fetchVer = async (file: string): Promise<string | null> => {
-			const res = await fetch(
-				`https://raw.githubusercontent.com/autonomic-ai-dev/homebrew-tap/main/Formula/${file}`,
-				{
-					headers: { 'User-Agent': 'autonomic-website' },
-					signal: AbortSignal.timeout(3000)
+			for (const branch of ['main', 'master']) {
+				try {
+					const res = await fetch(
+						`https://raw.githubusercontent.com/autonomic-ai-dev/homebrew-tap/${branch}/Formula/${file}`,
+						{
+							headers: { 'User-Agent': 'autonomic-website' },
+							signal: AbortSignal.timeout(3000)
+						}
+					);
+					if (res.ok) {
+						const text = await res.text();
+						const match = text.match(/version\s+"([^"]+)"/);
+						if (match) return match[1];
+					}
+				} catch {
+					// continue to next branch
 				}
-			);
-			if (!res.ok) return null;
-			const text = await res.text();
-			const match = text.match(/version\s+"([^"]+)"/);
-			return match ? match[1] : null;
+			}
+			return null;
 		};
 
-		const [autonomic, stack, brain] = await Promise.all([
-			fetchVer('autonomic.rb'),
+		const [stack, brain, spine] = await Promise.all([
 			fetchVer('autonomic-stack.rb'),
-			fetchVer('agent-brain.rb')
+			fetchVer('agent-brain.rb'),
+			fetchVer('agent-spine.rb')
 		]);
 
-		const autoVer = autonomic || '1.0.0-beta.3.9';
-		const stackVer = stack || '1.0.0-beta.3.11';
-		const brainVer = brain || '1.0.0-beta.3.11';
+		const stackVer = stack || '1.0.0-rc2';
+		const brainVer = brain || stackVer;
+		const spineVer = spine || stackVer;
 
 		cached = {
-			autonomic: autoVer,
+			autonomic: stackVer,
 			stack: stackVer,
 			ecosystemVersion: `v${stackVer}`,
 			stackVersion: `v${stackVer}`,
 			organs: {
-				'agent-body': `v${autoVer}`,
 				'agent-brain': `v${brainVer}`,
-				'agent-spine': `v${autoVer}`,
-				'agent-heart': `v${autoVer}`,
-				'agent-nerves': `v${autoVer}`,
-				'agent-muscle': `v${autoVer}`,
-				'agent-immune': `v${autoVer}`,
-				'agent-eyes': `v${autoVer}`,
-				'agent-mouth': `v${autoVer}`,
-				'agent-tui': `v${autoVer}`,
-				'agent-ci-dashboard': `v${autoVer}`
+				'agent-spine': `v${spineVer}`,
+				'agstack': `v${stackVer}`
 			}
 		};
 		lastFetch = now;
 		return cached;
 	} catch (err) {
+		// Fallback baseline
 		return {
-			autonomic: '1.0.0-beta.3.9',
-			stack: '1.0.0-beta.3.11',
-			ecosystemVersion: 'v1.0.0-beta.3.11',
-			stackVersion: 'v1.0.0-beta.3.11',
+			autonomic: '1.0.0-rc2',
+			stack: '1.0.0-rc2',
+			ecosystemVersion: 'v1.0.0-rc2',
+			stackVersion: 'v1.0.0-rc2',
 			organs: {
-				'agent-body': 'v1.0.0-beta.3.9',
-				'agent-brain': 'v1.0.0-beta.3.11',
-				'agent-spine': 'v1.0.0-beta.3.9',
-				'agent-heart': 'v1.0.0-beta.3.9',
-				'agent-nerves': 'v1.0.0-beta.3.9',
-				'agent-muscle': 'v1.0.0-beta.3.9',
-				'agent-immune': 'v1.0.0-beta.3.9',
-				'agent-eyes': 'v1.0.0-beta.3.9',
-				'agent-mouth': 'v1.0.0-beta.3.9',
-				'agent-tui': 'v1.0.0-beta.3.9',
-				'agent-ci-dashboard': 'v1.0.0-beta.3'
+				'agent-brain': 'v1.0.0-rc2',
+				'agent-spine': 'v1.0.0-rc2',
+				'agstack': 'v1.0.0-rc2'
 			}
 		};
 	}

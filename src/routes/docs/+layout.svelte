@@ -3,97 +3,190 @@
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import {
-    Book,
-    Download,
-    Terminal,
-    Layers,
-    Server,
+    ChevronRight,
+    ExternalLink,
+    FileText,
     Brain,
     Workflow,
-    Heart,
-    Radio,
-    Cpu,
-    Shield,
-    Eye,
-    MessageSquare,
-    Activity,
-    Plug,
-    ChevronRight,
-    Search,
+    Layers,
+    Book,
+    Terminal,
     Menu,
     X,
-    ExternalLink,
-    Code2,
-    Check
+    Shield
   } from "lucide-svelte";
 
   let { children, data } = $props();
   let pathname = $derived($page.url.pathname);
   let isMobileDocsMenuOpen = $state(false);
-  let searchQuery = $state("");
 
-  interface DocItem {
-    href: string;
-    label: string;
-    icon: any;
-    badge: string;
-    description: string;
+  // Determine active section based on URL
+  let isCliSection = $derived(pathname.startsWith("/docs/cli"));
+  let activeTab = $state<'docs' | 'cli'>('docs');
+  let activeHash = $state("");
+  let activeModalSvg = $state<string | null>(null);
+
+  function openDiagramModal(svgHtml: string) {
+    activeModalSvg = svgHtml;
   }
 
-  interface DocSection {
-    title: string;
-    items: DocItem[];
+  function closeDiagramModal() {
+    activeModalSvg = null;
   }
 
-  const docSections: DocSection[] = [
-    {
-      title: "Get Started",
-      items: [
-        { href: "/docs", label: "Core Concepts", icon: Book, badge: "Concepts", description: "Ecosystem introduction and core philosophy" },
-        { href: "/docs/architecture", label: "Architecture Topology", icon: Layers, badge: "Two Components", description: "agent-brain and agent-spine: scope, contracts, and runtime" },
-        { href: "/docs/installation", label: "Quick Installation", icon: Download, badge: "Install", description: "Homebrew tap and curl bootstrap" },
-      ]
-    },
-    {
-      title: "Manuals",
-      items: [
-        { href: "/docs/memory", label: "agent-brain", icon: Brain, badge: "Memory", description: "Vector memory, HNSW reasoning, curated skills, MCP hub" },
-        { href: "/docs/workflows", label: "agent-spine", icon: Workflow, badge: "Workflows", description: "Deterministic YAML DAG engine and state replay" },
-      ]
-    },
-    {
-      title: "CLI Reference",
-      items: [
-        { href: "/docs/cli", label: "CLI Reference Hub", icon: Terminal, badge: "Overview", description: "CLI ecosystem overview and universal flags" },
-        { href: "/docs/cli/agent-brain", label: "agent-brain", icon: Brain, badge: "Brain CLI", description: "Memory, MCP hub, skills, and routing CLI" },
-        { href: "/docs/cli/agent-spine", label: "agent-spine", icon: Workflow, badge: "Spine CLI", description: "YAML workflow runner and DAG validator" },
-      ]
+  interface TocItem {
+    id: string;
+    text: string;
+    level: number;
+  }
+  let tocItems = $state<TocItem[]>([]);
+  let activeTocId = $state<string>("");
+  let isScrollingFromClick = false;
+  let scrollTimeout: any = null;
+
+  $effect(() => {
+    if (isCliSection) {
+      activeTab = 'cli';
+    } else {
+      activeTab = 'docs';
     }
-  ];
-
-  let filteredSections = $derived.by(() => {
-    if (!searchQuery.trim()) return docSections;
-    const q = searchQuery.toLowerCase().trim();
-    return docSections
-      .map(section => ({
-        ...section,
-        items: section.items.filter(item => 
-          item.label.toLowerCase().includes(q) || 
-          item.badge.toLowerCase().includes(q) ||
-          item.description.toLowerCase().includes(q)
-        )
-      }))
-      .filter(section => section.items.length > 0);
   });
 
-  const activeDocItem = $derived.by(() => {
-    for (const sec of docSections) {
-      for (const item of sec.items) {
-        if (item.href === pathname) return item;
+  $effect(() => {
+    if (browser) {
+      activeHash = window.location.hash;
+      const handleHashChange = () => {
+        activeHash = window.location.hash;
+        if (window.location.hash) {
+          const h = window.location.hash.replace('#', '');
+          activeTocId = h;
+          scrollToHeading(h);
+        }
+      };
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape" && activeModalSvg) {
+          closeDiagramModal();
+        }
+      };
+
+      window.addEventListener("hashchange", handleHashChange);
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        window.removeEventListener("hashchange", handleHashChange);
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  });
+
+  function extractToc() {
+    if (!browser) return;
+    const article = document.querySelector("article");
+    if (!article) return;
+
+    const headings = article.querySelectorAll("h2, h3");
+    const items: TocItem[] = [];
+
+    headings.forEach((heading, idx) => {
+      let rawText = heading.textContent?.replace(/^#+\s*/, "").replace(/`/g, "").trim() || "";
+      if (!rawText) return;
+
+      const lower = rawText.toLowerCase();
+      // Filter out low-level repetitive subheadings
+      if (["options", "arguments", "examples", "subcommands", "checks performed", "options for package add"].includes(lower)) {
+        return;
+      }
+
+      let id = heading.id;
+      if (!id) {
+        const parentSection = heading.closest("section");
+        if (parentSection && parentSection.id && !items.some(i => i.id === parentSection.id)) {
+          id = parentSection.id;
+          heading.id = id;
+        } else {
+          id = rawText
+            .toLowerCase()
+            .replace(/[^a-z0-9_]+/g, "-")
+            .replace(/(^-|-$)+/g, "");
+          heading.id = id;
+        }
+      }
+
+      items.push({
+        id,
+        text: rawText,
+        level: heading.tagName.toLowerCase() === "h2" ? 2 : 3
+      });
+    });
+
+    tocItems = items;
+    if (items.length > 0) {
+      if (window.location.hash) {
+        const target = window.location.hash.replace("#", "");
+        if (items.some(i => i.id === target)) {
+          activeTocId = target;
+          setTimeout(() => scrollToHeading(target), 200);
+          return;
+        }
+      }
+      if (!activeTocId) {
+        activeTocId = items[0].id;
       }
     }
-    return null;
-  });
+  }
+
+  function handleScroll() {
+    if (!browser || isScrollingFromClick) return;
+    const article = document.querySelector("article");
+    if (!article) return;
+
+    const headings = article.querySelectorAll("h2[id], h3[id], section[id]");
+    if (headings.length === 0) return;
+
+    let currentActiveId = "";
+
+    for (let i = 0; i < headings.length; i++) {
+      const h = headings[i] as HTMLElement;
+      if (!tocItems.some(item => item.id === h.id)) continue;
+
+      const rect = h.getBoundingClientRect();
+      if (rect.top <= 140) {
+        currentActiveId = h.id;
+      } else {
+        break;
+      }
+    }
+
+    if (currentActiveId && currentActiveId !== activeTocId) {
+      activeTocId = currentActiveId;
+      activeHash = `#${currentActiveId}`;
+    }
+  }
+
+  function scrollToHeading(id: string) {
+    if (!browser) return;
+    const el = document.getElementById(id);
+    if (el) {
+      isScrollingFromClick = true;
+      activeTocId = id;
+      activeHash = `#${id}`;
+      history.pushState(null, "", `#${id}`);
+
+      const headerOffset = 96;
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: "smooth"
+      });
+
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isScrollingFromClick = false;
+      }, 700);
+    }
+  }
 
   async function renderMermaidDiagrams() {
     if (!browser) return;
@@ -109,19 +202,19 @@
         securityLevel: "loose",
         themeVariables: {
           darkMode: true,
-          background: "#080b11",
-          mainBkg: "#081c2e",
-          nodeBorder: "#38bdf8",
-          primaryColor: "#081c2e",
+          background: "#0a0a0c",
+          mainBkg: "#0d1117",
+          nodeBorder: "#06b6d4",
+          primaryColor: "#0d1117",
           primaryTextColor: "#f8fafc",
-          primaryBorderColor: "#38bdf8",
-          lineColor: "#38bdf8",
+          primaryBorderColor: "#06b6d4",
+          lineColor: "#06b6d4",
           secondaryColor: "#1e293b",
           tertiaryColor: "#0f172a",
           edgeLabelBackground: "#0d1117",
           clusterBkg: "#080d1a",
-          clusterBorder: "rgba(56, 189, 248, 0.3)",
-          fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+          clusterBorder: "rgba(6, 182, 212, 0.3)",
+          fontFamily: "Fira Code, JetBrains Mono, monospace",
           fontSize: "12px"
         }
       });
@@ -138,16 +231,24 @@
         try {
           const { svg } = await mermaid.render(id, code.trim());
           const wrapper = document.createElement("div");
-          wrapper.className = "mermaid-diagram-container my-8 p-6 bg-[#080b11]/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md";
-          wrapper.innerHTML = svg;
-          const target = el.tagName === "CODE" && el.parentElement?.tagName === "PRE" ? el.parentElement : el;
-          target.replaceWith(wrapper);
-        } catch (diagErr) {
-          console.warn(`Mermaid render failed for block ${i}:`, diagErr);
-          // Clean up any stray error elements Mermaid injects into document body
-          const strayError = document.getElementById(id) || document.getElementById(`d${id}`);
-          if (strayError) strayError.remove();
-          // Leave the raw code block styled cleanly if render fails
+          wrapper.className = "mermaid-diagram-container group relative my-8 p-6 bg-slate-950/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md cursor-zoom-in hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.18)] transition-all";
+          wrapper.title = "Click to enlarge diagram";
+          wrapper.innerHTML = `
+            ${svg}
+            <div class="absolute top-3 right-3 text-[10px] font-mono text-cyan-300 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-cyan-500/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+              <span class="text-xs">⤢</span>
+              <span>Click to enlarge</span>
+            </div>
+          `;
+          wrapper.onclick = () => {
+            openDiagramModal(svg);
+          };
+          const preParent = el.tagName === "CODE" ? el.parentElement : el;
+          if (preParent && preParent.parentNode) {
+            preParent.parentNode.replaceChild(wrapper, preParent);
+          }
+        } catch (err) {
+          console.warn("Mermaid render error for block:", err);
         }
       }
     } catch (e) {
@@ -161,7 +262,7 @@
     preBlocks.forEach((pre) => {
       if (pre.querySelector(".copy-code-btn")) return;
       const btn = document.createElement("button");
-      btn.className = "copy-code-btn absolute top-3 right-3 px-2 py-1 bg-white/10 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 rounded text-xs font-mono transition flex items-center gap-1 opacity-0 group-hover:opacity-100 border border-white/10";
+      btn.className = "copy-code-btn absolute top-3 right-3 px-2 py-1 bg-slate-800/80 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 rounded text-xs font-mono transition flex items-center gap-1 opacity-0 group-hover:opacity-100 border border-slate-700/80 cursor-pointer";
       btn.innerHTML = "<span>Copy</span>";
       btn.onclick = () => {
         const codeEl = pre.querySelector("code") as HTMLElement | null;
@@ -180,138 +281,433 @@
 
   $effect(() => {
     if (pathname) {
-      renderMermaidDiagrams();
-      addCopyButtons();
+      tick().then(() => {
+        renderMermaidDiagrams();
+        addCopyButtons();
+        extractToc();
+        isMobileDocsMenuOpen = false;
+        if (browser && !window.location.hash) {
+          window.scrollTo(0, 0);
+        }
+      });
     }
   });
 
   onMount(() => {
-    renderMermaidDiagrams();
-    addCopyButtons();
+    tick().then(() => {
+      renderMermaidDiagrams();
+      addCopyButtons();
+      extractToc();
+    });
+
+    if (browser) {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+    }
+
+    return () => {
+      if (browser) {
+        window.removeEventListener("scroll", handleScroll);
+      }
+    };
   });
 </script>
 
-<div class="flex flex-col md:flex-row min-h-screen pt-0 bg-[#080b10]">
-  <!-- Mobile Docs Toggle Bar -->
-  <div class="md:hidden px-6 py-3.5 border-b border-white/[0.08] flex justify-between items-center bg-[#0d1117] sticky top-16 z-40">
+<!-- DOCUMENTATION FRAMEWORK: Responsive three-column layout below floating header -->
+<div class="flex flex-col lg:flex-row min-h-[calc(100vh-6rem)] bg-[#0a0a0c] text-slate-300 font-body w-full items-start">
+  
+  <!-- Mobile Navigation Header Bar -->
+  <div class="lg:hidden px-6 py-3 border-b border-white/[0.08] flex justify-between items-center bg-slate-950 shrink-0 sticky top-16 z-40 w-full">
     <div class="flex items-center gap-2">
-      <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">DOCS HUB</span>
-      {#if activeDocItem}
-        <ChevronRight size={14} class="text-slate-500" />
-        <span class="text-xs font-mono text-white truncate max-w-[180px]">{activeDocItem.label}</span>
-      {/if}
+      <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">{activeTab === 'cli' ? 'CLI REFERENCE' : 'DOCUMENTATION'}</span>
+      <ChevronRight size={14} class="text-slate-500" />
+      <span class="text-xs font-mono text-white truncate max-w-[180px]">
+        {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Overview' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/minimalist-entrepreneur') ? 'Minimalist Entrepreneur' : pathname.endsWith('/gstack') ? 'gstack Review' : pathname.endsWith('/verification') ? 'Verification' : pathname.endsWith('/invariants') ? 'Invariants' : 'Overview'}
+      </span>
     </div>
     <button 
       onclick={() => isMobileDocsMenuOpen = !isMobileDocsMenuOpen}
-      class="p-2 bg-[#161b22] border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
+      class="p-2 bg-slate-900 border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
       aria-label="Toggle Navigation"
     >
       {#if isMobileDocsMenuOpen} <X size={18} /> {:else} <Menu size={18} /> {/if}
     </button>
   </div>
 
-  <!-- Docs Sidebar -->
-  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-72 border-b md:border-b-0 md:border-r border-white/[0.08] p-5 overflow-y-auto shrink-0 bg-[#0d1117]/95 backdrop-blur-xl z-30 sticky top-16 h-[calc(100vh-4rem)]">
-    <!-- Live Hub Telemetry Pill -->
-    <div class="mb-5 pb-4 border-b border-white/[0.08] flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-        </span>
-        <span class="text-xs font-mono font-bold text-white tracking-wide">CENTRAL DOCS HUB</span>
-      </div>
-      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">2 COMPONENTS</span>
-    </div>
-
-    <!-- Quick Filter Search -->
-    <div class="relative mb-6">
-      <Search size={14} class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-      <input 
-        type="text" 
-        bind:value={searchQuery}
-        placeholder="Filter organs & guides..."
-        class="w-full bg-[#121622] border border-white/10 rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 transition"
-      />
-    </div>
-
-    <!-- Navigation Tree -->
-    <div class="space-y-6">
-      {#each filteredSections as section}
+  <!-- LEFT SIDEBAR: Sticky, independent scroll, page navigation tree -->
+  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-64 xl:w-72 shrink-0 sticky top-20 sm:top-24 h-auto lg:h-[calc(100vh-6rem)] self-start overflow-y-auto px-5 py-6 border-b lg:border-b-0 lg:border-r border-white/[0.06] text-xs font-body bg-[#0a0a0c] z-30">
+    
+    {#if activeTab === 'cli'}
+      <!-- CLI Reference Mode: Page Navigation Only (Command headings moved to Right Sidebar) -->
+      <div class="space-y-6">
+        <!-- Section: CLI REFERENCE -->
         <div>
-          <h3 class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold mb-2.5 px-2 flex items-center justify-between">
-            <span>{section.title}</span>
-          </h3>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>CLI Reference</span>
+          </div>
           <ul class="space-y-1">
-            {#each section.items as item}
-              {@const Icon = item.icon}
-              {@const isActive = pathname === item.href}
-              <li>
-                <a 
-                  href={item.href} 
-                  onclick={() => isMobileDocsMenuOpen = false} 
-                  class="group flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-sans transition-all {isActive ? 'bg-cyan-500/15 text-cyan-300 font-semibold border border-cyan-500/30 shadow-sm' : 'text-slate-300 hover:text-white hover:bg-white/[0.04]'}"
-                >
-                  <div class="flex items-center gap-2.5 min-w-0">
-                    <Icon size={15} class="{isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'} transition-colors shrink-0" />
-                    <span class="truncate">{item.label}</span>
+            <li>
+              <a 
+                href="/docs/cli" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/cli' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <Terminal size={14} class="text-cyan-400" />
+                <span>CLI Overview</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section: CORE ENGINES -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>Dual Engines</span>
+          </div>
+          <ul class="space-y-2">
+            <li>
+              <a 
+                href="/docs/cli/agent-brain" 
+                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/cli/agent-brain' ? 'border-cyan-500/50 bg-cyan-950/40 shadow-[0_0_15px_rgba(6,182,212,0.12)]' : 'border-white/[0.08] bg-slate-900/40 hover:border-cyan-500/40 hover:bg-slate-900/70'}"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-cyan-400 font-mono font-medium">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                    <span>agent-brain</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.2 rounded shrink-0 {isActive ? 'bg-cyan-500/20 text-cyan-300' : 'bg-white/[0.05] text-slate-400 group-hover:bg-white/10'}">
-                    {item.badge}
-                  </span>
-                </a>
+                  <span class="text-[10px] font-mono text-cyan-400/80 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/20">6 cmds</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
+                  Reasoning, vector memory, AST router, and MCP gateway.
+                </p>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/cli/agent-spine" 
+                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/cli/agent-spine' ? 'border-indigo-500/50 bg-indigo-950/40 shadow-[0_0_15px_rgba(99,102,241,0.12)]' : 'border-white/[0.08] bg-slate-900/40 hover:border-indigo-500/40 hover:bg-slate-900/70'}"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-indigo-400 font-mono font-medium">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                    <span>agent-spine</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-indigo-400/80 bg-indigo-950/60 px-1.5 py-0.5 rounded border border-indigo-500/20">4 cmds</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
+                  Deterministic DAG runner, milestone gates, and state replay.
+                </p>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Strict Dual-Engine Invariant Footer -->
+        <div class="pt-5 border-t border-white/[0.08] text-slate-400 text-xs">
+          <span class="text-slate-300 font-medium block mb-1">Dual-Engine Invariant</span>
+          <p class="text-slate-400 leading-relaxed text-[11px]">Cognitive routing (<span class="text-cyan-400 font-mono">brain</span>) and deterministic state execution (<span class="text-indigo-400 font-mono">spine</span>).</p>
+        </div>
+      </div>
+
+    {:else}
+      <!-- Documentation Mode: Navigation Tree -->
+      <div class="space-y-6">
+        <!-- Section: GETTING STARTED -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>Getting Started</span>
+          </div>
+          <ul class="space-y-1">
+            <li>
+              <a 
+                href="/docs" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <Book size={14} class="text-cyan-400" />
+                <span>Introduction & Overview</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/installation" 
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/installation' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-500 font-mono">⚡</span>
+                  <span>Quickstart Execution</span>
+                </div>
+                <span class="text-[10px] font-mono text-slate-500">2 min</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/architecture" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/architecture' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <Layers size={14} class="text-indigo-400" />
+                <span>Dual-Engine Topology</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section: CORE ARCHITECTURE -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>Core Engines</span>
+          </div>
+          <ul class="space-y-2">
+            <li>
+              <a 
+                href="/docs/memory" 
+                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/memory' ? 'border-cyan-500/50 bg-cyan-950/30 shadow-[0_0_15px_rgba(6,182,212,0.1)]' : 'border-white/[0.08] bg-slate-900/40 hover:border-cyan-500/40 hover:bg-slate-900/70'}"
+              >
+                <div class="flex items-center gap-2 text-cyan-400 font-mono font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                  <span>agent-brain Manual</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
+                  Token-bounded MCP router, durable vector memory, multi-host rule gates.
+                </p>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/workflows" 
+                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/workflows' ? 'border-indigo-500/50 bg-indigo-950/30 shadow-[0_0_15px_rgba(99,102,241,0.1)]' : 'border-white/[0.08] bg-slate-900/40 hover:border-indigo-500/40 hover:bg-slate-900/70'}"
+              >
+                <div class="flex items-center gap-2 text-indigo-400 font-mono font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                  <span>agent-spine Manual</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
+                  Declarative YAML DAGs, milestone approval gates, zero-human-block execution.
+                </p>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section: AGSTACK SDLC -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>AGSTACK SDLC</span>
+          </div>
+          <ul class="space-y-1">
+            <li>
+              <a 
+                href="/docs/agstack" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/agstack' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <Layers size={14} class="text-cyan-400" />
+                <span>agstack Mode & Matrix</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/minimalist-entrepreneur" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/minimalist-entrepreneur' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <Book size={14} class={pathname === '/docs/minimalist-entrepreneur' ? 'text-cyan-400' : 'text-slate-400'} />
+                <span>Minimalist Entrepreneurship</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/gstack" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/gstack' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <span class="text-yellow-400 font-mono">★</span>
+                <span>Garry Tan gstack Review Engine</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Section: VERIFICATION & INVARIANTS -->
+        <div>
+          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <span>Verification & Invariants</span>
+          </div>
+          <ul class="space-y-1">
+            <li>
+              <a 
+                href="/docs/invariants" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/invariants' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <Shield size={14} class="text-cyan-400" />
+                <span>The 4 Engineering Invariants</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/verification" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/verification' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <span class="text-cyan-400 font-bold font-mono text-[11px]">.verify/</span>
+                <span class="font-mono text-[11px]">Deterministic Harness</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Footer invariant -->
+        <div class="pt-6 border-t border-white/[0.06] text-slate-400">
+          <div class="flex items-center gap-2">
+            <span class="text-indigo-400 font-mono">ℹ</span>
+            <span class="text-[11px]">Strict dual-engine invariant applied.</span>
+          </div>
+        </div>
+      </div>
+    {/if}
+
+  </aside>
+
+  <!-- MAIN DOCUMENTATION CANVAS: Centered article content -->
+  <main class="flex-1 min-w-0 px-6 sm:px-10 lg:px-12 py-8 bg-[#0a0a0c] selection:bg-cyan-500/20 selection:text-cyan-300">
+    <div class="max-w-4xl mx-auto">
+      
+      <!-- Breadcrumb Header -->
+      <div class="mb-6 pb-4 border-b border-white/[0.08] flex items-center justify-between">
+        <nav class="flex items-center gap-2 text-xs font-mono text-slate-400" aria-label="Breadcrumb">
+          <a href={activeTab === 'cli' ? "/docs/cli" : "/docs"} class="hover:text-cyan-400 transition">
+            {activeTab === 'cli' ? 'CLI Reference' : 'Docs'}
+          </a>
+          <ChevronRight size={12} class="text-slate-600" />
+          <span class="text-cyan-400 font-medium">
+            {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/minimalist-entrepreneur') ? 'Minimalist Entrepreneurship' : pathname.endsWith('/gstack') ? 'Garry Tan gstack Review Engine' : pathname.endsWith('/verification') ? 'Deterministic Verification' : pathname.endsWith('/invariants') ? 'Engineering Invariants' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : pathname.endsWith('/memory') ? 'agent-brain Manual' : pathname.endsWith('/workflows') ? 'agent-spine Manual' : 'Introduction & Overview'}
+          </span>
+        </nav>
+        <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>SPEC {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
+        </div>
+      </div>
+
+      <!-- Article Content -->
+      <article class="prose max-w-none">
+        {@render children()}
+      </article>
+
+    </div>
+  </main>
+
+  <!-- RIGHT RAIL: Sticky, independent scroll, dynamic heading/command list -->
+  <aside class="w-72 xl:w-80 shrink-0 hidden xl:block sticky top-20 sm:top-24 h-auto lg:h-[calc(100vh-6rem)] self-start overflow-y-auto px-6 py-8 border-l border-white/[0.06] text-xs font-body bg-[#0a0a0c]">
+    <div class="space-y-6">
+      <div>
+        <div class="px-2 mb-3 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <FileText size={13} class="text-cyan-400" />
+            <span>ON THIS PAGE</span>
+          </div>
+          {#if tocItems.length > 0}
+            <span class="text-[10px] font-mono text-slate-500 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">{tocItems.length}</span>
+          {/if}
+        </div>
+
+        {#if tocItems.length > 0}
+          <ul class="space-y-1 text-slate-400 text-xs font-body">
+            {#each tocItems as item}
+              <li class="{item.level === 3 ? 'pl-3 border-l border-white/10 ml-2 my-0.5' : ''}">
+                <button
+                  type="button"
+                  onclick={() => scrollToHeading(item.id)}
+                  class="text-left w-full break-words leading-relaxed py-1 px-2 rounded-md transition-all cursor-pointer group flex items-start gap-1.5 {activeTocId === item.id ? 'bg-cyan-950/50 text-cyan-300 font-medium border-l-2 border-cyan-400 shadow-[inset_0_0_8px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'}"
+                >
+                  {#if activeTocId === item.id}
+                    <span class="text-cyan-400 font-mono text-[10px] mt-0.5">›</span>
+                  {/if}
+                  <span class="flex-1 {item.level === 3 ? 'font-mono text-[11px]' : ''}">{item.text}</span>
+                </button>
               </li>
             {/each}
           </ul>
-        </div>
-      {/each}
-    </div>
+        {:else}
+          <div class="text-[11px] text-slate-500 italic px-2">
+            Overview section
+          </div>
+        {/if}
+      </div>
 
-    <!-- External Links Footer in Sidebar -->
-    <div class="mt-8 pt-5 border-t border-white/[0.08] space-y-2">
-      <a 
-        href="https://github.com/autonomic-ai-dev" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        class="flex items-center justify-between px-2 py-1.5 rounded text-xs font-mono text-slate-400 hover:text-white hover:bg-white/5 transition"
-      >
-        <span>GitHub Monorepo</span>
-        <ExternalLink size={12} />
-      </a>
-      <a 
-        href="https://agent-ci-dashboard.vercel.app" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        class="flex items-center justify-between px-2 py-1.5 rounded text-xs font-mono text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition"
-      >
-        <span>Mission Control</span>
-        <ExternalLink size={12} />
-      </a>
+      <div class="pt-6 border-t border-white/[0.06] space-y-3 font-mono text-xs text-slate-400">
+        <a 
+          href="https://github.com/autonomic-ai-dev/website" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="flex items-center justify-between hover:text-white transition"
+        >
+          <span>Edit this page on GitHub</span>
+          <ExternalLink size={12} />
+        </a>
+        <a 
+          href="https://autonomic-ai.openstatus.dev" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="flex items-center justify-between hover:text-emerald-400 transition"
+        >
+          <span class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span>OpenStatus (Live)</span>
+          </span>
+          <ExternalLink size={12} />
+        </a>
+        <div class="text-[11px] text-slate-500 pt-2">
+          Release {data?.ecosystemVersion || 'v1.0.0-rc2'}
+        </div>
+      </div>
     </div>
   </aside>
 
-  <!-- Docs Content Container -->
-  <main class="flex-1 min-w-0 p-6 md:p-12 lg:p-16 max-w-5xl">
-    <!-- Breadcrumb Header -->
-    <div class="mb-8 pb-4 border-b border-white/[0.08] flex items-center justify-between">
-      <nav class="flex items-center gap-2 text-xs font-mono text-slate-400" aria-label="Breadcrumb">
-        <a href="/docs" class="hover:text-white transition">Docs</a>
-        <ChevronRight size={12} class="text-slate-600" />
-        {#if activeDocItem}
-          <span class="text-cyan-400 font-semibold">{activeDocItem.label}</span>
-        {:else}
-          <span class="text-cyan-400 font-semibold">Specification</span>
-        {/if}
-      </nav>
-      <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span>SPEC {data?.ecosystemVersion || 'v1.0.0-beta.3.11'}</span>
+</div>
+
+{#if activeModalSvg}
+  <!-- DIAGRAM ZOOM MODAL: Blurred backdrop & enlarged inspection -->
+  <div 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 md:p-12 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200"
+    role="presentation"
+    onclick={(e) => { if (e.target === e.currentTarget) closeDiagramModal(); }}
+  >
+    <div 
+      class="relative max-w-6xl w-full max-h-[88vh] bg-slate-950/95 border border-cyan-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_60px_rgba(6,182,212,0.25)] flex flex-col overflow-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Zoomed Architecture Diagram"
+    >
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4 shrink-0">
+        <div class="flex items-center gap-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span class="font-headline font-bold text-white text-base tracking-wide">Interactive Architecture Diagram</span>
+          <span class="text-xs font-mono text-cyan-400 bg-cyan-950/60 px-2.5 py-0.5 rounded border border-cyan-500/20">Zoomed Inspection</span>
+        </div>
+        <button 
+          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] border border-transparent hover:border-white/[0.1] transition-all cursor-pointer"
+          onclick={closeDiagramModal}
+          aria-label="Close zoomed diagram"
+        >
+          <X size={20} />
+        </button>
+      </div>
+
+      <!-- Zoomed Diagram Body -->
+      <div class="flex-1 overflow-auto flex items-center justify-center p-4 min-h-[250px] zoomed-diagram-modal-body">
+        {@html activeModalSvg}
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-4 border-t border-white/[0.08] mt-4 flex items-center justify-between text-xs font-mono text-slate-400 shrink-0">
+        <span>Press <kbd class="px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-cyan-300">ESC</kbd> or click outside to dismiss</span>
+        <span class="text-cyan-400 font-medium">Autonomic AI Engine Specification</span>
       </div>
     </div>
+  </div>
+{/if}
 
-    <!-- Article Content -->
-    <article class="prose max-w-none">
-      {@render children()}
-    </article>
-  </main>
-</div>
+<style>
+  :global(.zoomed-diagram-modal-body svg) {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 65vh !important;
+    min-height: 250px !important;
+  }
+</style>

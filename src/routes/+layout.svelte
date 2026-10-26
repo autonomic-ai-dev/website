@@ -1,182 +1,171 @@
 <script lang="ts">
   import "../app.css";
   import { onMount } from "svelte";
-  import { Menu, X, ExternalLink, Activity, ArrowRight } from "lucide-svelte";
-  import { particles } from "$lib/actions/particles";
+  import { page } from "$app/stores";
   let { children, data } = $props();
-
-  let isMobileMenuOpen = $state(false);
 
   onMount(() => {
     document.documentElement.classList.add('dark');
   });
+
+  const structuredData = $derived({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Autonomic AI",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS Apple Silicon (ARM64)",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "softwareVersion": data?.ecosystemVersion || "v1.0.0-rc2",
+        "description": "Autonomous AI agent engineering operating system featuring agent-brain (HNSW vector memory & MCP hub) and agent-spine (deterministic YAML DAG runner)."
+      },
+      {
+        "@type": "Organization",
+        "name": "Autonomic AI",
+        "url": "https://autonomic-ai.dev",
+        "logo": "https://autonomic-ai.dev/logo.png",
+        "sameAs": [
+          "https://github.com/autonomic-ai-dev",
+          "https://autonomic-ai.openstatus.dev"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "name": "Autonomic AI",
+        "url": "https://autonomic-ai.dev"
+      }
+    ]
+  });
 </script>
 
 <svelte:head>
-  <title>Autonomic AI Dev | Autonomous Agent Ecosystem</title>
-  <meta name="description" content="Autonomic AI: agent-brain and agent-spine. Right skill, right memory, right time, for AI coding agents. Local-first and built in Rust." />
+  <title>Autonomic AI — Autonomous AI Agent Operating System & MCP Router</title>
+  <meta name="description" content="Autonomic AI is the operating system for autonomous engineering agents. Features agent-brain (HNSW vector memory, turn routing, skill registry) and agent-spine (deterministic YAML DAG runner)." />
+  <meta name="keywords" content="autonomous AI agents, AI agent memory, MCP router, agent-brain, agent-spine, agstack, AI engineering OS, deterministic workflows, Model Context Protocol, Rust AI CLI" />
+  <meta name="author" content="Autonomic AI Team" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="theme-color" content="#0a0a0c" />
+  <link rel="canonical" href="https://autonomic-ai.dev{$page.url.pathname}" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://autonomic-ai.dev{$page.url.pathname}" />
+  <meta property="og:site_name" content="Autonomic AI" />
+  <meta property="og:title" content="Autonomic AI — Autonomous AI Agent Operating System & MCP Router" />
+  <meta property="og:description" content="Deterministic DAG workflows, HNSW vector memory, and intelligent MCP routing for AI coding agents." />
+  <meta property="og:image" content="https://autonomic-ai.dev/logo.png" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@autonomic_ai" />
+  <meta name="twitter:creator" content="@autonomic_ai" />
+  <meta name="twitter:title" content="Autonomic AI — Autonomous AI Agent Operating System" />
+  <meta name="twitter:description" content="Deterministic DAG workflows, HNSW vector memory, and intelligent MCP routing for AI coding agents." />
+  <meta name="twitter:image" content="https://autonomic-ai.dev/logo.png" />
+
+  <!-- Schema.org JSON-LD -->
+  {@html `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 </svelte:head>
 
-<div class="min-h-screen relative overflow-hidden bg-[#080b10] text-[#f0f6fc] font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+<div class="bg-[#0a0a0c] text-slate-100 font-body selection:bg-cyan-500/30 selection:text-cyan-200 antialiased relative min-h-screen overflow-x-clip">
   
-  <!-- Neural Particles Background -->
-  <canvas use:particles class="fixed inset-0 z-0 pointer-events-none opacity-25"></canvas>
+  <!-- Ambient Glow Canvas Layer -->
+  <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-gradient-to-b from-indigo-600/15 via-cyan-500/10 to-transparent blur-[120px] rounded-full"></div>
+    <div class="absolute top-[35%] -left-60 w-[500px] h-[500px] bg-cyan-600/10 blur-[130px] rounded-full"></div>
+    <div class="absolute top-[65%] -right-60 w-[550px] h-[550px] bg-indigo-600/10 blur-[140px] rounded-full"></div>
+    <!-- Subtle Grid Overlay -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+  </div>
 
-  <!-- Top Avionics Navigation Bar -->
-  <nav class="fixed top-0 w-full z-50 bg-[#0d1117]/85 backdrop-blur-xl border-b border-white/[0.08]">
-    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-      
-      <!-- Brand & Home Link -->
-      <a href="/" class="flex items-center gap-3 group cursor-pointer">
-        <div class="relative flex items-center justify-center">
-          <img src="/logo.png" alt="Autonomic AI Logo" class="w-8 h-8 object-contain rounded-lg border border-cyan-500/30 shadow-[0_0_12px_rgba(0,242,254,0.2)] group-hover:border-cyan-400 transition-colors" />
-          <span class="absolute -top-1 -right-1 flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-          </span>
+  <!-- Shared Component: TopNavBar (Floating Island Header) -->
+  <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-6xl rounded-full border border-cyan-500/20 shadow-[0_0_25px_rgba(6,182,212,0.15)] bg-slate-950/70 backdrop-blur-xl z-50 transition-all duration-200">
+    <div class="flex justify-between items-center px-6 py-3 w-full">
+      <!-- Brand Logo + Wordmark & Live Status -->
+      <a class="font-headline text-base font-bold tracking-tight text-white flex items-center gap-3 group" href="/">
+        <div class="relative w-8 h-8 rounded-lg overflow-hidden ring-1 ring-cyan-500/30 p-0.5 bg-slate-900 flex items-center justify-center">
+          <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.png" />
         </div>
-        <div class="flex items-baseline gap-1.5 font-mono">
-          <span class="font-bold text-base tracking-tight text-white">AUTONOMIC</span>
-          <span class="text-xs text-cyan-400 font-semibold tracking-wider">AI</span>
-          <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/25 hidden sm:inline">{data?.ecosystemVersion || 'v1.0.0-beta.3.11'}</span>
-        </div>
+        <span class="tracking-tight text-white font-headline font-bold">Autonomic AI</span>
+        <span class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-medium text-cyan-300 bg-cyan-950/60 border border-cyan-500/30">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          {data?.ecosystemVersion || 'v1.0.0-rc2'} Online
+        </span>
       </a>
-      
-      <!-- Center Desktop Navigation -->
-      <div class="hidden md:flex items-center gap-7 text-xs font-mono">
-        <a href="/#ecosystem" class="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
-          <span>//</span>
-          <span>Ecosystem</span>
-        </a>
-        <a href="/docs" class="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
-          <span>//</span>
-          <span>Docs</span>
-        </a>
-        <a href="/docs/cli" class="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
-          <span>//</span>
-          <span>CLI Reference</span>
-        </a>
-        <a href="/blog" class="text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
-          <span>//</span>
-          <span>Dispatches</span>
-        </a>
-      </div>
 
-      <!-- Right Action Controls -->
-      <div class="hidden md:flex items-center gap-3">
+      <!-- Primary Nav Links -->
+      <nav class="hidden md:flex items-center gap-7 font-headline text-sm font-medium">
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname === '/' ? 'text-cyan-400 font-semibold' : 'text-slate-300'}" href="/#platform">Platform</a>
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/docs/architecture') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/docs/architecture">Architecture</a>
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/registry') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/registry">Registry</a>
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/docs') && !$page.url.pathname.startsWith('/docs/cli') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/docs">Docs</a>
+        <a class="transition-colors duration-200 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] {$page.url.pathname.startsWith('/docs/cli') ? 'text-cyan-400 font-semibold drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-300'}" href="/docs/cli">CLI Reference</a>
+        <a class="text-emerald-400 font-semibold transition-colors duration-200 hover:text-emerald-300 flex items-center gap-1.5" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Status</span>
+        </a>
+      </nav>
+
+      <!-- Trailing Action: GitHub Org Link -->
+      <div class="flex items-center gap-3">
         <a 
           href="https://github.com/autonomic-ai-dev" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="p-2 rounded-lg bg-[#161b22] hover:bg-[#21262d] text-slate-300 hover:text-white border border-white/10 transition-colors"
-          aria-label="GitHub Repositories"
+          class="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800 text-xs font-mono text-slate-300 hover:text-white hover:border-cyan-500/40 transition-all duration-200 active:scale-95"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span class="hidden sm:inline">GitHub</span>
         </a>
-        <a 
-          href="https://agent-ci-dashboard.vercel.app" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          class="px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-400 to-emerald-400 text-[#080b10] hover:shadow-[0_0_16px_rgba(0,242,254,0.4)] transition-all flex items-center gap-2 group"
-        >
-          <Activity size={13} class="text-[#080b10]" />
-          <span>Mission Control</span>
-          <ArrowRight size={12} class="group-hover:translate-x-0.5 transition-transform" />
-        </a>
-      </div>
-
-      <!-- Mobile Menu Toggle -->
-      <div class="flex items-center gap-2 md:hidden">
-        <button 
-          class="p-2 text-slate-300 hover:text-white bg-[#161b22] border border-white/10 rounded-lg transition-colors"
-          onclick={() => isMobileMenuOpen = !isMobileMenuOpen}
-          aria-label="Toggle menu"
-        >
-          {#if isMobileMenuOpen}
-            <X size={20} />
-          {:else}
-            <Menu size={20} />
-          {/if}
-        </button>
       </div>
     </div>
+  </header>
 
-    <!-- Mobile Drawer Overlay -->
-    {#if isMobileMenuOpen}
-      <div class="md:hidden bg-[#0d1117] border-b border-white/[0.08] p-6 flex flex-col gap-4 shadow-2xl animate-in slide-in-from-top-2 font-mono text-sm">
-        <a href="/#ecosystem" onclick={() => isMobileMenuOpen = false} class="text-slate-300 hover:text-cyan-400 py-1.5 flex items-center gap-2">
-          <span class="text-cyan-500">&gt;</span>
-          <span>Components</span>
-        </a>
-        <a href="/docs" onclick={() => isMobileMenuOpen = false} class="text-slate-300 hover:text-cyan-400 py-1.5 flex items-center gap-2">
-          <span class="text-cyan-500">&gt;</span>
-          <span>Documentation</span>
-        </a>
-        <a href="/docs/cli" onclick={() => isMobileMenuOpen = false} class="text-slate-300 hover:text-cyan-400 py-1.5 flex items-center gap-2">
-          <span class="text-cyan-500">&gt;</span>
-          <span>CLI Reference</span>
-        </a>
-        <a href="/blog" onclick={() => isMobileMenuOpen = false} class="text-slate-300 hover:text-cyan-400 py-1.5 flex items-center gap-2">
-          <span class="text-cyan-500">&gt;</span>
-          <span>Blog Dispatches</span>
-        </a>
-        <div class="pt-3 border-t border-white/[0.08] flex flex-col gap-2">
-          <a 
-            href="https://agent-ci-dashboard.vercel.app" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            class="px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider text-center bg-gradient-to-r from-cyan-400 to-emerald-400 text-[#080b10] shadow-[0_0_12px_rgba(0,242,254,0.3)]"
-          >
-            Launch Mission Control
-          </a>
-          <a 
-            href="https://github.com/autonomic-ai-dev" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            class="px-4 py-2 rounded-lg text-xs font-mono text-center bg-[#161b22] text-slate-300 border border-white/10"
-          >
-            GitHub Monorepo
+  <!-- Main Content Container -->
+  <div class="relative z-10 {$page.url.pathname.startsWith('/docs') ? 'pt-20 sm:pt-24' : 'pt-24 sm:pt-28'}">
+    {@render children()}
+  </div>
+
+  <!-- Shared Component: Footer (Unified across Homepage, Registry, Docs, and CLI Reference) -->
+  <footer class="w-full bg-[#06070a] border-t border-white/[0.08] relative z-10 text-xs font-body text-slate-400 mt-20">
+    <div class="w-full max-w-7xl mx-auto px-6 py-10 flex flex-col gap-6">
+      <!-- Top Row: Logo, Status Pill, Nav Links -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.06]">
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-lg overflow-hidden ring-1 ring-cyan-500/30 p-0.5 bg-slate-900 flex items-center justify-center">
+            <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.png" />
+          </div>
+          <span class="font-headline text-sm font-bold text-white tracking-tight">Autonomic AI</span>
+          <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="ml-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono bg-emerald-950/30 text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 transition">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            All systems operational • OpenStatus
           </a>
         </div>
+        <!-- Links -->
+        <nav class="flex flex-wrap items-center gap-6 font-mono text-xs">
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/architecture">Architecture</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/registry">Registry</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/invariants">Invariants</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs">Docs</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/cli">CLI Reference</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">Status</a>
+          <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://github.com/autonomic-ai-dev" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
       </div>
-    {/if}
-  </nav>
-
-  <!-- Main Viewport Content -->
-  <main class="relative z-10 pt-16">
-    {@render children()}
-  </main>
-  
-  <!-- Avionics Footer -->
-  <footer class="relative z-10 bg-[#0d1117]/90 border-t border-white/[0.08] mt-32 py-10 font-mono text-xs">
-    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-      
-      <div class="flex items-center gap-3">
-        <img src="/logo.png" alt="Autonomic AI" class="w-6 h-6 object-contain rounded" />
-        <span class="font-bold text-white tracking-wider">AUTONOMIC AI</span>
-        <span class="text-slate-600">|</span>
-        <span class="text-slate-400 text-[11px]">HOMEOSTATIC RUNTIME</span>
-      </div>
-
-      <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-[#161b22] border border-white/[0.08] text-[10px] text-slate-400">
-        <span class="relative flex h-1.5 w-1.5">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-        </span>
-        <span class="text-emerald-400 font-semibold">2/2 COMPONENTS IN SCOPE</span>
-        <span class="text-slate-600">·</span>
-        <span>LATENCY: &lt;0.8ms</span>
-      </div>
-
-      <div class="flex items-center gap-6 text-slate-400">
-        <a href="/docs" class="hover:text-cyan-400 transition-colors">Docs</a>
-        <a href="/docs/cli" class="hover:text-cyan-400 transition-colors">CLI</a>
-        <a href="/blog" class="hover:text-cyan-400 transition-colors">Blog</a>
-        <a href="https://github.com/autonomic-ai-dev" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors flex items-center gap-1">
-          <span>GitHub</span>
-          <ExternalLink size={12} />
-        </a>
+      <!-- Bottom Row -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-slate-500 font-mono text-[11px]">
+        <p>© 2026 Autonomic AI. Autonomous Agent Engineering OS ({data?.ecosystemVersion || 'v1.0.0-rc2'}). All systems operational.</p>
+        <p class="text-slate-500">Built for agentic precision.</p>
       </div>
     </div>
   </footer>
+
 </div>
