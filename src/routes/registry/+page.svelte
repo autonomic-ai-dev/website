@@ -482,6 +482,14 @@ description: Everything Claude Code — large curated skill library`
     })
   );
 
+  // Keep selectedItem synchronized with the active filter:
+  // Whenever the tab/category/search changes, default-select the first visible item if the current selection is filtered out.
+  $effect(() => {
+    if (filteredItems.length > 0 && !filteredItems.some((item) => item.id === selectedItem?.id)) {
+      selectedItem = filteredItems[0];
+    }
+  });
+
   function copyCommand(id: string, text: string) {
     if (typeof navigator !== "undefined") {
       navigator.clipboard.writeText(text);
