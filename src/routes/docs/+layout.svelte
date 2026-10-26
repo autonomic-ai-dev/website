@@ -21,12 +21,26 @@
   // Determine active section based on URL
   let isCliSection = $derived(pathname.startsWith("/docs/cli"));
   let activeTab = $state<'docs' | 'cli'>('docs');
+  let activeHash = $state("");
 
   $effect(() => {
     if (isCliSection) {
       activeTab = 'cli';
     } else {
       activeTab = 'docs';
+    }
+  });
+
+  $effect(() => {
+    if (browser) {
+      activeHash = window.location.hash;
+      const handleHashChange = () => {
+        activeHash = window.location.hash;
+      };
+      window.addEventListener("hashchange", handleHashChange);
+      return () => {
+        window.removeEventListener("hashchange", handleHashChange);
+      };
     }
   });
 
@@ -148,17 +162,7 @@
   <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-64 shrink-0 sticky top-20 h-auto lg:h-[calc(100vh-5rem)] overflow-y-auto px-5 py-6 border-b lg:border-b-0 lg:border-r border-white/[0.06] text-xs font-body bg-[#0a0a0c] z-30">
     
     {#if activeTab === 'cli'}
-      <!-- CLI Reference Mode: Exact Match for Stitch Screenshot 1 (tL3yHC) -->
-      
-      <!-- Dual Engine Status Badge -->
-      <div class="mb-6 p-2.5 rounded-xl bg-slate-900/80 border border-white/[0.08] flex items-center justify-between whitespace-nowrap shadow-inner">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
-          <span class="font-mono text-xs text-slate-300 font-medium">Rust Crates {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
-        </div>
-        <span class="text-[10px] font-mono font-bold tracking-wider text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800/60 uppercase">LIVE</span>
-      </div>
-
+      <!-- CLI Reference Mode: Clean Navigation Tree without Redundant Top Container -->
       <div class="space-y-6">
         <!-- Section: CORE ENGINES -->
         <div>
@@ -168,7 +172,8 @@
           <div class="space-y-1.5">
             <a 
               href="/docs/cli/agent-brain" 
-              class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all {pathname === '/docs/cli/agent-brain' || pathname === '/docs/cli' ? 'bg-cyan-950/30 text-cyan-300 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.08)]' : 'text-slate-300 hover:bg-slate-900 border border-white/[0.06] hover:border-white/10'}"
+              onclick={() => activeHash = ''}
+              class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all {pathname === '/docs/cli/agent-brain' && (!activeHash || activeHash === '') ? 'bg-cyan-950/40 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.12)]' : 'text-slate-300 hover:bg-slate-900 border border-white/[0.06] hover:border-white/10'}"
             >
               <div class="flex items-center gap-2 font-mono">
                 <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
@@ -179,7 +184,8 @@
 
             <a 
               href="/docs/cli/agent-spine" 
-              class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all {pathname === '/docs/cli/agent-spine' ? 'bg-indigo-950/30 text-indigo-300 border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.08)]' : 'text-slate-300 hover:bg-slate-900 border border-white/[0.06] hover:border-white/10'}"
+              onclick={() => activeHash = ''}
+              class="flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all {pathname === '/docs/cli/agent-spine' && (!activeHash || activeHash === '') ? 'bg-indigo-950/40 text-indigo-300 border border-indigo-500/40 shadow-[0_0_15px_rgba(99,102,241,0.12)]' : 'text-slate-300 hover:bg-slate-900 border border-white/[0.06] hover:border-white/10'}"
             >
               <div class="flex items-center gap-2 font-mono">
                 <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
@@ -196,13 +202,67 @@
             <Brain size={13} class="text-cyan-400" />
             <span>AGENT-BRAIN COMMANDS</span>
           </div>
-          <ul class="space-y-1.5 font-mono text-xs">
-            <li><a href="/docs/cli/agent-brain#serve" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">serve</span> <span class="text-slate-500 font-sans text-xs">Daemon mode</span></a></li>
-            <li><a href="/docs/cli/agent-brain#route_task" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">route_task</span> <span class="text-slate-500 font-sans text-xs">AST routing</span></a></li>
-            <li><a href="/docs/cli/agent-brain#doctor" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">doctor</span> <span class="text-slate-500 font-sans text-xs">Diagnostics</span></a></li>
-            <li><a href="/docs/cli/agent-brain#index" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">index</span> <span class="text-slate-500 font-sans text-xs">HNSW vectors</span></a></li>
-            <li><a href="/docs/cli/agent-brain#package" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">registry</span> <span class="text-slate-500 font-sans text-xs">MCP bindings</span></a></li>
-            <li><a href="/docs/cli/agent-brain#stats" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">stats</span> <span class="text-slate-500 font-sans text-xs">Token telemetry</span></a></li>
+          <ul class="space-y-1 font-mono text-xs">
+            <li>
+              <a 
+                href="/docs/cli/agent-brain#serve" 
+                onclick={() => activeHash = '#serve'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#serve' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">serve</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Daemon mode</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/cli/agent-brain#route_task" 
+                onclick={() => activeHash = '#route_task'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#route_task' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">route_task</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">AST routing</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/cli/agent-brain#doctor" 
+                onclick={() => activeHash = '#doctor'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#doctor' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">doctor</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Diagnostics</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/cli/agent-brain#index" 
+                onclick={() => activeHash = '#index'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#index' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">index</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">HNSW vectors</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/cli/agent-brain#package" 
+                onclick={() => activeHash = '#package'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#package' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">registry</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">MCP bindings</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/cli/agent-brain#stats" 
+                onclick={() => activeHash = '#stats'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-brain' && activeHash === '#stats' ? 'bg-cyan-950/50 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(6,182,212,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-cyan-300 transition-colors">stats</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Token telemetry</span>
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -212,11 +272,47 @@
             <Workflow size={13} class="text-indigo-400" />
             <span>AGENT-SPINE COMMANDS</span>
           </div>
-          <ul class="space-y-1.5 font-mono text-xs">
-            <li><a href="/docs/cli/agent-spine#run" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">run</span> <span class="text-slate-500 font-sans text-xs">Execute DAG</span></a></li>
-            <li><a href="/docs/cli/agent-spine#validate" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">validate</span> <span class="text-slate-500 font-sans text-xs">Invariants</span></a></li>
-            <li><a href="/docs/cli/agent-spine#init" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">init</span> <span class="text-slate-500 font-sans text-xs">Scaffold YAML</span></a></li>
-            <li><a href="/docs/cli/agent-spine#status" class="flex items-center gap-2 px-1 py-0.5 rounded text-slate-300 hover:text-white transition-colors"><span class="font-medium text-slate-200">status</span> <span class="text-slate-500 font-sans text-xs">Sealed audits</span></a></li>
+          <ul class="space-y-1 font-mono text-xs">
+            <li>
+              <a 
+                href="/docs/cli/agent-spine#run" 
+                onclick={() => activeHash = '#run'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-spine' && activeHash === '#run' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">run</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Execute DAG</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/cli/agent-spine#validate" 
+                onclick={() => activeHash = '#validate'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-spine' && activeHash === '#validate' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">validate</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Invariants</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/cli/agent-spine#init" 
+                onclick={() => activeHash = '#init'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-spine' && activeHash === '#init' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">init</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Scaffold YAML</span>
+              </a>
+            </li>
+            <li>
+              <a 
+                href="/docs/cli/agent-spine#status" 
+                onclick={() => activeHash = '#status'}
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-all group {pathname === '/docs/cli/agent-spine' && activeHash === '#status' ? 'bg-indigo-950/50 text-indigo-300 border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.12)]' : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'}"
+              >
+                <span class="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">status</span> 
+                <span class="text-slate-500 font-sans text-[11px] group-hover:text-slate-400 transition-colors">Sealed audits</span>
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -228,17 +324,7 @@
       </div>
 
     {:else}
-      <!-- Documentation Mode: Exact Match for Stitch Screenshot 2 (gsyzPI) -->
-
-      <!-- Engine Status Pill -->
-      <div class="mb-6 p-2.5 rounded-xl bg-slate-900/80 border border-white/[0.08] flex items-center justify-between whitespace-nowrap shadow-inner">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
-          <span class="font-mono text-xs text-slate-300 font-medium">Autonomous Engine {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
-        </div>
-        <span class="text-[10px] font-mono font-bold tracking-wider text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60 uppercase">LIVE</span>
-      </div>
-
+      <!-- Documentation Mode: Clean Navigation Tree without Redundant Top Container -->
       <div class="space-y-6">
         <!-- Section: GETTING STARTED -->
         <div>
@@ -249,7 +335,7 @@
             <li>
               <a 
                 href="/docs" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'}"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
               >
                 <Book size={14} class="text-cyan-400" />
                 <span>Introduction & Overview</span>
@@ -258,7 +344,7 @@
             <li>
               <a 
                 href="/docs/installation" 
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors {pathname === '/docs/installation' ? 'text-cyan-300 font-medium' : ''}"
+                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/installation' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
               >
                 <div class="flex items-center gap-2">
                   <span class="text-slate-500 font-mono">⚡</span>
@@ -270,7 +356,7 @@
             <li>
               <a 
                 href="/docs/architecture" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors {pathname === '/docs/architecture' ? 'text-cyan-300 font-medium' : ''}"
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/architecture' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
               >
                 <Layers size={14} class="text-indigo-400" />
                 <span>CLI Runtime & Doctor</span>
@@ -288,7 +374,7 @@
             <li>
               <a 
                 href="/docs/memory" 
-                class="group flex flex-col p-2.5 rounded-xl border border-white/[0.08] bg-slate-900/40 hover:border-cyan-500/40 transition-all {pathname === '/docs/memory' ? 'border-cyan-500/50 bg-cyan-950/20' : ''}"
+                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/memory' ? 'border-cyan-500/50 bg-cyan-950/30 shadow-[0_0_15px_rgba(6,182,212,0.1)]' : 'border-white/[0.08] bg-slate-900/40 hover:border-cyan-500/40 hover:bg-slate-900/70'}"
               >
                 <div class="flex items-center gap-2 text-cyan-400 font-mono font-medium">
                   <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
@@ -302,7 +388,7 @@
             <li>
               <a 
                 href="/docs/workflows" 
-                class="group flex flex-col p-2.5 rounded-xl border border-white/[0.08] bg-slate-900/40 hover:border-indigo-500/40 transition-all {pathname === '/docs/workflows' ? 'border-indigo-500/50 bg-indigo-950/20' : ''}"
+                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/workflows' ? 'border-indigo-500/50 bg-indigo-950/30 shadow-[0_0_15px_rgba(99,102,241,0.1)]' : 'border-white/[0.08] bg-slate-900/40 hover:border-indigo-500/40 hover:bg-slate-900/70'}"
               >
                 <div class="flex items-center gap-2 text-indigo-400 font-mono font-medium">
                   <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
@@ -323,19 +409,19 @@
           </div>
           <ul class="space-y-1">
             <li>
-              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors">
+              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
                 <Layers size={14} class="text-cyan-400" />
                 <span>agstack Mode & Matrix</span>
               </a>
             </li>
             <li>
-              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors">
+              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
                 <Book size={14} class="text-slate-400" />
                 <span>Minimalist Entrepreneurship</span>
               </a>
             </li>
             <li>
-              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors">
+              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
                 <span class="text-yellow-400 font-mono">★</span>
                 <span>Garry Tan gstack Review Engine</span>
               </a>
@@ -350,13 +436,13 @@
           </div>
           <ul class="space-y-1">
             <li>
-              <a href="/#spec" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors font-mono text-[11px]">
+              <a href="/#spec" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all font-mono text-[11px]">
                 <span class="text-cyan-400 font-bold">.verify/</span>
                 <span>Deterministic Harness</span>
               </a>
             </li>
             <li>
-              <a href="/#spec" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] transition-colors">
+              <a href="/#spec" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
                 <span class="text-emerald-400 font-mono">🛡</span>
                 <span>Boundary Isolation Protocol</span>
               </a>
