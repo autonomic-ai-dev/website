@@ -286,7 +286,7 @@
       <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">{activeTab === 'cli' ? 'CLI REFERENCE' : 'DOCUMENTATION'}</span>
       <ChevronRight size={14} class="text-slate-500" />
       <span class="text-xs font-mono text-white truncate max-w-[180px]">
-        {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Overview' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : 'Overview'}
+        {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Overview' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/minimalist-entrepreneur') ? 'Minimalist Entrepreneur' : pathname.endsWith('/gstack') ? 'gstack Review' : pathname.endsWith('/verification') ? 'Verification' : pathname.endsWith('/invariants') ? 'Invariants' : 'Overview'}
       </span>
     </div>
     <button 
@@ -360,39 +360,6 @@
                 <p class="text-[10px] text-slate-400 mt-1 pl-3.5 leading-relaxed">
                   Deterministic DAG runner, milestone gates, and state replay.
                 </p>
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Section: DOCUMENTATION HUB -->
-        <div>
-          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-            <span>Documentation Hub</span>
-          </div>
-          <ul class="space-y-1">
-            <li>
-              <a href="/docs" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
-                <Book size={14} class="text-slate-400" />
-                <span>Docs Home</span>
-              </a>
-            </li>
-            <li>
-              <a href="/docs/architecture" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
-                <Layers size={14} class="text-indigo-400" />
-                <span>Architecture</span>
-              </a>
-            </li>
-            <li>
-              <a href="/docs/agstack" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
-                <Layers size={14} class="text-cyan-400" />
-                <span>AGSTACK SDLC</span>
-              </a>
-            </li>
-            <li>
-              <a href="/registry" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
-                <Workflow size={14} class="text-cyan-400" />
-                <span>Registry & Workflows</span>
               </a>
             </li>
           </ul>
@@ -500,42 +467,21 @@
               </a>
             </li>
             <li>
-              <a href="/registry" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
-                <Book size={14} class="text-slate-400" />
+              <a 
+                href="/docs/minimalist-entrepreneur" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/minimalist-entrepreneur' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <Book size={14} class={pathname === '/docs/minimalist-entrepreneur' ? 'text-cyan-400' : 'text-slate-400'} />
                 <span>Minimalist Entrepreneurship</span>
               </a>
             </li>
             <li>
-              <a href="/registry" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+              <a 
+                href="/docs/gstack" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/gstack' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
                 <span class="text-yellow-400 font-mono">★</span>
                 <span>Garry Tan gstack Review Engine</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Section: CLI REFERENCE -->
-        <div>
-          <div class="px-2 mb-2 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-            <span>CLI Reference</span>
-          </div>
-          <ul class="space-y-1">
-            <li>
-              <a href="/docs/cli" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
-                <Terminal size={14} class="text-cyan-400" />
-                <span>CLI Overview</span>
-              </a>
-            </li>
-            <li>
-              <a href="/docs/cli/agent-brain" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all font-mono text-[11px]">
-                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                <span>agent-brain CLI</span>
-              </a>
-            </li>
-            <li>
-              <a href="/docs/cli/agent-spine" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all font-mono text-[11px]">
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                <span>agent-spine CLI</span>
               </a>
             </li>
           </ul>
@@ -557,9 +503,12 @@
               </a>
             </li>
             <li>
-              <a href="/docs/invariants#verification-harness" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all font-mono text-[11px]">
-                <span class="text-cyan-400 font-bold">.verify/</span>
-                <span>Deterministic Harness</span>
+              <a 
+                href="/docs/verification" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/verification' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <span class="text-cyan-400 font-bold font-mono text-[11px]">.verify/</span>
+                <span class="font-mono text-[11px]">Deterministic Harness</span>
               </a>
             </li>
             <li>
@@ -599,7 +548,7 @@
           </a>
           <ChevronRight size={12} class="text-slate-600" />
           <span class="text-cyan-400 font-medium">
-            {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/invariants') ? 'Engineering Invariants' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : pathname.endsWith('/memory') ? 'agent-brain Manual' : pathname.endsWith('/workflows') ? 'agent-spine Manual' : 'Introduction & Overview'}
+            {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/minimalist-entrepreneur') ? 'Minimalist Entrepreneurship' : pathname.endsWith('/gstack') ? 'Garry Tan gstack Review Engine' : pathname.endsWith('/verification') ? 'Deterministic Verification' : pathname.endsWith('/invariants') ? 'Engineering Invariants' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : pathname.endsWith('/memory') ? 'agent-brain Manual' : pathname.endsWith('/workflows') ? 'agent-spine Manual' : 'Introduction & Overview'}
           </span>
         </nav>
         <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
