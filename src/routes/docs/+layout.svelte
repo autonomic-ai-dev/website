@@ -24,6 +24,15 @@
   let isCliSection = $derived(pathname.startsWith("/docs/cli"));
   let activeTab = $state<'docs' | 'cli'>('docs');
   let activeHash = $state("");
+  let activeModalSvg = $state<string | null>(null);
+
+  function openDiagramModal(svgHtml: string) {
+    activeModalSvg = svgHtml;
+  }
+
+  function closeDiagramModal() {
+    activeModalSvg = null;
+  }
 
   interface TocItem {
     id: string;
@@ -55,9 +64,18 @@
           scrollToHeading(h);
         }
       };
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape" && activeModalSvg) {
+          closeDiagramModal();
+        }
+      };
+
       window.addEventListener("hashchange", handleHashChange);
+      window.addEventListener("keydown", handleKeyDown);
       return () => {
         window.removeEventListener("hashchange", handleHashChange);
+        window.removeEventListener("keydown", handleKeyDown);
       };
     }
   });
@@ -216,8 +234,18 @@
         try {
           const { svg } = await mermaid.render(id, code.trim());
           const wrapper = document.createElement("div");
-          wrapper.className = "mermaid-diagram-container my-8 p-6 bg-slate-950/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md";
-          wrapper.innerHTML = svg;
+          wrapper.className = "mermaid-diagram-container group relative my-8 p-6 bg-slate-950/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md cursor-zoom-in hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.18)] transition-all";
+          wrapper.title = "Click to enlarge diagram";
+          wrapper.innerHTML = `
+            ${svg}
+            <div class="absolute top-3 right-3 text-[10px] font-mono text-cyan-300 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-cyan-500/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+              <span class="text-xs">⤢</span>
+              <span>Click to enlarge</span>
+            </div>
+          `;
+          wrapper.onclick = () => {
+            openDiagramModal(svg);
+          };
           const preParent = el.tagName === "CODE" ? el.parentElement : el;
           if (preParent && preParent.parentNode) {
             preParent.parentNode.replaceChild(wrapper, preParent);
@@ -644,3 +672,56 @@
   </aside>
 
 </div>
+
+{#if activeModalSvg}
+  <!-- DIAGRAM ZOOM MODAL: Blurred backdrop & enlarged inspection -->
+  <div 
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 md:p-12 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200"
+    role="presentation"
+    onclick={(e) => { if (e.target === e.currentTarget) closeDiagramModal(); }}
+  >
+    <div 
+      class="relative max-w-6xl w-full max-h-[88vh] bg-slate-950/95 border border-cyan-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_60px_rgba(6,182,212,0.25)] flex flex-col overflow-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Zoomed Architecture Diagram"
+    >
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4 shrink-0">
+        <div class="flex items-center gap-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span class="font-headline font-bold text-white text-base tracking-wide">Interactive Architecture Diagram</span>
+          <span class="text-xs font-mono text-cyan-400 bg-cyan-950/60 px-2.5 py-0.5 rounded border border-cyan-500/20">Zoomed Inspection</span>
+        </div>
+        <button 
+          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] border border-transparent hover:border-white/[0.1] transition-all cursor-pointer"
+          onclick={closeDiagramModal}
+          aria-label="Close zoomed diagram"
+        >
+          <X size={20} />
+        </button>
+      </div>
+
+      <!-- Zoomed Diagram Body -->
+      <div class="flex-1 overflow-auto flex items-center justify-center p-4 min-h-[250px] zoomed-diagram-modal-body">
+        {@html activeModalSvg}
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-4 border-t border-white/[0.08] mt-4 flex items-center justify-between text-xs font-mono text-slate-400 shrink-0">
+        <span>Press <kbd class="px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.1] text-cyan-300">ESC</kbd> or click outside to dismiss</span>
+        <span class="text-cyan-400 font-medium">Autonomic AI Engine Specification</span>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<style>
+  :global(.zoomed-diagram-modal-body svg) {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 65vh !important;
+    min-height: 250px !important;
+  }
+</style>

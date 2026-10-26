@@ -47,13 +47,16 @@ agent-spine init
 
 ```mermaid
 flowchart LR
-    Brain["agent-brain\n(Reasoning Pillar)\n• serve (MCP stdio)\n• route_task\n• doctor\n• install\n• package add\n• stats"]
-    Spine["agent-spine\n(Execution Pillar)\n• run\n• validate\n• init\n• status\n• inspect & replay"]
+    Dev(["Developer / Editor CLI"]) --> Brain["agent-brain (Reasoning Engine)\n• serve (MCP stdio)\n• route_task & memory\n• doctor & install"]
+    Dev --> Spine["agent-spine (Execution Engine)\n• run (YAML DAGs)\n• approval gates\n• inspect & replay"]
+    Brain -.->|route context| Spine
 
     classDef brainClass fill:#0d1117,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc;
     classDef spineClass fill:#0d1117,stroke:#6366f1,stroke-width:1.5px,color:#f8fafc;
+    classDef devClass fill:#161b22,stroke:#475569,stroke-width:1px,color:#e2e8f0;
     class Brain brainClass;
     class Spine spineClass;
+    class Dev devClass;
 ```
 
 ---
