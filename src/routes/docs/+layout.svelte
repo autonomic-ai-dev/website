@@ -539,12 +539,6 @@
                 <span class="font-mono text-[11px]">Deterministic Harness</span>
               </a>
             </li>
-            <li>
-              <a href="/docs/invariants#boundary-discipline" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
-                <span class="text-emerald-400 font-mono">🛡</span>
-                <span>Boundary Isolation Protocol</span>
-              </a>
-            </li>
           </ul>
         </div>
 
@@ -590,14 +584,37 @@
         {@render children()}
       </article>
 
-      <!-- Embedded Documentation Footer -->
-      <footer class="mt-20 pt-8 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500 pb-16">
-        <p>© 2026 Autonomic AI. Autonomous Agent Engineering OS ({data?.ecosystemVersion || 'v1.0.0-rc2'}). All systems operational.</p>
-        <div class="flex items-center gap-4">
-          <a href="/registry" class="hover:text-cyan-400 transition">Registry</a>
-          <a href="/docs/invariants" class="hover:text-cyan-400 transition">Invariants</a>
-          <a href="/docs/architecture" class="hover:text-cyan-400 transition">Architecture</a>
-          <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition">Status</a>
+      <!-- Documentation Footer (Full Layout matching Main Screen) -->
+      <footer class="mt-24 pt-8 border-t border-white/[0.08] relative z-10 text-xs font-body text-slate-400 pb-16">
+        <div class="w-full flex flex-col gap-6">
+          <!-- Top Row: Logo, Status Pill, Nav Links -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.06]">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded-lg overflow-hidden ring-1 ring-cyan-500/30 p-0.5 bg-slate-900 flex items-center justify-center">
+                <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.png" />
+              </div>
+              <span class="font-headline text-sm font-bold text-white tracking-tight">Autonomic AI</span>
+              <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="ml-2 inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono bg-emerald-950/30 text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 transition">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>All systems operational • OpenStatus</span>
+              </a>
+            </div>
+            <!-- Links -->
+            <nav class="flex flex-wrap items-center gap-5 font-mono text-xs">
+              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/architecture">Architecture</a>
+              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/registry">Registry</a>
+              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/invariants">Invariants</a>
+              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs">Docs</a>
+              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/cli">CLI Reference</a>
+              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">Status</a>
+              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://github.com/autonomic-ai-dev/agent-registry" target="_blank" rel="noopener noreferrer">GitHub</a>
+            </nav>
+          </div>
+          <!-- Bottom Row -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-slate-500 font-mono text-[11px]">
+            <p>© 2026 Autonomic AI. Autonomous Agent Engineering OS ({data?.ecosystemVersion || 'v1.0.0-rc2'}). All systems operational.</p>
+            <p class="text-slate-500">Built for agentic precision.</p>
+          </div>
         </div>
       </footer>
 

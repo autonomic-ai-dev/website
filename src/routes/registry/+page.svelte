@@ -755,7 +755,23 @@ description: Everything Claude Code — large curated skill library`
 
             <!-- Quick Jump Link to Docs -->
             <div class="pt-2">
-              {#if selectedItem.kind === 'workflow'}
+              {#if selectedItem.id === 'minimalist-entrepreneur-pkg' || selectedItem.id === 'minimalist-entrepreneur-workflow'}
+                <a
+                  href="/docs/minimalist-entrepreneur"
+                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 text-xs font-headline font-semibold border border-cyan-500/30 transition"
+                >
+                  <span>Read Minimalist Entrepreneur Docs</span>
+                  <ArrowRight size={13} />
+                </a>
+              {:else if selectedItem.id === 'gstack-pkg' || selectedItem.id === 'gstack-workflow'}
+                <a
+                  href="/docs/gstack"
+                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 text-xs font-headline font-semibold border border-yellow-500/30 transition"
+                >
+                  <span>Read Garry Tan gstack Review Docs</span>
+                  <ArrowRight size={13} />
+                </a>
+              {:else if selectedItem.kind === 'workflow'}
                 <a
                   href="/docs/workflows"
                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-headline font-semibold border border-indigo-500/30 transition"
