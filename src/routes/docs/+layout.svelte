@@ -548,13 +548,22 @@
           </div>
           <ul class="space-y-1">
             <li>
-              <a href="/#spec" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all font-mono text-[11px]">
+              <a 
+                href="/docs/invariants" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/invariants' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
+                <Shield size={14} class="text-cyan-400" />
+                <span>The 4 Engineering Invariants</span>
+              </a>
+            </li>
+            <li>
+              <a href="/docs/invariants#verification-harness" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all font-mono text-[11px]">
                 <span class="text-cyan-400 font-bold">.verify/</span>
                 <span>Deterministic Harness</span>
               </a>
             </li>
             <li>
-              <a href="/#spec" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+              <a href="/docs/invariants#boundary-discipline" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
                 <span class="text-emerald-400 font-mono">🛡</span>
                 <span>Boundary Isolation Protocol</span>
               </a>
@@ -590,7 +599,7 @@
           </a>
           <ChevronRight size={12} class="text-slate-600" />
           <span class="text-cyan-400 font-medium">
-            {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : pathname.endsWith('/memory') ? 'agent-brain Manual' : pathname.endsWith('/workflows') ? 'agent-spine Manual' : 'Introduction & Overview'}
+            {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/invariants') ? 'Engineering Invariants' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : pathname.endsWith('/memory') ? 'agent-brain Manual' : pathname.endsWith('/workflows') ? 'agent-spine Manual' : 'Introduction & Overview'}
           </span>
         </nav>
         <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
@@ -609,6 +618,7 @@
         <p>© 2026 Autonomic AI. Autonomous Agent Engineering OS ({data?.ecosystemVersion || 'v1.0.0-rc2'}). All systems operational.</p>
         <div class="flex items-center gap-4">
           <a href="/registry" class="hover:text-cyan-400 transition">Registry</a>
+          <a href="/docs/invariants" class="hover:text-cyan-400 transition">Invariants</a>
           <a href="/docs/architecture" class="hover:text-cyan-400 transition">Architecture</a>
           <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition">Status</a>
         </div>

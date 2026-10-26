@@ -7,20 +7,20 @@ title: Workflows & DAG Engine (agent-spine)
 `agent-spine` is the orchestration engine for the Autonomic cluster. Instead of relying on probabilistic Python `while` loops to determine an agent's control flow, `agent-spine` forces multi-step procedures through strict, deterministic Directed Acyclic Graphs (DAGs) with **immutable state snapshots** and **Human-in-the-Loop (HITL) approval gates**.
 
 ```mermaid
-flowchart TD
-    Start(["Workflow Trigger"]) --> Lint["Node: lint_check"]
-    Start --> Scan["Node: immune_scan"]
+flowchart LR
+    Start(["Trigger"]) --> Lint["lint_check"]
+    Start --> Scan["immune_scan"]
     
-    Lint --> Build["Node: cargo_build"]
+    Lint --> Build["cargo_build"]
     Scan --> Build
     
-    Build --> Test["Node: test_suite"]
-    Test --> Gate{"Node: approval_gate<br/>(Prod Deploy Gate)"}
+    Build --> Test["test_suite"]
+    Test --> Gate{"approval_gate"}
     
-    Gate -->|Slack Approved| Deploy["Node: prod_deploy"]
-    Gate -->|Rejected / Timeout| Rollback["Node: revert_changes"]
+    Gate -->|Approved| Deploy["prod_deploy"]
+    Gate -->|Rejected| Rollback["revert_changes"]
 
-    Deploy --> Snapshot["Append-Only Snapshot Store"]
+    Deploy --> Snapshot[("Snapshot Store")]
     Rollback --> Snapshot
 
     classDef exec fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;

@@ -154,7 +154,7 @@
           <nav class="flex flex-wrap items-center gap-6 font-mono text-xs">
             <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/architecture">Architecture</a>
             <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/registry">Registry</a>
-            <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/#spec">Invariants</a>
+            <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/invariants">Invariants</a>
             <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs">Docs</a>
             <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/cli">CLI Reference</a>
             <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">Status</a>

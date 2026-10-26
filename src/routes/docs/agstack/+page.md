@@ -29,15 +29,12 @@ title: AGSTACK SDLC — Autonomous Software Development Lifecycle
 Modern LLMs degrade when given unbounded context or conversational feedback loops. AGSTACK establishes five non-negotiable runtime pillars enforced across both `agent-brain` and `agent-spine`:
 
 ```mermaid
-flowchart TD
-    subgraph AGSTACK["AGSTACK Engineering Invariants"]
-        I1["01 Immutability First<br/>• Cryptographic SHA-256 state sealing<br/>• Zero in-place mutations"]
-        I2["02 Boundary Discipline<br/>• Strict token context bounding (500 tok)<br/>• AST tool parameter fencing"]
-        I3["03 Fix Root Causes<br/>• Zero token burn retry loops<br/>• Systematic regression test isolation"]
-        I4["04 Zero Comment Slop<br/>• AST-level comment rejection<br/>• Self-documenting production code"]
-        I5["05 Verification Root Separation<br/>• Tamper-proof .verify/ harness<br/>• Hard evidence requirement (exit code 0)"]
-    end
-    I1 --> I2 --> I3 --> I4 --> I5
+flowchart LR
+    I1["01 Immutability First\n• SHA-256 Proof Sealing\n• No In-Place Mutation"] --> I2["02 Boundary Discipline\n• Context Bounding (500 tok)\n• AST Tool Fencing"]
+    I2 --> I3["03 Fix Root Causes\n• Zero Token Burn Loops\n• Fault Isolation"]
+    I3 --> I4["04 Zero Comment Slop\n• Pure Production Code\n• Pre-Commit AST Reject"]
+    I4 --> I5["05 Verification Root\n• .verify/ Separation\n• Exit 0 Recorded Proof"]
+
     classDef invariantClass fill:#0d1117,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc;
     class I1,I2,I3,I4,I5 invariantClass;
 ```

@@ -5,6 +5,7 @@ export async function GET() {
     { url: '', priority: '1.0', changefreq: 'daily' },
     { url: '/registry', priority: '0.9', changefreq: 'daily' },
     { url: '/docs', priority: '0.9', changefreq: 'weekly' },
+    { url: '/docs/invariants', priority: '0.8', changefreq: 'weekly' },
     { url: '/docs/agstack', priority: '0.8', changefreq: 'weekly' },
     { url: '/docs/architecture', priority: '0.8', changefreq: 'weekly' },
     { url: '/docs/installation', priority: '0.8', changefreq: 'weekly' },
