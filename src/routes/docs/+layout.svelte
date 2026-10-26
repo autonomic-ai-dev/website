@@ -41,7 +41,6 @@
   }
   let tocItems = $state<TocItem[]>([]);
   let activeTocId = $state<string>("");
-  let mainScrollContainer = $state<HTMLElement | null>(null);
   let isScrollingFromClick = false;
   let scrollTimeout: any = null;
 
@@ -137,14 +136,13 @@
   }
 
   function handleScroll() {
-    if (!browser || !mainScrollContainer || isScrollingFromClick) return;
+    if (!browser || isScrollingFromClick) return;
     const article = document.querySelector("article");
     if (!article) return;
 
     const headings = article.querySelectorAll("h2[id], h3[id], section[id]");
     if (headings.length === 0) return;
 
-    const mainRect = mainScrollContainer.getBoundingClientRect();
     let currentActiveId = "";
 
     for (let i = 0; i < headings.length; i++) {
@@ -152,8 +150,7 @@
       if (!tocItems.some(item => item.id === h.id)) continue;
 
       const rect = h.getBoundingClientRect();
-      const offset = rect.top - mainRect.top;
-      if (offset <= 140) {
+      if (rect.top <= 140) {
         currentActiveId = h.id;
       } else {
         break;
@@ -167,7 +164,7 @@
   }
 
   function scrollToHeading(id: string) {
-    if (!browser || !mainScrollContainer) return;
+    if (!browser) return;
     const el = document.getElementById(id);
     if (el) {
       isScrollingFromClick = true;
@@ -175,12 +172,12 @@
       activeHash = `#${id}`;
       history.pushState(null, "", `#${id}`);
 
-      const mainRect = mainScrollContainer.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      const targetTop = mainScrollContainer.scrollTop + (elRect.top - mainRect.top) - 30;
+      const headerOffset = 96;
+      const elementPosition = el.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-      mainScrollContainer.scrollTo({
-        top: Math.max(0, targetTop),
+      window.scrollTo({
+        top: Math.max(0, offsetPosition),
         behavior: "smooth"
       });
 
@@ -289,8 +286,8 @@
         addCopyButtons();
         extractToc();
         isMobileDocsMenuOpen = false;
-        if (mainScrollContainer) {
-          mainScrollContainer.scrollTop = 0;
+        if (browser && !window.location.hash) {
+          window.scrollTo(0, 0);
         }
       });
     }
@@ -302,14 +299,24 @@
       addCopyButtons();
       extractToc();
     });
+
+    if (browser) {
+      window.addEventListener("scroll", handleScroll, { passive: true });
+    }
+
+    return () => {
+      if (browser) {
+        window.removeEventListener("scroll", handleScroll);
+      }
+    };
   });
 </script>
 
-<!-- FIXED APPLICATION FRAMEWORK: Below fixed header (top-20 sm:top-24 to bottom-0) -->
-<div class="fixed inset-x-0 bottom-0 top-20 sm:top-24 flex flex-col lg:flex-row overflow-hidden bg-[#0a0a0c] text-slate-300 font-body">
+<!-- DOCUMENTATION FRAMEWORK: Responsive three-column layout below floating header -->
+<div class="flex flex-col lg:flex-row min-h-[calc(100vh-6rem)] bg-[#0a0a0c] text-slate-300 font-body w-full items-start">
   
   <!-- Mobile Navigation Header Bar -->
-  <div class="lg:hidden px-6 py-3 border-b border-white/[0.08] flex justify-between items-center bg-slate-950 shrink-0 z-40">
+  <div class="lg:hidden px-6 py-3 border-b border-white/[0.08] flex justify-between items-center bg-slate-950 shrink-0 sticky top-16 z-40 w-full">
     <div class="flex items-center gap-2">
       <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">{activeTab === 'cli' ? 'CLI REFERENCE' : 'DOCUMENTATION'}</span>
       <ChevronRight size={14} class="text-slate-500" />
@@ -326,8 +333,8 @@
     </button>
   </div>
 
-  <!-- LEFT SIDEBAR: Fixed, independent scroll, page navigation tree -->
-  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-64 xl:w-72 shrink-0 h-full overflow-y-auto px-5 py-6 border-b lg:border-b-0 lg:border-r border-white/[0.06] text-xs font-body bg-[#0a0a0c] z-30">
+  <!-- LEFT SIDEBAR: Sticky, independent scroll, page navigation tree -->
+  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-64 xl:w-72 shrink-0 sticky top-20 sm:top-24 h-auto lg:h-[calc(100vh-6rem)] self-start overflow-y-auto px-5 py-6 border-b lg:border-b-0 lg:border-r border-white/[0.06] text-xs font-body bg-[#0a0a0c] z-30">
     
     {#if activeTab === 'cli'}
       <!-- CLI Reference Mode: Page Navigation Only (Command headings moved to Right Sidebar) -->
@@ -554,12 +561,8 @@
 
   </aside>
 
-  <!-- MAIN DOCUMENTATION CANVAS: The ONLY scrollable element in documentation views -->
-  <main 
-    bind:this={mainScrollContainer}
-    onscroll={handleScroll}
-    class="flex-1 h-full overflow-y-auto px-6 sm:px-10 lg:px-12 py-8 bg-[#0a0a0c] selection:bg-cyan-500/20 selection:text-cyan-300"
-  >
+  <!-- MAIN DOCUMENTATION CANVAS: Centered article content -->
+  <main class="flex-1 min-w-0 px-6 sm:px-10 lg:px-12 py-8 bg-[#0a0a0c] selection:bg-cyan-500/20 selection:text-cyan-300">
     <div class="max-w-4xl mx-auto">
       
       <!-- Breadcrumb Header -->
@@ -584,45 +587,11 @@
         {@render children()}
       </article>
 
-      <!-- Documentation Footer (Full Layout matching Main Screen) -->
-      <footer class="mt-24 pt-8 border-t border-white/[0.08] relative z-10 text-xs font-body text-slate-400 pb-16">
-        <div class="w-full flex flex-col gap-6">
-          <!-- Top Row: Logo, Status Pill, Nav Links -->
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.06]">
-            <div class="flex items-center gap-3">
-              <div class="w-7 h-7 rounded-lg overflow-hidden ring-1 ring-cyan-500/30 p-0.5 bg-slate-900 flex items-center justify-center">
-                <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.png" />
-              </div>
-              <span class="font-headline text-sm font-bold text-white tracking-tight">Autonomic AI</span>
-              <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="ml-2 inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono bg-emerald-950/30 text-emerald-400 border border-emerald-500/20 hover:border-emerald-500/40 transition">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>All systems operational • OpenStatus</span>
-              </a>
-            </div>
-            <!-- Links -->
-            <nav class="flex flex-wrap items-center gap-5 font-mono text-xs">
-              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/architecture">Architecture</a>
-              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/registry">Registry</a>
-              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/invariants">Invariants</a>
-              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs">Docs</a>
-              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="/docs/cli">CLI Reference</a>
-              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">Status</a>
-              <a class="text-slate-400 hover:text-white transition-colors duration-150" href="https://github.com/autonomic-ai-dev/agent-registry" target="_blank" rel="noopener noreferrer">GitHub</a>
-            </nav>
-          </div>
-          <!-- Bottom Row -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-slate-500 font-mono text-[11px]">
-            <p>© 2026 Autonomic AI. Autonomous Agent Engineering OS ({data?.ecosystemVersion || 'v1.0.0-rc2'}). All systems operational.</p>
-            <p class="text-slate-500">Built for agentic precision.</p>
-          </div>
-        </div>
-      </footer>
-
     </div>
   </main>
 
-  <!-- RIGHT RAIL: Fixed, independent scroll, dynamic heading/command list -->
-  <aside class="w-72 xl:w-80 shrink-0 hidden xl:block h-full overflow-y-auto px-6 py-8 border-l border-white/[0.06] text-xs font-body bg-[#0a0a0c]">
+  <!-- RIGHT RAIL: Sticky, independent scroll, dynamic heading/command list -->
+  <aside class="w-72 xl:w-80 shrink-0 hidden xl:block sticky top-20 sm:top-24 h-auto lg:h-[calc(100vh-6rem)] self-start overflow-y-auto px-6 py-8 border-l border-white/[0.06] text-xs font-body bg-[#0a0a0c]">
     <div class="space-y-6">
       <div>
         <div class="px-2 mb-3 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
