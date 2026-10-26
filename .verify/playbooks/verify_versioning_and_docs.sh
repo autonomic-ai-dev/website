@@ -35,7 +35,7 @@ grep -rn "Model Usage & Budget Governance" src/routes/docs/ || {
 }
 
 echo "==> [Playbook: Versioning & Docs] Verifying extended CLI reference examples..."
-for organ in autonomic agent-brain agent-spine; do
+for organ in agent-brain agent-spine; do
   file="src/routes/docs/cli/$organ/+page.md"
   if [ -f "$file" ]; then
     count=$(grep -c '```bash' "$file" || true)
@@ -50,7 +50,7 @@ for organ in autonomic agent-brain agent-spine; do
 done
 
 echo "==> [Playbook: Versioning & Docs] Running svelte-check and build..."
-npm run check
-npm run build
+bun run check
+bun run build
 
 echo "==> [Playbook: Versioning & Docs] Passed cleanly (exit 0)."

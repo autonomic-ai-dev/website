@@ -23,6 +23,14 @@
   let activeTab = $state<'docs' | 'cli'>('docs');
   let activeHash = $state("");
 
+  interface TocItem {
+    id: string;
+    text: string;
+    level: number;
+  }
+  let tocItems = $state<TocItem[]>([]);
+  let activeTocId = $state<string>("");
+
   $effect(() => {
     if (isCliSection) {
       activeTab = 'cli';
@@ -36,6 +44,9 @@
       activeHash = window.location.hash;
       const handleHashChange = () => {
         activeHash = window.location.hash;
+        if (window.location.hash) {
+          activeTocId = window.location.hash.replace('#', '');
+        }
       };
       window.addEventListener("hashchange", handleHashChange);
       return () => {
@@ -125,16 +136,115 @@
     });
   }
 
+  function extractToc() {
+    if (!browser) return;
+    const article = document.querySelector("article");
+    if (!article) return;
+
+    const headings = article.querySelectorAll("h2, h3");
+    const items: TocItem[] = [];
+
+    headings.forEach((heading, idx) => {
+      let id = heading.id;
+      if (!id) {
+        const parentSection = heading.closest("section");
+        if (parentSection && parentSection.id && !items.some(i => i.id === parentSection.id)) {
+          id = parentSection.id;
+          heading.id = id;
+        } else {
+          const raw = heading.textContent || `heading-${idx}`;
+          id = raw
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)+/g, "");
+          heading.id = id;
+        }
+      }
+
+      items.push({
+        id,
+        text: heading.textContent?.replace(/^#+\s*/, "").trim() || "",
+        level: heading.tagName.toLowerCase() === "h2" ? 2 : 3
+      });
+    });
+
+    tocItems = items;
+    if (items.length > 0 && !activeTocId) {
+      if (window.location.hash) {
+        activeTocId = window.location.hash.replace("#", "");
+      } else {
+        activeTocId = items[0].id;
+      }
+    }
+  }
+
+  function scrollToHeading(id: string) {
+    if (!browser) return;
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.pushState(null, "", `#${id}`);
+      activeTocId = id;
+      activeHash = `#${id}`;
+    }
+  }
+
+  let cleanupObserver: (() => void) | undefined;
+
+  function setupIntersectionObserver() {
+    if (!browser) return;
+    if (cleanupObserver) {
+      cleanupObserver();
+      cleanupObserver = undefined;
+    }
+    const article = document.querySelector("article");
+    if (!article) return;
+    const headings = article.querySelectorAll("h2, h3, section[id]");
+    if (headings.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            if (id) {
+              activeTocId = id;
+              break;
+            }
+          }
+        }
+      },
+      {
+        rootMargin: "-90px 0px -70% 0px",
+        threshold: 0
+      }
+    );
+
+    headings.forEach((h) => observer.observe(h));
+    cleanupObserver = () => observer.disconnect();
+  }
+
   $effect(() => {
     if (pathname) {
-      renderMermaidDiagrams();
-      addCopyButtons();
+      tick().then(() => {
+        renderMermaidDiagrams();
+        addCopyButtons();
+        extractToc();
+        setupIntersectionObserver();
+      });
     }
   });
 
   onMount(() => {
-    renderMermaidDiagrams();
-    addCopyButtons();
+    tick().then(() => {
+      renderMermaidDiagrams();
+      addCopyButtons();
+      extractToc();
+      setupIntersectionObserver();
+    });
+    return () => {
+      if (cleanupObserver) cleanupObserver();
+    };
   });
 </script>
 
@@ -409,19 +519,22 @@
           </div>
           <ul class="space-y-1">
             <li>
-              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+              <a 
+                href="/docs/agstack" 
+                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/agstack' ? 'bg-gradient-to-r from-indigo-500/15 to-cyan-500/10 text-cyan-300 border-l-2 border-cyan-400 shadow-[inset_0_0_12px_rgba(6,182,212,0.08)]' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'}"
+              >
                 <Layers size={14} class="text-cyan-400" />
                 <span>agstack Mode & Matrix</span>
               </a>
             </li>
             <li>
-              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+              <a href="/registry#minimalist-entrepreneur" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
                 <Book size={14} class="text-slate-400" />
                 <span>Minimalist Entrepreneurship</span>
               </a>
             </li>
             <li>
-              <a href="/workflows" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
+              <a href="/registry#gstack" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-all">
                 <span class="text-yellow-400 font-mono">★</span>
                 <span>Garry Tan gstack Review Engine</span>
               </a>
@@ -472,7 +585,7 @@
         </a>
         <ChevronRight size={12} class="text-slate-600" />
         <span class="text-cyan-400 font-medium">
-          {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : 'Introduction & Overview'}
+          {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : pathname.endsWith('/memory') ? 'agent-brain Manual' : pathname.endsWith('/workflows') ? 'agent-spine Manual' : 'Introduction & Overview'}
         </span>
       </nav>
       <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-slate-500">
@@ -488,29 +601,35 @@
   </main>
 
   <!-- RIGHT RAIL: Table of Contents & Quick Links (Stitch Design) -->
-  <aside class="w-64 shrink-0 hidden xl:block sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto px-5 py-8 border-l border-white/[0.06] text-xs font-body">
+  <aside class="w-72 xl:w-80 shrink-0 hidden xl:block sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto px-6 py-8 border-l border-white/[0.06] text-xs font-body">
     <div class="space-y-6">
       <div>
         <div class="px-2 mb-3 text-[11px] font-headline font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
           <FileText size={13} class="text-cyan-400" />
           <span>ON THIS PAGE</span>
         </div>
-        <ul class="space-y-2 text-slate-400 text-xs font-body">
-          <li>
-            <a href="#hero" class="text-cyan-300 font-medium hover:text-cyan-200 transition">Introduction & Overview</a>
-          </li>
-          <li class="pl-2 border-l border-white/10 space-y-1.5">
-            <a href="#dual-engine-blueprint" class="block hover:text-slate-200 transition">The Dual-Engine Blueprint</a>
-            <a href="#agent-brain-section" class="block text-slate-500 hover:text-cyan-300 font-mono text-[11px] transition">agent-brain (Reasoning)</a>
-            <a href="#agent-spine-section" class="block text-slate-500 hover:text-indigo-300 font-mono text-[11px] transition">agent-spine (DAG Runner)</a>
-          </li>
-          <li>
-            <a href="#quickstart" class="hover:text-slate-200 transition">Quickstart & Installation</a>
-          </li>
-          <li>
-            <a href="#invariants" class="hover:text-slate-200 transition">Invariant & Safety Contracts</a>
-          </li>
-        </ul>
+        {#if tocItems.length > 0}
+          <ul class="space-y-1.5 text-slate-400 text-xs font-body">
+            {#each tocItems as item}
+              <li class="{item.level === 3 ? 'pl-3.5 border-l border-white/10 ml-1.5 my-1' : ''}">
+                <button
+                  type="button"
+                  onclick={() => scrollToHeading(item.id)}
+                  class="text-left w-full break-words leading-relaxed py-0.5 transition-colors cursor-pointer group flex items-start gap-1.5 {activeTocId === item.id ? 'text-cyan-300 font-medium' : 'text-slate-400 hover:text-slate-200'}"
+                >
+                  {#if activeTocId === item.id}
+                    <span class="text-cyan-400 font-mono text-[10px] mt-0.5">›</span>
+                  {/if}
+                  <span class="flex-1">{item.text}</span>
+                </button>
+              </li>
+            {/each}
+          </ul>
+        {:else}
+          <div class="text-[11px] text-slate-500 italic px-2">
+            Overview section
+          </div>
+        {/if}
       </div>
 
       <div class="pt-6 border-t border-white/[0.06] space-y-3 font-mono text-xs text-slate-400">

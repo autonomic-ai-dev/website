@@ -116,4 +116,4 @@ Autonomic AI enforces four strict runtime invariants:
 - [agent-brain Manual](/docs/memory) — HNSW vector indexing, turn gating, and skill packages.
 - [agent-spine Manual](/docs/workflows) — Declarative YAML DAG definitions and approval gates.
 - [CLI Reference Manual](/docs/cli) — Complete CLI syntax, flags, and exit codes for both binaries.
-- [Workflows Hub](/workflows) — Interactive library of pre-built DAG workflows and curated skill packages.
+- [Registry Hub](/registry) — Interactive library of pre-built DAG workflows and curated skill packages.

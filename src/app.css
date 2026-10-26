@@ -365,3 +365,16 @@
   height: auto !important;
   font-family: var(--font-mono) !important;
 }
+
+/* Smooth anchor scrolling and fixed navbar offset */
+html {
+  scroll-behavior: smooth;
+}
+
+article h1,
+article h2,
+article h3,
+article section {
+  scroll-margin-top: 6rem;
+}
+

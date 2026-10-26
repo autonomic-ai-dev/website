@@ -3,8 +3,9 @@ export const prerender = true;
 export async function GET() {
   const pages = [
     { url: '', priority: '1.0', changefreq: 'daily' },
-    { url: '/workflows', priority: '0.9', changefreq: 'daily' },
+    { url: '/registry', priority: '0.9', changefreq: 'daily' },
     { url: '/docs', priority: '0.9', changefreq: 'weekly' },
+    { url: '/docs/agstack', priority: '0.8', changefreq: 'weekly' },
     { url: '/docs/architecture', priority: '0.8', changefreq: 'weekly' },
     { url: '/docs/installation', priority: '0.8', changefreq: 'weekly' },
     { url: '/docs/memory', priority: '0.8', changefreq: 'weekly' },
