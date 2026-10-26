@@ -48,7 +48,7 @@ bun run preview
 
 This repository is configured for automatic deployments on **Vercel**. Every push to the `master` branch will trigger a production deployment.
 
-- **Live URL:** [https://website-one-chi-50.vercel.app](https://website-one-chi-50.vercel.app)
+- **Live URL:** [https://autonomic-ai-dev.vercel.app](https://autonomic-ai-dev.vercel.app)
 
 ## 🎨 Tech Stack
 
