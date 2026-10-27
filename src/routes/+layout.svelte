@@ -2,6 +2,7 @@
   import "../app.css";
   import { onMount } from "svelte";
   import { page } from "$app/stores";
+  import AnimatedBackground from "$lib/components/AnimatedBackground.svelte";
   let { children, data } = $props();
 
   onMount(() => {
@@ -75,24 +76,8 @@
 
 <div class="bg-black text-neutral-100 font-body selection:bg-neutral-800 selection:text-white antialiased relative min-h-screen overflow-x-clip">
   
-  <!-- Rich DevEx Ambient Lighting & Multi-Layered Atmosphere (Resend / Vercel style) -->
-  <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-    <!-- Top Primary Atmospheric Spotlight with Floating Drift -->
-    <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[1200px] h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.12),transparent_65%)] blur-[100px] animate-ambient-top"></div>
-    
-    <!-- Moving Ambient Aurora Beams -->
-    <div class="absolute -top-40 left-1/4 w-[700px] h-[700px] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06),transparent_60%)] blur-[130px] animate-light-beam"></div>
-
-    <!-- Mid Subsystem Tint Glows with Slow Orbit Drift -->
-    <div class="absolute top-[25%] -left-48 w-[650px] h-[650px] bg-[radial-gradient(circle,rgba(99,102,241,0.07),transparent_70%)] blur-[140px] animate-ambient-glow-1"></div>
-    <div class="absolute top-[48%] -right-48 w-[700px] h-[700px] bg-[radial-gradient(circle,rgba(0,242,254,0.05),transparent_70%)] blur-[140px] animate-ambient-glow-2"></div>
-    
-    <!-- Fine Precision Grid Pattern with Scan Accent -->
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff07_1px,transparent_1px),linear-gradient(to_bottom,#ffffff07_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_15%,#000_65%,transparent_100%)]"></div>
-    
-    <!-- Subtle Micro Dot Matrix Texture -->
-    <div class="absolute inset-0 bg-[radial-gradient(#ffffff0d_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_70%_50%_at_50%_35%,#000_50%,transparent_100%)] opacity-70"></div>
-  </div>
+  <!-- Framer Motion-Driven Rich DevEx Atmospheric Background & Neural Mesh -->
+  <AnimatedBackground />
 
   <!-- Shared Component: TopNavBar (Minimalist Island Header) -->
   <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-6xl rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.8)] bg-black/80 backdrop-blur-xl z-50 transition-all duration-200">
