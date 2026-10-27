@@ -9,23 +9,23 @@
   --font-label: "Public Sans", sans-serif;
   --font-mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Orbital Telemetry & Stitch Framer Palette */
-  --color-canvas-dark: #0a0a0c;
-  --color-surface-dark: #0d1117;
-  --color-surface-elevated: #161b22;
-  --color-surface-hover: #21262d;
-  --color-border-dark: #21262d;
+  /* Vercel / Resend Ultra-Minimalist Palette */
+  --color-canvas-dark: #000000;
+  --color-surface-dark: #050505;
+  --color-surface-elevated: #0d0d0d;
+  --color-surface-hover: #171717;
+  --color-border-dark: #222222;
   --color-border-subtle: rgba(255, 255, 255, 0.08);
 
-  --color-telemetry-cyan: #06b6d4;
+  --color-telemetry-cyan: #00f2fe;
   --color-telemetry-emerald: #10b981;
   --color-telemetry-indigo: #6366f1;
   --color-telemetry-amber: #f59e0b;
   --color-telemetry-crimson: #ef4444;
 
-  --color-text-primary: #f0f6fc;
-  --color-text-secondary: #8b949e;
-  --color-text-muted: #484f58;
+  --color-text-primary: #ededed;
+  --color-text-secondary: #a1a1aa;
+  --color-text-muted: #52525b;
 }
 
 @utility font-headline {
@@ -46,14 +46,14 @@
 
 @layer base {
   :root {
-    --bg-color: #0a0a0c;
-    --text-primary: #f0f6fc;
-    --text-secondary: #8b949e;
+    --bg-color: #000000;
+    --text-primary: #ededed;
+    --text-secondary: #a1a1aa;
   }
   
   body {
-    background-color: #0a0a0c;
-    color: #f0f6fc;
+    background-color: #000000;
+    color: #ededed;
     font-family: var(--font-body);
     antialiased: true;
     scroll-behavior: smooth;

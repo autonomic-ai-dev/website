@@ -1,29 +1,30 @@
 <script lang="ts">
   import {
-    Brain,
-    Layers,
+    Terminal,
+    Shield,
+    Zap,
+    Check,
+    Copy,
+    ArrowRight,
+    Database,
     Activity,
     GitBranch,
-    Terminal,
-    Copy,
-    Check,
-    ArrowRight,
-    ShieldCheck,
-    Zap,
-    ExternalLink,
+    Cpu,
+    Layers,
     Lock,
     CheckCircle2,
-    Database,
     FolderOpen,
-    FileText,
-    CheckSquare,
-    Fingerprint,
-    Shield
+    FileCode,
+    RefreshCw,
+    AlertTriangle,
+    Network,
+    ExternalLink
   } from "lucide-svelte";
 
   let { data } = $props();
   let version = $derived(data?.ecosystemVersion || 'v1.0.0-rc2');
-  let activeTab = $state<'brew' | 'spine' | 'brain' | 'cargo'>('brew');
+  let activeTab = $state<'brew' | 'brain' | 'spine' | 'cargo'>('brew');
+  let activeConsoleTab = $state<'procedure-graph' | 'trap-detection' | 'policy-sentry' | 'neural-bus'>('procedure-graph');
   let copied = $state(false);
 
   const commandSnippets: Record<string, { commands: string[]; notes: string[] }> = {
@@ -34,9 +35,21 @@
         "agent-brain doctor"
       ],
       notes: [
-        "✔ Tapped autonomic-ai-dev/tap (Formulae: agent-brain, agent-spine)",
-        "✔ Installed pre-compiled macOS Apple Silicon (arm64) universal binaries",
-        "✔ Doctor: binary, MCP schema, codesign, and hooks verified clean"
+        "Installed developer ID-signed Apple Silicon universal binary",
+        "Verified MCP stdio server, SQLite schema v23, and host hooks",
+        "Ready for local-first turn routing across all coding agents"
+      ]
+    },
+    brain: {
+      commands: [
+        "agent-brain install --global",
+        "agent-brain package add nextlevelbuilder/ui-ux-pro-max-skill",
+        "agent-brain briefing"
+      ],
+      notes: [
+        "Configured MCP stdio server + editor read-gates in global scope",
+        "Recursively indexed package into local vector and procedure DAG",
+        "Route briefing: token budget 448 / 600 tokens (cache latency: 0.4ms)"
       ]
     },
     spine: {
@@ -46,33 +59,21 @@
         "agent-spine run .autonomic/state/spine/build-and-test.yaml"
       ],
       notes: [
-        "✔ Scaffolded workflow: build-and-test.yaml with state snapshotting",
-        "✔ Validated DAG node dependencies, step transitions, and approval gates",
-        "✔ Execution complete: all nodes sealed with deterministic state"
-      ]
-    },
-    brain: {
-      commands: [
-        "agent-brain install --global",
-        "agent-brain package add @testing",
-        "agent-brain briefing"
-      ],
-      notes: [
-        "✔ Configured MCP stdio server + editor read-gates in user/global scope",
-        "✔ Reindexed curated @testing playbooks into local vector store",
-        "✔ Route briefing: active token budget 4,120 / 32,000 tokens"
+        "Scaffolded declarative YAML DAG workflow with state snapshotting",
+        "Validated node dependencies, step transitions, and approval gates",
+        "Execution complete: all nodes sealed with deterministic state"
       ]
     },
     cargo: {
       commands: [
         "cargo install --git https://github.com/autonomic-ai-dev/agent-brain agent-brain",
         "cargo install --git https://github.com/autonomic-ai-dev/agent-spine agent-spine",
-        "agent-spine doctor"
+        "agent-brain doctor"
       ],
       notes: [
-        "✔ Compiled agent-brain from source with FastEmbed & HNSW indexing",
-        "✔ Compiled agent-spine state machine engine and workflow parser",
-        "✔ Environment verified: ready for autonomous agent execution"
+        "Compiled from source with SQLite vec, BM25, and procedure DAG engine",
+        "Zero external I/O runtime dependencies in core engine boundary",
+        "Daemon ready on ~/.autonomic/memory/serve.sock"
       ]
     }
   };
@@ -90,411 +91,474 @@
 </script>
 
 <svelte:head>
-  <title>Autonomic AI — Autonomous AI Agent Engineering OS</title>
+  <title>Autonomic AI — Local-First Cognitive Governor & Procedure Graph for Coding Agents</title>
+  <meta name="description" content="Local-first cognitive governor and procedure graph for coding agents. Enforces turn-level token budgeting, blocks prompt injection and destructive commands, and accumulates execution DAGs across Cursor, Claude Code, and Antigravity." />
 </svelte:head>
 
-<main class="relative z-10 pb-24">
+<main class="relative z-10 pb-28 text-zinc-100 selection:bg-zinc-800 selection:text-white">
   <!-- HERO SECTION -->
-  <section class="max-w-6xl mx-auto px-6 text-center pt-8 pb-16">
-    <!-- Top Pill Tag -->
-    <a href="/docs/architecture" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-slate-900/60 backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.15)] mb-8 transition-transform hover:scale-105 cursor-pointer">
-      <span class="text-amber-400 text-xs leading-none">⚡</span>
-      <span class="text-xs font-headline font-medium text-slate-200 tracking-wide">
-        Autonomic AI — <span class="text-cyan-400 font-semibold">Production-Grade Agent Architecture</span>
-      </span>
-      <span class="material-symbols-outlined text-xs text-slate-400">arrow_forward</span>
+  <section class="max-w-6xl mx-auto px-6 text-center pt-16 pb-20">
+    <!-- Top Pill Badge -->
+    <a 
+      href="/docs/architecture" 
+      class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-zinc-800 bg-zinc-900/70 hover:border-zinc-700 backdrop-blur-md mb-8 transition-colors text-xs font-mono text-zinc-400 cursor-pointer"
+    >
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+      <span>v1.0.0-rc2</span>
+      <span class="text-zinc-600">/</span>
+      <span class="text-zinc-300">Local-First Cognitive Governor &amp; Procedure Graph</span>
+      <ArrowRight class="w-3.5 h-3.5 text-zinc-500" />
     </a>
 
     <!-- Hero Headline -->
-    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight font-headline max-w-4xl mx-auto leading-[1.1] mb-6 text-white">
-      Autonomous AI Agents Built for <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-teal-300 drop-shadow-[0_0_35px_rgba(6,182,212,0.3)]">Real Engineering</span>
+    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight font-headline max-w-4xl mx-auto leading-[1.08] mb-6 text-white">
+      Autonomous Coding Agents Need A Cognitive Governor, <span class="text-zinc-400">Not Just Static Prompts.</span>
     </h1>
 
     <!-- Subtitle -->
-    <p class="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto font-body leading-relaxed mb-10">
-      Replace fragile agent prompts with disciplined SDLC playbooks, token-bounded MCP routing, DAG workflows, and strict runtime verification (<span class="font-mono text-cyan-300 text-sm bg-cyan-950/40 px-1.5 py-0.5 rounded border border-cyan-500/20">.verify/</span>).
+    <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto font-body leading-relaxed mb-10">
+      Turn router packs skills into a strict <span class="text-zinc-200 font-mono">~500-token budget</span>. Host pre-tool hooks block destructive shell escapes and prompt injection. Recursive procedure graphs accumulate execution DAGs that never forget.
     </p>
 
-    <!-- Dual Action CTAs -->
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-      <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm font-headline font-semibold text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-[0_0_30px_rgba(6,182,212,0.45)] transition-all duration-200 active:scale-95 group" href="#quickstart">
-        <span>Start Building Free</span>
-        <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">rocket_launch</span>
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-16">
+      <a 
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold text-zinc-950 bg-white hover:bg-zinc-200 transition-colors cursor-pointer" 
+        href="#quickstart"
+      >
+        <span>Install via Homebrew</span>
+        <ArrowRight class="w-4 h-4" />
       </a>
-      <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-headline font-medium text-slate-200 bg-slate-900/80 hover:bg-slate-800/90 border border-slate-700/80 hover:border-cyan-500/40 backdrop-blur-md transition-all duration-200 active:scale-95" href="/docs/architecture">
-        <span class="material-symbols-outlined text-base text-cyan-400">terminal</span>
-        <span>View Architecture Spec</span>
+      <a 
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-medium text-zinc-300 bg-zinc-900/80 hover:bg-zinc-800/90 border border-zinc-800 hover:border-zinc-700 transition-colors" 
+        href="/docs/architecture"
+      >
+        <FileCode class="w-4 h-4 text-zinc-400" />
+        <span>Read Architecture Spec</span>
       </a>
     </div>
 
-    <!-- Verified Compatible Agent Environments Row -->
-    <div class="pt-4 pb-14 border-b border-slate-800/60 max-w-4xl mx-auto">
-      <p class="text-xs uppercase font-mono tracking-widest text-slate-500 mb-6 font-semibold">
-        Tested and verified across modern coding agent runtimes
+    <!-- Supported Hosts Badge Row -->
+    <div class="pt-6 pb-12 border-b border-zinc-900 max-w-4xl mx-auto">
+      <p class="text-[11px] uppercase font-mono tracking-widest text-zinc-500 mb-5 font-semibold">
+        Tested and enforced across modern coding agent runtimes
       </p>
-      <div class="flex flex-wrap items-center justify-center gap-8 md:gap-14 opacity-80 transition-all duration-300">
-        <div class="flex items-center gap-2 text-slate-300 font-headline font-semibold text-sm">
-          <span class="material-symbols-outlined text-cyan-400 text-lg">deployed_code</span> ANTIGRAVITY (AGY)
-        </div>
-        <div class="flex items-center gap-2 text-slate-300 font-headline font-semibold text-sm">
-          <span class="material-symbols-outlined text-indigo-400 text-lg">edit_note</span> CURSOR
-        </div>
-        <div class="flex items-center gap-2 text-slate-300 font-headline font-semibold text-sm">
-          <span class="material-symbols-outlined text-teal-400 text-lg">terminal</span> CLAUDE CODE
-        </div>
-        <div class="flex items-center gap-2 text-slate-300 font-headline font-semibold text-sm">
-          <span class="material-symbols-outlined text-cyan-400 text-lg">code</span> GEMINI CLI
-        </div>
+      <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-mono text-zinc-400">
+        <span class="flex items-center gap-2 hover:text-white transition-colors">
+          <Terminal class="w-3.5 h-3.5 text-zinc-500" /> CLAUDE CODE
+        </span>
+        <span class="flex items-center gap-2 hover:text-white transition-colors">
+          <Cpu class="w-3.5 h-3.5 text-zinc-500" /> CURSOR
+        </span>
+        <span class="flex items-center gap-2 hover:text-white transition-colors">
+          <Zap class="w-3.5 h-3.5 text-zinc-500" /> ANTIGRAVITY (AGY)
+        </span>
+        <span class="flex items-center gap-2 hover:text-white transition-colors">
+          <Layers class="w-3.5 h-3.5 text-zinc-500" /> OPENCODE
+        </span>
+        <span class="flex items-center gap-2 hover:text-white transition-colors">
+          <GitBranch class="w-3.5 h-3.5 text-zinc-500" /> GITHUB ACTIONS
+        </span>
       </div>
     </div>
 
-    <!-- HERO CENTERPIECE: Framer-Style Developer Console Mockup -->
-    <div class="mt-14 max-w-5xl mx-auto rounded-xl border border-cyan-500/30 bg-slate-950/80 backdrop-blur-2xl shadow-[0_0_50px_rgba(6,182,212,0.15)] overflow-hidden text-left ring-1 ring-white/5" id="console">
-      <!-- Window Chrome Bar -->
-      <div class="px-4 py-3 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+    <!-- HERO CENTERPIECE: Minimalist Developer Console (Memorable / Render Inspired) -->
+    <div class="mt-12 max-w-5xl mx-auto rounded-xl border border-zinc-800 bg-[#0c0d12] shadow-2xl text-left overflow-hidden ring-1 ring-white/[0.05]" id="console">
+      <!-- Window Title & Tab Bar -->
+      <div class="px-4 py-2.5 bg-zinc-900/70 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded-full bg-rose-500/80"></div>
-          <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
-          <div class="w-3 h-3 rounded-full bg-emerald-500/80"></div>
-          <span class="ml-3 text-xs font-mono text-slate-400 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-xs text-cyan-400">data_object</span>
-            autonomic://local-runtime/run/verify-pipeline
-          </span>
+          <div class="w-2.5 h-2.5 rounded-full bg-zinc-700"></div>
+          <div class="w-2.5 h-2.5 rounded-full bg-zinc-700"></div>
+          <div class="w-2.5 h-2.5 rounded-full bg-zinc-700"></div>
+          <span class="ml-2 text-xs font-mono text-zinc-400">agent-brain v1.0.0-rc2</span>
         </div>
-        <div class="flex items-center gap-3 text-xs font-mono">
-          <span class="flex items-center gap-1.5 text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-            LIVE EXEC
-          </span>
-          <span class="text-slate-400 hidden sm:inline">RAM: 412MB</span>
+
+        <!-- Pillar Switcher Tabs -->
+        <div class="inline-flex p-0.5 rounded-md bg-zinc-950 border border-zinc-800 text-[11px] font-mono">
+          <button 
+            type="button" 
+            onclick={() => activeConsoleTab = 'procedure-graph'}
+            class="px-2.5 py-1 rounded transition cursor-pointer {activeConsoleTab === 'procedure-graph' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
+          >
+            1. Procedure Graph
+          </button>
+          <button 
+            type="button" 
+            onclick={() => activeConsoleTab = 'trap-detection'}
+            class="px-2.5 py-1 rounded transition cursor-pointer {activeConsoleTab === 'trap-detection' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
+          >
+            2. Trap Detection
+          </button>
+          <button 
+            type="button" 
+            onclick={() => activeConsoleTab = 'policy-sentry'}
+            class="px-2.5 py-1 rounded transition cursor-pointer {activeConsoleTab === 'policy-sentry' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
+          >
+            3. Policy Sentry
+          </button>
+          <button 
+            type="button" 
+            onclick={() => activeConsoleTab = 'neural-bus'}
+            class="px-2.5 py-1 rounded transition cursor-pointer {activeConsoleTab === 'neural-bus' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
+          >
+            4. Neural Bus
+          </button>
         </div>
       </div>
 
-      <!-- IDE Main Split Content -->
-      <div class="grid grid-cols-1 md:grid-cols-12 min-h-[420px] font-mono text-xs">
-        <!-- Left Sidebar: Organ Pipeline Status -->
-        <div class="md:col-span-4 p-4 border-b md:border-b-0 md:border-r border-slate-800/80 bg-slate-950/60 flex flex-col justify-between">
-          <div>
-            <div class="text-[10px] uppercase font-bold tracking-wider text-slate-500 mb-3 flex items-center justify-between">
-              <span>Active Architecture</span>
-              <span class="text-cyan-400">VERIFIED</span>
+      <!-- Console Body Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-12 min-h-[380px] font-mono text-xs">
+        <!-- Left Panel: State Metadata -->
+        <div class="md:col-span-4 p-4 border-b md:border-b-0 md:border-r border-zinc-800/80 bg-zinc-950/40 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div>
+              <div class="text-[10px] uppercase font-bold tracking-wider text-zinc-500 mb-2">Internal Engine State</div>
+              {#if activeConsoleTab === 'procedure-graph'}
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Database Schema</div>
+                    <div class="text-zinc-200 font-semibold mt-0.5">v23: procedure_edges</div>
+                  </div>
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Traversal Algorithm</div>
+                    <div class="text-zinc-200 font-semibold mt-0.5">Recursive SQLite CTEs (p95 ≤ 31ms)</div>
+                  </div>
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Auto Trajectory Capture</div>
+                    <div class="text-emerald-400 font-semibold mt-0.5">Active (verify &amp; turn hooks)</div>
+                  </div>
+                </div>
+              {:else if activeConsoleTab === 'trap-detection'}
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Outcome Attribution</div>
+                    <div class="text-zinc-200 font-semibold mt-0.5">Linked to route_log_id</div>
+                  </div>
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Exit Code Squelching</div>
+                    <div class="text-amber-400 font-semibold mt-0.5">Failing recipes dropped</div>
+                  </div>
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Promotion to must_apply</div>
+                    <div class="text-emerald-400 font-semibold mt-0.5">Exit 0 commands promoted</div>
+                  </div>
+                </div>
+              {:else if activeConsoleTab === 'policy-sentry'}
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Pre-Tool Gate</div>
+                    <div class="text-rose-400 font-semibold mt-0.5">Physical tool blockage on bypass</div>
+                  </div>
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Shell Gate (bash-gate)</div>
+                    <div class="text-emerald-400 font-semibold mt-0.5">Blocks rm -rf /, --no-verify</div>
+                  </div>
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Scoped Read Fence</div>
+                    <div class="text-zinc-200 font-semibold mt-0.5">1h token-bounded unlock</div>
+                  </div>
+                </div>
+              {:else}
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Daemon Socket</div>
+                    <div class="text-zinc-200 font-semibold mt-0.5">~/.autonomic/memory/serve.sock</div>
+                  </div>
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Storage Engine</div>
+                    <div class="text-zinc-200 font-semibold mt-0.5">SQLite WAL + HNSW index</div>
+                  </div>
+                  <div class="p-2.5 rounded border border-zinc-800 bg-zinc-900/40">
+                    <div class="text-zinc-400 text-[11px]">Multi-Device Sync</div>
+                    <div class="text-emerald-400 font-semibold mt-0.5">agent-brain sync git supported</div>
+                  </div>
+                </div>
+              {/if}
             </div>
-            <ul class="space-y-2.5">
-              <li class="p-2.5 rounded-lg bg-slate-900/90 border border-cyan-500/30 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-cyan-400 text-sm">memory</span>
-                  <span class="font-medium text-slate-200">agent-brain</span>
-                </div>
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">Routing</span>
-              </li>
-              <li class="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800 flex items-center justify-between hover:border-slate-700">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-indigo-400 text-sm">account_tree</span>
-                  <span class="font-medium text-slate-300">agent-spine</span>
-                </div>
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">DAG: active</span>
-              </li>
-              <li class="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800 flex items-center justify-between hover:border-slate-700">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-emerald-400 text-sm">policy</span>
-                  <span class="font-medium text-slate-300">agstack</span>
-                </div>
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">Policy: Enforced</span>
-              </li>
-              <li class="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800 flex items-center justify-between hover:border-slate-700">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-teal-400 text-sm">verified</span>
-                  <span class="font-medium text-slate-300">.verify/</span>
-                </div>
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-800">14/14 tests pass</span>
-              </li>
-            </ul>
           </div>
 
-          <!-- Token Budget Meter in Sidebar -->
-          <div class="pt-4 mt-4 border-t border-slate-800/80">
-            <div class="flex items-center justify-between text-[11px] mb-1.5">
-              <span class="text-slate-400">AST Token Window</span>
-              <span class="text-cyan-300 font-semibold">4,120 / 32,000</span>
+          <!-- Bottom Token Meter -->
+          <div class="pt-4 mt-4 border-t border-zinc-800/80">
+            <div class="flex items-center justify-between text-[11px] mb-1">
+              <span class="text-zinc-400">Turn Budget Knapsack</span>
+              <span class="text-zinc-200 font-medium">448 / 600 tok</span>
             </div>
-            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-cyan-400 to-indigo-500 rounded-full w-[13%]"></div>
+            <div class="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+              <div class="h-full bg-emerald-400 rounded-full w-[74%]"></div>
             </div>
-            <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2">
-              <span>Strict Read Gates: Active</span>
-              <span class="text-emerald-400 font-medium">Zero Leakage</span>
+            <div class="text-[10px] text-zinc-500 mt-1.5 flex justify-between">
+              <span>Warm Cache Latency</span>
+              <span class="text-emerald-400 font-medium">0.42ms</span>
             </div>
           </div>
         </div>
 
-        <!-- Right Column: Live Execution Terminal Logs -->
-        <div class="md:col-span-8 p-4 bg-slate-950/90 flex flex-col justify-between overflow-x-auto terminal-scrollbar">
-          <div class="space-y-1.5 leading-relaxed font-mono">
-            <div class="text-slate-500">[14:32:01.002] <span class="text-indigo-400 font-semibold">[agent-spine]</span> Initializing DAG graph: build-and-test.yaml</div>
-            <div class="text-slate-500">[14:32:01.120] <span class="text-cyan-400 font-semibold">[agent-brain]</span> Resolving MCP routing table: [git, rust_ast, test_runner]</div>
-            <div class="text-slate-400 pl-4 border-l border-slate-800">
-              <span class="text-emerald-400">✔</span> Bound schema: <span class="text-slate-200">mcp://protocol.v2/agent-brain</span> (strictly read gated)
-            </div>
-            <div class="text-slate-500">[14:32:01.440] <span class="text-emerald-400 font-semibold">[agent-brain]</span> Applying token budget gate: 448/500 tokens routed</div>
-            <div class="text-slate-400 pl-4 border-l border-slate-800">
-              <span class="text-slate-500">Token allocation:</span> 4,120 / 32,000 tokens <span class="text-emerald-400">[Optimal]</span>
-            </div>
-            <div class="text-slate-500">[14:32:02.050] <span class="text-cyan-400 font-semibold">[agent-spine]</span> Step 01: [Plan] <span class="text-emerald-400">PASSED</span> (220ms)</div>
-            <div class="text-slate-500">[14:32:02.290] <span class="text-cyan-400 font-semibold">[agent-spine]</span> Step 02: [Lint &amp; Invariants] <span class="text-emerald-400">PASSED</span> (140ms)</div>
-            <div class="text-slate-500">[14:32:02.820] <span class="text-indigo-400 font-semibold">[.verify/]</span> Running independent sandbox verification suite...</div>
-            <div class="text-slate-300 bg-slate-900/80 p-2 rounded border border-slate-800 my-1">
-              <span class="text-emerald-400 font-semibold">SUCCESS:</span> All 14 runtime integration tests verified. Cryptographic artifact sealed: <span class="text-cyan-300">sha256:7f9e8a...</span>
-            </div>
-            <div class="text-slate-500 flex items-center gap-1 text-[11px] pt-1">
-              <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span>Standby for human approval gate or production merge...</span>
-            </div>
+        <!-- Right Panel: Live Execution Log -->
+        <div class="md:col-span-8 p-4 bg-black/40 flex flex-col justify-between overflow-x-auto">
+          <div class="space-y-2 leading-relaxed">
+            {#if activeConsoleTab === 'procedure-graph'}
+              <div class="text-zinc-500">[14:32:01.100] <span class="text-zinc-300">mcp::call</span> recall_procedures(query="reproduce and patch regression", task_kind="debugging")</div>
+              <div class="text-zinc-400 pl-3 border-l border-zinc-800">
+                <span class="text-emerald-400">✔</span> Traversed graph in <span class="text-zinc-200">12ms</span>: Matched workflow: <span class="text-zinc-200 font-semibold">bugfix_regression</span>
+              </div>
+              <div class="p-2.5 rounded bg-zinc-900/50 border border-zinc-800 text-zinc-300 my-1 text-[11px]">
+                <div class="text-zinc-400 font-semibold mb-1">RECALLED PROCEDURE DAG SEQUENCE:</div>
+                <div class="text-zinc-300">1. isolate_failing_case → 2. write_reproduction_test → 3. patch_core_logic → 4. run_verification_suite</div>
+                <div class="text-zinc-500 text-[10px] mt-1">Success rate: 100% across 8 previous executions. Next node suggestion: [patch_core_logic]</div>
+              </div>
+              <div class="text-zinc-500">[14:32:01.140] <span class="text-emerald-400">Auto Trajectory</span>: Staged execution path into workflow_trajectory for active turn.</div>
+            {:else if activeConsoleTab === 'trap-detection'}
+              <div class="text-zinc-500">[14:32:02.010] <span class="text-zinc-300">agent-brain verify</span> -- npm run test:broken</div>
+              <div class="text-rose-400 pl-3 border-l border-rose-900/60">
+                <span class="text-rose-400">✖ Command failed with exit 1</span>: Missing test target in package.json
+              </div>
+              <div class="p-2.5 rounded bg-zinc-900/50 border border-amber-900/50 text-amber-200 my-1 text-[11px]">
+                <div class="text-amber-400 font-semibold flex items-center gap-1.5 mb-1">
+                  <AlertTriangle class="w-3.5 h-3.5 text-amber-400" />
+                  <span>TRAP DETECTED &amp; SQUELCHED:</span>
+                </div>
+                <div>Failure fingerprint indexed. Squelched 'npm run test:broken' from future recipe recommendations.</div>
+                <div class="text-zinc-400 text-[10px] mt-1">Active constraint promoted: <span class="text-zinc-200 font-mono">must_apply: Prefer .verify/run.sh</span></div>
+              </div>
+              <div class="text-zinc-500">[14:32:02.240] <span class="text-zinc-400">Result</span>: Future agent turns are prevented from executing this failing command.</div>
+            {:else if activeConsoleTab === 'policy-sentry'}
+              <div class="text-zinc-500">[14:32:03.001] <span class="text-zinc-300">agent attempted execution</span>: git push --force origin main</div>
+              <div class="text-rose-400 pl-3 border-l border-rose-900/60">
+                <span class="text-rose-400">BLOCKED BY bash-gate (code 2)</span>: Destructive Git override denied.
+              </div>
+              <div class="p-2.5 rounded bg-zinc-900/50 border border-zinc-800 text-zinc-300 my-1 text-[11px]">
+                <div class="text-zinc-400 font-semibold mb-1">REASON:</div>
+                <div>Force pushing to protected branches is forbidden by policy. Agent must create a feature branch and pull request.</div>
+              </div>
+              <div class="text-zinc-500">[14:32:03.015] <span class="text-emerald-400">Physical Sentry</span>: Tool call rejected before execution. Zero repository damage.</div>
+            {:else}
+              <div class="text-zinc-500">[14:32:04.100] <span class="text-zinc-300">Terminal (Claude Code)</span>: agent-brain verify -- cargo test (Exit 0)</div>
+              <div class="text-emerald-400 pl-3 border-l border-zinc-800">
+                <span class="text-emerald-400">✔</span> Recorded verified recipe in <span class="text-zinc-200">~/.autonomic/memory/brain.db</span>
+              </div>
+              <div class="p-2.5 rounded bg-zinc-900/50 border border-zinc-800 text-zinc-300 my-1 text-[11px]">
+                <div class="text-zinc-400 font-semibold mb-1">CROSS-HOST NEURAL BUS DISPATCH:</div>
+                <div>Cursor IDE &amp; Antigravity immediately read newly verified recipe from SQLite WAL shared socket.</div>
+                <div class="text-zinc-500 text-[10px] mt-1">Zero configuration required. All local agents operate as a cohesive engineering swarm.</div>
+              </div>
+              <div class="text-zinc-500">[14:32:04.150] <span class="text-zinc-400">Telemetry</span>: 3 connected host agents synchronized.</div>
+            {/if}
           </div>
 
-          <!-- Terminal Footnote Bar -->
-          <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-            <span class="flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-xs text-emerald-400">check_circle</span>
-              Boundary isolation: 100% Guaranteed
-            </span>
-            <span class="font-mono text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/40">SDLC Spec: Invariant-Locked</span>
+          <div class="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500">
+            <span>Local SQLite WAL · Deterministic Verification</span>
+            <span class="text-zinc-400 font-mono">Status: Active Sentry</span>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SECTION: FEATURE BENTO GRID (THE DUAL-ENGINE ARCHITECTURE) -->
-  <section class="max-w-6xl mx-auto px-6 py-20" id="architecture">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <div class="inline-flex items-center gap-1 text-cyan-400 text-xs font-mono font-semibold uppercase tracking-wider mb-2">
-        <span class="material-symbols-outlined text-sm">hub</span>
-        Modular Architecture of Autonomous Agents
-      </div>
-      <h2 class="text-3xl sm:text-4xl font-headline font-bold text-white tracking-tight mb-4">
-        The Dual-Engine Architecture
+  <!-- SECTION: THE 4 STRATEGIC PILLARS (Category-Defining Architecture) -->
+  <section class="max-w-6xl mx-auto px-6 py-24" id="pillars">
+    <div class="max-w-2xl mx-auto text-center mb-16">
+      <div class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Category-Defining Architecture</div>
+      <h2 class="text-3xl sm:text-4xl font-bold font-headline text-white tracking-tight mb-4">
+        Four Pillars Beyond Static Prompts
       </h2>
-      <p class="text-slate-400 text-sm sm:text-base">
-        Deconstructed, specialized system modules replacing generic non-deterministic LLM loops with verified software engineering disciplines.
+      <p class="text-sm sm:text-base text-zinc-400 leading-relaxed font-body">
+        Passive skill libraries dump markdown text. agent-brain provides active cognitive governance, closed-loop reinforcement, and deterministic execution memory.
       </p>
     </div>
 
-    <!-- Bento Grid (4 Cards) -->
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-      <!-- Card 1: agent-brain (Span 7) -->
-      <div class="md:col-span-7 rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-xl p-7 hover:border-cyan-500/40 transition-all duration-300 relative group overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-cyan-500/20 transition-all"></div>
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-xl bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-            <span class="material-symbols-outlined text-xl">neurology</span>
+    <!-- 4 Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Pillar 1 -->
+      <div class="p-7 rounded-xl border border-zinc-800 bg-zinc-900/20 hover:border-zinc-700 transition-colors flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200">
+              <Network class="w-4 h-4" />
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white font-headline">1. Self-Evolving Procedure Graph</h3>
+              <p class="text-xs font-mono text-zinc-500">The Execution Flight Recorder</p>
+            </div>
           </div>
-          <div>
-            <h3 class="text-lg font-headline font-bold text-white">agent-brain</h3>
-            <p class="text-xs font-mono text-cyan-400">Token-Bounded MCP Router & Vector Memory</p>
-          </div>
+          <p class="text-sm text-zinc-400 leading-relaxed mb-4 font-body">
+            Replaces static prompt templates with a persistent procedural DAG. Execution steps across <span class="text-zinc-200 font-mono">verify</span> and turn boundaries automatically accumulate into SQLite schema v23 (<span class="text-zinc-200 font-mono">procedure_edges</span>). When encountering similar tasks, <span class="text-zinc-200 font-mono">recall_procedures</span> injects the proven multi-step sequence rather than generic text.
+          </p>
         </div>
-        <p class="text-slate-400 text-sm leading-relaxed mb-6 font-body">
-          Strict MCP tool routing prevents token window explosion. Cross-session context injection dynamically evaluates dependency trees before loading AST tokens.
-        </p>
-
-        <!-- Mini Routing Diagram Visualization -->
-        <div class="rounded-xl border border-slate-800/80 bg-slate-950/80 p-4 font-mono text-xs">
-          <div class="flex items-center justify-between text-[11px] text-slate-500 pb-3 mb-3 border-b border-slate-800">
-            <span>MCP Protocol Bus</span>
-            <span class="text-cyan-400">Bounded Context: 8k Tokens</span>
-          </div>
-          <div class="grid grid-cols-3 gap-2 text-center">
-            <div class="p-2.5 rounded-lg bg-slate-900 border border-cyan-500/30 text-cyan-300 flex flex-col items-center gap-1">
-              <span class="material-symbols-outlined text-base">route</span>
-              <span class="text-[11px] font-semibold">Router</span>
-              <span class="text-[9px] text-slate-400">Strict AST</span>
-            </div>
-            <div class="p-2.5 rounded-lg bg-slate-900/70 border border-slate-800 text-slate-300 flex flex-col items-center gap-1">
-              <span class="material-symbols-outlined text-base text-indigo-400">database</span>
-              <span class="text-[11px] font-semibold">Vector Store</span>
-              <span class="text-[9px] text-slate-400">Hashed Memory</span>
-            </div>
-            <div class="p-2.5 rounded-lg bg-slate-900/70 border border-slate-800 text-slate-300 flex flex-col items-center gap-1">
-              <span class="material-symbols-outlined text-base text-emerald-400">lock</span>
-              <span class="text-[11px] font-semibold">Tool Fence</span>
-              <span class="text-[9px] text-slate-400">Sandbox Isolation</span>
-            </div>
-          </div>
+        <div class="pt-4 border-t border-zinc-800/80 text-xs font-mono text-zinc-400 flex items-center justify-between">
+          <span>Recursive CTE Traversal</span>
+          <span class="text-emerald-400 font-semibold">p95 ≤ 31ms</span>
         </div>
       </div>
 
-      <!-- Card 2: agent-spine (Span 5) -->
-      <div class="md:col-span-5 rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-xl p-7 hover:border-indigo-500/40 transition-all duration-300 relative group overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-56 h-56 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/20 transition-all"></div>
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-xl bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-            <span class="material-symbols-outlined text-xl">account_tree</span>
+      <!-- Pillar 2 -->
+      <div class="p-7 rounded-xl border border-zinc-800 bg-zinc-900/20 hover:border-zinc-700 transition-colors flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200">
+              <AlertTriangle class="w-4 h-4 text-amber-400" />
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white font-headline">2. Closed-Loop Trap Detection</h3>
+              <p class="text-xs font-mono text-zinc-500">Negative Reinforcement Sentry</p>
+            </div>
           </div>
-          <div>
-            <h3 class="text-lg font-headline font-bold text-white">agent-spine</h3>
-            <p class="text-xs font-mono text-indigo-400">Declarative YAML DAG Workflows</p>
-          </div>
+          <p class="text-sm text-zinc-400 leading-relaxed mb-4 font-body">
+            LLMs repeatedly hallucinate deprecated flags and failing test commands. agent-brain captures execution outcomes directly into <span class="text-zinc-200 font-mono">verify_outcomes</span>. Commands that exit non-zero are instantly squelched from recommendations, while proven recipes (exit 0) are elevated into mandatory <span class="text-zinc-200 font-mono">must_apply</span> directives.
+          </p>
         </div>
-        <p class="text-slate-400 text-sm leading-relaxed mb-6 font-body">
-          State machine engine ensuring step-by-step determinism. Eliminates unguided autonomous drift with hard human approval gates.
-        </p>
-
-        <!-- Interactive Visual DAG Step Tracker -->
-        <div class="rounded-xl border border-slate-800/80 bg-slate-950/80 p-3.5 space-y-2 font-mono text-xs">
-          <div class="flex items-center gap-2 text-slate-300">
-            <span class="w-5 h-5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-[10px]">1</span>
-            <span>Plan &amp; Architecture</span>
-            <span class="ml-auto text-emerald-400 text-[10px]">VERIFIED</span>
-          </div>
-          <div class="flex items-center gap-2 text-slate-300">
-            <span class="w-5 h-5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-[10px]">2</span>
-            <span>Code &amp; Invariant Gate</span>
-            <span class="ml-auto text-emerald-400 text-[10px]">VERIFIED</span>
-          </div>
-          <div class="flex items-center gap-2 text-cyan-300">
-            <span class="w-5 h-5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-500/40 flex items-center justify-center text-[10px] animate-pulse">3</span>
-            <span>.verify/ Independent Sandbox</span>
-            <span class="ml-auto text-cyan-400 text-[10px]">RUNNING</span>
-          </div>
-          <div class="flex items-center gap-2 text-slate-500">
-            <span class="w-5 h-5 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-[10px]">4</span>
-            <span>Human Approval Gate</span>
-            <span class="ml-auto text-slate-500 text-[10px]">QUEUED</span>
-          </div>
+        <div class="pt-4 border-t border-zinc-800/80 text-xs font-mono text-zinc-400 flex items-center justify-between">
+          <span>Failed Recipe Squelching</span>
+          <span class="text-emerald-400 font-semibold">Zero-Token Loops</span>
         </div>
       </div>
 
-      <!-- Card 3: agstack SDLC Engine (Span 6) -->
-      <div class="md:col-span-6 rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-xl p-7 hover:border-teal-500/40 transition-all duration-300 relative group overflow-hidden">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-xl bg-teal-950/80 border border-teal-500/30 flex items-center justify-center text-teal-400">
-            <span class="material-symbols-outlined text-xl">terminal</span>
+      <!-- Pillar 3 -->
+      <div class="p-7 rounded-xl border border-zinc-800 bg-zinc-900/20 hover:border-zinc-700 transition-colors flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200">
+              <Shield class="w-4 h-4 text-rose-400" />
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white font-headline">3. Active Policy Sentry</h3>
+              <p class="text-xs font-mono text-zinc-500">Host-Level Mechanical Guardrails</p>
+            </div>
           </div>
-          <div>
-            <h3 class="text-lg font-headline font-bold text-white">agstack SDLC Engine</h3>
-            <p class="text-xs font-mono text-teal-400">25+ Disciplined Playbooks &amp; Skills</p>
-          </div>
+          <p class="text-sm text-zinc-400 leading-relaxed mb-4 font-body">
+            Prompts and advisory instructions are routinely ignored by LLMs. agent-brain hooks directly into the host runtime (<span class="text-zinc-200 font-mono">route_gate.py</span>, <span class="text-zinc-200 font-mono">bash-gate</span>). It physically halts execution if an agent attempts unscouted massive file reads, unallowlisted destructive operations, or bypasses verification before completing tasks.
+          </p>
         </div>
-        <p class="text-slate-400 text-sm leading-relaxed mb-6 font-body">
-          Replaces verbose, hallucinated comment slop with verifiable code artifacts. Strict verification separation keeps evaluation isolated from generation.
-        </p>
-
-        <!-- File Tree Preview -->
-        <div class="rounded-xl border border-slate-800/80 bg-slate-950/80 p-3.5 font-mono text-xs text-slate-400 space-y-1.5">
-          <div class="text-cyan-400 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-xs">folder_open</span> .verify/
-          </div>
-          <div class="pl-4 text-slate-300 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-xs text-cyan-400">description</span> spec.invariants.md
-          </div>
-          <div class="pl-4 text-slate-300 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-xs text-cyan-400">checklist</span> regression-matrix.yaml
-          </div>
-          <div class="pl-4 text-emerald-400 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-xs">verified</span> cryptographic_proof.sig
-          </div>
+        <div class="pt-4 border-t border-zinc-800/80 text-xs font-mono text-zinc-400 flex items-center justify-between">
+          <span>Jailbreak &amp; Prompt Defense</span>
+          <span class="text-emerald-400 font-semibold">250/250 Passed</span>
         </div>
       </div>
 
-      <!-- Card 4: Strict Verification Harness (.verify/) (Span 6) -->
-      <div class="md:col-span-6 rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-xl p-7 hover:border-cyan-500/40 transition-all duration-300 relative group overflow-hidden">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-xl bg-teal-950/60 border border-teal-500/30 flex items-center justify-center text-teal-400">
-            <span class="material-symbols-outlined text-xl">verified</span>
+      <!-- Pillar 4 -->
+      <div class="p-7 rounded-xl border border-zinc-800 bg-zinc-900/20 hover:border-zinc-700 transition-colors flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-200">
+              <Activity class="w-4 h-4 text-cyan-400" />
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white font-headline">4. Universal Cross-Host Neural Bus</h3>
+              <p class="text-xs font-mono text-zinc-500">Shared Background Daemon</p>
+            </div>
           </div>
-          <div>
-            <h3 class="text-lg font-headline font-bold text-white">Strict Verification Harness (.verify/)</h3>
-            <p class="text-xs font-mono text-teal-400">Allowlisted Phased Runner & Proof Artifacts</p>
-          </div>
+          <p class="text-sm text-zinc-400 leading-relaxed mb-4 font-body">
+            Eliminates siloed agent context. A build fix discovered by Claude Code in your terminal is instantly available to Cursor in the IDE, Antigravity in agentic loops, and CI runners. All hosts connect over stdio proxy to a unified background SQLite daemon with WAL concurrency.
+          </p>
         </div>
-        <p class="text-slate-400 text-sm leading-relaxed mb-6 font-body">
-          Strict verification root separation keeps input fixtures read-only while test harnesses, snapshots, and logs output strictly under .verify/. Zero permission asking: every modification is verified before completion.
-        </p>
-
-        <!-- Metric Cards -->
-        <div class="grid grid-cols-2 gap-3 font-mono">
-          <div class="rounded-xl border border-slate-800/80 bg-slate-950/80 p-3.5">
-            <span class="text-slate-500 text-[10px] block mb-1">VERIFICATION PASS RATE</span>
-            <span class="text-2xl font-bold text-emerald-400">100%</span>
-            <span class="text-[10px] text-slate-400 block mt-1">Exit code 0 mandatory</span>
-          </div>
-          <div class="rounded-xl border border-slate-800/80 bg-slate-950/80 p-3.5">
-            <span class="text-slate-500 text-[10px] block mb-1">PROOF ARTIFACT SURVIVAL</span>
-            <span class="text-2xl font-bold text-cyan-400">Deterministic</span>
-            <span class="text-[10px] text-slate-400 block mt-1">Self-contained evidence</span>
-          </div>
+        <div class="pt-4 border-t border-zinc-800/80 text-xs font-mono text-zinc-400 flex items-center justify-between">
+          <span>Cross-Host Synchronization</span>
+          <span class="text-emerald-400 font-semibold">Shared brain.db</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SECTION: REAL INTERACTIVE QUICKSTART TERMINAL -->
-  <section class="max-w-5xl mx-auto px-6 py-16" id="quickstart">
-    <div class="rounded-2xl border border-cyan-500/30 bg-slate-950/90 backdrop-blur-xl p-6 sm:p-8 shadow-[0_0_40px_rgba(6,182,212,0.12)]">
-      <!-- Header & Runtime Tabs -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+  <!-- SECTION: VERIFIED BENCHMARKS (Evidence-Based, Zero Fluff) -->
+  <section class="max-w-6xl mx-auto px-6 py-16 border-t border-b border-zinc-900" id="benchmarks">
+    <div class="max-w-2xl mx-auto text-center mb-12">
+      <div class="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-2">Measured System Metrics</div>
+      <h2 class="text-2xl sm:text-3xl font-bold font-headline text-white tracking-tight mb-3">
+        Engineered for Sub-Millisecond Speed &amp; Hard Isolation
+      </h2>
+      <p class="text-xs sm:text-sm text-zinc-400">Every metric is verified through recorded CLI execution in .verify/.</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 font-mono text-left">
+      <div class="p-5 rounded-lg border border-zinc-800/80 bg-zinc-950/40">
+        <div class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider mb-2">Warm Route Latency</div>
+        <div class="text-2xl sm:text-3xl font-bold text-white">≤ 24ms</div>
+        <div class="text-zinc-500 text-[11px] mt-1">p95 over 500+ turns</div>
+      </div>
+      <div class="p-5 rounded-lg border border-zinc-800/80 bg-zinc-950/40">
+        <div class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider mb-2">Procedure Traversal</div>
+        <div class="text-2xl sm:text-3xl font-bold text-emerald-400">≤ 31ms</div>
+        <div class="text-zinc-500 text-[11px] mt-1">p95 recursive CTE depth</div>
+      </div>
+      <div class="p-5 rounded-lg border border-zinc-800/80 bg-zinc-950/40">
+        <div class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider mb-2">Jailbreak Defense</div>
+        <div class="text-2xl sm:text-3xl font-bold text-white">250/250</div>
+        <div class="text-zinc-500 text-[11px] mt-1">Adversarial queries passed</div>
+      </div>
+      <div class="p-5 rounded-lg border border-zinc-800/80 bg-zinc-950/40">
+        <div class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider mb-2">Core I/O Isolation</div>
+        <div class="text-2xl sm:text-3xl font-bold text-emerald-400">0 I/O</div>
+        <div class="text-zinc-500 text-[11px] mt-1">agent-brain-core boundary</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: QUICKSTART DEPLOYMENT -->
+  <section class="max-w-5xl mx-auto px-6 py-24" id="quickstart">
+    <div class="rounded-xl border border-zinc-800 bg-[#0c0d12] p-6 sm:p-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
         <div>
-          <h3 class="text-xl font-headline font-bold text-white flex items-center gap-2">
-            <span class="material-symbols-outlined text-cyan-400">terminal</span>
-            Deploy In Your Engineering Stack
+          <h3 class="text-lg font-bold font-headline text-white flex items-center gap-2">
+            <Terminal class="w-4 h-4 text-zinc-400" />
+            Quickstart Installation
           </h3>
-          <p class="text-xs text-slate-400 mt-1 font-body">Verified CLI commands for agent-brain and agent-spine.</p>
+          <p class="text-xs text-zinc-400 mt-1">Verified CLI commands for agent-brain and agent-spine.</p>
         </div>
-        <!-- Runtimes Tabs -->
-        <div class="inline-flex p-1 bg-slate-900 rounded-lg border border-slate-800 text-xs font-mono">
+
+        <!-- Tabs -->
+        <div class="inline-flex p-0.5 rounded-md bg-zinc-950 border border-zinc-800 text-xs font-mono">
           <button 
             type="button" 
             onclick={() => activeTab = 'brew'} 
-            class="px-3 py-1.5 rounded-md transition cursor-pointer {activeTab === 'brew' ? 'bg-cyan-950 text-cyan-300 font-semibold border border-cyan-500/30' : 'text-slate-400 hover:text-slate-200'}"
+            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'brew' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
           >
             Homebrew
           </button>
           <button 
             type="button" 
-            onclick={() => activeTab = 'spine'} 
-            class="px-3 py-1.5 rounded-md transition cursor-pointer {activeTab === 'spine' ? 'bg-cyan-950 text-cyan-300 font-semibold border border-cyan-500/30' : 'text-slate-400 hover:text-slate-200'}"
-          >
-            agent-spine
-          </button>
-          <button 
-            type="button" 
             onclick={() => activeTab = 'brain'} 
-            class="px-3 py-1.5 rounded-md transition cursor-pointer {activeTab === 'brain' ? 'bg-cyan-950 text-cyan-300 font-semibold border border-cyan-500/30' : 'text-slate-400 hover:text-slate-200'}"
+            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'brain' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
           >
             agent-brain
           </button>
           <button 
             type="button" 
+            onclick={() => activeTab = 'spine'} 
+            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'spine' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
+          >
+            agent-spine
+          </button>
+          <button 
+            type="button" 
             onclick={() => activeTab = 'cargo'} 
-            class="px-3 py-1.5 rounded-md transition cursor-pointer {activeTab === 'cargo' ? 'bg-cyan-950 text-cyan-300 font-semibold border border-cyan-500/30' : 'text-slate-400 hover:text-slate-200'}"
+            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'cargo' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
           >
             Cargo Source
           </button>
         </div>
       </div>
 
-      <!-- Terminal Shell Body -->
-      <div class="mt-6 rounded-xl bg-black/60 border border-slate-800 p-5 font-mono text-sm relative group">
+      <!-- Terminal Body -->
+      <div class="mt-6 rounded-lg bg-black/60 border border-zinc-800/80 p-5 font-mono text-xs relative group">
         <button 
           type="button" 
           onclick={copyCommand}
-          class="absolute top-4 right-4 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1.5 border border-slate-700 transition cursor-pointer"
+          class="absolute top-4 right-4 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[11px] flex items-center gap-1.5 border border-zinc-700 transition cursor-pointer"
         >
           {#if copied}
             <span class="text-emerald-400">✔ Copied</span>
           {:else}
-            <span class="material-symbols-outlined text-xs">content_copy</span>
+            <Copy class="w-3.5 h-3.5" />
             <span>Copy</span>
           {/if}
         </button>
 
         <div class="space-y-3">
           {#each commandSnippets[activeTab].commands as cmd, idx}
-            <div class="text-slate-400">
-              <span class="text-cyan-400 font-bold">$</span> {cmd}
+            <div class="text-zinc-300">
+              <span class="text-zinc-500 font-bold">$</span> {cmd}
             </div>
             {#if commandSnippets[activeTab].notes[idx]}
-              <div class="text-slate-500 text-xs pl-4">
+              <div class="text-zinc-500 text-[11px] pl-3 border-l border-zinc-800">
                 {commandSnippets[activeTab].notes[idx]}
               </div>
             {/if}
@@ -502,134 +566,44 @@
         </div>
       </div>
 
-      <!-- Terminal Verification Status Pill -->
-      <div class="mt-5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-slate-400">
+      <!-- Footer Pill -->
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-zinc-500">
         <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>macOS Apple Silicon (ARM64)</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Apple Silicon (arm64) &amp; Linux x86_64</span>
           <span>•</span>
-          <span class="text-cyan-300">100% Rust Core</span>
-          <span>•</span>
-          <span>Local-first &amp; Zero Ambient Context Leakage</span>
+          <span>Zero Telemetry Leaks</span>
         </div>
-        <span class="text-slate-500">macOS 13+ (arm64) / Brew 4.x</span>
+        <span class="text-zinc-600">macOS 13+ · SQLite 3.45+</span>
       </div>
     </div>
   </section>
 
-  <!-- SECTION: NON-NEGOTIABLE INVARIANTS -->
-  <section class="max-w-6xl mx-auto px-6 py-20" id="spec">
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <div class="inline-flex items-center gap-1 text-indigo-400 text-xs font-mono font-semibold uppercase tracking-wider mb-2">
-        <span class="material-symbols-outlined text-sm">gavel</span>
-        SDLC Guarantees
-      </div>
-      <h2 class="text-3xl sm:text-4xl font-headline font-bold text-white tracking-tight mb-4">
-        The Engineering Invariants That Never Fail
+  <!-- BOTTOM CALL TO ACTION -->
+  <section class="max-w-4xl mx-auto px-6 text-center py-12">
+    <div class="p-10 rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900/40 to-transparent">
+      <h2 class="text-2xl sm:text-3xl font-bold font-headline text-white tracking-tight mb-3">
+        Ready to govern your coding agents?
       </h2>
-      <p class="text-slate-400 text-sm sm:text-base">
-        Our core architectural pillars replace statistical hope with deterministic mathematical and runtime constraints.
+      <p class="text-sm text-zinc-400 max-w-lg mx-auto mb-6">
+        Install the local binary, configure your host hooks in one click, and stop losing architectural context between turns.
       </p>
-    </div>
-
-    <!-- 4-Card Invariant Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <!-- Invariant 1 -->
-      <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-xl hover:border-cyan-500/40 transition-all duration-300 flex flex-col justify-between">
-        <div>
-          <div class="w-10 h-10 rounded-xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-4 font-mono font-bold text-sm">
-            01
-          </div>
-          <h3 class="text-base font-headline font-bold text-white mb-2">Immutability First</h3>
-          <p class="text-slate-400 text-xs leading-relaxed font-body">
-            Once a workflow step validates, artifacts are cryptographically hashed and sealed. No background modifications allowed.
-          </p>
-        </div>
-        <div class="mt-6 pt-4 border-t border-slate-800/80 text-[11px] font-mono text-cyan-400 flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">fingerprint</span>
-          SHA-256 Proof Sealing
-        </div>
-      </div>
-
-      <!-- Invariant 2 -->
-      <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-xl hover:border-indigo-500/40 transition-all duration-300 flex flex-col justify-between">
-        <div>
-          <div class="w-10 h-10 rounded-xl bg-indigo-950/60 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4 font-mono font-bold text-sm">
-            02
-          </div>
-          <h3 class="text-base font-headline font-bold text-white mb-2">Boundary Discipline</h3>
-          <p class="text-slate-400 text-xs leading-relaxed font-body">
-            Strict context windows and AST tool fencing. Agents cannot exceed assigned scopes or hallucinate out-of-band parameters.
-          </p>
-        </div>
-        <div class="mt-6 pt-4 border-t border-slate-800/80 text-[11px] font-mono text-indigo-400 flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">fence</span>
-          Fenced AST Sandbox
-        </div>
-      </div>
-
-      <!-- Invariant 3 -->
-      <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between">
-        <div>
-          <div class="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 font-mono font-bold text-sm">
-            03
-          </div>
-          <h3 class="text-base font-headline font-bold text-white mb-2">Fix Root Causes</h3>
-          <p class="text-slate-400 text-xs leading-relaxed font-body">
-            Automatic trace analysis pinpoints logic bugs rather than looping infinite token retries and burning operational budgets.
-          </p>
-        </div>
-        <div class="mt-6 pt-4 border-t border-slate-800/80 text-[11px] font-mono text-emerald-400 flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">troubleshoot</span>
-          Zero Token Burn Loops
-        </div>
-      </div>
-
-      <!-- Invariant 4 -->
-      <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-xl hover:border-teal-500/40 transition-all duration-300 flex flex-col justify-between">
-        <div>
-          <div class="w-10 h-10 rounded-xl bg-teal-950/60 border border-teal-500/30 flex items-center justify-center text-teal-400 mb-4 font-mono font-bold text-sm">
-            04
-          </div>
-          <h3 class="text-base font-headline font-bold text-white mb-2">Zero Comment Slop</h3>
-          <p class="text-slate-400 text-xs leading-relaxed font-body">
-            Enforced clean, production-grade code output without redundant assistant narrative or conversational fluff in repositories.
-          </p>
-        </div>
-        <div class="mt-6 pt-4 border-t border-slate-800/80 text-[11px] font-mono text-teal-400 flex items-center gap-1">
-          <span class="material-symbols-outlined text-xs">code_blocks</span>
-          Pure Production Code
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION: HIGH-IMPACT CALL TO ACTION BANNER -->
-  <section class="max-w-6xl mx-auto px-6 py-12">
-    <div class="relative rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-b from-slate-900/90 via-slate-950 to-slate-950 p-10 sm:p-16 text-center shadow-[0_0_60px_rgba(6,182,212,0.2)]">
-      <!-- Cosmic glow background inside banner -->
-      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-indigo-500/30 via-cyan-500/30 to-teal-400/20 blur-[90px] rounded-full pointer-events-none"></div>
-      <div class="relative z-10 max-w-2xl mx-auto">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 mb-6">
-          <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-          Enterprise Production Ready
-        </div>
-        <h2 class="text-3xl sm:text-5xl font-headline font-extrabold text-white tracking-tight mb-6">
-          Architect Your Autonomous Fleet Today
-        </h2>
-        <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-8 font-body">
-          Join forward-thinking software engineering organizations migrating from chaotic prompt chains to disciplined, verifiable agent operations.
-        </p>
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-sm font-headline font-semibold text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-300 hover:from-cyan-300 hover:to-indigo-200 shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-200 active:scale-95" href="#quickstart">
-            <span>Install CLI (Homebrew)</span>
-            <span class="material-symbols-outlined text-base">arrow_forward</span>
-          </a>
-          <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-sm font-headline font-medium text-slate-200 bg-slate-900 border border-slate-700/80 hover:border-cyan-500/40 transition-all duration-200 active:scale-95" href="/docs/architecture">
-            <span class="material-symbols-outlined text-base text-cyan-400">calendar_month</span>
-            <span>Architecture Spec</span>
-          </a>
-        </div>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a 
+          href="#quickstart" 
+          class="w-full sm:w-auto px-5 py-2.5 rounded-lg text-sm font-semibold text-zinc-950 bg-white hover:bg-zinc-200 transition-colors"
+        >
+          Get Started
+        </a>
+        <a 
+          href="https://github.com/autonomic-ai-dev/agent-brain" 
+          target="_blank" 
+          rel="noreferrer"
+          class="w-full sm:w-auto px-5 py-2.5 rounded-lg text-sm font-medium text-zinc-300 border border-zinc-800 hover:border-zinc-700 transition-colors inline-flex items-center justify-center gap-1.5"
+        >
+          <span>View on GitHub</span>
+          <ExternalLink class="w-3.5 h-3.5 text-zinc-500" />
+        </a>
       </div>
     </div>
   </section>
