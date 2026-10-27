@@ -507,12 +507,7 @@ description: Everything Claude Code — large curated skill library`
   <link rel="canonical" href="https://autonomic-ai.dev/registry" />
 </svelte:head>
 
-<div class="relative min-h-screen bg-black text-neutral-100 font-body antialiased selection:bg-neutral-800 selection:text-white pb-24">
-  
-  <!-- Subtle Background Grid & Glows -->
-  <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(255,255,255,0.05),transparent_70%)] pointer-events-none"></div>
-  <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
-
+<div class="relative min-h-screen bg-transparent text-neutral-100 font-body antialiased selection:bg-neutral-800 selection:text-white pb-24">
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
 
     <!-- HERO SECTION -->
@@ -618,7 +613,7 @@ description: Everything Claude Code — large curated skill library`
       <!-- LEFT COLUMN: Grid of Items (8 Cols) -->
       <div class="lg:col-span-7 xl:col-span-8 space-y-4">
         {#if filteredItems.length === 0}
-          <div class="p-12 text-center rounded-2xl border border-white/[0.06] bg-slate-950/40">
+          <div class="p-12 text-center rounded-2xl border border-white/[0.06] bg-neutral-950/40">
             <Layers size={32} class="text-slate-600 mx-auto mb-3" />
             <h3 class="font-headline font-bold text-white text-base">No registry resources found</h3>
             <p class="text-xs text-slate-400 mt-1">Try modifying your query or selecting "All Resources".</p>
@@ -693,7 +688,7 @@ description: Everything Claude Code — large curated skill library`
 
       <!-- RIGHT COLUMN: Interactive Inspector & Blueprint Terminal (4-5 Cols) -->
       <aside class="lg:col-span-5 xl:col-span-4 sticky top-24 space-y-4">
-        <div class="p-6 rounded-2xl bg-slate-950/80 border border-white/[0.1] shadow-2xl backdrop-blur-md">
+        <div class="p-6 rounded-2xl bg-neutral-950/80 border border-white/[0.1] shadow-2xl backdrop-blur-md">
           
           <!-- Inspector Header -->
           <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
