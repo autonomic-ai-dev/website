@@ -132,9 +132,6 @@
         <span class="flex items-center gap-2 hover:text-white transition-colors">
           <Layers class="w-3.5 h-3.5 text-zinc-500" /> OPENCODE
         </span>
-        <span class="flex items-center gap-2 hover:text-white transition-colors">
-          <GitBranch class="w-3.5 h-3.5 text-zinc-500" /> GITHUB ACTIONS
-        </span>
       </div>
     </div>
 
