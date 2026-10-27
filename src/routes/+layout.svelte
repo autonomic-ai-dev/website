@@ -2,6 +2,7 @@
   import "../app.css";
   import { onMount } from "svelte";
   import { page } from "$app/stores";
+  import AnimatedBackground from "$lib/components/AnimatedBackground.svelte";
   let { children, data } = $props();
 
   onMount(() => {
@@ -75,11 +76,8 @@
 
 <div class="bg-black text-neutral-100 font-body selection:bg-neutral-800 selection:text-white antialiased relative min-h-screen overflow-x-clip">
   
-  <!-- Subtle Vercel-style radial spotlight and fine grid -->
-  <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_70%)] blur-[90px]"></div>
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
-  </div>
+  <!-- Framer Motion-Driven Rich DevEx Atmospheric Background & Neural Mesh -->
+  <AnimatedBackground />
 
   <!-- Shared Component: TopNavBar (Minimalist Island Header) -->
   <header class="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-6xl rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.8)] bg-black/80 backdrop-blur-xl z-50 transition-all duration-200">
@@ -146,13 +144,17 @@
             All systems operational
           </a>
         </div>
-        <!-- Links -->
+        <!-- Synchronized Navigation Links matching Header -->
         <nav class="flex flex-wrap items-center gap-6 font-mono text-xs text-neutral-400">
+          <a class="hover:text-white transition-colors duration-150" href="/#platform">Platform</a>
           <a class="hover:text-white transition-colors duration-150" href="/docs/architecture">Architecture</a>
           <a class="hover:text-white transition-colors duration-150" href="/registry">Registry</a>
-          <a class="hover:text-white transition-colors duration-150" href="/docs/memory">Memory</a>
           <a class="hover:text-white transition-colors duration-150" href="/docs">Docs</a>
           <a class="hover:text-white transition-colors duration-150" href="/docs/cli">CLI Reference</a>
+          <a class="hover:text-emerald-400 transition-colors duration-150 flex items-center gap-1.5" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span>Status</span>
+          </a>
           <a class="hover:text-white transition-colors duration-150" href="https://github.com/autonomic-ai-dev" target="_blank" rel="noopener noreferrer">GitHub</a>
         </nav>
       </div>

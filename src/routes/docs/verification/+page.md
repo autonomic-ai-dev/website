@@ -3,20 +3,20 @@ title: Deterministic Verification Harness — .verify/ Proof Engine
 ---
 
 <div id="hero" class="space-y-4 not-prose mb-8">
-  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-xs font-mono text-cyan-300">
-    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono text-neutral-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
     <span>Verification Engine — Deterministic Harness</span>
   </div>
 
   <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
-    Deterministic Verification <br/>
-    <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-cyan-300 to-indigo-400">
+    Deterministic Verification — <br/>
+    <span class="text-neutral-400 font-normal">
       The .verify/ Proof Harness
     </span>
   </h1>
 
-  <p class="text-base sm:text-lg text-slate-300 font-body leading-relaxed max-w-3xl">
-    In Autonomic AI, claims of test success or code correctness are never accepted from conversational statements. Every claim must be backed by a cryptographically sealed verification record generated through <code class="text-cyan-400 font-mono">agent-brain verify</code> that exited 0.
+  <p class="text-base sm:text-lg text-neutral-300 font-body leading-relaxed max-w-3xl">
+    In Autonomic AI, claims of test success or code correctness are never accepted from conversational statements. Every claim must be backed by a cryptographically sealed verification record generated through <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">agent-brain verify</code> that exited 0.
   </p>
 </div>
 
@@ -34,8 +34,8 @@ flowchart LR
     SBX --> PROOF["03 Proof Generation\n• SHA-256 scenario hash\n• UUID receipt sealing"]
     PROOF --> REC[("04 .verify/ Store\n• Append-only ledger\n• Exit 0 verified")]
 
-    classDef procNode fill:#0d1117,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc;
-    classDef storeNode fill:#064e3b,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
+    classDef procNode fill:#0d0d0d,stroke:#444444,stroke-width:1px,color:#f4f4f5;
+    classDef storeNode fill:#141414,stroke:#777777,stroke-width:1.5px,color:#ffffff;
     class CMD,SBX,PROOF procNode;
     class REC storeNode;
 ```
@@ -54,38 +54,38 @@ flowchart LR
       <span class="text-emerald-400 font-mono text-sm">01</span>
       <h3 class="text-base font-headline font-semibold text-white">Verification Root Separation</h3>
     </div>
-    <p class="text-xs text-slate-300 leading-relaxed">
-      All generated test harnesses, snapshots, logs, and artifacts MUST output strictly to <code class="text-cyan-300 font-mono">.verify/</code>. Reference test fixtures remain strictly read-only to prevent agents from modifying test expectations to fake passing results.
+    <p class="text-xs text-neutral-300 leading-relaxed">
+      All generated test harnesses, snapshots, logs, and artifacts MUST output strictly to <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">.verify/</code>. Reference test fixtures remain strictly read-only to prevent agents from modifying test expectations to fake passing results.
     </p>
   </div>
 
-  <div class="p-5 rounded-2xl bg-slate-900/40 border border-white/[0.08]">
+  <div class="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
     <div class="flex items-center gap-2 mb-2">
-      <span class="text-emerald-400 font-mono text-sm">02</span>
+      <span class="text-white font-mono text-sm">02</span>
       <h3 class="text-base font-headline font-semibold text-white">Hard Exit Code 0 Invariant</h3>
     </div>
-    <p class="text-xs text-slate-300 leading-relaxed">
+    <p class="text-xs text-neutral-300 leading-relaxed">
       No agent is permitted to claim a task is complete or that checks pass without a recorded execution that exited with return code 0. Any non-zero exit immediately breaks execution and triggers root-cause fault isolation.
     </p>
   </div>
 
-  <div class="p-5 rounded-2xl bg-slate-900/40 border border-white/[0.08]">
+  <div class="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
     <div class="flex items-center gap-2 mb-2">
-      <span class="text-emerald-400 font-mono text-sm">03</span>
+      <span class="text-white font-mono text-sm">03</span>
       <h3 class="text-base font-headline font-semibold text-white">Cryptographic Scenario Sealing</h3>
     </div>
-    <p class="text-xs text-slate-300 leading-relaxed">
+    <p class="text-xs text-neutral-300 leading-relaxed">
       Every execution calculates a SHA-256 hash of the entire scenario tree and git working directory. Proof receipts verify that the exact tree tested is identical to the tree committed.
     </p>
   </div>
 
-  <div class="p-5 rounded-2xl bg-slate-900/40 border border-white/[0.08]">
+  <div class="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
     <div class="flex items-center gap-2 mb-2">
-      <span class="text-emerald-400 font-mono text-sm">04</span>
+      <span class="text-white font-mono text-sm">04</span>
       <h3 class="text-base font-headline font-semibold text-white">Playbook Modularity</h3>
     </div>
-    <p class="text-xs text-slate-300 leading-relaxed">
-      Playbooks reside under <code class="text-cyan-300 font-mono">.verify/playbooks/*.sh</code>. Each playbook targets a specific boundary: formula versioning, schema verification, regression suites, or static type-checking.
+    <p class="text-xs text-neutral-300 leading-relaxed">
+      Playbooks reside under <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">.verify/playbooks/*.sh</code>. Each playbook targets a specific boundary: formula versioning, schema verification, regression suites, or static type-checking.
     </p>
   </div>
 </div>
@@ -98,7 +98,7 @@ flowchart LR
 
 ## Proof Receipt Schema
 
-When a verification command executes, <code class="text-cyan-400 font-mono">agent-brain</code> emits an immutable JSON verification receipt:
+When a verification command executes, <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">agent-brain</code> emits an immutable JSON verification receipt:
 
 ```json
 {

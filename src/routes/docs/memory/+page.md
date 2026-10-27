@@ -23,12 +23,12 @@ sequenceDiagram
     Governor->>Graph: Hybrid RRF (Vector + Lexical + Exact) & Knapsack Packing
     Graph-->>Governor: Top ranked skills + rules + verified recipes (~500 tok)
     Governor-->>Host: Token-budgeted context + must_apply constraints
-    Host->>Governor: Executes verified tool / task
-    Host->>Governor: agent-brain verify -- <cmd>
+    Host->>Governor: Executes verified tool or task
+    Host->>Governor: agent-brain verify -- command
     alt Exit 0 (Success)
-        Governor->>Graph: Promote procedure edge (procedure_edges) & verified recipe
-    alt Non-Zero (Failure)
-        Governor->>Graph: Squelch recipe & synthesize TRAP WARNING into must_apply
+        Governor->>Graph: Promote procedure edge & verified recipe
+    else Non-Zero (Failure)
+        Governor->>Graph: Squelch recipe & synthesize TRAP WARNING
     end
 ```
 

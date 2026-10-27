@@ -23,7 +23,7 @@
 
   let { data } = $props();
   let version = $derived(data?.ecosystemVersion || 'v1.0.0-rc2');
-  let activeTab = $state<'brew' | 'brain' | 'spine' | 'cargo'>('brew');
+  let activeTab = $state<'brew' | 'cargo'>('brew');
   let activeConsoleTab = $state<'procedure-graph' | 'trap-detection' | 'policy-sentry' | 'neural-bus'>('procedure-graph');
   let copied = $state(false);
 
@@ -35,33 +35,9 @@
         "agent-brain doctor"
       ],
       notes: [
-        "Installed developer ID-signed Apple Silicon universal binary",
-        "Verified MCP stdio server, SQLite schema v23, and host hooks",
-        "Ready for local-first turn routing across all coding agents"
-      ]
-    },
-    brain: {
-      commands: [
-        "agent-brain install --global",
-        "agent-brain package add nextlevelbuilder/ui-ux-pro-max-skill",
-        "agent-brain briefing"
-      ],
-      notes: [
-        "Configured MCP stdio server + editor read-gates in global scope",
-        "Recursively indexed package into local vector and procedure DAG",
-        "Route briefing: token budget 448 / 600 tokens (cache latency: 0.4ms)"
-      ]
-    },
-    spine: {
-      commands: [
-        "agent-spine init --with build-and-test",
-        "agent-spine validate .autonomic/state/spine/build-and-test.yaml",
-        "agent-spine run .autonomic/state/spine/build-and-test.yaml"
-      ],
-      notes: [
-        "Scaffolded declarative YAML DAG workflow with state snapshotting",
-        "Validated node dependencies, step transitions, and approval gates",
-        "Execution complete: all nodes sealed with deterministic state"
+        "Installed developer ID-signed Apple Silicon universal binaries for both agent-brain & agent-spine",
+        "Configured MCP stdio server, SQLite schema v23, and host pre-tool hooks",
+        "Ready for local-first turn routing across Cursor, Claude Code, and Antigravity"
       ]
     },
     cargo: {
@@ -163,7 +139,7 @@
     </div>
 
     <!-- HERO CENTERPIECE: Minimalist Developer Console (Memorable / Render Inspired) -->
-    <div class="mt-12 max-w-5xl mx-auto rounded-xl border border-zinc-800 bg-[#0c0d12] shadow-2xl text-left overflow-hidden ring-1 ring-white/[0.05]" id="console">
+    <div class="mt-12 max-w-5xl mx-auto rounded-xl border border-white/10 bg-neutral-950/80 shadow-2xl text-left overflow-hidden ring-1 ring-white/[0.05]" id="console">
       <!-- Window Title & Tab Bar -->
       <div class="px-4 py-2.5 bg-zinc-900/70 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
@@ -494,7 +470,7 @@
 
   <!-- SECTION: QUICKSTART DEPLOYMENT -->
   <section class="max-w-5xl mx-auto px-6 py-24" id="quickstart">
-    <div class="rounded-xl border border-zinc-800 bg-[#0c0d12] p-6 sm:p-8">
+    <div class="rounded-xl border border-white/10 bg-neutral-950/80 p-6 sm:p-8">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
         <div>
           <h3 class="text-lg font-bold font-headline text-white flex items-center gap-2">
@@ -509,28 +485,14 @@
           <button 
             type="button" 
             onclick={() => activeTab = 'brew'} 
-            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'brew' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
+            class="px-3.5 py-1.5 rounded transition cursor-pointer {activeTab === 'brew' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
           >
             Homebrew
           </button>
           <button 
             type="button" 
-            onclick={() => activeTab = 'brain'} 
-            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'brain' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
-          >
-            agent-brain
-          </button>
-          <button 
-            type="button" 
-            onclick={() => activeTab = 'spine'} 
-            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'spine' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
-          >
-            agent-spine
-          </button>
-          <button 
-            type="button" 
             onclick={() => activeTab = 'cargo'} 
-            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'cargo' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
+            class="px-3.5 py-1.5 rounded transition cursor-pointer {activeTab === 'cargo' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
           >
             Cargo Source
           </button>

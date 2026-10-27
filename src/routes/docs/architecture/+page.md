@@ -13,9 +13,9 @@ flowchart LR
     Spine["agent-spine\n(YAML DAG engine)"] -->|events| Nats["NATS (optional)"]
     Brain -.->|route context| Spine
 
-    classDef host fill:#0f172a,stroke:#64748b,stroke-width:1.5px,color:#f8fafc;
-    classDef core fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
-    classDef exec fill:#261606,stroke:#f59e0b,stroke-width:1.5px,color:#f8fafc;
+    classDef host fill:#0a0a0a,stroke:#333333,stroke-width:1px,color:#d4d4d8;
+    classDef core fill:#121212,stroke:#666666,stroke-width:1.5px,color:#f4f4f5;
+    classDef exec fill:#121212,stroke:#666666,stroke-width:1.5px,color:#f4f4f5;
     class Host host;
     class Brain core;
     class Spine exec;

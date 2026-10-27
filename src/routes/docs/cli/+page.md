@@ -3,20 +3,17 @@ title: Autonomic AI CLI Reference Manual
 ---
 
 <div id="hero" class="space-y-4 not-prose mb-8">
-  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-xs font-mono text-cyan-300">
-    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono text-neutral-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
     <span>autonomic-ai.dev/cli — Official Manual</span>
   </div>
 
   <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
-    Autonomic AI <br/>
-    <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-300 to-indigo-500">
-      CLI Reference Manual
-    </span>
+    Autonomic AI CLI Reference
   </h1>
 
-  <p class="text-base sm:text-lg text-slate-300 font-body leading-relaxed max-w-3xl">
-    Command-line interface manual for the Autonomic AI dual-engine architecture. Manage token-bounded MCP routing and vector memory with <code class="font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/25">agent-brain</code>, and orchestrate deterministic YAML DAG state machines with <code class="font-mono text-indigo-400 bg-indigo-950/60 px-1.5 py-0.5 rounded border border-indigo-500/25">agent-spine</code>.
+  <p class="text-base sm:text-lg text-neutral-300 font-body leading-relaxed max-w-3xl">
+    Command-line interface manual for the Autonomic AI dual-engine architecture. Manage token-bounded cognitive governor routing, procedure graph recall, and vector memory with <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">agent-brain</code>, and orchestrate deterministic YAML DAG state machines with <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">agent-spine</code>.
   </p>
 </div>
 
@@ -51,9 +48,9 @@ flowchart LR
     Dev --> Spine["agent-spine (Execution Engine)\n• run (YAML DAGs)\n• approval gates\n• inspect & replay"]
     Brain -.->|route context| Spine
 
-    classDef brainClass fill:#0d1117,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc;
-    classDef spineClass fill:#0d1117,stroke:#6366f1,stroke-width:1.5px,color:#f8fafc;
-    classDef devClass fill:#161b22,stroke:#475569,stroke-width:1px,color:#e2e8f0;
+    classDef brainClass fill:#0d0d0d,stroke:#555555,stroke-width:1.5px,color:#f4f4f5;
+    classDef spineClass fill:#0d0d0d,stroke:#555555,stroke-width:1.5px,color:#f4f4f5;
+    classDef devClass fill:#050505,stroke:#333333,stroke-width:1px,color:#d4d4d8;
     class Brain brainClass;
     class Spine spineClass;
     class Dev devClass;

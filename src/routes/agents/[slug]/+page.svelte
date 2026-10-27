@@ -98,13 +98,13 @@
             <Terminal size={14} class="text-white" />
             <span>CLI INVOCATION</span>
           </span>
-          <a href={`/docs/cli/${agent.id === 'agent-body' ? 'autonomic' : agent.id}`} class="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1 font-semibold">
+          <a href={`/docs/cli/${agent.id === 'agent-body' ? 'autonomic' : agent.id}`} class="text-neutral-300 hover:text-white transition-colors flex items-center gap-1 font-semibold">
             <span>Flag-Level Docs</span>
             <ArrowRight size={12} />
           </a>
         </div>
-        <div class="p-3 rounded-lg bg-[#0d1117] border border-white/[0.06] text-slate-200 flex items-center gap-2 overflow-x-auto">
-          <span class="text-cyan-400 font-bold select-none">&gt;_</span>
+        <div class="p-3 rounded-lg bg-black border border-white/10 text-neutral-200 flex items-center gap-2 overflow-x-auto">
+          <span class="text-neutral-500 font-bold select-none">&gt;_</span>
           <code>{agent.id === 'agent-body' ? 'autonomic status' : `${agent.id} --help`}</code>
         </div>
       </div>
@@ -113,33 +113,33 @@
     <!-- Right Column: Subsystem Metrics & Specs -->
     <div class="space-y-6">
       
-      <div class="bg-[#0d1117]/85 border border-white/[0.08] rounded-xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
-        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-400 mb-4">// Telemetry Profile</div>
+      <div class="bg-neutral-950 border border-white/10 rounded-xl p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-neutral-400 mb-4">// Telemetry Profile</div>
         
         <div class="space-y-4 font-mono text-xs">
           <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-            <span class="text-slate-400">IPC Protocol</span>
-            <span class="text-cyan-300 font-semibold">{agent.protocol}</span>
+            <span class="text-neutral-400">IPC Protocol</span>
+            <span class="text-neutral-200 font-semibold">{agent.protocol}</span>
           </div>
 
           <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-            <span class="text-slate-400">Response Latency</span>
+            <span class="text-neutral-400">Response Latency</span>
             <span class="text-emerald-400 font-semibold">{agent.latency}</span>
           </div>
 
           <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-            <span class="text-slate-400">Process Model</span>
-            <span class="text-slate-200">Isolated Daemon</span>
+            <span class="text-neutral-400">Process Model</span>
+            <span class="text-neutral-300">Isolated Daemon</span>
           </div>
 
           <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-            <span class="text-slate-400">Runtime Target</span>
-            <span class="text-slate-200">Rust (Metal / CUDA)</span>
+            <span class="text-neutral-400">Runtime Target</span>
+            <span class="text-neutral-300">Rust (Metal / CUDA)</span>
           </div>
 
           <div class="flex items-center justify-between">
-            <span class="text-slate-400">Release Version</span>
-            <span class="text-slate-200">{agent.version}</span>
+            <span class="text-neutral-400">Release Version</span>
+            <span class="text-neutral-300">{agent.version}</span>
           </div>
         </div>
       </div>
@@ -147,14 +147,14 @@
       <!-- Quick Docs Action Card -->
       <a 
         href="/docs/architecture" 
-        class="block p-5 rounded-xl bg-gradient-to-br from-[#161b22] to-[#0d1117] border border-cyan-500/30 hover:border-cyan-400 transition-all group"
+        class="block p-5 rounded-xl bg-neutral-950 border border-white/10 hover:border-white/30 transition-all group"
       >
-        <div class="text-xs font-mono font-semibold text-cyan-400 mb-1 flex items-center gap-1.5">
+        <div class="text-xs font-mono font-semibold text-white mb-1 flex items-center gap-1.5">
           <Activity size={14} />
           <span>Ecosystem Blueprint</span>
         </div>
-        <p class="text-xs text-slate-300 mb-3 font-sans">Learn how {agent.name} fits with the other Autonomic AI component.</p>
-        <div class="text-xs font-mono font-bold text-cyan-400 group-hover:text-cyan-300 flex items-center gap-1">
+        <p class="text-xs text-neutral-400 mb-3 font-sans">Learn how {agent.name} fits with the other Autonomic AI component.</p>
+        <div class="text-xs font-mono font-bold text-neutral-300 group-hover:text-white flex items-center gap-1">
           <span>Read Architecture Spec</span>
           <ArrowRight size={12} class="group-hover:translate-x-0.5 transition-transform" />
         </div>
