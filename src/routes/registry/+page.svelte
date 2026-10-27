@@ -507,43 +507,43 @@ description: Everything Claude Code — large curated skill library`
   <link rel="canonical" href="https://autonomic-ai.dev/registry" />
 </svelte:head>
 
-<div class="relative min-h-screen bg-[#060709] text-slate-100 font-body antialiased selection:bg-cyan-500/20 selection:text-cyan-300 pb-24">
+<div class="relative min-h-screen bg-black text-neutral-100 font-body antialiased selection:bg-neutral-800 selection:text-white pb-24">
   
   <!-- Subtle Background Grid & Glows -->
-  <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(6,182,212,0.12),transparent_70%)] pointer-events-none"></div>
-  <div class="absolute inset-0 bg-[linear-gradient(to_right,#0d1117_1px,transparent_1px),linear-gradient(to_bottom,#0d1117_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-35 pointer-events-none"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(255,255,255,0.05),transparent_70%)] pointer-events-none"></div>
+  <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
 
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
 
     <!-- HERO SECTION -->
     <header class="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-xs font-mono text-cyan-300 mb-6 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
-        <Sparkles size={13} class="text-cyan-400" />
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/10 text-xs font-mono text-neutral-300 mb-6">
+        <Sparkles size={13} class="text-neutral-400" />
         <span>Autonomic Registry • Dual-Engine Ecosystem</span>
       </div>
 
       <h1 class="text-4xl sm:text-5xl lg:text-6xl font-headline font-extrabold tracking-tight text-white mb-6 leading-[1.12]">
         Deterministic Workflows & <br />
-        <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-300 to-indigo-500">
+        <span class="text-white">
           Curated Skill Packages
         </span>
       </h1>
 
-      <p class="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed font-body">
-        Browse certified <span class="text-indigo-400 font-mono font-medium">agent-spine</span> DAG workflows for multi-step state execution, and <span class="text-cyan-400 font-mono font-medium">agent-brain</span> skill bundles for token-bounded cognitive reasoning.
+      <p class="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed font-body">
+        Browse certified <span class="text-white font-mono font-medium">agent-spine</span> DAG workflows for multi-step state execution, and <span class="text-white font-mono font-medium">agent-brain</span> skill bundles for token-bounded cognitive reasoning.
       </p>
 
       <!-- Quick Metrics Pill Banner -->
-      <div class="mt-8 flex flex-wrap justify-center items-center gap-3 sm:gap-6 text-xs font-mono text-slate-400">
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/60 border border-white/[0.08]">
-          <Workflow size={13} class="text-indigo-400" />
+      <div class="mt-8 flex flex-wrap justify-center items-center gap-3 sm:gap-6 text-xs font-mono text-neutral-400">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-950/80 border border-white/10">
+          <Workflow size={13} class="text-neutral-300" />
           <span>7 Verified Spine DAGs</span>
         </div>
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/60 border border-white/[0.08]">
-          <Brain size={13} class="text-cyan-400" />
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-950/80 border border-white/10">
+          <Brain size={13} class="text-neutral-300" />
           <span>8 Audited Skill Packages</span>
         </div>
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/60 border border-white/[0.08]">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-950/80 border border-white/10">
           <Shield size={13} class="text-emerald-400" />
           <span>100% .verify/ Proven</span>
         </div>
@@ -555,23 +555,23 @@ description: Everything Claude Code — large curated skill library`
       <div class="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
         
         <!-- Engine / Kind Switcher -->
-        <div class="inline-flex p-1 rounded-xl bg-slate-900/90 border border-white/[0.08] backdrop-blur-sm">
+        <div class="inline-flex p-1 rounded-xl bg-neutral-950 border border-white/10 backdrop-blur-sm">
           <button
             onclick={() => selectedTab = "all"}
-            class="px-4 py-2 rounded-lg text-xs font-headline font-semibold transition-all {selectedTab === 'all' ? 'bg-cyan-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}"
+            class="px-4 py-2 rounded-lg text-xs font-headline font-semibold transition-all {selectedTab === 'all' ? 'bg-white text-black shadow-sm' : 'text-neutral-400 hover:text-white'}"
           >
             All Resources ({items.length})
           </button>
           <button
             onclick={() => selectedTab = "workflow"}
-            class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-headline font-semibold transition-all {selectedTab === 'workflow' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}"
+            class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-headline font-semibold transition-all {selectedTab === 'workflow' ? 'bg-white text-black shadow-sm' : 'text-neutral-400 hover:text-white'}"
           >
             <Workflow size={13} />
             <span>Spine Workflows (7)</span>
           </button>
           <button
             onclick={() => selectedTab = "package"}
-            class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-headline font-semibold transition-all {selectedTab === 'package' ? 'bg-cyan-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'}"
+            class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-headline font-semibold transition-all {selectedTab === 'package' ? 'bg-white text-black shadow-sm' : 'text-neutral-400 hover:text-white'}"
           >
             <Brain size={13} />
             <span>Brain Packages (8)</span>
@@ -580,17 +580,17 @@ description: Everything Claude Code — large curated skill library`
 
         <!-- Search Bar -->
         <div class="relative flex-1 max-w-md">
-          <Search size={15} class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+          <Search size={15} class="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500" />
           <input
             type="text"
             bind:value={searchQuery}
             placeholder="Search by title, tag (#dag, #sdlc), or command..."
-            class="w-full bg-slate-900/80 border border-white/[0.08] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/40 transition"
+            class="w-full bg-neutral-950 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-white/30 transition"
           />
           {#if searchQuery}
             <button
               onclick={() => searchQuery = ""}
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs font-mono"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white text-xs font-mono"
             >
               clear
             </button>
@@ -631,12 +631,12 @@ description: Everything Claude Code — large curated skill library`
                 tabindex="0"
                 onclick={() => selectedItem = item}
                 onkeydown={(e) => { if (e.key === 'Enter') selectedItem = item; }}
-                class="group text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between {selectedItem.id === item.id ? 'bg-gradient-to-b from-slate-900/90 to-slate-950/90 border-cyan-500/50 shadow-[0_0_25px_rgba(6,182,212,0.12)]' : 'bg-slate-950/40 border-white/[0.08] hover:border-white/[0.18] hover:bg-slate-900/50'}"
+                class="group text-left p-5 rounded-2xl border transition-all duration-150 cursor-pointer flex flex-col justify-between {selectedItem.id === item.id ? 'bg-neutral-900 border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.06)]' : 'bg-neutral-950/60 border-white/10 hover:border-white/20 hover:bg-neutral-900/40'}"
               >
                 <div>
                   <!-- Top Badge Row -->
                   <div class="flex items-center justify-between mb-3">
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium {item.kind === 'workflow' ? 'bg-indigo-950/70 text-indigo-300 border border-indigo-500/30' : 'bg-cyan-950/70 text-cyan-300 border border-cyan-500/30'}">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-white/[0.04] text-neutral-300 border border-white/10">
                       {#if item.kind === 'workflow'}
                         <Workflow size={10} />
                         <span>Spine DAG</span>
@@ -646,26 +646,26 @@ description: Everything Claude Code — large curated skill library`
                       {/if}
                     </span>
 
-                    <span class="text-[10px] font-mono text-slate-500">{item.version}</span>
+                    <span class="text-[10px] font-mono text-neutral-500">{item.version}</span>
                   </div>
 
                   <!-- Title -->
-                  <h3 class="font-headline text-base font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center justify-between">
+                  <h3 class="font-headline text-base font-bold text-white group-hover:text-neutral-200 transition-colors flex items-center justify-between">
                     <span>{item.title}</span>
                     {#if selectedItem.id === item.id}
-                      <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
                     {/if}
                   </h3>
 
                   <!-- Description -->
-                  <p class="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">
+                  <p class="text-xs text-neutral-400 mt-2 line-clamp-2 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
 
                 <!-- Footer & Command Action -->
                 <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                  <div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-500">
+                  <div class="flex items-center gap-1.5 text-[11px] font-mono text-neutral-500">
                     <span>{item.latencyOrMemory}</span>
                   </div>
 
@@ -674,7 +674,7 @@ description: Everything Claude Code — large curated skill library`
                       e.stopPropagation();
                       copyCommand(item.id, item.command);
                     }}
-                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-mono bg-white/[0.05] hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 border border-white/[0.08] transition"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-mono bg-white/[0.04] hover:bg-white/[0.1] text-neutral-300 hover:text-white border border-white/10 transition"
                   >
                     {#if copiedId === item.id}
                       <Check size={11} class="text-emerald-400" />

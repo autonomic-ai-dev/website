@@ -389,10 +389,26 @@ agent-brain stats [OPTIONS]
 
 ### `dashboard`
 
-Generate a local HTML metrics dashboard.
+Generate a local HTML metrics dashboard presenting tokens saved via knapsack packing, dangerous/unscouted blocks, and verified recipes auto-promoted.
 
 ```bash
 agent-brain dashboard [--days N] [--open]
+```
+
+---
+
+### `recall-procedures`
+
+Query the recursive CTE procedure graph to recall proven execution DAGs.
+
+```bash
+agent-brain recall-procedures <QUERY> [--task-kind KIND] [--limit N]
+```
+
+#### Examples
+
+```bash
+agent-brain recall-procedures "reproduce bug" --task-kind debugging
 ```
 
 ---

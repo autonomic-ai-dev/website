@@ -1,151 +1,152 @@
 ---
-title: Memory & Context Routing (agent-brain)
+title: Cognitive Governor & Procedure Graph (agent-brain)
 ---
 
-# `agent-brain` — Vector Memory & Context Router
+# `agent-brain` — Cognitive Governor & Procedure Graph
 
-`agent-brain` is the memory, routing, and context substrate for the Autonomic ecosystem. It solves the critical problem of **context window saturation and rule adherence drift** by selecting the exact slice of ranked skills, rules, and durable facts (~500 tokens) needed for each LLM turn, backed by a temporal SQLite Knowledge Graph and HNSW vector index.
+`agent-brain` is the local-first cognitive governor, procedure graph, and memory engine for autonomous coding agents. It solves the critical problems of **context window saturation, repeated debugging traps, and rule adherence drift** by actively managing the agent's context under a strict token budget (~500 tokens), backed by an embedded SQLite WAL database (`~/.autonomic/memory/brain.db`), in-memory HNSW vector index, and recursive CTE procedure graph.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Agent as "Host Agent (Cursor / Claude)"
-    participant Hook as "route_gate.py (PreToolUse Hook)"
-    participant Proxy as "agent-brain (Stdio Proxy)"
-    participant Daemon as "serve.sock (Background Daemon)"
-    participant Store as "brain.db (SQLite + HNSW)"
+    participant Host as "Host Agent (Cursor / Claude / Antigravity)"
+    participant Sentry as "route_gate.py & command_policy (Host Guard)"
+    participant Governor as "agent-brain (Stdio Proxy & Daemon)"
+    participant Graph as "brain.db (SQLite WAL + HNSW + CTE Graph)"
 
-    Agent->>Hook: Invokes MCP / Shell Tool
-    Hook->>Hook: Checks turn state (route_task called?)
-    alt route_task Not Called
-        Hook-->>Agent: BLOCK turn. Inject mandatory route_task directive
+    Host->>Sentry: Invokes MCP / Shell Tool
+    Sentry->>Sentry: Checks turn gate & command policy
+    alt Pre-Tool Gate Unmet
+        Sentry-->>Host: PHYSICAL BLOCK. Forces route_task pre-flight routine
     end
-    Agent->>Proxy: call_tool("route_task", {user_message, cwd})
-    Proxy->>Daemon: Unix Domain Socket stream
-    Daemon->>Store: Vector query + temporal validity filter
-    Store-->>Daemon: Top ranked skills + rules + verified recipes
-    Daemon-->>Agent: Compact Context (~500 tokens) + must_apply constraints
-    Agent->>Agent: Executes verified task
-    Agent->>Proxy: call_tool("store_memory", {topic, fact})
-    Proxy->>Daemon: Commit immutable fact (valid_from = now)
-    Daemon->>Store: Persist to brain.db
+    Host->>Governor: call_tool("route_task", {user_message, cwd, open_files})
+    Governor->>Graph: Hybrid RRF (Vector + Lexical + Exact) & Knapsack Packing
+    Graph-->>Governor: Top ranked skills + rules + verified recipes (~500 tok)
+    Governor-->>Host: Token-budgeted context + must_apply constraints
+    Host->>Governor: Executes verified tool / task
+    Host->>Governor: agent-brain verify -- <cmd>
+    alt Exit 0 (Success)
+        Governor->>Graph: Promote procedure edge (procedure_edges) & verified recipe
+    alt Non-Zero (Failure)
+        Governor->>Graph: Squelch recipe & synthesize TRAP WARNING into must_apply
+    end
 ```
 
 ---
 
-## Architectural Invariants
+## 4 Strategic Pillars
 
-### 1. Proxy-over-Supervised-Daemon Architecture
-To prevent `database is locked` concurrency errors across concurrent IDE turns (Cursor, OpenCode, Claude Code, Antigravity), `agent-brain serve` runs as an ultra-lightweight stdio proxy connecting to `~/.autonomic/memory/serve.sock`. A single background daemon manages SQLite WAL access and in-memory HNSW vector indexes with zero lock contention.
+Unlike passive prompt servers or static skill markdown repos, `agent-brain` operates as an active runtime governor:
 
-### 2. Adaptive Outcome Scoring & Verified Recipes
-Command executions verified via `agent-brain verify -- <cmd>` or recorded outcomes are automatically attributed to the active turn's `route_log_id`:
-- **Success (`exit 0`)**: Rewards context relevance, reinforcing the pattern in future `route_task` calls and promoting high-confidence recipes into `must_apply` constraints.
-- **Failure (`exit != 0`)**: Instantly squelches the failing command from few-shot recipe recommendations, preventing broken suggestions from propagating.
+### 1. Self-Evolving Procedures & Auto-Distillation (The Flight Recorder)
+Developers no longer need to manually write `.md` skills for every workflow. When agents explore a codebase, execute commands, patch files, and pass `.verify/run.sh`:
+- `agent-brain` automatically captures execution transcripts from Cursor, Claude Code, OpenCode, and Antigravity.
+- Passing tool sequences are distilled into state transitions in `procedure_edges` and `workflow_trajectory`.
+- On future turns, `recall_procedures` queries the graph via recursive Common Table Expressions (CTEs), surfacing proven execution DAGs rather than generic advice.
 
-### 3. Read Tool Scout Guard
-Reading multi-thousand line files consumes tokens and degrades reasoning. `agent-brain` intercepts oversized file reads and routes the agent to token-bounded scout tools: `file_summary`, `grep_search`, `read_file_head`, and `read_file_tail`.
+### 2. Closed-Loop Negative Reinforcement (Trap Detection & Squelching)
+LLMs repeatedly fall into the exact same traps (deprecated flags, slow test commands, broken dependency versions):
+- When a command fails during `agent-brain verify` or exits non-zero, its fingerprint is captured into `workflow_trajectory` with status `failure`.
+- Broken commands are immediately squelched from few-shot recipe recall.
+- Recurrent failure patterns automatically promote into high-priority `TRAP WARNING: DO NOT RUN <X>` directives inside `must_apply`.
 
-### 4. Decoupled Dynamic Registry & `@agstack` Enforcement
-Rather than bloating the `agent-brain` binary with hundreds of embedded skill files, `agent-brain` dynamically syncs packages and workflows from the central [**`agent-registry`**](https://github.com/autonomic-ai-dev/agent-registry) into `~/.autonomic/memory/registry-cache/`. 
+### 3. Active Policy Sentry (Host-Level Guardrails)
+System prompts and guidelines are routinely ignored by models during long, complex sessions. `agent-brain` enforces physical execution boundaries:
+- **Host Pre-Tool Hooks**: `route_gate.py` and `command_policy.rs` physically halt execution if an agent attempts unscouted reads on massive files or invokes dangerous unallowlisted commands (`rm -rf`, `curl | sh`, raw git resets).
+- **Tool Scout Guard**: Enforces token-bounded reads (`file_summary`, `read_file_head`, `read_file_tail`, `grep_search`) to prevent context window saturation.
 
-To guarantee that autonomous agents adhere to strict engineering standards, `agent-brain` enforces the `@agstack` gold standard through five systematic pillars:
-1. **Mandatory Invariants in `must_apply`**: Invariants (pure functions, immutability, zero comment slop, boundary isolation, 4-Hour Time Horizon contracts) are permanently injected into `route_task` output on every turn.
-2. **Pre-Commit Zero Comment Slop Hook**: A pre-commit hook runs `check-added-comments.sh` to reject AI narration or redundant comments in code diffs.
-3. **Strict Path & Ref Validation**: Package repository slugs and git refs are strictly validated to prevent traversal and injection attacks.
-4. **Trap Warning Promotion**: When verification fails (`agent-brain verify`), the negative outcome promotes the memory into a prominent `TRAP WARNING: <fact>` directive in future turns.
-5. **Dynamic Workflow Auto-Indexing**: Curated workflows (`@bugfix`, `@feature`, `@stacked-pr`, `@release-notes`) are automatically indexed into SQLite on registry sync and surfaced as verified recipes.
-
-### 5. Elastic Token Budgeting & Decoupled Memory Recall
-Routing adapts dynamically to task complexity while preventing memory starvation:
-- **Elastic Token Budgeting**: Rather than a rigid token ceiling, the token budget dynamically scales by task kind to minimize token consumption on quick verification while allocating headroom for deep architectural work:
-  - `Verification`: 350 tokens
-  - `Review`: 550 tokens
-  - `Implementing`: 600 tokens
-  - `Debugging`: 650 tokens
-  - `Architecture`: 700 tokens
-- **Decoupled Memory Recall**: Memory score floor thresholds are decoupled from high-matching rule scores, and 120 tokens are explicitly reserved in Pass 1 to prevent skills and rules from starving memory retrieval (`relevant_memory: []`).
-- **`agstack-mode` Prioritization & Config Toggle**: On engineering turns, `agstack-mode` is prioritized into slot #1 in `recommended_skills`. This priority can be toggled via `~/.autonomic/memory/config.yaml` (`routing: prefer_agstack: false`) or the `AGENT_BRAIN_PREFER_AGSTACK=0` environment variable.
-- **Silent Watcher Ambient Guidance**: When `AGENT_BRAIN_SILENT_WATCHER=1` is configured, prompt-submit hooks automatically inject verified recipes and critical invariants ambiently without requiring active agent tool calls.
+### 4. Universal Cross-Host Neural Bus
+Developers switch between Cursor in the IDE, Claude Code in the terminal, Antigravity in agent loops, and GitHub Actions in CI:
+- `agent-brain` runs over a unified background daemon on `~/.autonomic/memory/brain.db` in SQLite WAL mode.
+- A fix discovered in Claude Code terminal is instantly available to Cursor.
+- A verification pass executed in CI populates `verify_outcomes`, giving local agents immediate access to proven recipes.
 
 ---
 
-## MCP Tool Reference
+## Procedure Graph & Recall Pipeline
 
-`agent-brain` exposes the following native tools over stdio and socket:
+Procedures are stored as state transitions in `procedure_edges`:
 
-| MCP Tool | Parameters | Purpose |
+```sql
+CREATE TABLE IF NOT EXISTS procedure_edges (
+    source_workflow TEXT NOT NULL,
+    source_node TEXT NOT NULL,
+    target_node TEXT NOT NULL,
+    transition_count INTEGER NOT NULL DEFAULT 1,
+    last_transition_at INTEGER NOT NULL,
+    PRIMARY KEY (source_workflow, source_node, target_node)
+);
+```
+
+### Recursive CTE Procedure Traversal
+
+When recalling procedures, `agent-brain` executes a multi-hop recursive CTE to discover optimal execution sequences:
+
+```sql
+WITH RECURSIVE walk(node_id, depth) AS (
+    SELECT ?2, 0
+    UNION ALL
+    SELECT e.target_node, walk.depth + 1
+    FROM procedure_edges e
+    JOIN walk ON e.source_node = walk.node_id
+    WHERE e.source_workflow = ?1
+      AND walk.depth < ?3
+)
+SELECT DISTINCT node_id FROM walk WHERE depth > 0;
+```
+
+### Retrieval Hierarchy (`recall_procedures`)
+
+The recall pipeline combines three tiers of precision:
+1. **Tier 1 (Exact Match)**: Exact query match on `node_id` or `workflow_id`.
+2. **Tier 2 (FTS5 Lexical Search)**: Full-text indexing over procedure notes and command strings.
+3. **Tier 3 (ANN Semantic Fallback)**: In-memory HNSW cosine similarity across procedure embeddings.
+
+Candidate items are scored using success-weighted fusion (`score = base_score + 0.2 * success_rate`), and each result includes its forward execution graph (`next_nodes`).
+
+---
+
+## Token Knapsack Packing & Bounded Reads
+
+To prevent context saturation, `agent-brain` employs a dynamic knapsack algorithm that scales budget by task kind:
+
+| Task Kind | Budget | Focus |
 | :--- | :--- | :--- |
-| **`route_task`** | `user_message`, `current_working_directory`, `open_files` | Returns ranked skills, rules, and memory (~500 tokens) for the turn. |
-| **`store_memory`** | `topic`, `fact`, `scope`, `confidence`, `valid_from` | Commits durable facts (under 50 words) to temporal storage. |
-| **`get_context`** | `query`, `limit`, `category` | Explicit vector similarity search against the Knowledge Graph. |
-| **`file_summary`** | `path` | Returns token-compact AST outline of classes, functions, and exports. |
-| **`grep_search`** | `query`, `path`, `regex` | Bounded grep search avoiding massive full-file reads. |
-| **`read_file_head`** | `path`, `lines` | Reads only the initial N lines of a file. |
-| **`read_file_tail`** | `path`, `lines` | Reads only the trailing N lines of a file. |
+| **Verification** | 350 tokens | Exit codes, failing assertion lines, target command |
+| **Review** | 550 tokens | Review finding baseline, diff constraints, invariants |
+| **Implementing** | 600 tokens | Playbook steps, active skills, verified recipes |
+| **Debugging** | 650 tokens | Traps to avoid, related failure patterns, reproduction steps |
+| **Architecture** | 700 tokens | Dual-engine topology, persistence boundaries, ADR records |
 
 ---
 
-## CLI Command Reference
+## CLI & MCP Tool Reference
 
-`agent-brain` provides robust command-line operations for verification and administrative maintenance:
+### MCP Tools
+| MCP Tool | Arguments | Description |
+| :--- | :--- | :--- |
+| **`route_task`** | `user_message`, `current_working_directory`, `open_files` | Required pre-flight turn routing under token knapsack budget. |
+| **`recall_procedures`** | `query`, `task_kind`, `limit` | Walks the procedure graph to return proven execution DAGs. |
+| **`store_memory`** | `topic`, `fact`, `scope`, `confidence` | Commits immutable durable memory (max 50 words). |
+| **`file_summary`** | `path` | AST summary of types, functions, and exports (no full read). |
+| **`grep_search`** | `query`, `path`, `regex` | Bounded grep search with line-range limits. |
+| **`read_file_head`** | `path`, `lines` | Bounded read of first N lines. |
+| **`read_file_tail`** | `path`, `lines` | Bounded read of last N lines. |
 
+### CLI Commands
 ```bash
-# 1. Verify a command execution and record outcome in brain.db
+# Verify a command and record outcome into brain.db
 agent-brain verify -- cargo test
 
-# 2. Check health of the embedding model and vector index
+# Recall procedure graph for a task
+agent-brain recall-procedures "fix compiler error in lib.rs"
+
+# View real-time cognitive governor dashboard (tokens saved, blocks, recipes)
+agent-brain dashboard
+
+# Add a package with recursive discovery (nested .claude/skills, .agents/skills)
+agent-brain package add nextlevelbuilder/ui-ux-pro-max-skill
+
+# Run diagnostic health check on SQLite WAL and vector embeddings
 agent-brain doctor
-
-# 3. Store a durable memory manually via CLI
-agent-brain memory put --topic "ci" --fact "Always pass protected-path-approved label on test changes"
-
-# 4. Trigger vector deduplication and temporal vacuum
-agent-brain gc
-
-# 5. Global setup: configure hooks for Cursor, Claude Code, and Antigravity
-agent-brain install --global
-
-# 6. Dynamically synchronize packages and workflows from central registry
-agent-brain registry sync
-
-# 7. Install the @agstack gold standard engineering package
-agent-brain package add @agstack
-```
-
----
-
-## Curated Package Registry (`agent-registry`)
-
-Curated skill packages, domain engineering rules, and deterministic workflows are distributed through the decoupled [**`agent-registry`**](https://github.com/autonomic-ai-dev/agent-registry) repository.
-
-| Package Alias | Category | Description |
-| :--- | :--- | :--- |
-| **`@agstack`** | Engineering OS | **Gold Standard** — Full-SDLC operating system, 11 playbooks, immutability, zero comment slop, boundary discipline, root-cause fixes |
-| **`@starter`** | Onboarding | Core productivity and coding skills from Matt Pocock & Vercel Labs |
-| **`@ecc`** | Comprehensive | Full Everything Claude Code (ECC) engineering library |
-| **`@rust`** | Language | High-performance Rust design patterns, borrow checker safety, and clippy review |
-| **`@nextjs`** | Web Framework | Modern React, Next.js App Router, and server components best practices |
-| **`@bugfix`** | Workflow | Reproduce test → isolate → fix → verify → review lifecycle |
-| **`@feature`** | Workflow | Intent spec → model domain → 4-H2 contract → test suite → security gate |
-| **`@stacked-pr`** | Workflow | Git stacked commit chunking → branch verify → PR generation |
-
-Running `agent-brain registry sync` refreshes local manifests and triggers vector auto-indexing, immediately making new playbooks and workflows discoverable in turn routing.
-
----
-
-## Verification Policy (`.verify/verify.toml`)
-
-Projects specify allowable verification commands to ensure untrusted scripts do not poison the knowledge graph:
-
-```toml
-[verify]
-allow_unlisted = false
-timeout_seconds = 120
-
-[verify.commands]
-test = "cargo test --release"
-lint = "cargo clippy -- -D warnings"
-fmt = "cargo fmt -- --check"
-verify_suite = "bash .verify/run.sh"
 ```
