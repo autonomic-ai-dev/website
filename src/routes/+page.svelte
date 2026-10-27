@@ -23,7 +23,7 @@
 
   let { data } = $props();
   let version = $derived(data?.ecosystemVersion || 'v1.0.0-rc2');
-  let activeTab = $state<'brew' | 'brain' | 'spine' | 'cargo'>('brew');
+  let activeTab = $state<'brew' | 'cargo'>('brew');
   let activeConsoleTab = $state<'procedure-graph' | 'trap-detection' | 'policy-sentry' | 'neural-bus'>('procedure-graph');
   let copied = $state(false);
 
@@ -35,33 +35,9 @@
         "agent-brain doctor"
       ],
       notes: [
-        "Installed developer ID-signed Apple Silicon universal binary",
-        "Verified MCP stdio server, SQLite schema v23, and host hooks",
-        "Ready for local-first turn routing across all coding agents"
-      ]
-    },
-    brain: {
-      commands: [
-        "agent-brain install --global",
-        "agent-brain package add nextlevelbuilder/ui-ux-pro-max-skill",
-        "agent-brain briefing"
-      ],
-      notes: [
-        "Configured MCP stdio server + editor read-gates in global scope",
-        "Recursively indexed package into local vector and procedure DAG",
-        "Route briefing: token budget 448 / 600 tokens (cache latency: 0.4ms)"
-      ]
-    },
-    spine: {
-      commands: [
-        "agent-spine init --with build-and-test",
-        "agent-spine validate .autonomic/state/spine/build-and-test.yaml",
-        "agent-spine run .autonomic/state/spine/build-and-test.yaml"
-      ],
-      notes: [
-        "Scaffolded declarative YAML DAG workflow with state snapshotting",
-        "Validated node dependencies, step transitions, and approval gates",
-        "Execution complete: all nodes sealed with deterministic state"
+        "Installed developer ID-signed Apple Silicon universal binaries for both agent-brain & agent-spine",
+        "Configured MCP stdio server, SQLite schema v23, and host pre-tool hooks",
+        "Ready for local-first turn routing across Cursor, Claude Code, and Antigravity"
       ]
     },
     cargo: {
@@ -509,28 +485,14 @@
           <button 
             type="button" 
             onclick={() => activeTab = 'brew'} 
-            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'brew' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
+            class="px-3.5 py-1.5 rounded transition cursor-pointer {activeTab === 'brew' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
           >
             Homebrew
           </button>
           <button 
             type="button" 
-            onclick={() => activeTab = 'brain'} 
-            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'brain' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
-          >
-            agent-brain
-          </button>
-          <button 
-            type="button" 
-            onclick={() => activeTab = 'spine'} 
-            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'spine' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
-          >
-            agent-spine
-          </button>
-          <button 
-            type="button" 
             onclick={() => activeTab = 'cargo'} 
-            class="px-3 py-1.5 rounded transition cursor-pointer {activeTab === 'cargo' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
+            class="px-3.5 py-1.5 rounded transition cursor-pointer {activeTab === 'cargo' ? 'bg-zinc-800 text-white font-medium' : 'text-zinc-400 hover:text-zinc-200'}"
           >
             Cargo Source
           </button>

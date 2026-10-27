@@ -45,7 +45,7 @@ flowchart LR
     Ops --> ops["stats · dashboard · inspect · learn · verify"]
     Extras --> extras["graphify · distill · dataset · eval · grpc"]
 
-    classDef default fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef default fill:#0d0d0d,stroke:rgba(255,255,255,0.2),stroke-width:1px,color:#f4f4f5;
 ```
 
 ---

@@ -3,20 +3,20 @@ title: Garry Tan gstack Review Engine — Autonomous YC Operating Rigor
 ---
 
 <div id="hero" class="space-y-4 not-prose mb-8">
-  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-xs font-mono text-cyan-300">
-    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono text-neutral-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
     <span>Autonomous SDLC Specification — AGSTACK Framework</span>
   </div>
 
   <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
-    Garry Tan gstack <br/>
-    <span class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-amber-300 to-orange-400">
+    Garry Tan gstack — <br/>
+    <span class="text-neutral-400 font-normal">
       Autonomous Review Engine
     </span>
   </h1>
 
-  <p class="text-base sm:text-lg text-slate-300 font-body leading-relaxed max-w-3xl">
-    Codifying high-velocity startup operating principles and YC review rigor into an immutable, multi-stage Directed Acyclic Graph (DAG) executed by <code class="text-cyan-400 font-mono">agent-spine</code>. Enforces relentless problem clarity, architectural invariants, design excellence, and human CEO signoff before any code touches production.
+  <p class="text-base sm:text-lg text-neutral-300 font-body leading-relaxed max-w-3xl">
+    Codifying high-velocity startup operating principles and YC review rigor into an immutable, multi-stage Directed Acyclic Graph (DAG) executed by <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">agent-spine</code>. Enforces relentless problem clarity, architectural invariants, design excellence, and human CEO signoff before any code touches production.
   </p>
 </div>
 
@@ -36,8 +36,8 @@ flowchart LR
     Des --> Gate{"05 CEO Gate\n• Human-in-the-Loop\n• Founder signoff"}
     Gate -->|Approved| QA["06 QA Lead\n• Regression harness\n• .verify/ proof seal"]
 
-    classDef stageNode fill:#0d1117,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc;
-    classDef gateNode fill:#1e1b4b,stroke:#a855f7,stroke-width:1.5px,color:#f8fafc;
+    classDef stageNode fill:#0d0d0d,stroke:#444444,stroke-width:1px,color:#f4f4f5;
+    classDef gateNode fill:#141414,stroke:#888888,stroke-width:1.5px,color:#ffffff;
     class YC,Plan,Eng,Des,QA stageNode;
     class Gate gateNode;
 ```
@@ -61,32 +61,32 @@ flowchart LR
     </p>
   </div>
 
-  <div class="p-5 rounded-2xl bg-slate-900/40 border border-white/[0.08]">
+  <div class="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
     <div class="flex items-center justify-between mb-2">
       <h3 class="text-lg font-headline font-semibold text-white">02. Autoplan</h3>
-      <span class="font-mono text-xs text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/20">Agent Node</span>
+      <span class="font-mono text-xs text-neutral-300 bg-white/[0.04] px-2 py-0.5 rounded border border-white/10">Agent Node</span>
     </div>
-    <p class="text-sm text-slate-300 leading-relaxed">
+    <p class="text-sm text-neutral-300 leading-relaxed">
       Decomposes high-level requirements into bounded milestone deliverables. Establishes explicit API schemas, boundary conditions, and test definitions. Emits an immutable plan artifact into the workspace.
     </p>
   </div>
 
-  <div class="p-5 rounded-2xl bg-slate-900/40 border border-white/[0.08]">
+  <div class="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
     <div class="flex items-center justify-between mb-2">
       <h3 class="text-lg font-headline font-semibold text-white">03. Engineering Review (AGSTACK)</h3>
-      <span class="font-mono text-xs text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/20">Agent Node</span>
+      <span class="font-mono text-xs text-neutral-300 bg-white/[0.04] px-2 py-0.5 rounded border border-white/10">Agent Node</span>
     </div>
-    <p class="text-sm text-slate-300 leading-relaxed">
+    <p class="text-sm text-neutral-300 leading-relaxed">
       Audits the pull request or codebase against the non-negotiable AGSTACK invariants: strict immutability, zero in-place mutations, bounded context queries, AST tool parameter verification, and absolute zero AI comment slop.
     </p>
   </div>
 
-  <div class="p-5 rounded-2xl bg-slate-900/40 border border-white/[0.08]">
+  <div class="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
     <div class="flex items-center justify-between mb-2">
       <h3 class="text-lg font-headline font-semibold text-white">04. Design & Ergonomics Review</h3>
-      <span class="font-mono text-xs text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/20">Agent Node</span>
+      <span class="font-mono text-xs text-neutral-300 bg-white/[0.04] px-2 py-0.5 rounded border border-white/10">Agent Node</span>
     </div>
-    <p class="text-sm text-slate-300 leading-relaxed">
+    <p class="text-sm text-neutral-300 leading-relaxed">
       Evaluates user interface rendering, typography hierarchy, contrast ratios, and responsive breakpoints across mobile and desktop viewports. Validates that interactive states (hover, focus, active pills) respond predictably.
     </p>
   </div>

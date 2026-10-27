@@ -77,15 +77,21 @@
   
   <!-- Rich DevEx Ambient Lighting & Multi-Layered Atmosphere (Resend / Vercel style) -->
   <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-    <!-- Top Primary Atmospheric Spotlight -->
-    <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[1200px] h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.09),transparent_65%)] blur-[100px]"></div>
-    <!-- Mid Subsystem Tint Glows -->
-    <div class="absolute top-[25%] -left-48 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(99,102,241,0.05),transparent_70%)] blur-[140px]"></div>
-    <div class="absolute top-[50%] -right-48 w-[650px] h-[650px] bg-[radial-gradient(circle,rgba(0,242,254,0.04),transparent_70%)] blur-[140px]"></div>
-    <!-- Fine Precision Grid Pattern -->
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_15%,#000_60%,transparent_100%)]"></div>
+    <!-- Top Primary Atmospheric Spotlight with Floating Drift -->
+    <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[1200px] h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.12),transparent_65%)] blur-[100px] animate-ambient-top"></div>
+    
+    <!-- Moving Ambient Aurora Beams -->
+    <div class="absolute -top-40 left-1/4 w-[700px] h-[700px] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06),transparent_60%)] blur-[130px] animate-light-beam"></div>
+
+    <!-- Mid Subsystem Tint Glows with Slow Orbit Drift -->
+    <div class="absolute top-[25%] -left-48 w-[650px] h-[650px] bg-[radial-gradient(circle,rgba(99,102,241,0.07),transparent_70%)] blur-[140px] animate-ambient-glow-1"></div>
+    <div class="absolute top-[48%] -right-48 w-[700px] h-[700px] bg-[radial-gradient(circle,rgba(0,242,254,0.05),transparent_70%)] blur-[140px] animate-ambient-glow-2"></div>
+    
+    <!-- Fine Precision Grid Pattern with Scan Accent -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff07_1px,transparent_1px),linear-gradient(to_bottom,#ffffff07_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_15%,#000_65%,transparent_100%)]"></div>
+    
     <!-- Subtle Micro Dot Matrix Texture -->
-    <div class="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_70%_50%_at_50%_35%,#000_50%,transparent_100%)] opacity-60"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(#ffffff0d_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_70%_50%_at_50%_35%,#000_50%,transparent_100%)] opacity-70"></div>
   </div>
 
   <!-- Shared Component: TopNavBar (Minimalist Island Header) -->
@@ -153,13 +159,17 @@
             All systems operational
           </a>
         </div>
-        <!-- Links -->
+        <!-- Synchronized Navigation Links matching Header -->
         <nav class="flex flex-wrap items-center gap-6 font-mono text-xs text-neutral-400">
+          <a class="hover:text-white transition-colors duration-150" href="/#platform">Platform</a>
           <a class="hover:text-white transition-colors duration-150" href="/docs/architecture">Architecture</a>
           <a class="hover:text-white transition-colors duration-150" href="/registry">Registry</a>
-          <a class="hover:text-white transition-colors duration-150" href="/docs/memory">Memory</a>
           <a class="hover:text-white transition-colors duration-150" href="/docs">Docs</a>
           <a class="hover:text-white transition-colors duration-150" href="/docs/cli">CLI Reference</a>
+          <a class="hover:text-emerald-400 transition-colors duration-150 flex items-center gap-1.5" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span>Status</span>
+          </a>
           <a class="hover:text-white transition-colors duration-150" href="https://github.com/autonomic-ai-dev" target="_blank" rel="noopener noreferrer">GitHub</a>
         </nav>
       </div>

@@ -3,19 +3,19 @@ title: AGSTACK SDLC — Autonomous Software Development Lifecycle
 ---
 
 <div id="hero" class="space-y-4 not-prose mb-8">
-  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-xs font-mono text-cyan-300">
-    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono text-neutral-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
     <span>Autonomous SDLC Specification — AGSTACK Invariants</span>
   </div>
 
   <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
     AGSTACK SDLC — <br/>
-    <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-300 to-indigo-500">
+    <span class="text-neutral-400 font-normal">
       Deterministic Engineering Invariants
     </span>
   </h1>
 
-  <p class="text-base sm:text-lg text-slate-300 font-body leading-relaxed max-w-3xl">
+  <p class="text-base sm:text-lg text-neutral-300 font-body leading-relaxed max-w-3xl">
     AGSTACK is the foundational engineering standard powering Autonomic AI. It replaces statistical prompt hope with deterministic mathematical and runtime constraints. By enforcing strict boundaries, immutable state transitions, and automated verification harnesses, AGSTACK ensures agentic code generation achieves production-grade rigor.
   </p>
 </div>
@@ -35,7 +35,7 @@ flowchart LR
     I3 --> I4["04 Zero Comment Slop\n• Pure Production Code\n• Pre-Commit AST Reject"]
     I4 --> I5["05 Verification Root\n• .verify/ Separation\n• Exit 0 Recorded Proof"]
 
-    classDef invariantClass fill:#0d1117,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc;
+    classDef invariantClass fill:#0d0d0d,stroke:#555555,stroke-width:1px,color:#f4f4f5;
     class I1,I2,I3,I4,I5 invariantClass;
 ```
 

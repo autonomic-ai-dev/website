@@ -600,11 +600,11 @@ description: Everything Claude Code — large curated skill library`
 
       <!-- Categories Row -->
       <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-        <span class="text-slate-500 font-mono text-[11px] uppercase tracking-wider shrink-0 mr-1">Scope:</span>
+        <span class="text-neutral-500 font-mono text-[11px] uppercase tracking-wider shrink-0 mr-1">Scope:</span>
         {#each ["all", "Engineering SDLC", "Startup & Product", "Review & QA", "Language & Frameworks"] as cat}
           <button
             onclick={() => selectedCategory = cat}
-            class="px-3 py-1 rounded-lg border text-xs font-medium transition-all shrink-0 {selectedCategory === cat ? 'bg-white/[0.1] text-cyan-300 border-cyan-500/40' : 'bg-slate-900/40 text-slate-400 border-white/[0.06] hover:border-white/[0.15] hover:text-slate-200'}"
+            class="px-3 py-1 rounded-lg border text-xs font-medium transition-all shrink-0 {selectedCategory === cat ? 'bg-white text-black font-semibold border-white' : 'bg-white/[0.04] text-neutral-400 border-white/[0.08] hover:border-white/20 hover:text-white'}"
           >
             {cat === "all" ? "All Categories" : cat}
           </button>
@@ -698,7 +698,7 @@ description: Everything Claude Code — large curated skill library`
           <!-- Inspector Header -->
           <div class="flex items-center justify-between pb-4 border-b border-white/[0.08]">
             <div class="flex items-center gap-2">
-              <div class="w-2.5 h-2.5 rounded-full {selectedItem.kind === 'workflow' ? 'bg-indigo-400' : 'bg-cyan-400'}"></div>
+              <div class="w-2 h-2 rounded-full bg-white"></div>
               <span class="font-headline font-bold text-white text-sm">Resource Inspector</span>
             </div>
             <span class="text-[10px] font-mono text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-500/30">
@@ -710,17 +710,17 @@ description: Everything Claude Code — large curated skill library`
           <div class="mt-4 space-y-4">
             <div>
               <h2 class="text-lg font-headline font-extrabold text-white">{selectedItem.title}</h2>
-              <p class="text-xs text-slate-400 mt-1 leading-relaxed">{selectedItem.description}</p>
+              <p class="text-xs text-neutral-400 mt-1 leading-relaxed">{selectedItem.description}</p>
             </div>
 
             <!-- Stages or Skills Chips -->
             <div>
-              <span class="text-[11px] font-mono text-slate-500 uppercase tracking-wider block mb-2">
+              <span class="text-[11px] font-mono text-neutral-500 uppercase tracking-wider block mb-2">
                 {selectedItem.kind === 'workflow' ? 'DAG Stage Progression:' : 'Included Skills / Invariants:'}
               </span>
               <div class="flex flex-wrap gap-1.5">
                 {#each selectedItem.stagesOrSkills as stage}
-                  <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-white/[0.04] text-slate-300 border border-white/[0.08]">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-white/[0.04] text-neutral-300 border border-white/[0.08]">
                     {stage}
                   </span>
                 {/each}
@@ -729,14 +729,14 @@ description: Everything Claude Code — large curated skill library`
 
             <!-- Code Execution Block -->
             <div>
-              <span class="text-[11px] font-mono text-slate-500 uppercase tracking-wider block mb-1.5">
+              <span class="text-[11px] font-mono text-neutral-500 uppercase tracking-wider block mb-1.5">
                 Terminal Execution:
               </span>
-              <div class="p-3 rounded-xl bg-slate-900 border border-white/[0.08] flex items-center justify-between font-mono text-xs">
-                <span class="text-cyan-300 truncate mr-2">{selectedItem.command}</span>
+              <div class="p-3 rounded-xl bg-black border border-white/10 flex items-center justify-between font-mono text-xs">
+                <span class="text-neutral-200 truncate mr-2">{selectedItem.command}</span>
                 <button
                   onclick={() => copyCommand(`inspector-${selectedItem.id}`, selectedItem.command)}
-                  class="p-1.5 rounded-lg hover:bg-white/[0.1] text-slate-400 hover:text-white transition"
+                  class="p-1.5 rounded-lg hover:bg-white/[0.1] text-neutral-400 hover:text-white transition"
                   title="Copy command"
                 >
                   {#if copiedId === `inspector-${selectedItem.id}`}
@@ -752,12 +752,12 @@ description: Everything Claude Code — large curated skill library`
             {#if selectedItem.spec}
               <div>
                 <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[11px] font-mono text-slate-500 uppercase tracking-wider">
+                  <span class="text-[11px] font-mono text-neutral-500 uppercase tracking-wider">
                     {selectedItem.kind === 'workflow' ? 'YAML Blueprint Manifest:' : 'Package Specification:'}
                   </span>
-                  <span class="text-[10px] font-mono text-slate-500">{selectedItem.seal}</span>
+                  <span class="text-[10px] font-mono text-neutral-500">{selectedItem.seal}</span>
                 </div>
-                <pre class="p-3.5 rounded-xl bg-black/60 border border-white/[0.06] text-[11px] font-mono text-slate-300 overflow-x-auto max-h-56 leading-relaxed"><code>{selectedItem.spec}</code></pre>
+                <pre class="p-3.5 rounded-xl bg-black border border-white/10 text-[11px] font-mono text-neutral-300 overflow-x-auto max-h-56 leading-relaxed"><code>{selectedItem.spec}</code></pre>
               </div>
             {/if}
 
@@ -766,7 +766,7 @@ description: Everything Claude Code — large curated skill library`
               {#if selectedItem.id === 'minimalist-entrepreneur-pkg' || selectedItem.id === 'minimalist-entrepreneur-workflow'}
                 <a
                   href="/docs/minimalist-entrepreneur"
-                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 text-xs font-headline font-semibold border border-cyan-500/30 transition"
+                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white text-xs font-headline font-semibold border border-white/10 transition"
                 >
                   <span>Read Minimalist Entrepreneur Docs</span>
                   <ArrowRight size={13} />
@@ -774,7 +774,7 @@ description: Everything Claude Code — large curated skill library`
               {:else if selectedItem.id === 'gstack-pkg' || selectedItem.id === 'gstack-workflow'}
                 <a
                   href="/docs/gstack"
-                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 text-xs font-headline font-semibold border border-yellow-500/30 transition"
+                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white text-xs font-headline font-semibold border border-white/10 transition"
                 >
                   <span>Read Garry Tan gstack Review Docs</span>
                   <ArrowRight size={13} />
@@ -782,7 +782,7 @@ description: Everything Claude Code — large curated skill library`
               {:else if selectedItem.kind === 'workflow'}
                 <a
                   href="/docs/workflows"
-                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-headline font-semibold border border-indigo-500/30 transition"
+                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white text-xs font-headline font-semibold border border-white/10 transition"
                 >
                   <span>Read agent-spine Manual</span>
                   <ArrowRight size={13} />
@@ -790,7 +790,7 @@ description: Everything Claude Code — large curated skill library`
               {:else if selectedItem.id === 'agstack-pkg'}
                 <a
                   href="/docs/agstack"
-                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 text-xs font-headline font-semibold border border-cyan-500/30 transition"
+                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white text-xs font-headline font-semibold border border-white/10 transition"
                 >
                   <span>Read AGSTACK SDLC Docs</span>
                   <ArrowRight size={13} />
@@ -798,7 +798,7 @@ description: Everything Claude Code — large curated skill library`
               {:else}
                 <a
                   href="/docs/memory"
-                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-300 text-xs font-headline font-semibold border border-cyan-500/30 transition"
+                  class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-white text-xs font-headline font-semibold border border-white/10 transition"
                 >
                   <span>Read agent-brain Manual</span>
                   <ArrowRight size={13} />

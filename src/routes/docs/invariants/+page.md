@@ -3,19 +3,16 @@ title: The Engineering Invariants That Never Fail — Autonomic AI
 ---
 
 <div id="hero" class="space-y-4 not-prose mb-8">
-  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-xs font-mono text-cyan-300">
-    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono text-neutral-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
     <span>Architectural Specification — Core Invariants</span>
   </div>
 
   <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
-    The Engineering Invariants <br/>
-    <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-300 to-indigo-500">
-      That Never Fail
-    </span>
+    The Engineering Invariants That Never Fail
   </h1>
 
-  <p class="text-base sm:text-lg text-slate-300 font-body leading-relaxed max-w-3xl">
+  <p class="text-base sm:text-lg text-neutral-300 font-body leading-relaxed max-w-3xl">
     Our core architectural pillars replace statistical hope with deterministic mathematical and runtime constraints. By stripping away stochastic drift, autonomous software engineering becomes reproducible, verifiable, and safe for production codebases.
   </p>
 </div>
@@ -32,7 +29,7 @@ flowchart LR
     I2 --> I3["03 Fix Root Causes\n• Zero Token Burn Loops\n• Trace Fault Pinpointing"]
     I3 --> I4["04 Zero Comment Slop\n• Pure Production Code\n• Pre-Commit AST Lints"]
 
-    classDef invNode fill:#0d1117,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc;
+    classDef invNode fill:#080808,stroke:#ffffff,stroke-width:1px,color:#ffffff;
     class I1,I2,I3,I4 invNode;
 ```
 
@@ -44,9 +41,9 @@ flowchart LR
 
 ## 01. Immutability First
 
-<div class="not-prose my-4 p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/25 flex items-center justify-between">
-  <span class="font-mono text-xs font-semibold text-cyan-300 uppercase tracking-wider">Fingerprint Pillar</span>
-  <span class="font-mono text-xs text-slate-400">SHA-256 Proof Sealing</span>
+<div class="not-prose my-4 p-4 rounded-xl bg-neutral-950 border border-white/10 flex items-center justify-between">
+  <span class="font-mono text-xs font-semibold text-white uppercase tracking-wider">Fingerprint Pillar</span>
+  <span class="font-mono text-xs text-neutral-400">SHA-256 Proof Sealing</span>
 </div>
 
 Once an organ or workflow step validates, all artifacts are cryptographically hashed and sealed into immutable append-only snapshots. No background modifications, uncommitted state mutations, or hidden drift are allowed.
@@ -64,9 +61,9 @@ Once an organ or workflow step validates, all artifacts are cryptographically ha
 
 ## 02. Boundary Discipline
 
-<div class="not-prose my-4 p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/25 flex items-center justify-between">
-  <span class="font-mono text-xs font-semibold text-indigo-300 uppercase tracking-wider">Fence Pillar</span>
-  <span class="font-mono text-xs text-slate-400">Fenced AST Sandbox</span>
+<div class="not-prose my-4 p-4 rounded-xl bg-neutral-950 border border-white/10 flex items-center justify-between">
+  <span class="font-mono text-xs font-semibold text-white uppercase tracking-wider">Fence Pillar</span>
+  <span class="font-mono text-xs text-neutral-400">Fenced AST Sandbox</span>
 </div>
 
 Strict context windows and AST tool fencing. Agents cannot exceed assigned scopes, traverse unauthorized directory boundaries, or hallucinate out-of-band parameters.
@@ -84,9 +81,9 @@ Strict context windows and AST tool fencing. Agents cannot exceed assigned scope
 
 ## 03. Fix Root Causes
 
-<div class="not-prose my-4 p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/25 flex items-center justify-between">
-  <span class="font-mono text-xs font-semibold text-cyan-300 uppercase tracking-wider">Troubleshoot Pillar</span>
-  <span class="font-mono text-xs text-slate-400">Zero Token Burn Loops</span>
+<div class="not-prose my-4 p-4 rounded-xl bg-neutral-950 border border-white/10 flex items-center justify-between">
+  <span class="font-mono text-xs font-semibold text-white uppercase tracking-wider">Troubleshoot Pillar</span>
+  <span class="font-mono text-xs text-neutral-400">Zero Token Burn Loops</span>
 </div>
 
 Automatic trace analysis pinpoints logic bugs rather than looping infinite token retries and burning operational budgets on speculative guesses.
@@ -104,9 +101,9 @@ Automatic trace analysis pinpoints logic bugs rather than looping infinite token
 
 ## 04. Zero Comment Slop
 
-<div class="not-prose my-4 p-4 rounded-xl bg-emerald-950/20 border border-emerald-500/25 flex items-center justify-between">
-  <span class="font-mono text-xs font-semibold text-emerald-300 uppercase tracking-wider">Code Blocks Pillar</span>
-  <span class="font-mono text-xs text-slate-400">Pure Production Code</span>
+<div class="not-prose my-4 p-4 rounded-xl bg-neutral-950 border border-white/10 flex items-center justify-between">
+  <span class="font-mono text-xs font-semibold text-white uppercase tracking-wider">Code Blocks Pillar</span>
+  <span class="font-mono text-xs text-neutral-400">Pure Production Code</span>
 </div>
 
 Enforced clean, production-grade code output without redundant assistant narrative, conversational fluff, or noisy comments in code repositories.

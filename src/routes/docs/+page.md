@@ -3,21 +3,18 @@ title: Autonomic AI Documentation — Dual-Engine Architecture
 ---
 
 <div id="hero" class="space-y-4 not-prose mb-8">
-  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-xs font-mono text-cyan-300">
-    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-    <span>Autonomic 1.0.0-rc2 — Strict Dual-Engine Specification</span>
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono text-neutral-300">
+    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+    <span>Autonomic 1.0.0-rc2 — Dual-Engine Specification</span>
   </div>
 
   <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
-    Autonomic AI Documentation — <br/>
-    <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-300 to-indigo-500">
-      Dual-Engine Architecture
-    </span>
+    Autonomic AI Documentation — Dual-Engine Architecture
   </h1>
 
-  <p class="text-base sm:text-lg text-slate-300 font-body leading-relaxed max-w-3xl">
+  <p class="text-base sm:text-lg text-neutral-300 font-body leading-relaxed max-w-3xl">
     Autonomic AI strictly bifurcates stochastic machine cognition from deterministic operational execution. 
-    By decoupling reasoning into <code class="font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-500/25">agent-brain</code> and resilient workflow orchestration into <code class="font-mono text-indigo-400 bg-indigo-950/60 px-1.5 py-0.5 rounded border border-indigo-500/25">agent-spine</code>, systems avoid cascading token hallucinations, eliminate execution drift, and guarantee mathematical verification across autonomous agent deployments.
+    By decoupling reasoning into <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">agent-brain</code> and resilient workflow orchestration into <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">agent-spine</code>, systems avoid cascading token hallucinations, eliminate execution drift, and guarantee mathematical verification across autonomous agent deployments.
   </p>
 </div>
 
@@ -38,9 +35,9 @@ flowchart LR
     Brain -.->|route context| Spine
     Spine -->|state events| NATS
 
-    classDef brainClass fill:#0d1117,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc;
-    classDef spineClass fill:#0d1117,stroke:#6366f1,stroke-width:1.5px,color:#f8fafc;
-    classDef hostClass fill:#161b22,stroke:#475569,stroke-width:1px,color:#e2e8f0;
+    classDef brainClass fill:#121212,stroke:#666666,stroke-width:1.5px,color:#f4f4f5;
+    classDef spineClass fill:#121212,stroke:#666666,stroke-width:1.5px,color:#f4f4f5;
+    classDef hostClass fill:#0a0a0a,stroke:#333333,stroke-width:1px,color:#d4d4d8;
     class Brain brainClass;
     class Spine spineClass;
     class Host,NATS hostClass;

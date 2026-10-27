@@ -48,9 +48,9 @@ flowchart LR
     Dev --> Spine["agent-spine (Execution Engine)\n• run (YAML DAGs)\n• approval gates\n• inspect & replay"]
     Brain -.->|route context| Spine
 
-    classDef brainClass fill:#0d1117,stroke:#06b6d4,stroke-width:1.5px,color:#f8fafc;
-    classDef spineClass fill:#0d1117,stroke:#6366f1,stroke-width:1.5px,color:#f8fafc;
-    classDef devClass fill:#161b22,stroke:#475569,stroke-width:1px,color:#e2e8f0;
+    classDef brainClass fill:#0d0d0d,stroke:#555555,stroke-width:1.5px,color:#f4f4f5;
+    classDef spineClass fill:#0d0d0d,stroke:#555555,stroke-width:1.5px,color:#f4f4f5;
+    classDef devClass fill:#050505,stroke:#333333,stroke-width:1px,color:#d4d4d8;
     class Brain brainClass;
     class Spine spineClass;
     class Dev devClass;

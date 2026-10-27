@@ -23,9 +23,9 @@ flowchart LR
     Deploy --> Snapshot[("Snapshot Store")]
     Rollback --> Snapshot
 
-    classDef exec fill:#081c2e,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
-    classDef gate fill:#261606,stroke:#f59e0b,stroke-width:1.5px,color:#f8fafc;
-    classDef terminal fill:#04211a,stroke:#10b981,stroke-width:1.5px,color:#f8fafc;
+    classDef exec fill:#0d0d0d,stroke:#444444,stroke-width:1px,color:#f4f4f5;
+    classDef gate fill:#141414,stroke:#888888,stroke-width:1.5px,color:#ffffff;
+    classDef terminal fill:#050505,stroke:#555555,stroke-width:1px,color:#d4d4d8;
     class Lint,Scan,Build,Test,Deploy,Rollback exec;
     class Gate gate;
     class Snapshot,Start terminal;

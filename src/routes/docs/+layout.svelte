@@ -188,6 +188,19 @@
     }
   }
 
+  function decodeHtmlEntities(str: string): string {
+    const txt = document.createElement("textarea");
+    txt.innerHTML = str;
+    return txt.value;
+  }
+
+  function sanitizeMermaidCode(str: string): string {
+    return str
+      .replace(/rgba\(\s*255\s*,\s*255\s*,\s*255\s*,\s*0\.[0-9]+\s*\)/gi, '#404040')
+      .replace(/rgba\(\s*255\s*,\s*255\s*,\s*255\s*,\s*1(?:\.0)?\s*\)/gi, '#ffffff')
+      .replace(/rgba\([^)]+\)/gi, '#262626');
+  }
+
   async function renderMermaidDiagrams() {
     if (!browser) return;
     await tick();
@@ -198,22 +211,37 @@
       const mermaid = (await import("mermaid")).default;
       mermaid.initialize({
         startOnLoad: false,
-        theme: "dark",
+        theme: "base",
         securityLevel: "loose",
         themeVariables: {
           darkMode: true,
-          background: "#0a0a0c",
-          mainBkg: "#0d1117",
-          nodeBorder: "#06b6d4",
-          primaryColor: "#0d1117",
-          primaryTextColor: "#f8fafc",
-          primaryBorderColor: "#06b6d4",
-          lineColor: "#06b6d4",
-          secondaryColor: "#1e293b",
-          tertiaryColor: "#0f172a",
-          edgeLabelBackground: "#0d1117",
-          clusterBkg: "#080d1a",
-          clusterBorder: "rgba(6, 182, 212, 0.3)",
+          background: "#000000",
+          mainBkg: "#09090b",
+          nodeBorder: "#333333",
+          primaryColor: "#09090b",
+          primaryTextColor: "#f4f4f5",
+          primaryBorderColor: "#404040",
+          lineColor: "#52525b",
+          secondaryColor: "#18181b",
+          secondaryTextColor: "#d4d4d8",
+          secondaryBorderColor: "#333333",
+          tertiaryColor: "#18181b",
+          edgeLabelBackground: "#09090b",
+          clusterBkg: "#050505",
+          clusterBorder: "#27272a",
+          actorBkg: "#09090b",
+          actorBorder: "#404040",
+          actorTextColor: "#ffffff",
+          actorLineColor: "#3f3f46",
+          signalColor: "#71717a",
+          signalTextColor: "#e4e4e7",
+          labelBoxBkgColor: "#09090b",
+          labelBoxBorderColor: "#333333",
+          labelTextColor: "#e4e4e7",
+          loopTextColor: "#a1a1aa",
+          noteBkgColor: "#18181b",
+          noteBorderColor: "#333333",
+          noteTextColor: "#e4e4e7",
           fontFamily: "Fira Code, JetBrains Mono, monospace",
           fontSize: "12px"
         }
@@ -224,18 +252,19 @@
         if (el.dataset.mermaidRendered === "true") continue;
         el.dataset.mermaidRendered = "true";
 
-        const code = el.innerText || el.textContent || "";
-        if (!code.trim()) continue;
+        const rawCode = el.innerText || el.textContent || "";
+        const code = sanitizeMermaidCode(decodeHtmlEntities(rawCode).trim());
+        if (!code) continue;
 
         const id = `mermaid-svg-${Date.now()}-${i}`;
         try {
-          const { svg } = await mermaid.render(id, code.trim());
+          const { svg } = await mermaid.render(id, code);
           const wrapper = document.createElement("div");
-          wrapper.className = "mermaid-diagram-container group relative my-8 p-6 bg-slate-950/90 border border-cyan-500/25 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md cursor-zoom-in hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.18)] transition-all";
+          wrapper.className = "mermaid-diagram-container group relative my-8 p-6 bg-neutral-950/80 border border-white/10 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md cursor-zoom-in hover:border-white/25 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all";
           wrapper.title = "Click to enlarge diagram";
           wrapper.innerHTML = `
             ${svg}
-            <div class="absolute top-3 right-3 text-[10px] font-mono text-cyan-300 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-cyan-500/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
+            <div class="absolute top-3 right-3 text-[10px] font-mono text-neutral-300 bg-neutral-900/90 px-2.5 py-1 rounded-lg border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5 shadow-lg backdrop-blur-sm">
               <span class="text-xs">⤢</span>
               <span>Click to enlarge</span>
             </div>
@@ -262,7 +291,7 @@
     preBlocks.forEach((pre) => {
       if (pre.querySelector(".copy-code-btn")) return;
       const btn = document.createElement("button");
-      btn.className = "copy-code-btn absolute top-3 right-3 px-2 py-1 bg-slate-800/80 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 rounded text-xs font-mono transition flex items-center gap-1 opacity-0 group-hover:opacity-100 border border-slate-700/80 cursor-pointer";
+      btn.className = "copy-code-btn absolute top-3 right-3 px-2 py-1 bg-white/[0.04] hover:bg-white/10 text-neutral-400 hover:text-white rounded text-xs font-mono transition flex items-center gap-1 opacity-0 group-hover:opacity-100 border border-white/10 cursor-pointer";
       btn.innerHTML = "<span>Copy</span>";
       btn.onclick = () => {
         const codeEl = pre.querySelector("code") as HTMLElement | null;
