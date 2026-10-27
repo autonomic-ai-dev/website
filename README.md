@@ -1,71 +1,73 @@
-# Autonomic AI Website
+<div align="center">
+  <img src="static/logo.svg" width="120" alt="Autonomic AI Logo" />
+  <h1>Autonomic AI — Website & Documentation</h1>
+  <p><b>The official website, documentation, and registry for Autonomic AI.</b></p>
+  <p><i>Built with SvelteKit 2, Svelte 5 runes, Tailwind CSS v4, and Framer Motion.</i></p>
 
-The official public-facing website and landing page for **Autonomic AI** — a fully autonomous ecosystem of specialized AI agents.
+  <p>
+    <a href="https://autonomic-ai.dev"><img src="https://img.shields.io/badge/Production-autonomic--ai.dev-ffffff?style=flat-square&labelColor=18181b" alt="Production"></a>
+    <a href="https://github.com/autonomic-ai-dev/agent-brain"><img src="https://img.shields.io/badge/Governor-agent--brain-ffffff?style=flat-square&labelColor=18181b" alt="agent-brain"></a>
+    <a href="https://github.com/autonomic-ai-dev/agent-spine"><img src="https://img.shields.io/badge/Workflows-agent--spine-ffffff?style=flat-square&labelColor=18181b" alt="agent-spine"></a>
+    <a href="https://autonomic-ai.openstatus.dev"><img src="https://img.shields.io/badge/Status-Operational-10b981?style=flat-square&labelColor=18181b" alt="Status"></a>
+  </p>
+</div>
 
-Built with [SvelteKit](https://kit.svelte.dev/) and [Tailwind CSS v4](https://tailwindcss.com/).
+---
 
-## 🚀 Getting Started
+## Overview
 
-### Prerequisites
+This repository powers the official public web presence and documentation portal for **Autonomic AI** ([autonomic-ai.dev](https://autonomic-ai.dev)).
 
-Make sure you have [Bun](https://bun.sh/) installed on your machine.
+* **Landing Experience**: Minimalist, high-contrast DevEx inspired by Resend and Vercel, featuring a 3D perspective floor, Framer Motion scroll reactivity, and an interactive developer avionics console.
+* **Documentation Hub**: Complete flag-level specifications for `agent-brain`, `agent-spine`, AGSTACK engineering invariants, Garry Tan review workflows (`gstack`), and deterministic `.verify/` harnesses.
+* **Registry & Inspector**: Interactive browser for discoverable skills, agent recipes, and declarative YAML workflow manifests.
 
-### Installation
+---
 
-Clone the repository and install dependencies:
+## Tech Stack
+
+* **Framework**: SvelteKit 2 with Svelte 5 Runes (`$state`, `$derived`, `$effect`, `$props`)
+* **Styling**: Tailwind CSS v4 with custom dark DevEx palette
+* **Animation**: Framer Motion (`motion`) scroll observer & reactive horizon beams
+* **Diagrams**: Monochromatic Mermaid.js embedded diagrams with zoom inspection modals
+* **Markdown**: MDSveX with syntax highlighting and auto-extracted table of contents
+* **Deployment**: Vercel Edge Network via `@sveltejs/adapter-vercel`
+
+---
+
+## Local Development
 
 ```bash
+# Clone the repository
 git clone https://github.com/autonomic-ai-dev/website.git
 cd website
-bun install
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
-### Development Server
+Visit `http://localhost:5173/` in your browser.
 
-Start the local development server:
+---
+
+## Quality Gates & Verification
 
 ```bash
-bun run dev
+# Type-check with svelte-check
+npm run check
+
+# Create production build
+npm run build
+
+# Preview production build locally
+npm run preview
 ```
 
-The site will be available at `http://localhost:5173`.
+---
 
-### Production Build
-
-To create a production-optimized build:
-
-```bash
-bun run build
-```
-
-You can preview the production build locally with:
-
-```bash
-bun run preview
-```
-
-## 🌐 Deployment
-
-This repository is configured for automatic deployments on **Vercel**. Every push to the `master` branch will trigger a production deployment.
-
-- **Live URL:** [https://autonomic-ai-dev.vercel.app](https://autonomic-ai-dev.vercel.app)
-
-## 🎨 Tech Stack
-
-```mermaid
-flowchart TD
-    Client[SvelteKit Client<br>Svelte 5 Runes]
-    Styling[Tailwind CSS v4]
-    Icons[Lucide Svelte]
-    Host[Vercel Edge Network]
-    
-    Client --> Styling
-    Client --> Icons
-    Client --> Host
-```
-
-- **Framework:** SvelteKit (Svelte 5 Runes)
-- **Styling:** Tailwind CSS v4
-- **Icons:** Lucide Svelte
-- **Animations:** Custom CSS keyframes and glassmorphism styling
-- **Hosting:** Vercel (Edge Network)
+<div align="center">
+  <sub>© 2026 Autonomic AI. The Cognitive Governor & Procedure Graph for Autonomous Coding Agents.</sub>
+</div>
