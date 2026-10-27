@@ -75,10 +75,17 @@
 
 <div class="bg-black text-neutral-100 font-body selection:bg-neutral-800 selection:text-white antialiased relative min-h-screen overflow-x-clip">
   
-  <!-- Subtle Vercel-style radial spotlight and fine grid -->
+  <!-- Rich DevEx Ambient Lighting & Multi-Layered Atmosphere (Resend / Vercel style) -->
   <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_70%)] blur-[90px]"></div>
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff04_1px,transparent_1px),linear-gradient(to_bottom,#ffffff04_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+    <!-- Top Primary Atmospheric Spotlight -->
+    <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[1200px] h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.09),transparent_65%)] blur-[100px]"></div>
+    <!-- Mid Subsystem Tint Glows -->
+    <div class="absolute top-[25%] -left-48 w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(99,102,241,0.05),transparent_70%)] blur-[140px]"></div>
+    <div class="absolute top-[50%] -right-48 w-[650px] h-[650px] bg-[radial-gradient(circle,rgba(0,242,254,0.04),transparent_70%)] blur-[140px]"></div>
+    <!-- Fine Precision Grid Pattern -->
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_15%,#000_60%,transparent_100%)]"></div>
+    <!-- Subtle Micro Dot Matrix Texture -->
+    <div class="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_70%_50%_at_50%_35%,#000_50%,transparent_100%)] opacity-60"></div>
   </div>
 
   <!-- Shared Component: TopNavBar (Minimalist Island Header) -->

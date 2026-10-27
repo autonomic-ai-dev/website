@@ -163,7 +163,7 @@
     </div>
 
     <!-- HERO CENTERPIECE: Minimalist Developer Console (Memorable / Render Inspired) -->
-    <div class="mt-12 max-w-5xl mx-auto rounded-xl border border-zinc-800 bg-[#0c0d12] shadow-2xl text-left overflow-hidden ring-1 ring-white/[0.05]" id="console">
+    <div class="mt-12 max-w-5xl mx-auto rounded-xl border border-white/10 bg-neutral-950/80 shadow-2xl text-left overflow-hidden ring-1 ring-white/[0.05]" id="console">
       <!-- Window Title & Tab Bar -->
       <div class="px-4 py-2.5 bg-zinc-900/70 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
@@ -494,7 +494,7 @@
 
   <!-- SECTION: QUICKSTART DEPLOYMENT -->
   <section class="max-w-5xl mx-auto px-6 py-24" id="quickstart">
-    <div class="rounded-xl border border-zinc-800 bg-[#0c0d12] p-6 sm:p-8">
+    <div class="rounded-xl border border-white/10 bg-neutral-950/80 p-6 sm:p-8">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
         <div>
           <h3 class="text-lg font-bold font-headline text-white flex items-center gap-2">
