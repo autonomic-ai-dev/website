@@ -87,56 +87,56 @@
     </a>
 
     <!-- Hero Headline -->
-    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight font-headline max-w-4xl mx-auto leading-[1.08] mb-6 text-white">
-      Autonomous Coding Agents Need A Cognitive Governor, <span class="text-zinc-400">Not Just Static Prompts.</span>
+    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-[-0.035em] font-headline max-w-4xl mx-auto leading-[1.08] mb-6 bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent">
+      Autonomous Coding Agents Need A Cognitive Governor.
     </h1>
 
     <!-- Subtitle -->
-    <p class="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto font-body leading-relaxed mb-10">
-      Turn router packs skills into a strict <span class="text-zinc-200 font-mono">~500-token budget</span>. Host pre-tool hooks block destructive shell escapes and prompt injection. Recursive procedure graphs accumulate execution DAGs that never forget.
+    <p class="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto font-body leading-relaxed mb-10">
+      Turn router packs skills into a strict <span class="text-neutral-200 font-mono">~500-token budget</span>. Host pre-tool hooks block destructive shell escapes and prompt injection. Recursive procedure graphs accumulate execution DAGs that never forget.
     </p>
 
     <!-- CTAs -->
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-16">
       <a 
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold text-zinc-950 bg-white hover:bg-zinc-200 transition-colors cursor-pointer" 
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-black bg-white hover:bg-neutral-200 transition-all shadow-[0_0_24px_rgba(255,255,255,0.18)] cursor-pointer active:scale-95" 
         href="#quickstart"
       >
         <span>Install via Homebrew</span>
         <ArrowRight class="w-4 h-4" />
       </a>
       <a 
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-medium text-zinc-300 bg-zinc-900/80 hover:bg-zinc-800/90 border border-zinc-800 hover:border-zinc-700 transition-colors" 
+        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium text-neutral-300 bg-neutral-900/90 hover:bg-neutral-800 border border-white/10 hover:border-white/20 transition-all active:scale-95" 
         href="/docs/architecture"
       >
-        <FileCode class="w-4 h-4 text-zinc-400" />
+        <FileCode class="w-4 h-4 text-neutral-400" />
         <span>Read Architecture Spec</span>
       </a>
     </div>
 
     <!-- Supported Hosts Badge Row -->
-    <div class="pt-6 pb-12 border-b border-zinc-900 max-w-4xl mx-auto">
-      <p class="text-[11px] uppercase font-mono tracking-widest text-zinc-500 mb-5 font-semibold">
+    <div class="pt-6 pb-12 border-b border-neutral-800/80 max-w-4xl mx-auto">
+      <p class="text-[11px] uppercase font-mono tracking-widest text-neutral-500 mb-5 font-semibold">
         Tested and enforced across modern coding agent runtimes
       </p>
-      <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-mono text-zinc-400">
+      <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-mono text-neutral-400">
         <span class="flex items-center gap-2 hover:text-white transition-colors">
-          <Terminal class="w-3.5 h-3.5 text-zinc-500" /> CLAUDE CODE
+          <Terminal class="w-3.5 h-3.5 text-neutral-500" /> CLAUDE CODE
         </span>
         <span class="flex items-center gap-2 hover:text-white transition-colors">
-          <Cpu class="w-3.5 h-3.5 text-zinc-500" /> CURSOR
+          <Cpu class="w-3.5 h-3.5 text-neutral-500" /> CURSOR
         </span>
         <span class="flex items-center gap-2 hover:text-white transition-colors">
-          <Zap class="w-3.5 h-3.5 text-zinc-500" /> ANTIGRAVITY (AGY)
+          <Zap class="w-3.5 h-3.5 text-neutral-500" /> ANTIGRAVITY (AGY)
         </span>
         <span class="flex items-center gap-2 hover:text-white transition-colors">
-          <Layers class="w-3.5 h-3.5 text-zinc-500" /> OPENCODE
+          <Layers class="w-3.5 h-3.5 text-neutral-500" /> OPENCODE
         </span>
       </div>
     </div>
 
     <!-- HERO CENTERPIECE: Minimalist Developer Console (Memorable / Render Inspired) -->
-    <div class="mt-12 max-w-5xl mx-auto rounded-xl border border-white/10 bg-neutral-950/80 shadow-2xl text-left overflow-hidden ring-1 ring-white/[0.05]" id="console">
+    <div class="mt-12 max-w-5xl mx-auto rounded-2xl border border-white/15 bg-neutral-950 shadow-[0_24px_60px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.1)] text-left overflow-hidden ring-1 ring-white/[0.05]" id="console">
       <!-- Window Title & Tab Bar -->
       <div class="px-4 py-2.5 bg-zinc-900/70 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
