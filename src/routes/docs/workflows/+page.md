@@ -4,270 +4,138 @@ title: Workflows & DAG Engine (agent-spine)
 
 # `agent-spine` — Deterministic Workflow Engine
 
-`agent-spine` is the orchestration engine for the Autonomic cluster. Instead of relying on probabilistic Python `while` loops to determine an agent's control flow, `agent-spine` forces multi-step procedures through strict, deterministic Directed Acyclic Graphs (DAGs) with **immutable state snapshots** and **Human-in-the-Loop (HITL) approval gates**.
+`agent-spine` is the deterministic execution engine for the Autonomic AI cluster. Instead of relying on unconstrained, probabilistic agent loops that can drift or hallucinate, `agent-spine` executes multi-step procedures through version-controlled Directed Acyclic Graphs (DAGs) with **immutable state snapshots**, **active command verification**, and **Human-in-the-Loop (HITL) approval gates**.
 
 ```mermaid
 flowchart LR
-    Start(["Trigger"]) --> Lint["lint_check"]
-    Start --> Scan["immune_scan"]
+    Start(["Trigger: Run Workflow"]) --> Lint["Verify: lint_check"]
+    Start --> Scan["Agent: security_audit"]
     
-    Lint --> Build["cargo_build"]
+    Lint --> Build["Agent: implement_patch"]
     Scan --> Build
     
-    Build --> Test["test_suite"]
-    Test --> Gate{"approval_gate"}
+    Build --> Test["Verify: test_suite<br/>(Active Command)"]
+    Test --> Gate{"ApprovalGate<br/>(Operator Sign-off)"}
     
-    Gate -->|Approved| Deploy["prod_deploy"]
-    Gate -->|Rejected| Rollback["revert_changes"]
+    Gate -->|Approved| Deploy["Verify: prod_deploy"]
+    Gate -->|Rejected| Fallback["Agent: revert_changes"]
 
-    Deploy --> Snapshot[("Snapshot Store")]
-    Rollback --> Snapshot
+    Deploy --> Snapshot[("Append-Only Snapshot Store<br/>SQLite state.db")]
+    Fallback --> Snapshot
+    Snapshot --> BrainSync[("Procedure Graph Sync<br/>Schema v23")]
 
     classDef exec fill:#0d0d0d,stroke:#444444,stroke-width:1px,color:#f4f4f5;
     classDef gate fill:#141414,stroke:#888888,stroke-width:1.5px,color:#ffffff;
     classDef terminal fill:#050505,stroke:#555555,stroke-width:1px,color:#d4d4d8;
-    class Lint,Scan,Build,Test,Deploy,Rollback exec;
+    class Lint,Scan,Build,Test,Deploy,Fallback exec;
     class Gate gate;
-    class Snapshot,Start terminal;
+    class Snapshot,Start,BrainSync terminal;
 ```
 
 ---
 
-## Architectural Invariants
+## Architectural Pillars
 
-### 1. Deterministic Execution over Improvisation
-Ad-hoc prompts ("run lint, then tests, then build, then review") lack audit trails, concurrency discipline, and retry safety. `agent-spine` treats workflows as **declarative, version-controlled artifacts**. The LLM is invoked only to perform discrete tasks *within* a node; the DAG controls the topology, retries, and data passing.
+### 1. Active Verification over Passive Observation
+`Verify` nodes actively execute specified shell validation commands under timeouts, capturing stdout, stderr, and exit codes. Successful runs (`exit 0`) mark the step `verified = true`, while failures halt the pipeline unless `continue_on_failure: true` is explicitly configured.
 
-### 2. Time-Travel Debugging via Immutable Snapshots
-Before and after every node execution, `agent-spine` serializes the runtime state, environment variables, and filesystem diffs into an append-only SQLite/JSONL snapshot. If an agent hallucinates on Step 5 and breaks the build, operators can literally "rewind" the execution state to Step 4, tweak the prompt or parameters, and resume without re-running prior nodes.
+### 2. Cognitive Knapsack Injection via `agent-brain`
+Before an `Agent` node executes, `agent-spine` queries `agent-brain route_task` to inject a surgical ~500-token `_brain_knapsack` containing relevant skills, invariant rules, and traps directly into the node payload. This prevents worker agents from suffering from context bloat or hallucinating rules.
 
-### 3. Cryptographic Human-in-the-Loop (HITL) Gates
-When a DAG reaches an `ApprovalGate`, `agent-spine` pauses execution. It dispatches a webhook event via `agent-mouth` to Slack/Discord containing the proposed diffs and waits for an authorized operator callback before proceeding.
+### 3. Time-Travel Debugging via Immutable Snapshots
+Every successful node transition creates an append-only snapshot in `state.db`. Operators can rewind to any prior sequence index via CLI (`agent-spine run --resume <seq>`) or trigger a 1-click **"↺ Replay From Here"** action directly from the dashboard.
+
+### 4. Zero-Daemon Local Execution with Durable DLQ
+In local development environments without an external message broker, `agent-spine` automatically falls back to an embedded SQLite event log and persists failed nodes to `~/.autonomic/state/spine/dlq.jsonl`, providing full durability with zero daemon dependencies.
+
+### 5. Speculative Multi-Branch Worktrees
+For non-deterministic or high-risk engineering tasks, `SpeculativeFork` nodes spin up isolated Git worktrees concurrently. The first branch to satisfy verification criteria is merged into the mainline execution snapshot, and temporary worktrees are pruned cleanly.
 
 ---
 
-## In-Depth Usage Guide
+## The Node Kinds (`NodeKind`)
 
-### 1. Authoring Workflow Definitions (`workflow.yaml`)
+| Kind | Purpose | Runtime Behavior |
+| :--- | :--- | :--- |
+| **`Agent`** | Discrete cognitive subtask | Hydrates ~500-token knapsack from `agent-brain`, delegates to worker, snapshots output |
+| **`Verify`** | Machine validation | Actively executes `command`, captures exit code and output streams, asserts `verified` |
+| **`ApprovalGate`** | Human-in-the-loop safety | Suspends execution and awaits operator `agent-spine approve` or dashboard button |
+| **`SpeculativeFork`** | Parallel exploration | Evaluates multiple candidate branches in isolated Git worktrees |
+| **`Fork` / `Join`** | Concurrency barrier | Fans out across parallel branches, continuing only when all dependencies resolve |
+| **`Debate`** | Iterative refinement | Alternates between coder and critic agents in multi-turn feedback rounds |
+| **`Vote`** | Consensus sampling | Runs prompt N times with temperature variance, selecting highest-quality output |
+| **`Router`** | Dynamic edge branching | Computes variables used in conditional edge expressions |
+| **`Hydrate`** | Context gathering | Collects environment diagnostics (diffs, test outputs) prior to execution |
+| **`Checkpoint`** | Audit synchronization | Explicit append-only point-in-time state barrier |
 
-Workflows are declared using strict YAML schemas that validate dependency graphs, execution timeouts, retries, and failure handlers before any code runs:
+---
 
-```yaml
-version: "1.0"
-name: "ci-validation-and-release"
-concurrency: 4
+## Authoring Declarative Workflows
 
-env:
-  ENVIRONMENT: "staging"
-  CARGO_TERM_COLOR: "always"
-
-nodes:
-  - id: "security_scan"
-    action: "immune:scan_manifest"
-    params:
-      manifest: "Cargo.toml"
-      block_on_cvss_above: 7.5
-    timeout_seconds: 60
-
-  - id: "lint_check"
-    action: "muscle:execute_bash"
-    params:
-      command: "cargo clippy -- -D warnings"
-    timeout_seconds: 120
-
-  - id: "build_and_test"
-    action: "muscle:execute_bash"
-    depends_on: ["security_scan", "lint_check"]
-    params:
-      command: "cargo test --release"
-    retries: 2
-    retry_delay_seconds: 5
-    timeout_seconds: 300
-
-  - id: "prod_deploy_gate"
-    type: "approval_gate"
-    depends_on: ["build_and_test"]
-    channel: "slack"
-    title: "Production Release Approval"
-    description: "Approve deployment of v1.0.0-beta.3.11 bottle to production cluster."
-    timeout_minutes: 30
-
-  - id: "deploy"
-    action: "muscle:execute_bash"
-    depends_on: ["prod_deploy_gate"]
-    params:
-      command: "cargo publish && git push origin --tags"
-    timeout_seconds: 180
-
-  - id: "rollback"
-    action: "muscle:execute_bash"
-    on_failure_of: ["deploy"]
-    params:
-      command: "git reset --hard HEAD~1"
-```
-
-### 2. Validating Workflow Acyclicity & Syntax
-
-Before running a workflow in production, validate its graph structure against the `agent-spine` schema compiler:
-
-```bash
-# Validates DAG topology, detects circular dependencies, and verifies parameter types
-agent-spine validate .autonomic/workflows/ci.yaml
-```
-
-**Expected Output:**
-```
-✓ Schema: Valid (v1.0 spec)
-✓ Topology: 6 nodes, 0 cycles detected
-✓ Critical Path: security_scan -> build_and_test -> prod_deploy_gate -> deploy (estimated 480s)
-✓ Concurrency: 4 max parallel execution slots
-```
-
-### 3. Executing Workflows via CLI
-
-You can trigger DAGs synchronously or as detached background tasks:
-
-```bash
-# Execute synchronously with live terminal progress
-agent-spine run .autonomic/workflows/ci.yaml --meta "release-v1.0.0-beta.3.11"
-
-# Execute in background with parameter overrides
-agent-spine run .autonomic/workflows/ci.yaml \
-  --param ENVIRONMENT=production \
-  --param BATCH_SIZE=50 \
-  --detach
-```
-
-### 4. Workflow Budget Preconditions & Cost Ceiling Gates
-Workflows can protect against runaway token consumption by specifying top-level budget ceilings and step-level preconditions evaluated against `agent-heart`:
+Workflows are defined in clear, version-controlled YAML files:
 
 ```yaml
-version: "1.0"
-name: "autonomous-feature-development"
-budget:
-  max_cost_usd: 25.00
-  max_tokens: 1000000
+version: 1
+name: bugfix_pipeline
+description: "Reproduce, isolate, fix, and verify a bug with human sign-off"
 
 nodes:
-  - id: "deep_refactor"
-    action: "brain:execute_refactor"
-    preconditions:
-      # Halts if remaining daily headroom is below $5.00
-      - check: "budget_headroom"
-        min_remaining_usd: 5.00
-      # Verifies provider rate limit / token quota utilization
-      - check: "quota_available"
-        provider: "anthropic"
-        max_utilization_pct: 85.0
+  - id: reproduce_failure
+    kind: verify
+    command: "cargo test --test reproduce_bug"
+    continue_on_failure: true
+
+  - id: isolate_and_patch
+    kind: agent
+    depends_on: [reproduce_failure]
+    description: "Analyze test failure, isolate root cause, and apply minimal patch"
+    retry:
+      max_attempts: 2
+      backoff_ms: 1000
+
+  - id: verify_fix
+    kind: verify
+    depends_on: [isolate_and_patch]
+    command: "cargo test --all-features"
+
+  - id: sign_off
+    kind: approval_gate
+    depends_on: [verify_fix]
+    description: "Operator sign-off before committing changes"
 ```
 
-### 5. Human-in-the-Loop (HITL) Approvals
+---
 
-When execution reaches an `approval_gate`, `agent-spine` enters the `WAITING_APPROVAL` state and broadcasts a webhook via `agent-mouth`. Operators can approve from Slack or directly via CLI:
-
-```bash
-# Check active approval requests
-agent-spine approvals list
-
-# Approve an active run gate
-agent-spine approvals approve run-8924b1a --comment "Approved by DevOps on-call"
-
-# Reject and trigger rollback DAG branch
-agent-spine approvals reject run-8924b1a --reason "Pending security sign-off"
-```
-
-### 5. Time-Travel Debugging & Snapshot Recovery
-
-Every node transition saves a bit-exact snapshot of the execution context to `~/.autonomic/spine/snapshots/`:
+## CLI Reference
 
 ```bash
-# Inspect snapshots for a specific workflow run
-agent-spine snapshots list --run-id run-8924b1a
+# Validate workflow DAG acyclicity and syntax
+agent-spine validate workflows/bugfix_pipeline.yaml
 
-# Output:
-# SNAPSHOT ID          STEP ID            STATUS     TIMESTAMP
-# snap-01J9X1        security_scan       SUCCESS    2026-10-17 07:15:02 UTC
-# snap-01J9X2        build_and_test      FAILED     2026-10-17 07:18:44 UTC
+# Run workflow synchronously with live terminal progress
+agent-spine run workflows/bugfix_pipeline.yaml
 
-# Rewind to the pre-test snapshot and resume after fixing code
-agent-spine resume run-8924b1a --from-snapshot snap-01J9X1
+# Resume execution from a specific immutable state snapshot
+agent-spine run workflows/bugfix_pipeline.yaml --resume 3
+
+# Inspect real-time status of active or completed workflows
+agent-spine status
+
+# Human-in-the-Loop: approve or reject a paused ApprovalGate node
+agent-spine approve <workflow_id> --step sign_off
+agent-spine reject <workflow_id> --step sign_off --reason "Fails security audit"
+
+# Start the local event bus and Svelte dashboard on port 3100
+agent-spine serve
 ```
 
 ---
 
 ## MCP Tool Reference
 
-`agent-spine` integrates natively into AI IDEs (Cursor, Claude, Antigravity) via Model Context Protocol:
+When running in MCP mode (`agent-spine mcp-serve`), the engine exposes native tools for IDE integration:
 
-### `spine_submit_workflow`
-Submits a declarative YAML DAG payload and returns a unique `run_id`:
-
-```json
-{
-  "name": "ci-pipeline",
-  "workflow_yaml": "version: '1.0'\nnodes:\n  - id: test\n    action: muscle:execute_bash\n    params: { command: 'npm test' }",
-  "meta": "feature-branch-verification"
-}
-```
-
-### `spine_check_status`
-Polls real-time step progress, stdout snippets, and approval gate status:
-
-```json
-{
-  "run_id": "run-8924b1a"
-}
-```
-
-**Response:**
-```json
-{
-  "status": "WAITING_APPROVAL",
-  "active_step": "prod_deploy_gate",
-  "completed_steps": ["security_scan", "lint_check", "build_and_test"],
-  "failed_steps": [],
-  "approval_url": "https://hooks.slack.com/actions/...",
-  "duration_seconds": 412
-}
-```
-
-### `spine_list_workflows`
-Lists all available predefined workflow blueprints registered in `.autonomic/workflows/`.
-
----
-
-## Curated Registry Workflows & Dual-Mode Execution
-
-Workflows defined in the central [**`agent-registry`**](https://github.com/autonomic-ai-dev/agent-registry) automate standard engineering lifecycles and are automatically discovered and indexed by `agent-brain`.
-
-### 1. Curated Workflow Catalog
-
-| Workflow | Alias | Lifecycle Stages |
-| :--- | :--- | :--- |
-| `workflows/bugfix.yaml` | `@bugfix` | Reproduce (failing test) → Isolate → Root Cause Fix → Verify Suite → QualityGate → Review |
-| `workflows/feature.yaml` | `@feature` | Intent Spec → Model Domain → 4-H2 Contract → Implement → Verification Suites → SecurityGate → ReviewGate |
-| `workflows/stacked-pr.yaml` | `@stacked-pr` | Inspect Git Stack → Atomic Chunking → Verification Gate → PR Description Generation → Approval Gate |
-| `workflows/release-notes.yaml` | `@release-notes` | Collect Git Commit Diff → Draft Notes (Diátaxis Format) → Review Gate → Publish Release |
-| `workflows/mcp-health-check.yaml` | `@mcp-health-check` | Audit MCP Tool Schemas → Gateway Probe → Verify Turn Routing → Output Health Matrix |
-
-### 2. Automatic Synchronization & Vector Indexing
-
-Running `agent-brain registry sync` dynamically pulls the latest workflows from `agent-registry`:
-
-```bash
-agent-brain registry sync
-```
-
-This operation clones or updates `~/.autonomic/memory/registry-cache/repo/workflows/` and **automatically indexes** each workflow into the SQLite knowledge graph and vector database. When an agent calls `route_task` with a task like "fix this failing test" or "prepare a stacked pull request", the relevant workflow blueprint is ranked and injected into the agent's turn context.
-
-### 3. Dual-Mode Execution
-
-Workflows support execution across both supervised and lightweight environments:
-
-- **With `agent-spine` (Deterministic DAG Engine):**
-  ```bash
-  agent-spine run ~/.autonomic/memory/registry-cache/workflows/bugfix.yaml --meta "issue-128"
-  ```
-  Provides append-only snapshot rollbacks, concurrency isolation, and Slack/Discord approval gates.
-- **Without `agent-spine` (Autonomous Agent Orchestration):**
-  When running in a minimal environment or directly inside an AI agent session (Cursor, Claude Code, Antigravity), agents read the workflow YAML topology directly and execute nodes step-by-step using local tools or `./scripts/run-workflow.sh run workflows/<name>.yaml`, guaranteeing reproducibility even without a running spine daemon.
+- **`spine_submit_workflow`**: Submits a declarative YAML DAG payload and returns an execution ID.
+- **`spine_workflow_status`**: Polls real-time step progress, output variables, and pending approval gates.
+- **`spine_approve_step`**: Unblocks an active `ApprovalGate` node with decision (`approve` or `reject`).
+- **`spine_cancel_workflow`**: Gracefully terminates an active execution and marks in-flight steps cancelled.
