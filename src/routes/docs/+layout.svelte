@@ -26,6 +26,22 @@
   let activeHash = $state("");
   let activeModalSvg = $state<string | null>(null);
 
+  let currentPageTitle = $derived(
+    pathname.endsWith('/agent-brain') ? 'agent-brain CLI' :
+    pathname.endsWith('/agent-spine') ? 'agent-spine CLI' :
+    pathname.endsWith('/cli') ? 'CLI Reference Manual' :
+    pathname.endsWith('/agstack') ? 'AGSTACK SDLC' :
+    pathname.endsWith('/minimalist-entrepreneur') ? 'Minimalist Entrepreneurship' :
+    pathname.endsWith('/gstack') ? 'Garry Tan gstack Review Engine' :
+    pathname.endsWith('/verification') ? 'Deterministic Verification' :
+    pathname.endsWith('/invariants') ? 'Engineering Invariants' :
+    pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' :
+    pathname.endsWith('/installation') ? 'Installation' :
+    pathname.endsWith('/memory') ? 'Cognitive Governor & Memory' :
+    pathname.endsWith('/workflows') ? 'agent-spine Manual' :
+    'Introduction & Overview'
+  );
+
   function openDiagramModal(svgHtml: string) {
     activeModalSvg = svgHtml;
   }
@@ -260,7 +276,7 @@
         try {
           const { svg } = await mermaid.render(id, code);
           const wrapper = document.createElement("div");
-          wrapper.className = "mermaid-diagram-container group relative my-8 p-6 bg-neutral-950/80 border border-white/10 rounded-2xl overflow-x-auto shadow-2xl flex justify-center backdrop-blur-md cursor-zoom-in hover:border-white/25 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all";
+          wrapper.className = "mermaid-diagram-container group relative my-8 p-4 sm:p-6 bg-neutral-950/80 border border-white/10 rounded-2xl overflow-x-auto shadow-2xl flex justify-start sm:justify-center backdrop-blur-md cursor-zoom-in hover:border-white/25 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all max-w-full";
           wrapper.title = "Click to enlarge diagram";
           wrapper.innerHTML = `
             ${svg}
@@ -283,6 +299,18 @@
     } catch (e) {
       console.warn("Mermaid global initialization error:", e);
     }
+  }
+
+  function wrapTables() {
+    if (!browser) return;
+    const tables = document.querySelectorAll("article table");
+    tables.forEach((table) => {
+      if (table.parentElement?.classList.contains("table-wrapper")) return;
+      const wrapper = document.createElement("div");
+      wrapper.className = "table-wrapper";
+      table.parentNode?.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    });
   }
 
   function addCopyButtons() {
@@ -313,6 +341,7 @@
       tick().then(() => {
         renderMermaidDiagrams();
         addCopyButtons();
+        wrapTables();
         extractToc();
         isMobileDocsMenuOpen = false;
         if (browser && !window.location.hash) {
@@ -326,6 +355,7 @@
     tick().then(() => {
       renderMermaidDiagrams();
       addCopyButtons();
+      wrapTables();
       extractToc();
     });
 
@@ -341,278 +371,341 @@
   });
 </script>
 
+{#snippet navTree()}
+  {#if activeTab === 'cli'}
+    <div class="space-y-6">
+      <div>
+        <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
+          <span>CLI Reference</span>
+        </div>
+        <ul class="space-y-1">
+          <li>
+            <a 
+              href="/docs/cli" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/cli' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+            >
+              <Terminal size={14} class="text-neutral-300" />
+              <span>CLI Overview</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
+          <span>Dual Engines</span>
+        </div>
+        <ul class="space-y-2">
+          <li>
+            <a 
+              href="/docs/cli/agent-brain" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/cli/agent-brain' ? 'border-white/30 bg-white/[0.06] text-white' : 'border-white/10 bg-neutral-950/60 hover:border-white/20 hover:bg-neutral-900/40 text-neutral-400 hover:text-white'}"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 font-mono font-medium text-white">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>agent-brain</span>
+                </div>
+                <span class="text-[10px] font-mono text-neutral-400 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/10">6 cmds</span>
+              </div>
+              <p class="text-[10px] text-neutral-400 mt-1 pl-3.5 leading-relaxed">
+                Reasoning, vector memory, AST router, and MCP gateway.
+              </p>
+            </a>
+          </li>
+          <li>
+            <a 
+              href="/docs/cli/agent-spine" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/cli/agent-spine' ? 'border-white/30 bg-white/[0.06] text-white' : 'border-white/10 bg-neutral-950/60 hover:border-white/20 hover:bg-neutral-900/40 text-neutral-400 hover:text-white'}"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 font-mono font-medium text-white">
+                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                  <span>agent-spine</span>
+                </div>
+                <span class="text-[10px] font-mono text-neutral-400 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/10">4 cmds</span>
+              </div>
+              <p class="text-[10px] text-neutral-400 mt-1 pl-3.5 leading-relaxed">
+                Deterministic DAG runner, milestone gates, and state replay.
+              </p>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="pt-5 border-t border-white/10 text-neutral-400 text-xs">
+        <span class="text-neutral-300 font-medium block mb-1">Dual-Engine Invariant</span>
+        <p class="text-neutral-400 leading-relaxed text-[11px]">Cognitive routing (<span class="text-white font-mono">brain</span>) and deterministic state execution (<span class="text-white font-mono">spine</span>).</p>
+      </div>
+    </div>
+
+  {:else}
+    <div class="space-y-6">
+      <div>
+        <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
+          <span>Getting Started</span>
+        </div>
+        <ul class="space-y-1">
+          <li>
+            <a 
+              href="/docs" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+            >
+              <Book size={14} class="text-neutral-300" />
+              <span>Introduction & Overview</span>
+            </a>
+          </li>
+          <li>
+            <a 
+              href="/docs/installation" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="flex items-center justify-between px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/installation' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+            >
+              <div class="flex items-center gap-2">
+                <span class="text-neutral-500 font-mono">⚡</span>
+                <span>Quickstart Execution</span>
+              </div>
+              <span class="text-[10px] font-mono text-neutral-500">2 min</span>
+            </a>
+          </li>
+          <li>
+            <a 
+              href="/docs/architecture" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/architecture' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+            >
+              <Layers size={14} class="text-neutral-300" />
+              <span>Dual-Engine Topology</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
+          <span>Core Engines</span>
+        </div>
+        <ul class="space-y-2">
+          <li>
+            <a 
+              href="/docs/memory" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/memory' ? 'border-white/30 bg-white/[0.06] text-white' : 'border-white/10 bg-neutral-950/60 hover:border-white/20 hover:bg-neutral-900/40 text-neutral-400 hover:text-white'}"
+            >
+              <div class="flex items-center gap-2 font-mono font-medium text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>agent-brain Manual</span>
+              </div>
+              <p class="text-[10px] text-neutral-400 mt-1 pl-3.5 leading-relaxed">
+                Cognitive governor, procedure graph, and token knapsack packing.
+              </p>
+            </a>
+          </li>
+          <li>
+            <a 
+              href="/docs/workflows" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/workflows' ? 'border-white/30 bg-white/[0.06] text-white' : 'border-white/10 bg-neutral-950/60 hover:border-white/20 hover:bg-neutral-900/40 text-neutral-400 hover:text-white'}"
+            >
+              <div class="flex items-center gap-2 font-mono font-medium text-white">
+                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                <span>agent-spine Manual</span>
+              </div>
+              <p class="text-[10px] text-neutral-400 mt-1 pl-3.5 leading-relaxed">
+                Declarative YAML DAGs, milestone approval gates, zero-human-block execution.
+              </p>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
+          <span>AGSTACK SDLC</span>
+        </div>
+        <ul class="space-y-1">
+          <li>
+            <a 
+              href="/docs/agstack" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/agstack' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+            >
+              <Layers size={14} class="text-neutral-300" />
+              <span>agstack Mode & Matrix</span>
+            </a>
+          </li>
+          <li>
+            <a 
+              href="/docs/minimalist-entrepreneur" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/minimalist-entrepreneur' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+            >
+              <Book size={14} class="text-neutral-300" />
+              <span>Minimalist Entrepreneurship</span>
+            </a>
+          </li>
+          <li>
+            <a 
+              href="/docs/gstack" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/gstack' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+            >
+              <span class="text-neutral-400 font-mono">★</span>
+              <span>Garry Tan gstack Review Engine</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
+          <span>Verification & Invariants</span>
+        </div>
+        <ul class="space-y-1">
+          <li>
+            <a 
+              href="/docs/invariants" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/invariants' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+            >
+              <Shield size={14} class="text-neutral-300" />
+              <span>The 4 Engineering Invariants</span>
+            </a>
+          </li>
+          <li>
+            <a 
+              href="/docs/verification" 
+              onclick={() => isMobileDocsMenuOpen = false}
+              class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/verification' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+            >
+              <span class="text-neutral-300 font-mono text-[11px]">.verify/</span>
+              <span class="font-mono text-[11px]">Deterministic Harness</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="pt-6 border-t border-white/10 text-neutral-400">
+        <div class="flex items-center gap-2">
+          <span class="text-neutral-400 font-mono">ℹ</span>
+          <span class="text-[11px]">Strict dual-engine invariant applied.</span>
+        </div>
+      </div>
+    </div>
+  {/if}
+{/snippet}
+
 <!-- DOCUMENTATION FRAMEWORK: Responsive three-column layout below floating header -->
 <div class="flex flex-col lg:flex-row min-h-[calc(100vh-6rem)] bg-transparent text-neutral-300 font-body w-full items-start">
   
   <!-- Mobile Navigation Header Bar -->
-  <div class="lg:hidden px-6 py-3 border-b border-white/10 flex justify-between items-center bg-black/90 backdrop-blur-md shrink-0 sticky top-16 z-40 w-full">
-    <div class="flex items-center gap-2">
-      <span class="text-xs font-mono text-white font-semibold uppercase tracking-wider">{activeTab === 'cli' ? 'CLI REFERENCE' : 'DOCUMENTATION'}</span>
-      <ChevronRight size={14} class="text-neutral-500" />
-      <span class="text-xs font-mono text-neutral-200 truncate max-w-[180px]">
-        {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Overview' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/minimalist-entrepreneur') ? 'Minimalist Entrepreneur' : pathname.endsWith('/gstack') ? 'gstack Review' : pathname.endsWith('/verification') ? 'Verification' : pathname.endsWith('/invariants') ? 'Invariants' : 'Overview'}
+  <div class="lg:hidden px-4 sm:px-6 py-2.5 border-b border-white/10 flex justify-between items-center bg-black/95 backdrop-blur-xl shrink-0 sticky top-20 sm:top-24 z-30 w-full">
+    <div class="flex items-center gap-2 min-w-0">
+      <span class="text-[10px] font-mono text-white font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-white/[0.06] border border-white/10 shrink-0">
+        {activeTab === 'cli' ? 'CLI' : 'DOCS'}
+      </span>
+      <ChevronRight size={12} class="text-neutral-500 shrink-0" />
+      <span class="text-xs font-mono text-neutral-200 truncate">
+        {currentPageTitle}
       </span>
     </div>
     <button 
-      onclick={() => isMobileDocsMenuOpen = !isMobileDocsMenuOpen}
-      class="p-2 bg-neutral-900 border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
-      aria-label="Toggle Navigation"
+      type="button"
+      onclick={() => isMobileDocsMenuOpen = true}
+      class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/10 text-xs font-mono text-neutral-300 hover:text-white transition cursor-pointer shrink-0 ml-2"
+      aria-label="Open Documentation Navigation"
+      aria-expanded={isMobileDocsMenuOpen}
     >
-      {#if isMobileDocsMenuOpen} <X size={18} /> {:else} <Menu size={18} /> {/if}
+      <Menu size={14} />
+      <span>Menu</span>
     </button>
   </div>
 
-  <!-- LEFT SIDEBAR: Sticky, independent scroll, page navigation tree -->
-  <aside class="{isMobileDocsMenuOpen ? 'block' : 'hidden'} lg:block w-full lg:w-64 xl:w-72 shrink-0 sticky top-20 sm:top-24 h-auto lg:h-[calc(100vh-6rem)] self-start overflow-y-auto px-5 py-6 border-b lg:border-b-0 lg:border-r border-white/10 text-xs font-body bg-black/40 backdrop-blur-md z-30">
-    
-    {#if activeTab === 'cli'}
-      <!-- CLI Reference Mode: Page Navigation Only -->
-      <div class="space-y-6">
-        <!-- Section: CLI REFERENCE -->
-        <div>
-          <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
-            <span>CLI Reference</span>
+  <!-- Mobile Off-Canvas Drawer (Slide-Over Sheet) -->
+  {#if isMobileDocsMenuOpen}
+    <div 
+      class="fixed inset-0 bg-black/80 backdrop-blur-md z-[55] lg:hidden" 
+      onclick={() => isMobileDocsMenuOpen = false}
+      role="button"
+      tabindex="0"
+      onkeydown={(e) => e.key === 'Escape' && (isMobileDocsMenuOpen = false)}
+      aria-label="Close Navigation Backdrop"
+    ></div>
+    <aside class="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-black border-r border-white/15 z-[60] flex flex-col lg:hidden shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0 bg-black">
+        <div class="flex items-center gap-2.5">
+          <div class="w-6 h-6 rounded-md border border-white/15 bg-black p-0.5 flex items-center justify-center">
+            <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.svg" />
           </div>
-          <ul class="space-y-1">
-            <li>
-              <a 
-                href="/docs/cli" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/cli' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
-              >
-                <Terminal size={14} class="text-neutral-300" />
-                <span>CLI Overview</span>
-              </a>
-            </li>
-          </ul>
+          <span class="font-headline font-semibold text-sm text-white">Documentation</span>
         </div>
+        <button 
+          type="button"
+          onclick={() => isMobileDocsMenuOpen = false} 
+          class="p-1.5 rounded-lg border border-white/10 bg-white/[0.04] text-neutral-400 hover:text-white transition cursor-pointer"
+          aria-label="Close Navigation"
+        >
+          <X size={16} />
+        </button>
+      </div>
 
-        <!-- Section: CORE ENGINES -->
-        <div>
-          <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
-            <span>Dual Engines</span>
-          </div>
-          <ul class="space-y-2">
-            <li>
-              <a 
-                href="/docs/cli/agent-brain" 
-                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/cli/agent-brain' ? 'border-white/30 bg-white/[0.06] text-white' : 'border-white/10 bg-neutral-950/60 hover:border-white/20 hover:bg-neutral-900/40 text-neutral-400 hover:text-white'}"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2 font-mono font-medium text-white">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    <span>agent-brain</span>
-                  </div>
-                  <span class="text-[10px] font-mono text-neutral-400 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/10">6 cmds</span>
-                </div>
-                <p class="text-[10px] text-neutral-400 mt-1 pl-3.5 leading-relaxed">
-                  Reasoning, vector memory, AST router, and MCP gateway.
-                </p>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/cli/agent-spine" 
-                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/cli/agent-spine' ? 'border-white/30 bg-white/[0.06] text-white' : 'border-white/10 bg-neutral-950/60 hover:border-white/20 hover:bg-neutral-900/40 text-neutral-400 hover:text-white'}"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2 font-mono font-medium text-white">
-                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                    <span>agent-spine</span>
-                  </div>
-                  <span class="text-[10px] font-mono text-neutral-400 bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/10">4 cmds</span>
-                </div>
-                <p class="text-[10px] text-neutral-400 mt-1 pl-3.5 leading-relaxed">
-                  Deterministic DAG runner, milestone gates, and state replay.
-                </p>
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Strict Dual-Engine Invariant Footer -->
-        <div class="pt-5 border-t border-white/10 text-neutral-400 text-xs">
-          <span class="text-neutral-300 font-medium block mb-1">Dual-Engine Invariant</span>
-          <p class="text-neutral-400 leading-relaxed text-[11px]">Cognitive routing (<span class="text-white font-mono">brain</span>) and deterministic state execution (<span class="text-white font-mono">spine</span>).</p>
+      <div class="p-3 border-b border-white/10 bg-black shrink-0">
+        <div class="grid grid-cols-2 p-1 rounded-xl bg-neutral-900 border border-white/10 text-xs font-mono">
+          <button 
+            type="button"
+            onclick={() => activeTab = 'docs'} 
+            class="py-1.5 px-3 rounded-lg font-medium transition cursor-pointer {activeTab === 'docs' ? 'bg-white text-black shadow' : 'text-neutral-400 hover:text-white'}"
+          >
+            Docs
+          </button>
+          <button 
+            type="button"
+            onclick={() => activeTab = 'cli'} 
+            class="py-1.5 px-3 rounded-lg font-medium transition cursor-pointer {activeTab === 'cli' ? 'bg-white text-black shadow' : 'text-neutral-400 hover:text-white'}"
+          >
+            CLI Reference
+          </button>
         </div>
       </div>
 
-    {:else}
-      <!-- Documentation Mode: Navigation Tree -->
-      <div class="space-y-6">
-        <!-- Section: GETTING STARTED -->
-        <div>
-          <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
-            <span>Getting Started</span>
-          </div>
-          <ul class="space-y-1">
-            <li>
-              <a 
-                href="/docs" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
-              >
-                <Book size={14} class="text-neutral-300" />
-                <span>Introduction & Overview</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/installation" 
-                class="flex items-center justify-between px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/installation' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
-              >
-                <div class="flex items-center gap-2">
-                  <span class="text-neutral-500 font-mono">⚡</span>
-                  <span>Quickstart Execution</span>
-                </div>
-                <span class="text-[10px] font-mono text-neutral-500">2 min</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/architecture" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/architecture' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
-              >
-                <Layers size={14} class="text-neutral-300" />
-                <span>Dual-Engine Topology</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Section: CORE ARCHITECTURE -->
-        <div>
-          <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
-            <span>Core Engines</span>
-          </div>
-          <ul class="space-y-2">
-            <li>
-              <a 
-                href="/docs/memory" 
-                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/memory' ? 'border-white/30 bg-white/[0.06] text-white' : 'border-white/10 bg-neutral-950/60 hover:border-white/20 hover:bg-neutral-900/40 text-neutral-400 hover:text-white'}"
-              >
-                <div class="flex items-center gap-2 font-mono font-medium text-white">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  <span>agent-brain Manual</span>
-                </div>
-                <p class="text-[10px] text-neutral-400 mt-1 pl-3.5 leading-relaxed">
-                  Cognitive governor, procedure graph, and token knapsack packing.
-                </p>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/workflows" 
-                class="group flex flex-col p-2.5 rounded-xl border transition-all {pathname === '/docs/workflows' ? 'border-white/30 bg-white/[0.06] text-white' : 'border-white/10 bg-neutral-950/60 hover:border-white/20 hover:bg-neutral-900/40 text-neutral-400 hover:text-white'}"
-              >
-                <div class="flex items-center gap-2 font-mono font-medium text-white">
-                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                  <span>agent-spine Manual</span>
-                </div>
-                <p class="text-[10px] text-neutral-400 mt-1 pl-3.5 leading-relaxed">
-                  Declarative YAML DAGs, milestone approval gates, zero-human-block execution.
-                </p>
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Section: AGSTACK SDLC -->
-        <div>
-          <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
-            <span>AGSTACK SDLC</span>
-          </div>
-          <ul class="space-y-1">
-            <li>
-              <a 
-                href="/docs/agstack" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/agstack' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
-              >
-                <Layers size={14} class="text-neutral-300" />
-                <span>agstack Mode & Matrix</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/minimalist-entrepreneur" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/minimalist-entrepreneur' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
-              >
-                <Book size={14} class="text-neutral-300" />
-                <span>Minimalist Entrepreneurship</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/gstack" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/gstack' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
-              >
-                <span class="text-neutral-400 font-mono">★</span>
-                <span>Garry Tan gstack Review Engine</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Section: VERIFICATION & INVARIANTS -->
-        <div>
-          <div class="px-2 mb-2 text-[11px] font-mono uppercase tracking-wider text-neutral-400 flex items-center justify-between">
-            <span>Verification & Invariants</span>
-          </div>
-          <ul class="space-y-1">
-            <li>
-              <a 
-                href="/docs/invariants" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/invariants' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
-              >
-                <Shield size={14} class="text-neutral-300" />
-                <span>The 4 Engineering Invariants</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="/docs/verification" 
-                class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg font-medium transition-all {pathname === '/docs/verification' ? 'bg-white/[0.08] text-white border-l-2 border-white' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
-              >
-                <span class="text-neutral-300 font-mono text-[11px]">.verify/</span>
-                <span class="font-mono text-[11px]">Deterministic Harness</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Footer invariant -->
-        <div class="pt-6 border-t border-white/10 text-neutral-400">
-          <div class="flex items-center gap-2">
-            <span class="text-neutral-400 font-mono">ℹ</span>
-            <span class="text-[11px]">Strict dual-engine invariant applied.</span>
-          </div>
-        </div>
+      <div class="flex-1 overflow-y-auto px-5 py-6 text-xs font-body space-y-6">
+        {@render navTree()}
       </div>
-    {/if}
+    </aside>
+  {/if}
 
+  <!-- LEFT SIDEBAR: Sticky, independent scroll, page navigation tree (Desktop only) -->
+  <aside class="hidden lg:block w-64 xl:w-72 shrink-0 sticky top-20 sm:top-24 h-[calc(100vh-6rem)] self-start overflow-y-auto px-5 py-6 border-r border-white/10 text-xs font-body bg-black/40 backdrop-blur-md z-30">
+    {@render navTree()}
   </aside>
 
   <!-- MAIN DOCUMENTATION CANVAS: Centered article content -->
-  <main class="flex-1 min-w-0 px-6 sm:px-10 lg:px-12 py-8 bg-transparent selection:bg-neutral-800 selection:text-white">
-    <div class="max-w-4xl mx-auto">
+  <main class="flex-1 min-w-0 w-full px-4 sm:px-8 lg:px-12 py-8 bg-transparent selection:bg-neutral-800 selection:text-white overflow-hidden">
+    <div class="max-w-4xl mx-auto w-full min-w-0">
       
       <!-- Breadcrumb Header -->
-      <div class="mb-6 pb-4 border-b border-white/10 flex items-center justify-between">
-        <nav class="flex items-center gap-2 text-xs font-mono text-neutral-400" aria-label="Breadcrumb">
-          <a href={activeTab === 'cli' ? "/docs/cli" : "/docs"} class="hover:text-white transition">
+      <div class="mb-6 pb-4 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+        <nav class="flex items-center gap-2 text-xs font-mono text-neutral-400 min-w-0 flex-wrap" aria-label="Breadcrumb">
+          <a href={activeTab === 'cli' ? "/docs/cli" : "/docs"} class="hover:text-white transition shrink-0">
             {activeTab === 'cli' ? 'CLI Reference' : 'Docs'}
           </a>
-          <ChevronRight size={12} class="text-neutral-600" />
-          <span class="text-white font-medium">
-            {pathname.endsWith('/agent-brain') ? 'agent-brain CLI' : pathname.endsWith('/agent-spine') ? 'agent-spine CLI' : pathname.endsWith('/cli') ? 'CLI Reference Manual' : pathname.endsWith('/agstack') ? 'AGSTACK SDLC' : pathname.endsWith('/minimalist-entrepreneur') ? 'Minimalist Entrepreneurship' : pathname.endsWith('/gstack') ? 'Garry Tan gstack Review Engine' : pathname.endsWith('/verification') ? 'Deterministic Verification' : pathname.endsWith('/invariants') ? 'Engineering Invariants' : pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' : pathname.endsWith('/installation') ? 'Installation' : pathname.endsWith('/memory') ? 'Cognitive Governor & Memory' : pathname.endsWith('/workflows') ? 'agent-spine Manual' : 'Introduction & Overview'}
+          <ChevronRight size={12} class="text-neutral-600 shrink-0" />
+          <span class="text-white font-medium truncate max-w-[200px] sm:max-w-none">
+            {currentPageTitle}
           </span>
         </nav>
-        <div class="hidden sm:flex items-center gap-2 text-[11px] font-mono text-neutral-400">
+        <div class="inline-flex items-center gap-2 text-[11px] font-mono text-neutral-400 shrink-0">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
           <span>SPEC {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
         </div>
       </div>
 
       <!-- Article Content -->
-      <article class="prose prose-invert max-w-none text-neutral-300">
+      <article class="prose prose-invert max-w-none text-neutral-300 w-full min-w-0 overflow-hidden">
         {@render children()}
       </article>
 

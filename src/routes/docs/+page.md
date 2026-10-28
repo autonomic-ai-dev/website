@@ -3,12 +3,12 @@ title: Autonomic AI Documentation — Dual-Engine Architecture
 ---
 
 <div id="hero" class="space-y-4 not-prose mb-8">
-  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono text-neutral-300">
-    <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-    <span>Autonomic 1.0.0-rc2 — Dual-Engine Specification</span>
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] sm:text-xs font-mono text-neutral-300 max-w-full">
+    <span class="w-1.5 h-1.5 rounded-full bg-white shrink-0"></span>
+    <span class="truncate">Autonomic 1.0.0-rc2 — Dual-Engine Specification</span>
   </div>
 
-  <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
+  <h1 class="text-2xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15] break-words">
     Autonomic AI Documentation — Dual-Engine Architecture
   </h1>
 

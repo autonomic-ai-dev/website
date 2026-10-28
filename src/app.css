@@ -289,6 +289,8 @@
   max-width: 100% !important;
   color: #a1a1aa !important;
   font-family: var(--font-body) !important;
+  overflow-wrap: break-word !important;
+  word-wrap: break-word !important;
 }
 
 .prose pre {
@@ -298,6 +300,15 @@
   padding: 1.25rem !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
   font-family: var(--font-mono) !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose pre code {
+  white-space: pre !important;
+  word-break: normal !important;
+  word-wrap: normal !important;
 }
 
 .prose code:not(pre code) {
@@ -308,6 +319,25 @@
   font-size: 0.875em !important;
   font-family: var(--font-mono) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  word-break: break-word !important;
+}
+
+.table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.75rem 0;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #080808;
+}
+
+.table-wrapper table {
+  margin: 0 !important;
+  border: none !important;
+  width: 100% !important;
+  min-width: 540px;
 }
 
 .prose table {
@@ -423,11 +453,15 @@
   background: #080808 !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 0.75rem !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mermaid-diagram-container svg {
-  max-width: 100% !important;
+  max-width: none !important;
   height: auto !important;
+  min-width: fit-content !important;
   font-family: var(--font-mono) !important;
 }
 
