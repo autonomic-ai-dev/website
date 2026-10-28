@@ -92,18 +92,18 @@
     <div class="flex justify-between items-center px-4 sm:px-6 py-3 w-full">
       <!-- Brand Logo + Wordmark & Live Status -->
       <a class="font-headline text-base font-bold tracking-tight text-white flex items-center gap-2.5 sm:gap-3 group shrink-0" href="/">
-        <div class="relative w-7 h-7 rounded-lg overflow-hidden border border-white/15 bg-black p-0.5 flex items-center justify-center transition-transform group-hover:scale-105">
+        <div class="relative w-7 h-7 rounded-lg overflow-hidden border border-white/15 bg-black p-0.5 flex items-center justify-center transition-transform group-hover:scale-105 shrink-0">
           <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.svg" />
         </div>
-        <span class="tracking-tight text-white font-headline font-semibold text-sm">Autonomic AI</span>
-        <span class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-medium text-neutral-300 bg-white/[0.04] border border-white/10">
+        <span class="tracking-tight text-white font-headline font-semibold text-sm whitespace-nowrap shrink-0">Autonomic AI</span>
+        <span class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-medium text-neutral-300 bg-white/[0.04] border border-white/10 whitespace-nowrap shrink-0">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          {data?.ecosystemVersion || 'v1.0.0-rc2'}
+          <span class="whitespace-nowrap">{data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
         </span>
       </a>
 
       <!-- Primary Nav Links -->
-      <nav class="hidden md:flex items-center gap-6 font-headline text-xs font-medium text-neutral-400">
+      <nav class="hidden lg:flex items-center gap-6 font-headline text-xs font-medium text-neutral-400">
         <a class="transition-colors duration-150 hover:text-white {$page.url.pathname === '/' ? 'text-white font-semibold' : ''}" href="/#platform">Platform</a>
         <a class="transition-colors duration-150 hover:text-white {$page.url.pathname.startsWith('/docs/architecture') ? 'text-white font-semibold' : ''}" href="/docs/architecture">Architecture</a>
         <a class="transition-colors duration-150 hover:text-white {$page.url.pathname.startsWith('/registry') ? 'text-white font-semibold' : ''}" href="/registry">Registry</a>
@@ -116,12 +116,12 @@
       </nav>
 
       <!-- Trailing Action: GitHub Org Link & Mobile Menu Toggle -->
-      <div class="flex items-center gap-2 sm:gap-3">
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
         <a 
           href="https://github.com/autonomic-ai-dev" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/20 text-xs font-mono text-neutral-300 hover:text-white transition-all duration-150 active:scale-95"
+          class="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] hover:border-white/20 text-xs font-mono text-neutral-300 hover:text-white transition-all duration-150 active:scale-95 shrink-0"
           aria-label="GitHub Repository"
         >
           <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@
         <button 
           type="button"
           onclick={() => isMobileNavOpen = !isMobileNavOpen}
-          class="md:hidden p-1.5 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-white transition cursor-pointer"
+          class="lg:hidden p-1.5 rounded-lg border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-white transition cursor-pointer"
           aria-label="Toggle Navigation Menu"
           aria-expanded={isMobileNavOpen}
         >
@@ -147,7 +147,7 @@
     </div>
 
     {#if isMobileNavOpen}
-      <div class="md:hidden px-4 pt-2 pb-4 border-t border-white/10 flex flex-col gap-1 text-sm font-headline bg-black/95 rounded-b-2xl">
+      <div class="lg:hidden px-4 pt-2 pb-4 border-t border-white/10 flex flex-col gap-1 text-sm font-headline bg-black/95 rounded-b-2xl">
         <a 
           onclick={() => isMobileNavOpen = false} 
           class="px-3 py-2 rounded-lg transition-colors {$page.url.pathname === '/' ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
