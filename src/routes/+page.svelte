@@ -77,17 +77,17 @@
     <!-- Top Pill Badge -->
     <a 
       href="/docs/architecture" 
-      class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-zinc-800 bg-zinc-900/70 hover:border-zinc-700 backdrop-blur-md mb-8 transition-colors text-xs font-mono text-zinc-400 cursor-pointer"
+      class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-zinc-800 bg-zinc-900/70 hover:border-zinc-700 backdrop-blur-md mb-8 transition-colors text-xs font-mono text-zinc-400 cursor-pointer max-w-full"
     >
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-      <span>v1.0.0-rc2</span>
-      <span class="text-zinc-600">/</span>
-      <span class="text-zinc-300">Local-First Cognitive Governor &amp; Procedure Graph</span>
-      <ArrowRight class="w-3.5 h-3.5 text-zinc-500" />
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+      <span class="whitespace-nowrap font-medium text-zinc-300">v1.0.0-rc2</span>
+      <span class="text-zinc-600 hidden sm:inline">/</span>
+      <span class="text-zinc-300 truncate">Local-First Cognitive Governor &amp; Procedure Graph</span>
+      <ArrowRight class="w-3.5 h-3.5 text-zinc-500 shrink-0" />
     </a>
 
     <!-- Hero Headline -->
-    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-[-0.035em] font-headline max-w-4xl mx-auto leading-[1.08] mb-6 bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent">
+    <h1 class="text-3xl sm:text-6xl lg:text-7xl font-semibold tracking-[-0.035em] font-headline max-w-4xl mx-auto leading-[1.08] mb-6 bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent break-words">
       Autonomous Coding Agents Need A Cognitive Governor.
     </h1>
 
@@ -147,7 +147,7 @@
         </div>
 
         <!-- Pillar Switcher Tabs -->
-        <div class="inline-flex p-0.5 rounded-md bg-zinc-950 border border-zinc-800 text-[11px] font-mono">
+        <div class="inline-flex max-w-full overflow-x-auto p-0.5 rounded-md bg-zinc-950 border border-zinc-800 text-[11px] font-mono whitespace-nowrap">
           <button 
             type="button" 
             onclick={() => activeConsoleTab = 'procedure-graph'}
@@ -497,11 +497,11 @@
       </div>
 
       <!-- Terminal Body -->
-      <div class="mt-6 rounded-lg bg-black/60 border border-zinc-800/80 p-5 font-mono text-xs relative group">
+      <div class="mt-6 rounded-lg bg-black/60 border border-zinc-800/80 p-5 font-mono text-xs relative group overflow-x-auto">
         <button 
           type="button" 
           onclick={copyCommand}
-          class="absolute top-4 right-4 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[11px] flex items-center gap-1.5 border border-zinc-700 transition cursor-pointer"
+          class="absolute top-4 right-4 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[11px] flex items-center gap-1.5 border border-zinc-700 transition cursor-pointer shrink-0 z-10"
         >
           {#if copied}
             <span class="text-emerald-400">✔ Copied</span>
@@ -511,9 +511,9 @@
           {/if}
         </button>
 
-        <div class="space-y-3">
+        <div class="space-y-3 pr-16 sm:pr-0">
           {#each commandSnippets[activeTab].commands as cmd, idx}
-            <div class="text-zinc-300">
+            <div class="text-zinc-300 break-all sm:break-normal">
               <span class="text-zinc-500 font-bold">$</span> {cmd}
             </div>
             {#if commandSnippets[activeTab].notes[idx]}
