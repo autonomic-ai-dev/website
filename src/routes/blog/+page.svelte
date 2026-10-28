@@ -18,11 +18,39 @@
     if (currentPage > 1) currentPage--;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://autonomic-ai.dev"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Dispatches",
+        "item": "https://autonomic-ai.dev/blog"
+      }
+    ]
+  };
 </script>
 
 <svelte:head>
-  <title>Engineering Dispatches - Autonomic AI Dev</title>
-  <meta name="description" content="Technical dispatches, architecture breakdowns, and release postmortems from the Autonomic AI engineering team." />
+  <title>Engineering Dispatches — Autonomic AI</title>
+  <meta name="description" content="Technical dispatches, architecture breakdowns, AST safety invariants, deterministic DAG execution, and cognitive governor postmortems from the Autonomic AI engineering team." />
+  <link rel="canonical" href="https://autonomic-ai.dev/blog" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Engineering Dispatches — Autonomic AI" />
+  <meta property="og:description" content="Technical dispatches, architecture breakdowns, AST safety invariants, deterministic DAG execution, and cognitive governor postmortems." />
+  <meta property="og:url" content="https://autonomic-ai.dev/blog" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Engineering Dispatches — Autonomic AI" />
+  <meta name="twitter:description" content="Technical dispatches, architecture breakdowns, AST safety invariants, deterministic DAG execution, and cognitive governor postmortems." />
+  {@html `<script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>`}
 </svelte:head>
 
 <main class="pt-8 pb-24 px-6 max-w-5xl mx-auto min-h-screen">

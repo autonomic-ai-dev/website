@@ -69,6 +69,14 @@
 <svelte:head>
   <title>Autonomic AI — Local-First Cognitive Governor & Procedure Graph for Coding Agents</title>
   <meta name="description" content="Local-first cognitive governor and procedure graph for coding agents. Enforces turn-level token budgeting, blocks prompt injection and destructive commands, and accumulates execution DAGs across Cursor, Claude Code, and Antigravity." />
+  <link rel="canonical" href="https://autonomic-ai.dev/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Autonomic AI — Local-First Cognitive Governor & Procedure Graph for Coding Agents" />
+  <meta property="og:description" content="Local-first cognitive governor and procedure graph for coding agents. Enforces turn-level token budgeting, blocks prompt injection and destructive commands, and accumulates execution DAGs across Cursor, Claude Code, and Antigravity." />
+  <meta property="og:url" content="https://autonomic-ai.dev/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Autonomic AI — Local-First Cognitive Governor & Procedure Graph" />
+  <meta name="twitter:description" content="Local-first cognitive governor and procedure graph for coding agents. Enforces turn-level token budgeting, blocks prompt injection, and executes deterministic DAG workflows." />
 </svelte:head>
 
 <main class="relative z-10 pb-28 text-zinc-100 selection:bg-zinc-800 selection:text-white">

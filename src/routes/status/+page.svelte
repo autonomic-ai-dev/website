@@ -9,6 +9,7 @@
 
 <svelte:head>
   <title>System Status | Autonomic AI</title>
+  <meta name="robots" content="noindex, follow" />
   <meta http-equiv="refresh" content="0; url=https://autonomic-ai.openstatus.dev/" />
 </svelte:head>
 

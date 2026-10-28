@@ -42,6 +42,47 @@
     'Introduction & Overview'
   );
 
+  let currentPageDescription = $derived(
+    pathname.includes('/cli/agent-brain') ? 'CLI reference manual for agent-brain: turn routing, vector search, skill registration, and verification.' :
+    pathname.includes('/cli/agent-spine') ? 'CLI reference manual for agent-spine: DAG pipeline execution, state snapshots, replay, and approval gates.' :
+    pathname.endsWith('/cli') || pathname.endsWith('/cli/') ? 'Complete command-line interface manual for the Autonomic AI dual-engine ecosystem.' :
+    pathname.includes('/agstack') ? 'Software development lifecycle invariants, model token budgeting, and boundary discipline in AGSTACK.' :
+    pathname.includes('/minimalist-entrepreneur') ? 'Minimalist entrepreneurship principles applied to autonomous AI engineering and software delivery.' :
+    pathname.includes('/gstack') ? 'Garry Tan gstack code review and QA engine integration for autonomous software development.' :
+    pathname.includes('/verification') ? 'Deterministic mathematical verification, regression gates, and zero-drift test execution.' :
+    pathname.includes('/invariants') ? 'Core engineering invariants: immutability first, zero comment slop, boundary schema validation, and verified recipes.' :
+    pathname.includes('/architecture') ? 'Dual-engine architectural blueprint: decoupling stochastic reasoning from deterministic DAG execution.' :
+    pathname.includes('/installation') ? 'Installation guide for Autonomic AI developer ID-signed universal binaries via Homebrew and Cargo.' :
+    pathname.includes('/memory') ? 'Durable vector memory substrate, SQLite temporal knowledge graphs, and local HNSW context routing.' :
+    pathname.includes('/workflows') ? 'Deterministic YAML DAG workflow orchestrator with immutable snapshots, circuit breakers, and HITL gates.' :
+    'Comprehensive documentation and developer manuals for the Autonomic AI autonomous agent operating system.'
+  );
+
+  const breadcrumbData = $derived({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://autonomic-ai.dev"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Documentation",
+        "item": "https://autonomic-ai.dev/docs"
+      },
+      ...(pathname !== '/docs' && pathname !== '/docs/' ? [{
+        "@type": "ListItem",
+        "position": 3,
+        "name": currentPageTitle,
+        "item": `https://autonomic-ai.dev${pathname.replace(/\/+$/, '')}`
+      }] : [])
+    ]
+  });
+
   function openDiagramModal(svgHtml: string) {
     activeModalSvg = svgHtml;
   }
@@ -370,6 +411,19 @@
     };
   });
 </script>
+
+<svelte:head>
+  <title>{currentPageTitle} — Autonomic AI Documentation</title>
+  <meta name="description" content={currentPageDescription} />
+  <link rel="canonical" href={`https://autonomic-ai.dev${pathname.replace(/\/+$/, '') || '/docs'}`} />
+  <meta property="og:title" content={`${currentPageTitle} — Autonomic AI Documentation`} />
+  <meta property="og:description" content={currentPageDescription} />
+  <meta property="og:url" content={`https://autonomic-ai.dev${pathname.replace(/\/+$/, '') || '/docs'}`} />
+  <meta property="og:type" content="article" />
+  <meta name="twitter:title" content={`${currentPageTitle} — Autonomic AI Documentation`} />
+  <meta name="twitter:description" content={currentPageDescription} />
+  {@html `<script type="application/ld+json">${JSON.stringify(breadcrumbData)}</script>`}
+</svelte:head>
 
 {#snippet navTree()}
   {#if activeTab === 'cli'}
