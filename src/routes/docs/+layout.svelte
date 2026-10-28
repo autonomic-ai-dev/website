@@ -27,18 +27,18 @@
   let activeModalSvg = $state<string | null>(null);
 
   let currentPageTitle = $derived(
-    pathname.endsWith('/agent-brain') ? 'agent-brain CLI' :
-    pathname.endsWith('/agent-spine') ? 'agent-spine CLI' :
-    pathname.endsWith('/cli') ? 'CLI Reference Manual' :
-    pathname.endsWith('/agstack') ? 'AGSTACK SDLC' :
-    pathname.endsWith('/minimalist-entrepreneur') ? 'Minimalist Entrepreneurship' :
-    pathname.endsWith('/gstack') ? 'Garry Tan gstack Review Engine' :
-    pathname.endsWith('/verification') ? 'Deterministic Verification' :
-    pathname.endsWith('/invariants') ? 'Engineering Invariants' :
-    pathname.endsWith('/architecture') ? 'Dual-Engine Architecture' :
-    pathname.endsWith('/installation') ? 'Installation' :
-    pathname.endsWith('/memory') ? 'Cognitive Governor & Memory' :
-    pathname.endsWith('/workflows') ? 'agent-spine Manual' :
+    pathname.includes('/cli/agent-brain') ? 'agent-brain CLI' :
+    pathname.includes('/cli/agent-spine') ? 'agent-spine CLI' :
+    pathname.endsWith('/cli') || pathname.endsWith('/cli/') ? 'CLI Reference Manual' :
+    pathname.includes('/agstack') ? 'AGSTACK SDLC' :
+    pathname.includes('/minimalist-entrepreneur') ? 'Minimalist Entrepreneurship' :
+    pathname.includes('/gstack') ? 'Garry Tan gstack Review Engine' :
+    pathname.includes('/verification') ? 'Deterministic Verification' :
+    pathname.includes('/invariants') ? 'Engineering Invariants' :
+    pathname.includes('/architecture') ? 'Dual-Engine Architecture' :
+    pathname.includes('/installation') ? 'Installation' :
+    pathname.includes('/memory') ? 'Cognitive Governor & Memory' :
+    pathname.includes('/workflows') ? 'agent-spine Manual' :
     'Introduction & Overview'
   );
 
