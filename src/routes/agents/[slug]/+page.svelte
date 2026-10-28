@@ -4,11 +4,62 @@
   let { data } = $props();
   let agent = $derived(data.agent);
   let Icon = $derived(agent.icon);
+
+  const organSchema = $derived({
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": agent.name,
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "macOS Apple Silicon (ARM64)",
+    "description": agent.longDescription,
+    "url": `https://autonomic-ai.dev/agents/${agent.id}`,
+    "softwareVersion": agent.version,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  });
+
+  const breadcrumbSchema = $derived({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://autonomic-ai.dev"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Platform",
+        "item": "https://autonomic-ai.dev/#platform"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": agent.name,
+        "item": `https://autonomic-ai.dev/agents/${agent.id}`
+      }
+    ]
+  });
 </script>
 
 <svelte:head>
-  <title>{agent.name} - Autonomic AI Dev</title>
-  <meta name="description" content={agent.description} />
+  <title>{agent.name} — Autonomic AI Organ</title>
+  <meta name="description" content={agent.longDescription || agent.description} />
+  <link rel="canonical" href={`https://autonomic-ai.dev/agents/${agent.id}`} />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={`${agent.name} — Autonomic AI Organ`} />
+  <meta property="og:description" content={agent.description} />
+  <meta property="og:url" content={`https://autonomic-ai.dev/agents/${agent.id}`} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={`${agent.name} — Autonomic AI Organ`} />
+  <meta name="twitter:description" content={agent.description} />
+  {@html `<script type="application/ld+json">${JSON.stringify(organSchema)}</script>`}
+  {@html `<script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>`}
 </svelte:head>
 
 <main class="pt-8 pb-24 px-6 max-w-6xl mx-auto min-h-screen">

@@ -17,6 +17,9 @@
     document.documentElement.classList.add('dark');
   });
 
+  const normalizedPath = $derived($page.url.pathname === '/' ? '' : $page.url.pathname.replace(/\/+$/, ''));
+  const canonicalUrl = $derived(`https://autonomic-ai.dev${normalizedPath || '/'}`);
+
   const structuredData = $derived({
     "@context": "https://schema.org",
     "@graph": [
@@ -30,7 +33,7 @@
           "price": "0",
           "priceCurrency": "USD"
         },
-        "softwareVersion": data?.ecosystemVersion || "v1.0.0-rc2",
+        "softwareVersion": data?.ecosystemVersion || "v1.0.0-rc3",
         "description": "Autonomous AI agent engineering operating system featuring agent-brain (HNSW vector memory & MCP hub) and agent-spine (deterministic YAML DAG runner)."
       },
       {
@@ -46,7 +49,12 @@
       {
         "@type": "WebSite",
         "name": "Autonomic AI",
-        "url": "https://autonomic-ai.dev"
+        "url": "https://autonomic-ai.dev",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://autonomic-ai.dev/registry?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
       }
     ]
   });
@@ -59,11 +67,11 @@
   <meta name="author" content="Autonomic AI Team" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta name="theme-color" content="#0a0a0c" />
-  <link rel="canonical" href="https://autonomic-ai.dev{$page.url.pathname}" />
+  <link rel="canonical" href={canonicalUrl} />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://autonomic-ai.dev{$page.url.pathname}" />
+  <meta property="og:url" content={canonicalUrl} />
   <meta property="og:site_name" content="Autonomic AI" />
   <meta property="og:title" content="Autonomic AI — Autonomous AI Agent Operating System & MCP Router" />
   <meta property="og:description" content="Deterministic DAG workflows, HNSW vector memory, and intelligent MCP routing for AI coding agents." />

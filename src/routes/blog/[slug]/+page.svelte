@@ -1,11 +1,70 @@
 <script lang="ts">
   import { ArrowLeft, Calendar, User } from "lucide-svelte";
   let { data } = $props();
+
+  const articleSchema = $derived({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": data.metadata.title,
+    "description": data.metadata.excerpt,
+    "datePublished": data.metadata.date,
+    "dateModified": data.metadata.date,
+    "mainEntityOfPage": `https://autonomic-ai.dev/blog/${data.metadata.slug}`,
+    "author": {
+      "@type": "Person",
+      "name": data.metadata.author || "Autonomic AI Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Autonomic AI",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://autonomic-ai.dev/logo.png"
+      }
+    }
+  });
+
+  const breadcrumbSchema = $derived({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://autonomic-ai.dev"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Dispatches",
+        "item": "https://autonomic-ai.dev/blog"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": data.metadata.title,
+        "item": `https://autonomic-ai.dev/blog/${data.metadata.slug}`
+      }
+    ]
+  });
 </script>
 
 <svelte:head>
-  <title>{data.metadata.title} - Autonomic AI Dev</title>
+  <title>{data.metadata.title} — Autonomic AI Dispatches</title>
   <meta name="description" content={data.metadata.excerpt} />
+  <link rel="canonical" href={`https://autonomic-ai.dev/blog/${data.metadata.slug}`} />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content={`${data.metadata.title} — Autonomic AI Dispatches`} />
+  <meta property="og:description" content={data.metadata.excerpt} />
+  <meta property="og:url" content={`https://autonomic-ai.dev/blog/${data.metadata.slug}`} />
+  <meta property="article:published_time" content={data.metadata.date} />
+  <meta property="article:section" content={data.metadata.category} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={`${data.metadata.title} — Autonomic AI Dispatches`} />
+  <meta name="twitter:description" content={data.metadata.excerpt} />
+  {@html `<script type="application/ld+json">${JSON.stringify(articleSchema)}</script>`}
+  {@html `<script type="application/ld+json">${JSON.stringify(breadcrumbSchema)}</script>`}
 </svelte:head>
 
 <main class="pt-8 pb-24 px-6 max-w-4xl mx-auto min-h-screen">

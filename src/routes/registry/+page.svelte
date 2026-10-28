@@ -505,6 +505,31 @@ description: Everything Claude Code — large curated skill library`
   <title>Autonomic Registry — Curated DAG Workflows & Brain Skill Packages</title>
   <meta name="description" content="Explore deterministic Spine DAG workflows and Brain skill packages for autonomous AI software engineering." />
   <link rel="canonical" href="https://autonomic-ai.dev/registry" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Autonomic Registry — Curated DAG Workflows & Brain Skill Packages" />
+  <meta property="og:description" content="Explore deterministic Spine DAG workflows and Brain skill packages for autonomous AI software engineering." />
+  <meta property="og:url" content="https://autonomic-ai.dev/registry" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Autonomic Registry — Curated DAG Workflows & Brain Skill Packages" />
+  <meta name="twitter:description" content="Explore deterministic Spine DAG workflows and Brain skill packages for autonomous AI software engineering." />
+  {@html `<script type="application/ld+json">${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://autonomic-ai.dev"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Registry",
+        "item": "https://autonomic-ai.dev/registry"
+      }
+    ]
+  })}</script>`}
 </svelte:head>
 
 <div class="relative min-h-screen bg-transparent text-neutral-100 font-body antialiased selection:bg-neutral-800 selection:text-white pb-24">
