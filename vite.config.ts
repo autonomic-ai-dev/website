@@ -1,11 +1,24 @@
 import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { mdsvex } from 'mdsvex';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
-		sveltekit()
+		sveltekit({
+			extensions: ['.svelte', '.md', '.svx'],
+			preprocess: [
+				vitePreprocess(),
+				mdsvex({
+					extensions: ['.md', '.svx']
+				})
+			],
+			adapter: adapter({
+				runtime: 'nodejs22.x'
+			})
+		})
 	]
 });
