@@ -1,7 +1,7 @@
 <script lang="ts">
   import "../app.css";
   import { onMount } from "svelte";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { Menu, X } from "lucide-svelte";
   import AnimatedBackground from "$lib/components/AnimatedBackground.svelte";
   let { children, data } = $props();
@@ -9,7 +9,7 @@
   let isMobileNavOpen = $state(false);
 
   $effect(() => {
-    $page.url.pathname;
+    page.url.pathname;
     isMobileNavOpen = false;
   });
 
@@ -17,7 +17,7 @@
     document.documentElement.classList.add('dark');
   });
 
-  const normalizedPath = $derived($page.url.pathname === '/' ? '' : $page.url.pathname.replace(/\/+$/, ''));
+  const normalizedPath = $derived(page.url.pathname === '/' ? '' : page.url.pathname.replace(/\/+$/, ''));
   const canonicalUrl = $derived(`https://autonomic-ai.dev${normalizedPath || '/'}`);
 
   const structuredData = $derived({
@@ -112,11 +112,11 @@
 
       <!-- Primary Nav Links -->
       <nav class="hidden lg:flex items-center gap-6 font-headline text-xs font-medium text-neutral-400">
-        <a class="transition-colors duration-150 hover:text-white {$page.url.pathname === '/' ? 'text-white font-semibold' : ''}" href="/#platform">Platform</a>
-        <a class="transition-colors duration-150 hover:text-white {$page.url.pathname.startsWith('/docs/architecture') ? 'text-white font-semibold' : ''}" href="/docs/architecture">Architecture</a>
-        <a class="transition-colors duration-150 hover:text-white {$page.url.pathname.startsWith('/registry') ? 'text-white font-semibold' : ''}" href="/registry">Registry</a>
-        <a class="transition-colors duration-150 hover:text-white {$page.url.pathname.startsWith('/docs') && !$page.url.pathname.startsWith('/docs/cli') ? 'text-white font-semibold' : ''}" href="/docs">Docs</a>
-        <a class="transition-colors duration-150 hover:text-white {$page.url.pathname.startsWith('/docs/cli') ? 'text-white font-semibold' : ''}" href="/docs/cli">CLI Reference</a>
+        <a class="transition-colors duration-150 hover:text-white {page.url.pathname === '/' ? 'text-white font-semibold' : ''}" href="/#platform">Platform</a>
+        <a class="transition-colors duration-150 hover:text-white {page.url.pathname.startsWith('/docs/architecture') ? 'text-white font-semibold' : ''}" href="/docs/architecture">Architecture</a>
+        <a class="transition-colors duration-150 hover:text-white {page.url.pathname.startsWith('/registry') ? 'text-white font-semibold' : ''}" href="/registry">Registry</a>
+        <a class="transition-colors duration-150 hover:text-white {page.url.pathname.startsWith('/docs') && !page.url.pathname.startsWith('/docs/cli') ? 'text-white font-semibold' : ''}" href="/docs">Docs</a>
+        <a class="transition-colors duration-150 hover:text-white {page.url.pathname.startsWith('/docs/cli') ? 'text-white font-semibold' : ''}" href="/docs/cli">CLI Reference</a>
         <a class="text-neutral-400 hover:text-emerald-400 transition-colors duration-150 flex items-center gap-1.5" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
           <span>Status</span>
@@ -158,35 +158,35 @@
       <div class="lg:hidden px-4 pt-2 pb-4 border-t border-white/10 flex flex-col gap-1 text-sm font-headline bg-black/95 rounded-b-2xl">
         <a 
           onclick={() => isMobileNavOpen = false} 
-          class="px-3 py-2 rounded-lg transition-colors {$page.url.pathname === '/' ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
+          class="px-3 py-2 rounded-lg transition-colors {page.url.pathname === '/' ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
           href="/#platform"
         >
           Platform
         </a>
         <a 
           onclick={() => isMobileNavOpen = false} 
-          class="px-3 py-2 rounded-lg transition-colors {$page.url.pathname.startsWith('/docs/architecture') ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
+          class="px-3 py-2 rounded-lg transition-colors {page.url.pathname.startsWith('/docs/architecture') ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
           href="/docs/architecture"
         >
           Architecture
         </a>
         <a 
           onclick={() => isMobileNavOpen = false} 
-          class="px-3 py-2 rounded-lg transition-colors {$page.url.pathname.startsWith('/registry') ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
+          class="px-3 py-2 rounded-lg transition-colors {page.url.pathname.startsWith('/registry') ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
           href="/registry"
         >
           Registry
         </a>
         <a 
           onclick={() => isMobileNavOpen = false} 
-          class="px-3 py-2 rounded-lg transition-colors {$page.url.pathname.startsWith('/docs') && !$page.url.pathname.startsWith('/docs/cli') ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
+          class="px-3 py-2 rounded-lg transition-colors {page.url.pathname.startsWith('/docs') && !page.url.pathname.startsWith('/docs/cli') ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
           href="/docs"
         >
           Docs
         </a>
         <a 
           onclick={() => isMobileNavOpen = false} 
-          class="px-3 py-2 rounded-lg transition-colors {$page.url.pathname.startsWith('/docs/cli') ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
+          class="px-3 py-2 rounded-lg transition-colors {page.url.pathname.startsWith('/docs/cli') ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}" 
           href="/docs/cli"
         >
           CLI Reference
@@ -209,7 +209,7 @@
   </header>
 
   <!-- Main Content Container -->
-  <div class="relative {$page.url.pathname.startsWith('/docs') ? 'pt-20 sm:pt-24' : 'pt-24 sm:pt-28'}">
+  <div class="relative {page.url.pathname.startsWith('/docs') ? 'pt-20 sm:pt-24' : 'pt-24 sm:pt-28'}">
     {@render children()}
   </div>
 

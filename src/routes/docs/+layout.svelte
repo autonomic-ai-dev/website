@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
-  import { browser } from "$app/environment";
-  import { page } from "$app/stores";
+  import { browser } from "$app/env";
+  import { page } from "$app/state";
   import {
     ChevronRight,
     ExternalLink,
@@ -17,7 +17,7 @@
   } from "lucide-svelte";
 
   let { children, data } = $props();
-  let pathname = $derived($page.url.pathname);
+  let pathname = $derived(page.url.pathname);
   let isMobileDocsMenuOpen = $state(false);
 
   // Determine active section based on URL

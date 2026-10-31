@@ -368,6 +368,88 @@ agent-brain promote <list|approve|reject> <staging_id>
 
 ---
 
+## Memory Facts
+
+Read, write, and import facts from the shell. These commands use the same store as the MCP tools, so a fact written here is visible to every connected host.
+
+### `recall`
+
+Read stored facts, by text, tag, or meaning.
+
+```bash
+agent-brain recall [QUERY WORDS] [--tag TAG ...] [--limit N] [--since 30d|12h|90m] [--semantic] [--min-score F] [--json]
+```
+
+- Without a query, facts come back newest first with score `null`.
+- With a query, facts sharing a token with it are scored by token overlap.
+- `--semantic` embeds the query and scores facts by cosine similarity. `--min-score` keeps only close matches.
+- Tags match a fact's topic or any of its tags. `--limit` is 1 to 200, default 20. Empty results print `[]` with exit 0.
+
+```bash
+agent-brain recall "release notes" --tag posted --since 30d --semantic --min-score 0.8
+```
+
+---
+
+### `remember`
+
+Store one fact.
+
+```bash
+agent-brain remember --text TEXT --tag TAG [--tag TAG ...] [--source SOURCE]
+```
+
+- The first tag becomes the fact's topic, and every tag is recorded.
+- Secret-shaped text and text over 20,000 characters are refused.
+- Text that is already stored returns the existing id with `deduplicated: true`.
+
+---
+
+### `import-corpus`
+
+Store every paragraph of a folder of Markdown files.
+
+```bash
+agent-brain import-corpus DIR --tag TAG [--tag TAG ...]
+```
+
+- Paragraphs are split on blank lines. Each fact's source is `FILE#paragraph-N`, so a reviewer can open the original.
+- Paragraphs already stored, matched by content hash, are skipped. Running the same import twice creates no new facts.
+- Secret-shaped and over-long paragraphs are counted in the report and not stored.
+
+---
+
+## Extensions & Memorable
+
+### `ext`
+
+Install optional subcommands from the agent-registry. Each extension is a separate executable, so the core binary stays small.
+
+```bash
+agent-brain ext list
+agent-brain ext add <NAME>
+agent-brain ext remove <NAME>
+```
+
+- `ext add` downloads the build for this platform, checks its SHA-256 against the registry manifest, and installs it under the brain home.
+- An installed extension runs as a subcommand, for example `agent-brain bench` after `agent-brain ext add bench`.
+
+---
+
+### `memorable`
+
+Control the opt-in Memorable integration. It is off by default, and nothing leaves the machine until you enable it.
+
+```bash
+agent-brain memorable [status | enable [--capture] | capture <trace.json> | disable]
+```
+
+- `enable` registers Memorable's read-only MCP server. Run `agent-brain mcp sync` to index it. Traces stay on the machine.
+- `enable --capture` also allows `capture`, which sends a session trace to Memorable's extraction service. Capture refuses unless the repository's last `agent-brain verify` passed. Use it only when you accept that trace leaving the machine.
+- `disable` turns both off.
+
+---
+
 ## Operations & Diagnostics
 
 ### `stats`
@@ -450,6 +532,8 @@ agent-brain verify init [--dir DIR]
 agent-brain verify record --exit CODE [OPTIONS] -- <SUMMARY...>
 ```
 
+Pass `--save-artifact` to keep the command's full output. It is written to `${AUTONOMIC_HOME:-~/.autonomic}/artifacts/<project>/<report-id>.log`, and the path is printed to stderr. Without the flag, no log is written.
+
 ---
 
 ## Extras (`--features extras`)
@@ -461,7 +545,7 @@ Advanced tools compiled when building with `--features extras`:
 | `dataset` | Export execution trajectories into JSONL format for LoRA training. |
 | `digest` | Generate weekly operator summary digest of agent activity. |
 | `eval` | Recall benchmark gates (`Recall@3`, BEAM memory tests). |
-| `bench` | Microbenchmarks for vector search latency and SQLite throughput. |
+| `bench` | Moved out of the core binary. Install with `agent-brain ext add bench`. |
 | `distill` | Perform semantic clustering over memory nodes to merge redundant facts. |
 | `graphify` | Build codebase entity-relationship graphs from AST symbols. |
 | `grpc` | Launch high-performance gRPC orchestrator bridge. |
