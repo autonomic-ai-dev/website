@@ -36,8 +36,8 @@ Suppose your organization maintains a curated library of over 2,000 specialized 
 | Behavior | Cost & Impact |
 | :--- | :--- |
 | **Mandatory Hook Gate** | Host hooks block MCP execution until `route_task` returns approved context |
-| **Sub-500 Token Routing** | Hybrid BM25 + HNSW vector engine selects the top 3 relevant skills in under **477 tokens** |
-| **99% Token Reduction** | Reasoning window remains completely clean, fast, and focused |
+| **Budgeted Token Routing** | Hybrid BM25 + HNSW vector engine selects the top relevant skills, rules and memory within a per-task budget of 350–700 tokens |
+| **Measured Token Savings** | `agent-brain dashboard` reports the total tokens saved for your repo, so the number is yours to check |
 | **Durable Conventions** | `store_memory` persists verified architectural rules forever |
 
 ---
@@ -47,8 +47,8 @@ Suppose your organization maintains a curated library of over 2,000 specialized 
 Every release of `agent-brain` executes strict verification tests against standardized fixtures:
 
 * **Isolated Recall@3**: &ge; 0.85
-* **Warm-Route Latency p95**: &le; 100ms
-* **Token Budget Ceiling**: Hard-capped at 500 tokens
+* **Warm-Route Latency p95 target**: &le; 100ms. The recorded CI run measured 3 ms with a deterministic embedder, not the production embedding model.
+* **Token Budget**: 350–700 tokens per task kind, with a 120-token memory reservation
 * **Memory Deduplication**: HNSW cosine similarity thresholding
 
 ```bash
@@ -64,6 +64,6 @@ agent-brain briefing
 With `agent-brain install --global` configured on your developer workstation:
 
 1. **Turn Start**: Your editor triggers `route_task` with the user query and open files.
-2. **Context Resolution**: In under 40ms, `agent-brain` extracts verified recipes and high-confidence memory facts.
+2. **Context Resolution**: `agent-brain` extracts verified recipes and high-confidence memory facts locally, within a per-task token budget.
 3. **Execution**: The agent solves the task strictly adhering to loaded conventions.
 4. **Verification**: Executed commands record exit codes via `agent-brain verify`, reinforcing successful patterns and dampening failures.

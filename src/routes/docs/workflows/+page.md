@@ -22,7 +22,7 @@ flowchart LR
 
     Deploy --> Snapshot[("Append-Only Snapshot Store<br/>SQLite state.db")]
     Fallback --> Snapshot
-    Snapshot --> BrainSync[("Procedure Graph Sync<br/>Schema v23")]
+    Snapshot --> BrainSync[("Procedure Graph Sync<br/>Schema v25")]
 
     classDef exec fill:#0d0d0d,stroke:#444444,stroke-width:1px,color:#f4f4f5;
     classDef gate fill:#141414,stroke:#888888,stroke-width:1.5px,color:#ffffff;
@@ -40,7 +40,7 @@ flowchart LR
 `Verify` nodes actively execute specified shell validation commands under timeouts, capturing stdout, stderr, and exit codes. Successful runs (`exit 0`) mark the step `verified = true`, while failures halt the pipeline unless `continue_on_failure: true` is explicitly configured.
 
 ### 2. Cognitive Knapsack Injection via `agent-brain`
-Before an `Agent` node executes, `agent-spine` queries `agent-brain route_task` to inject a surgical ~500-token `_brain_knapsack` containing relevant skills, invariant rules, and traps directly into the node payload. This prevents worker agents from suffering from context bloat or hallucinating rules.
+Before an `Agent` node executes, `agent-spine` queries `agent-brain route_task` to inject a surgical `_brain_knapsack` (350–700 tokens, depending on task kind) containing relevant skills, invariant rules, and traps directly into the node payload. This prevents worker agents from suffering from context bloat or hallucinating rules.
 
 ### 3. Time-Travel Debugging via Immutable Snapshots
 Every successful node transition creates an append-only snapshot in `state.db`. Operators can rewind to any prior sequence index via CLI (`agent-spine run --resume <seq>`) or trigger a 1-click **"↺ Replay From Here"** action directly from the dashboard.
@@ -57,7 +57,7 @@ For non-deterministic or high-risk engineering tasks, `SpeculativeFork` nodes sp
 
 | Kind | Purpose | Runtime Behavior |
 | :--- | :--- | :--- |
-| **`Agent`** | Discrete cognitive subtask | Hydrates ~500-token knapsack from `agent-brain`, delegates to worker, snapshots output |
+| **`Agent`** | Discrete cognitive subtask | Hydrates a 350–700 token knapsack from `agent-brain`, delegates to worker, snapshots output |
 | **`Verify`** | Machine validation | Actively executes `command`, captures exit code and output streams, asserts `verified` |
 | **`ApprovalGate`** | Human-in-the-loop safety | Suspends execution and awaits operator `agent-spine approve` or dashboard button |
 | **`SpeculativeFork`** | Parallel exploration | Evaluates multiple candidate branches in isolated Git worktrees |
