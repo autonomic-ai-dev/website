@@ -8,7 +8,7 @@ Curated **third-party skill packs** for [`agent-brain`](https://github.com/auton
 
 | Alias | Packages |
 |-------|----------|
-| `@starter` | vercel-labs/skills, vercel-labs/agent-skills |
+| `@starter` | mattpocock/skills, vercel-labs/agent-skills |
 | `@nextjs` | vercel-labs/agent-skills |
 | `@ecc` | affaan-m/everything-claude-code |
 | `@rust` | affaan-m/everything-claude-code |

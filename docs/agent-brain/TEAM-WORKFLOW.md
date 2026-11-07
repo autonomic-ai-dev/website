@@ -8,7 +8,7 @@ How a staff engineer standardizes agent-brain for a team without per-developer c
 |------|----------------|
 | **Platform / staff** | Chooses skill packs, repo rules, memory conventions, sync policy |
 | **Developers** | `install --global`, `add @alias`, use Agent mode (hooks enforce routing) |
-| **CI (optional)** | `agent-brain proofs --ci` or a custom golden suite on the team skill pack |
+| **CI (optional)** | `agent-brain verify -- <cmd>` running a golden suite for the team skill pack |
 
 ## 1. Pick the team skill pack
 
@@ -27,7 +27,7 @@ agent-brain add @nextjs
 
 ## 2. Repo-scoped rules (optional)
 
-Commit project rules under `.cursor/rules/` as usual. agent-brain indexes them on bootstrap and ranks them per turn — they do not need to be pasted into every chat.
+Commit project rules under `.cursor/rules/` as usual. `agent-brain index` indexes them and the router ranks them per turn — they do not need to be pasted into every chat.
 
 For package-only teams, a repo can ship **`agent-brain.yaml`** in a dedicated config repo; today the supported path is **`agent-brain add owner/repo`** plus standard skill paths in that repo.
 
@@ -49,7 +49,7 @@ Second machine:
 agent-brain sync git pull
 ```
 
-Use **encrypted cloud sync** (`AGENT_BRAIN_SYNC_KEY`) if git is not appropriate for memory contents.
+Use `agent-brain sync cloud` if git is not appropriate for memory contents. Encryption applies when the cloud sync `encrypt` setting is on; the key is read from `AGENT_BRAIN_SYNC_KEY`.
 
 ## 4. Governance — promote operator loop
 
@@ -61,7 +61,7 @@ agent-brain promote approve <staging-id>
 agent-brain promote reject <staging-id>
 ```
 
-Staff reviews staging queue weekly; approved skills land under `~/.agent_brain/skills/` or package paths.
+Staff reviews staging queue weekly; approved skills land under `~/.autonomic/memory/skills/` or in their package paths.
 
 ## 5. Verify routing on your stack
 
@@ -69,10 +69,10 @@ After changing the team pack, spot-check:
 
 ```bash
 agent-brain briefing
-agent-brain proofs --ci
+agent-brain stats
 ```
 
-Add repo-specific golden queries if you maintain a custom eval suite.
+The `proofs` benchmark command exists only in builds with the `extras` extension. Add repo-specific golden queries if you maintain a custom eval suite.
 
 ## 6. Onboarding checklist (copy for new hires)
 

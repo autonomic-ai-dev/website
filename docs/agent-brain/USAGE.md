@@ -253,6 +253,9 @@ agent-brain sync git init --remote git@github.com:your-org/agent-brain-sync.git
 # Second machine: clone the sync repo
 agent-brain sync git clone --remote git@github.com:your-org/agent-brain-sync.git
 
+# Or join this device to an existing sync repo in one step
+agent-brain bootstrap --remote git@github.com:your-org/agent-brain-sync.git
+
 # Then, on either machine
 agent-brain sync status
 agent-brain sync git pull
@@ -295,7 +298,7 @@ agent-brain verify init
 agent-brain verify -- cargo test
 ```
 
-When `.verify/` exists in the repository, `agent-brain verify` matches against the allowlist and records outcomes in `brain.db`. `route_task` uses those outcomes to offer recipes from passing runs and withhold recipes whose latest run failed.
+When `.verify/` exists in the repository, `agent-brain verify` matches against the allowlist and records outcomes in `brain.db`. `route_task` uses those outcomes to offer recipes from passing runs and withhold recipes whose latest run failed. Print the verify report by source with `agent-brain report`.
 
 ## Environment variables
 
