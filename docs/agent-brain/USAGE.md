@@ -12,7 +12,7 @@ After that, **you do not run `serve` or `index` daily.** Cursor starts the MCP s
 
 The **agent** (not you) calls `route_task` every turn and `store_memory` at task end. Agent-facing contract: [AGENT-CONTEXT.md](AGENT-CONTEXT.md).
 
-**Enforcement:** `install --global` (Cursor) and `install --claude-code|--opencode|--codex|--gemini|--antigravity|--all --global` install hooks/plugins that **block other agent-brain MCP tools** until `route_task` succeeds (default scope `brain_mcp`). Native Shell/Read/Grep stay available if MCP is down. VS Code and Claude Desktop are instruction-only — see [host-integration.md](host-integration.md).
+**Enforcement:** `install --global` (Cursor) and `install --claude-code|--opencode|--codex|--gemini|--antigravity|--all --global` install hooks/plugins that **block other agent-brain MCP tools** until `route_task` succeeds (scope set by `AGENT_BRAIN_ROUTE_GATE_SCOPE`, default `all`). VS Code and Claude Desktop are instruction-only — see [host-integration.md](host-integration.md).
 
 > Disable hooks only for debugging: `AGENT_BRAIN_ROUTE_HOOKS=0` in MCP env or shell.
 
@@ -222,42 +222,39 @@ agent-brain verify --source orchestrator -- cargo test -p agent-brain
 
 # Record an already-known exit (hooks use --source hook; MCP asserts are not trusted for learning)
 agent-brain verify record --exit 0 --source cli -- cargo test -p agent-brain
-
-# View aggregate verification stats (orchestrator|cli strongest; mcp/playbook not trusted for learning)
-agent-brain report
 ```
 
 - **Project playbooks (`.verify/`):** When a `.verify/` folder exists at project root, its scenario files and configs are hashed to track drift against outcomes. Command allowlist: `.verify/verify.toml`.
-- **Hook auto-capture:** When enabled in host hooks (`route_gate.py`), matching Shell test commands (`cargo test`, `pytest`, `npm test`, etc.) automatically record verification outcomes into SQLite.
+- **Hook auto-capture:** The route gate hook (`route_gate.py`) records Shell commands that match `cargo test|clippy|check`, `npm test`, `npx vitest|jest|playwright`, `bun test`, `pytest`, `go test`, `make test`, `agent-brain proofs|doctor`, or a `.verify/` path.
 
 ## Durable memory CLI fallback and pending queue
 
 If `store_memory` fails due to an MCP transport disconnect (`Connection closed`, `Broken pipe`), durable facts must not be dropped. Use the CLI fallback:
 
 ```bash
-# Write directly to the SQLite store and index
-agent-brain memory put --topic "architecture" --fact "Auth tokens refresh via JWT rotation" --scope project
+# Store the fact directly in the SQLite store
+agent-brain remember --text "Auth tokens refresh via JWT rotation" --tag architecture --source cli
 
-# Alternatively, enqueue to ~/.autonomic/memory/pending/
+# Queue the fact in ~/.autonomic/memory/pending/ when the store is unavailable
 agent-brain memory enqueue --topic "conventions" --fact "Always use snake_case for SQLite migrations"
 
-# Flush enqueued pending facts with retry backoff
+# Write queued facts to the store
 agent-brain memory flush-pending
-
-# Watch mode for continuous background flushing
-agent-brain memory flush-pending --watch --interval-secs 5
 ```
 
-## Portable sync and bootstrap
+## Portable sync
 
-Synchronize memory and event outboxes across development machines:
+Synchronize memory across development machines through a git repository:
 
 ```bash
-# Bootstrap this device into an existing git sync repository
-agent-brain bootstrap --remote git@github.com:your-org/agent-brain-sync.git
+# First machine: create the sync repo and point it at a remote
+agent-brain sync git init --remote git@github.com:your-org/agent-brain-sync.git
 
-# Normal git sync commands
-agent-brain sync git status
+# Second machine: clone the sync repo
+agent-brain sync git clone --remote git@github.com:your-org/agent-brain-sync.git
+
+# Then, on either machine
+agent-brain sync status
 agent-brain sync git pull
 agent-brain sync git push
 ```
@@ -269,7 +266,7 @@ agent-brain sync git push
 1. Confirm binary exists: `which agent-brain` and `agent-brain version`
 2. Use an **absolute path** in `mcp.json` (run `agent-brain install --global` again)
 3. Check logs: **View → Output → MCP** (select `agent-brain`)
-4. First start downloads the embedding model (~90MB) — can take 1–2 minutes
+4. First start downloads the embedding model once. On a slow connection this takes a while.
 
 ### `route_task` not appearing
 
@@ -286,7 +283,7 @@ agent-brain sync git push
 
 - Requires `git` on PATH
 - Check network access to GitHub
-- Try explicit ref: `agent-brain add affaan-m/ecc --ref main`
+- Try explicit ref: `agent-brain package add affaan-m/ecc --ref main`
 
 ## Verification and Scaffolding
 
@@ -296,34 +293,30 @@ agent-brain verify init
 
 # Run verified check and record trusted outcome
 agent-brain verify -- cargo test
-
-# View aggregated verification results
-agent-brain verify report
 ```
 
-When `.verify/` exists in the repository, `agent-brain verify` matches against allowlists and records outcomes directly into `brain.db`. Historical successes and failures from these runs adaptively adjust tool recommendation rankings in `route_task`.
+When `.verify/` exists in the repository, `agent-brain verify` matches against the allowlist and records outcomes in `brain.db`. `route_task` uses those outcomes to offer recipes from passing runs and withhold recipes whose latest run failed.
 
 ## Environment variables
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `AGENT_BRAIN_HOME` | `~/.autonomic/memory` | Brain data dir (legacy `~/.agent_brain` migrated on first run) |
-| `AGENT_BRAIN_SESSION_INGEST` | `1` (on) | Set `0` or `false` to disable legacy session import |
-| `AGENT_BRAIN_ROUTE_HOOKS` | `1` (on) | Set `0` to disable Cursor route_task gate hooks |
-| `AGENT_BRAIN_ROUTE_GATE_SCOPE` | `brain_mcp` | `brain_mcp` = gate agent-brain MCP only; `all` = legacy strict |
+| `AGENT_BRAIN_SESSION_INGEST` | `0` (off) | Set `1` to import session digests |
+| `AGENT_BRAIN_ROUTE_HOOKS` | `1` (on) | Set `0` to disable the route_task gate hooks |
+| `AGENT_BRAIN_ROUTE_GATE_SCOPE` | `all` | `all` = gate every tool until `route_task`; `brain_mcp` = gate agent-brain MCP tools only |
 | `AGENT_BRAIN_READ_GATE` | `hard` | `hard` = deny large/blocked native Read; `steer` = warn only; `off` = disable |
 | `AGENT_BRAIN_SCOUT_UNLOCK_SECS` | `3600` | After MCP `file_summary` / `read_file_head` / `grep_search` on a path, native Read/StrReplace is unlocked for this duration |
 | `AGENT_BRAIN_ALLOW_MULTI_SERVE` | `0` | Set `1` to allow multiple concurrent `serve` processes on the same home (exclusive `serve.lock` by default) |
 | `AGENT_BRAIN_ALLOW_PYTHON_SHELL` | `0` | Set `1` to override Python Shell deny policy (`python -c` / heredoc / piped stdin) |
-| `AGENT_BRAIN_AUTO_UPDATE_DELAY_SEC` | `300` | Delay before background auto-update checks |
-| `AGENT_BRAIN_AUTO_UPDATE_DEFER_SECS` | `60` | Defer applying updates while MCP server is actively handling requests |
+| `AGENT_BRAIN_AUTO_UPDATE_DELAY_SEC` | `60` | Delay before the background auto-update check |
 | `RUST_LOG` | `agent_brain=info` | Log level (stderr only) |
 
 ## Route gate (enforcement)
 
-Shared script: `route_gate.py` (requires `python3` on PATH). Default scope `brain_mcp` — only other agent-brain MCP tools are denied until `route_task`; set `AGENT_BRAIN_ROUTE_GATE_SCOPE=all` for legacy strict mode.
+Shared script: `route_gate.py` (requires `python3` on PATH). Default scope `all` — every tool is denied until `route_task` succeeds. Set `AGENT_BRAIN_ROUTE_GATE_SCOPE=brain_mcp` to deny only agent-brain MCP tools.
 
-### Enforcement features (v0.40.0+)
+### Enforcement features
 
 - **Large-file edit & scout unlock:** When an agent inspects a file via `file_summary`, `read_file_head`, `read_file_tail`, or `grep_search`, native Read and StrReplace tools are unlocked for that path for 1 hour (`AGENT_BRAIN_SCOUT_UNLOCK_SECS`). Edit tools are never blocked by the read gate.
 - **Python Shell execution policy:** Shared `route_gate.py` denies ad-hoc `python -c`, heredocs, and piped stdin on Shell/Bash across hosts. Standard test runs (e.g. `python -m pytest`) and dedicated `.py` files remain permitted. Set `AGENT_BRAIN_ALLOW_PYTHON_SHELL=1` with operator approval to override.
@@ -343,7 +336,7 @@ Verify with `agent-brain doctor` (use `--fix` to reinstall stale gates). Full ma
 
 ## Legacy session import (0.3.2 bridge → digests in 0.4+)
 
-On startup, agent-brain scans recent session transcripts and stores **one digest per conversation** (v0.7.3+: Cursor, Codex, Gemini, OpenCode).
+On startup, agent-brain scans recent session transcripts and stores **one digest per conversation** (Cursor, Codex, Gemini, OpenCode).
 
 ```bash
 agent-brain sessions status          # discoverable vs stored counts

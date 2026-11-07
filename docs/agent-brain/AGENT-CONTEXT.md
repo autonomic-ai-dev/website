@@ -39,7 +39,7 @@ Code-nav tools (`query_codebase`, `get_symbol_definition`, …) need a build wit
 ## Host naming notes
 
 - **OpenCode:** tools are `agent-brain_<name>` (e.g. `agent-brain_route_task`). Plugin `agent-brain-route-gate` fail-closes if `route_gate.py` is missing.
-- **Claude Code:** hooks use PreToolUse `matcher: .*`; gate scope still `brain_mcp` (Read/Bash allowed). Trust hooks via `/hooks`.
+- **Claude Code:** hooks use PreToolUse `matcher: .*`; gate scope from `AGENT_BRAIN_ROUTE_GATE_SCOPE` (default `all`). Trust hooks via `/hooks`.
 - **Antigravity CLI:** MCP under `~/.gemini/antigravity/`; route gate shares `~/.gemini/settings.json` with Gemini CLI.
 
 ## If the gate denies you
