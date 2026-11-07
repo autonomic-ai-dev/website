@@ -28,8 +28,8 @@ You index a large skill library (thousands of skills). A user message arrives: *
 | What happens | Cost |
 |--------------|------|
 | Hooks block agent-brain MCP until `route_task` succeeds; large native Read steered to brain tools | Hard gate — not optional |
-| Hybrid BM25 + embeddings rank **top 3 skills** under **500 token budget** | **~477 routed tokens** typical |
-| **~99% fewer tokens** vs naive full-index load (see `agent-brain briefing`) | Faster, cleaner reasoning window |
+| Hybrid BM25 + embeddings rank the top skills, rules and memory under a **350–700 token budget** per task | Routed tokens shown by `agent-brain briefing` |
+| Tokens saved versus a full-index load, reported by `agent-brain dashboard` | Faster, cleaner reasoning window |
 | `store_memory` persists “Vitest not Jest” for future test-related prompts | Durable conventions |
 
 ---
@@ -39,7 +39,7 @@ You index a large skill library (thousands of skills). A user message arrives: *
 | Metric | Fixture | Gate |
 |--------|---------|------|
 | Isolated skills Recall@3 | proofs fixture | ≥ 0.85 |
-| Warm-route p95 | proofs fixture | ≤ 100 ms |
+| Warm-route p95 target | recorded CI run (deterministic embedder) | ≤ 100 ms |
 | Hook gate logic | preToolUse deny/allow | CI |
 
 Reproduce with `agent-brain proofs --ci` and `agent-brain briefing` after a routed turn.
@@ -55,7 +55,7 @@ Reproduce with `agent-brain proofs --ci` and `agent-brain briefing` after a rout
 **After clip:** Same prompt with hooks on. Show:
 
 1. MCP panel: `route_task` returns `vercel-react-best-practices` in top 3
-2. Terminal: `agent-brain briefing` — phase, skills, **saved ~99%**
+2. Terminal: `agent-brain briefing` — phase, skills, routed tokens (`agent-brain dashboard` shows total saved)
 3. Task completes using loaded skill path
 
 **Closing line:** *“Same model. Same repo. agent-brain chooses 500 tokens of the right context from 2000 skills — and hooks make it mandatory.”*

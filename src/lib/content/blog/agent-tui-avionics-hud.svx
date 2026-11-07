@@ -19,7 +19,7 @@ When running long-running autonomous workflows that span multiple daemons, devel
 Unlike web dashboards that poll REST endpoints every few seconds, `agent-tui` establishes an asynchronous push-based connection:
 - Directly connects to the Unix Domain Socket (`~/.autonomic/memory/serve.sock`) for low-latency memory turn events.
 - Subscribes to the NATS JetStream `autonomic.telemetry.*` subject for broadcast events from worker daemons.
-- When no events are in flight, `agent-tui` sleeps on `tokio::select!`, consuming less than 0.1% CPU.
+- When no events are in flight, `agent-tui` waits on `tokio::select!` and does not poll.
 
 ### 2. Double-Buffered Zero-Flicker Rendering
 High-velocity log streams and multi-step DAG executions can cause unbearable screen tearing in standard terminal applications. `agent-tui` uses Ratatui's double-buffered terminal canvas:
@@ -30,6 +30,8 @@ High-velocity log streams and multi-step DAG executions can cause unbearable scr
 ---
 
 ## The 5 Avionics Panels
+
+*Illustrative layout. The figures are not measurements.*
 
 ```
 ┌─ AUTONOMIC AVIONICS HUD [Darwin ARM64] ─────────── 2026-10-17 08:30:12 UTC ──┐

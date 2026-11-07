@@ -61,6 +61,6 @@ Spine calls Immune before every `Tool` node that executes generated code. The wo
 
 ## Design Decisions
 
-`Seccomp` is the default sandbox, not `Firecracker`, for a practical reason: startup latency. A `seccomp-bpf` filter compiles in microseconds and applies to a forked process. A `Firecracker` microVM takes ~125ms to boot. For the common case — executing generated code that came from a trusted brain with validated dependencies — `seccomp` is sufficient. `Firecracker` is reserved for execution contexts where the code source is untrusted, such as running scripts from community-contributed skills or executing `LLM` output directly.
+`Seccomp` is the default sandbox, not `Firecracker`, for a practical reason: startup latency. A `seccomp-bpf` filter is cheap to build and applies to a forked process. A `Firecracker` microVM adds a boot step that `seccomp` does not need. For the common case — executing generated code that came from a trusted brain with validated dependencies — `seccomp` is sufficient. `Firecracker` is reserved for execution contexts where the code source is untrusted, such as running scripts from community-contributed skills or executing `LLM` output directly.
 
 The `OSV` cache with a 24-hour `TTL` strikes a balance between freshness and `API` load. The `OSV` database receives updates throughout the day, but re-scanning every dependency on every workflow execution would overwhelm both the `OSV` `API` and the local network. The `TTL` means a vulnerability disclosed at 2 `AM` is caught by the morning build cycle at worst.

@@ -33,7 +33,7 @@
           "price": "0",
           "priceCurrency": "USD"
         },
-        "softwareVersion": data?.ecosystemVersion || "v1.0.0-rc3",
+        "softwareVersion": data?.ecosystemVersion || "v1.0.0-rc7",
         "description": "Autonomous AI agent engineering operating system featuring agent-brain (HNSW vector memory & MCP hub) and agent-spine (deterministic YAML DAG runner)."
       },
       {

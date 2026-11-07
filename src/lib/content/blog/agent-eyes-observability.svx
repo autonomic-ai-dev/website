@@ -71,6 +71,6 @@ In a full ecosystem, Eyes integrates with spine workflows for automated `UI` reg
 
 ## Design Decisions
 
-Running `LLaVA` locally rather than calling a cloud `VLM` `API` was a deliberate trade-off. Cloud `VLMs` provide better accuracy but introduce latency (2-5 seconds per inference), cost per image, and data privacy concerns — screenshots of internal dashboards should not leave the network. The local model is less capable but runs at 50ms per inference on an `M4 Max` and keeps all data on-device.
+Running `LLaVA` locally rather than calling a cloud `VLM` `API` was a deliberate trade-off. Cloud `VLMs` provide better accuracy but introduce network latency, cost per image, and data privacy concerns — screenshots of internal dashboards should not leave the network. The local model is less capable and keeps all data on-device.
 
 `DOM` indexing was added after we realized that pixel diffs alone are insufficient for meaningful visual `QA`. A layout shift might produce a large pixel diff even though the content is correct, while a wrong `CSS` color change might produce a small diff that escapes notice. `DOM` indexing lets Eyes reason about semantic changes: "the button moved 20px right" vs. "the button text changed from 'Save' to 'Delete'."

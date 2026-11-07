@@ -88,4 +88,4 @@ let currentTag = $derived(releases[0]?.tag_name || 'v1.0.0-beta.2');
 
 Whenever a new tag is pushed, the mission control header, sidebar repository list, and breadcrumb navigation update dynamically—ensuring consistent version visibility across the entire engineering team.
 
-By combining SvelteKit 5's reactivity with granular CI check triage, `agent-ci-dashboard` cuts multi-repo release coordination time by over 80%.
+By combining SvelteKit 5's reactivity with granular CI check triage, `agent-ci-dashboard` makes multi-repo release coordination easier to follow.

@@ -16,6 +16,33 @@ The **agent** (not you) calls `route_task` every turn and `store_memory` at task
 
 > Disable hooks only for debugging: `AGENT_BRAIN_ROUTE_HOOKS=0` in MCP env or shell.
 
+## See the savings after your first session
+
+```bash
+agent-brain dashboard --days 7
+```
+
+This writes `~/.autonomic/memory/metrics/dashboard.html`, a local page with **total tokens saved** by routing and bounded reads, route counts and latency. `agent-brain stats` prints the same counters in the terminal, without the tokens-saved total.
+
+## One install for every host
+
+```bash
+agent-brain install --all --global
+```
+
+This configures Claude Code, Cursor, Codex, Gemini CLI and OpenCode in one step. Antigravity and VS Code are available per host (`--antigravity`, `--vscode`). Hook enforcement depends on the host; see [host-integration.md](host-integration.md).
+
+## Local and private
+
+Routing, memory, verification and the token budget run on your machine, against a local SQLite database in `~/.autonomic/memory`. The route path makes no network calls.
+
+Outbound network happens only in these cases:
+
+- the one-time embedding model download on first use;
+- commands you run yourself: `learn`, `package add`, extension install and `sync cloud`.
+
+Nothing is sent to a hosted service by default.
+
 ## Other MCP hosts
 
 Same binary works with Claude Desktop, Claude Code, OpenCode, Codex, Gemini, Antigravity, VS Code, or any MCP client:
