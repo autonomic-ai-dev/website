@@ -89,7 +89,7 @@
 
   const proof = [
     { value: "0", label: "hosted services", note: "The route path makes no network calls. Routing, memory and verification run locally." },
-    { value: "v25", label: "store schema", note: "SQLite migrations, applied on first run." },
+    { value: "v26", label: "store schema", note: "SQLite migrations, applied on first run." },
     { value: "250", label: "routing regression cases", note: "The jailbreak_routing suite in the agent-brain test suite. Run with cargo test." },
     { value: "0", label: "I/O dependencies in the core crate", note: "Checked on every run by .verify/checks/core_boundary.sh." },
   ];

@@ -20,7 +20,7 @@ flowchart LR
     Gate -->|Approved| Deploy["Verify: prod_deploy"]
 
     Deploy --> Snapshot[("Append-Only Snapshot Store<br/>SQLite state.db")]
-    Snapshot --> BrainSync[("Procedure Graph Sync<br/>Schema v25")]
+    Snapshot --> BrainSync[("Procedure Graph Sync<br/>Schema v26")]
 
     classDef exec fill:#0d0d0d,stroke:#444444,stroke-width:1px,color:#f4f4f5;
     classDef gate fill:#141414,stroke:#888888,stroke-width:1.5px,color:#ffffff;

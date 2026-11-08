@@ -466,6 +466,7 @@ agent-brain stats [OPTIONS]
 | :--- | :--- | :--- | :--- |
 | `--days` | Integer | `7` | Lookback window in days. |
 | `--json` | Boolean | `false` | Output metrics in structured JSON for automation. |
+| `--markdown` | Boolean | `false` | Print a shareable summary of measured figures only, for a weekly update. Estimated savings are left out. |
 
 ---
 
@@ -519,8 +520,13 @@ Run an allowlisted verification script and record a trusted outcome into memory.
 ```bash
 agent-brain verify [OPTIONS] -- <COMMAND...>
 agent-brain verify init [--dir DIR]
+agent-brain verify receipt [--project DIR] [--markdown|--json]
 agent-brain verify record --exit CODE [OPTIONS] -- <SUMMARY...>
 ```
+
+`verify init` writes the agstack verification layout under `.verify/`: `verify.toml` (the allowlist), `run.sh`, and `artifacts/` and `functional/` folders. `run.sh` runs its phases in order: doctor, unit, static and functional. It skips a phase the repository lacks and says so. Each run writes a `summary.txt` and one log per phase under `.verify/artifacts/<RUN_ID>/`. Run the whole suite with `agent-brain verify -- .verify/run.sh`, or one feature with `agent-brain verify -- .verify/run.sh <feature>`.
+
+`verify receipt` reports `PASSED`, `FAILED` or `NOT VERIFIED` for the current commit and code state. It exits 0 only when the verdict is `PASSED`. A receipt counts only runs that `verify --` executed, and a run from another commit or an edited tree does not count. `--markdown` prints a block to paste into a pull request.
 
 Pass `--save-artifact` to keep the command's full output. It is written to `${AUTONOMIC_HOME:-~/.autonomic}/artifacts/<project>/<report-id>.log`, and the path is printed to stderr. Without the flag, no log is written.
 
