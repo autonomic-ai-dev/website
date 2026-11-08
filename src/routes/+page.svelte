@@ -134,7 +134,7 @@
     </a>
 
     <h1 class="text-3xl sm:text-6xl lg:text-7xl font-semibold tracking-[-0.035em] font-headline max-w-4xl mx-auto leading-[1.08] mb-6 bg-gradient-to-b from-white via-neutral-100 to-neutral-400 bg-clip-text text-transparent break-words">
-      Coding agents that route, gate and verify on your machine.
+      Every change comes with receipts.
     </h1>
 
     <p class="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto font-body leading-relaxed mb-10">
