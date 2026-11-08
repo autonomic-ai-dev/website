@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { agents } from '$lib/data/agents';
+import { agents } from '#lib/data/agents';
 
 export async function load({ params, parent }) {
   const parentData = await parent();

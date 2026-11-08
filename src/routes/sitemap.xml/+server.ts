@@ -1,4 +1,4 @@
-import { agents } from '$lib/data/agents';
+import { agents } from '#lib/data/agents';
 
 export const prerender = true;
 
