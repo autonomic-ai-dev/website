@@ -106,7 +106,7 @@
         <span class="tracking-tight text-white font-headline font-semibold text-sm whitespace-nowrap shrink-0">Autonomic AI</span>
         <span class="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-medium text-neutral-300 bg-white/[0.04] border border-white/10 whitespace-nowrap shrink-0">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span class="whitespace-nowrap">{data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
+          <span class="whitespace-nowrap">{data?.ecosystemVersion ?? 'version unavailable'}</span>
         </span>
       </a>
 
@@ -223,10 +223,6 @@
             <img alt="Autonomic AI Logo" class="w-full h-full object-contain" src="/logo.svg" />
           </div>
           <span class="font-headline text-sm font-semibold text-white tracking-tight">Autonomic AI</span>
-          <a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="ml-3 inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-white/[0.03] text-neutral-300 border border-white/10 hover:border-white/20 transition">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            All systems operational
-          </a>
         </div>
         <!-- Synchronized Navigation Links matching Header -->
         <nav class="flex flex-wrap items-center gap-6 font-mono text-xs text-neutral-400">
@@ -244,7 +240,7 @@
       </div>
       <!-- Bottom Row -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-neutral-500 font-mono text-[11px]">
-        <p>© 2026 Autonomic AI. The Cognitive Governor & Procedure Graph for Autonomous Coding Agents ({data?.ecosystemVersion || 'v1.0.0-rc2'}).</p>
+        <p>© 2026 Autonomic AI. The Cognitive Governor & Procedure Graph for Autonomous Coding Agents{data?.ecosystemVersion ? ` (${data.ecosystemVersion})` : ''}.</p>
         <p class="text-neutral-500">Built for agentic precision.</p>
       </div>
     </div>

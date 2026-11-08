@@ -138,9 +138,6 @@ To prevent context saturation, `agent-brain` employs a dynamic knapsack algorith
 # Verify a command and record outcome into brain.db
 agent-brain verify -- cargo test
 
-# Recall procedure graph for a task
-agent-brain recall-procedures "fix compiler error in lib.rs"
-
 # View real-time cognitive governor dashboard (tokens saved, blocks, recipes)
 agent-brain dashboard
 

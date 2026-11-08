@@ -479,19 +479,9 @@ agent-brain dashboard [--days N] [--open]
 
 ---
 
-### `recall-procedures`
+### Procedure recall (MCP tool)
 
-Query the recursive CTE procedure graph to recall proven execution DAGs.
-
-```bash
-agent-brain recall-procedures <QUERY> [--task-kind KIND] [--limit N]
-```
-
-#### Examples
-
-```bash
-agent-brain recall-procedures "reproduce bug" --task-kind debugging
-```
+There is no `recall-procedures` CLI command. Procedure recall is the `recall_procedures` MCP tool, which an agent host calls with `query`, `task_kind` and `limit`. It walks the procedure graph and returns execution sequences that worked for similar tasks.
 
 ---
 

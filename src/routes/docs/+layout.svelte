@@ -754,7 +754,7 @@
         </nav>
         <div class="inline-flex items-center gap-2 text-[11px] font-mono text-neutral-400 shrink-0">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span>SPEC {data?.ecosystemVersion || 'v1.0.0-rc2'}</span>
+          <span>SPEC {data?.ecosystemVersion ?? 'version unavailable'}</span>
         </div>
       </div>
 
@@ -827,7 +827,7 @@
           <ExternalLink size={12} />
         </a>
         <div class="text-[11px] text-neutral-500 pt-2">
-          Release {data?.ecosystemVersion || 'v1.0.0-rc2'}
+          Release {data?.ecosystemVersion ?? 'version unavailable'}
         </div>
       </div>
     </div>

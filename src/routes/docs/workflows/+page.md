@@ -15,19 +15,17 @@ flowchart LR
     Scan --> Build
     
     Build --> Test["Verify: test_suite<br/>(Active Command)"]
-    Test --> Gate{"ApprovalGate<br/>(Operator Sign-off)"}
+    Test --> Gate{"ApprovalGate<br/>(approved: true in payload)"}
     
     Gate -->|Approved| Deploy["Verify: prod_deploy"]
-    Gate -->|Rejected| Fallback["Agent: revert_changes"]
 
     Deploy --> Snapshot[("Append-Only Snapshot Store<br/>SQLite state.db")]
-    Fallback --> Snapshot
     Snapshot --> BrainSync[("Procedure Graph Sync<br/>Schema v25")]
 
     classDef exec fill:#0d0d0d,stroke:#444444,stroke-width:1px,color:#f4f4f5;
     classDef gate fill:#141414,stroke:#888888,stroke-width:1.5px,color:#ffffff;
     classDef terminal fill:#050505,stroke:#555555,stroke-width:1px,color:#d4d4d8;
-    class Lint,Scan,Build,Test,Deploy,Fallback exec;
+    class Lint,Scan,Build,Test,Deploy exec;
     class Gate gate;
     class Snapshot,Start,BrainSync terminal;
 ```
@@ -40,10 +38,10 @@ flowchart LR
 `Verify` nodes actively execute specified shell validation commands under timeouts, capturing stdout, stderr, and exit codes. Successful runs (`exit 0`) mark the step `verified = true`, while failures halt the pipeline unless `continue_on_failure: true` is explicitly configured.
 
 ### 2. Cognitive Knapsack Injection via `agent-brain`
-Before an `Agent` node executes, `agent-spine` queries `agent-brain route_task` to inject a surgical `_brain_knapsack` (350–700 tokens, depending on task kind) containing relevant skills, invariant rules, and traps directly into the node payload. This prevents worker agents from suffering from context bloat or hallucinating rules.
+With `--brain`, `agent-spine` queries `agent-brain route_task` before an `Agent` node executes and injects a token-budgeted `_brain_knapsack` of relevant skills, invariant rules, and traps into the node payload. This prevents worker agents from suffering from context bloat or hallucinating rules.
 
 ### 3. Time-Travel Debugging via Immutable Snapshots
-Every successful node transition creates an append-only snapshot in `state.db`. Operators can rewind to any prior sequence index via CLI (`agent-spine run --resume <seq>`) or trigger a 1-click **"↺ Replay From Here"** action directly from the dashboard.
+Every successful node transition creates an append-only snapshot in `state.db`. Inspect a run's history with `agent-spine inspect <EXECUTION_ID>` and recreate its final state with `agent-spine replay <EXECUTION_ID>`. There is no resume flag: to re-run after a failure, fix the cause and run the workflow again.
 
 ### 4. Zero-Daemon Local Execution with Durable DLQ
 In local development environments without an external message broker, `agent-spine` automatically falls back to an embedded SQLite event log and persists failed nodes to `~/.autonomic/state/spine/dlq.jsonl`, providing full durability with zero daemon dependencies.
@@ -59,7 +57,7 @@ For non-deterministic or high-risk engineering tasks, `SpeculativeFork` nodes sp
 | :--- | :--- | :--- |
 | **`Agent`** | Discrete cognitive subtask | Hydrates a 350–700 token knapsack from `agent-brain`, delegates to worker, snapshots output |
 | **`Verify`** | Machine validation | Actively executes `command`, captures exit code and output streams, asserts `verified` |
-| **`ApprovalGate`** | Human-in-the-loop safety | Suspends execution and awaits operator `agent-spine approve` or dashboard button |
+| **`ApprovalGate`** | Human-in-the-loop safety | Auto-approves by default. When auto-approval is turned off, waits until the node payload carries `approved: true` |
 | **`SpeculativeFork`** | Parallel exploration | Evaluates multiple candidate branches in isolated Git worktrees |
 | **`Fork` / `Join`** | Concurrency barrier | Fans out across parallel branches, continuing only when all dependencies resolve |
 | **`Debate`** | Iterative refinement | Alternates between coder and critic agents in multi-turn feedback rounds |
@@ -75,34 +73,43 @@ For non-deterministic or high-risk engineering tasks, `SpeculativeFork` nodes sp
 Workflows are defined in clear, version-controlled YAML files:
 
 ```yaml
-version: 1
 name: bugfix_pipeline
+version: 1
 description: "Reproduce, isolate, fix, and verify a bug with human sign-off"
+start_node: reproduce_failure
 
 nodes:
-  - id: reproduce_failure
+  - name: reproduce_failure
     kind: verify
     command: "cargo test --test reproduce_bug"
-    continue_on_failure: true
+    description: "Run the reproduction test"
 
-  - id: isolate_and_patch
+  - name: isolate_and_patch
     kind: agent
-    depends_on: [reproduce_failure]
     description: "Analyze test failure, isolate root cause, and apply minimal patch"
-    retry:
+    retry_policy:
       max_attempts: 2
       backoff_ms: 1000
 
-  - id: verify_fix
+  - name: verify_fix
     kind: verify
-    depends_on: [isolate_and_patch]
     command: "cargo test --all-features"
+    description: "Confirm all tests pass after the patch"
 
-  - id: sign_off
+  - name: sign_off
     kind: approval_gate
-    depends_on: [verify_fix]
     description: "Operator sign-off before committing changes"
+
+edges:
+  - from: reproduce_failure
+    to: isolate_and_patch
+  - from: isolate_and_patch
+    to: verify_fix
+  - from: verify_fix
+    to: sign_off
 ```
+
+Check a file with `agent-spine validate <file>`. The built-in workflows are listed by `agent-spine init --with list`.
 
 ---
 
@@ -112,21 +119,21 @@ nodes:
 # Validate workflow DAG acyclicity and syntax
 agent-spine validate workflows/bugfix_pipeline.yaml
 
-# Run workflow synchronously with live terminal progress
-agent-spine run workflows/bugfix_pipeline.yaml
+# Run a workflow synchronously; -p passes a JSON payload, -b enables agent-brain routing
+agent-spine run workflows/bugfix_pipeline.yaml -p '{"ticket": "BUG-42"}' -b
 
-# Resume execution from a specific immutable state snapshot
-agent-spine run workflows/bugfix_pipeline.yaml --resume 3
+# Inspect the history of one execution, or recreate its final state
+agent-spine inspect <EXECUTION_ID>
+agent-spine replay <EXECUTION_ID>
 
-# Inspect real-time status of active or completed workflows
+# Check the capabilities planned for the current scaffold
 agent-spine status
 
-# Human-in-the-Loop: approve or reject a paused ApprovalGate node
-agent-spine approve <workflow_id> --step sign_off
-agent-spine reject <workflow_id> --step sign_off --reason "Fails security audit"
-
-# Start the local event bus and Svelte dashboard on port 3100
+# Start the live dashboard API (:3000) and dashboard (:3001)
 agent-spine serve
+
+# Serve the MCP stdio server for IDE hosts
+agent-spine mcp-serve
 ```
 
 ---
@@ -135,7 +142,6 @@ agent-spine serve
 
 When running in MCP mode (`agent-spine mcp-serve`), the engine exposes native tools for IDE integration:
 
-- **`spine_submit_workflow`**: Submits a declarative YAML DAG payload and returns an execution ID.
-- **`spine_workflow_status`**: Polls real-time step progress, output variables, and pending approval gates.
-- **`spine_approve_step`**: Unblocks an active `ApprovalGate` node with decision (`approve` or `reject`).
-- **`spine_cancel_workflow`**: Gracefully terminates an active execution and marks in-flight steps cancelled.
+- **`spine_submit_workflow`**: Submits a YAML workflow and returns its workflow ID.
+- **`spine_check_status`**: Reports the status of a workflow execution.
+- **`spine_list_workflows`**: Lists workflow executions.
