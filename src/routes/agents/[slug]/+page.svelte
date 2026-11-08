@@ -76,9 +76,6 @@
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
       </span>
-      <span class="text-emerald-400 font-semibold uppercase">NODE ACTIVE</span>
-      <span class="text-neutral-600">|</span>
-      <span class="text-neutral-400">LATENCY: {agent.latency}</span>
     </div>
   </div>
 
@@ -169,23 +166,13 @@
         
         <div class="space-y-4 font-mono text-xs">
           <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-            <span class="text-neutral-400">IPC Protocol</span>
-            <span class="text-neutral-200 font-semibold">{agent.protocol}</span>
-          </div>
-
-          <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-            <span class="text-neutral-400">Response Latency</span>
-            <span class="text-emerald-400 font-semibold">{agent.latency}</span>
-          </div>
-
-          <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
             <span class="text-neutral-400">Process Model</span>
-            <span class="text-neutral-300">Isolated Daemon</span>
+            <span class="text-neutral-300">Local daemon, or stdio per host</span>
           </div>
 
           <div class="flex items-center justify-between pb-3 border-b border-white/[0.06]">
             <span class="text-neutral-400">Runtime Target</span>
-            <span class="text-neutral-300">Rust (Metal / CUDA)</span>
+            <span class="text-neutral-300">Rust, macOS Apple Silicon</span>
           </div>
 
           <div class="flex items-center justify-between">

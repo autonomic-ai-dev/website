@@ -103,7 +103,7 @@ agent-brain install --global --starter
 
 ### `doctor`
 
-Audit local installation, binary codesigning, MCP client configurations, and upstream tool schemas.
+Audit the local installation, binary codesigning, and MCP client configurations.
 
 ```bash
 agent-brain doctor [OPTIONS]
@@ -114,7 +114,6 @@ agent-brain doctor [OPTIONS]
 | Flag | Type | Description |
 | :--- | :--- | :--- |
 | `--fix` | Boolean | Re-sign macOS binary, align `mcp.json`, and regenerate hook symlinks. |
-| `--mcp` | Boolean | Audit the `agent-body` gateway schemas and execute a `tools/list` probe, if an agent-body gateway is configured. |
 
 ---
 

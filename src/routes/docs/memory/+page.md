@@ -56,10 +56,10 @@ System prompts and guidelines are routinely ignored by models during long, compl
 - **Tool Scout Guard**: Enforces token-bounded reads (`file_summary`, `read_file_head`, `read_file_tail`, `grep_search`) to prevent context window saturation.
 
 ### 4. Universal Cross-Host Neural Bus
-Developers switch between Cursor in the IDE, Claude Code in the terminal, Antigravity in agent loops, and GitHub Actions in CI:
-- `agent-brain` runs over a unified background daemon on `~/.autonomic/memory/brain.db` in SQLite WAL mode.
-- A fix discovered in Claude Code terminal is instantly available to Cursor.
-- A verification pass executed in CI populates `verify_outcomes`, giving local agents immediate access to proven recipes.
+Developers switch between Cursor in the IDE, Claude Code in the terminal, and Antigravity in agent loops. On one machine:
+- `agent-brain` runs as a daemon with a local SQLite database in WAL mode.
+- Memory and verify outcomes written by one host are readable by the others on the same machine.
+- Verify runs on this machine write to `verify_outcomes`, and agents on this machine can read the verified recipes from them.
 
 ---
 

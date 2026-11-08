@@ -9,7 +9,7 @@ export async function load({ params, parent }) {
     throw error(404, 'Agent not found');
   }
 
-  const dynamicVersion = parentData.organVersions?.[rawAgent.name] || rawAgent.version;
+  const dynamicVersion = parentData.organVersions?.[rawAgent.name] || 'version unavailable';
   const agent = {
     ...rawAgent,
     version: dynamicVersion
