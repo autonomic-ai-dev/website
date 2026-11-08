@@ -126,7 +126,7 @@ Readable route summary: `~/.autonomic/memory/logs/last-route.md` or `agent-brain
 | Host | `route_task` gate | How enforced |
 |------|-------------------|--------------|
 | **Cursor** | Yes | `~/.cursor/hooks.json` → `route_gate.py` (installed by `install --global`) |
-| **Claude Code** | Yes (agent-brain MCP) | `.claude/settings.json` → `route_gate.py` on `UserPromptSubmit` + Pre/PostToolUse `matcher: .*` (scope still `brain_mcp`); hard rule `.claude/rules/agent-brain-route.md` |
+| **Claude Code** | Yes (agent-brain MCP) | `.claude/settings.json` → `route_gate.py` on `UserPromptSubmit` + Pre/PostToolUse `matcher: .*` (scope from `AGENT_BRAIN_ROUTE_GATE_SCOPE`, default `all`); hard rule `.claude/rules/agent-brain-route.md` |
 | **Codex** | Yes (agent-brain MCP) | `~/.codex/hooks.json` → `route_gate.py` (installed by `install --codex --global`) |
 | **OpenCode** | Plugin (agent-brain MCP) | `plugin/agent-brain-route-gate.ts` + `rules/agent-brain-route.md` — blocks `agent-brain_*` tools; fail-closed if gate script missing |
 | **Gemini / Antigravity CLI** | Yes (agent-brain MCP) | Shared `~/.gemini/settings.json` BeforeAgent/BeforeTool + Antigravity MCP configs + `~/.gemini/antigravity/rules/agent-brain-route.md` |
@@ -134,7 +134,7 @@ Readable route summary: `~/.autonomic/memory/logs/last-route.md` or `agent-brain
 | **Claude Desktop** | Rule-only | Paste rule into project/system instructions |
 | **Windsurf / Zed / other** | Manual | Copy `mcpServers` block; add equivalent rule text |
 
-Cursor has the strongest host-tool gate (hooks on Read/Shell). Claude Code, Codex, Gemini/Antigravity, and OpenCode enforce **agent-brain MCP tools** until `route_task` via hooks/plugins. VS Code and Claude Desktop rely on rules/instructions plus operator discipline.
+Cursor enforces the gate through its hooks file (`~/.cursor/hooks.json`). Claude Code, Codex, Gemini/Antigravity, and OpenCode enforce **agent-brain MCP tools** until `route_task` via hooks/plugins. VS Code and Claude Desktop rely on rules/instructions plus operator discipline.
 
 Reinstall all hosts: `agent-brain install --all --global` or `agent-brain doctor --fix`.
 

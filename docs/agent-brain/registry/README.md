@@ -2,7 +2,7 @@
 
 One-command skill packs, playbooks, and workflows via **`agent-brain package add @alias`**.
 
-Starting in v1.0.0, the registry is dynamically synchronized from the central [**`autonomic-ai-dev/agent-registry`**](https://github.com/autonomic-ai-dev/agent-registry) repository into `~/.autonomic/memory/registry-cache/repo/`, decoupling package releases and updates from `agent-brain` binary compilations.
+The registry is synchronized from the central [**`autonomic-ai-dev/agent-registry`**](https://github.com/autonomic-ai-dev/agent-registry) repository into `~/.autonomic/memory/registry-cache/repo/`, decoupling package releases and updates from `agent-brain` binary compilations.
 
 ---
 
@@ -22,8 +22,7 @@ agent-brain registry sync
 
 | Alias | Description | Origin / Package |
 |---|---|---|
-| `@agstack` | **Gold Standard** — Full-SDLC engineering operating system, 11 playbooks, strict `.verify/` contracts, immutability, security audits, and zero comment slop | `packages/agstack` |
-| `@coding-policy` | Alias for `@agstack` (backward-compatible) | `packages/agstack` |
+| `@agstack` | **Gold Standard** — Full-SDLC engineering operating system, 32 playbooks, strict `.verify/` contracts, immutability, security audits, and zero comment slop | `packages/agstack` |
 | `@matt-skills` / `@mattpocock` | **Default** — Matt Pocock skills (boosted in routing) | `mattpocock/skills` |
 | `@starter` | Onboarding pack | `mattpocock/skills`, `vercel-labs/agent-skills` |
 | `@nextjs` | React / Next.js / React Native agent skills | `vercel-labs/agent-skills` |

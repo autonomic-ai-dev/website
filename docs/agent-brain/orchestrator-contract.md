@@ -1,4 +1,4 @@
-# Orchestrator contract (agent-brain v0.23+)
+# Orchestrator contract
 
 This document defines the **programmatic bridge** between `agent-orchestrator` and `agent-brain`. IDE agents continue to use **MCP** (`route_task` over stdio). Orchestrators should use **gRPC** for lower latency, typed contracts, and batch-friendly integration.
 
@@ -101,7 +101,7 @@ MCP `route_task` accepts the same optional `task_kind` string and returns the sa
 ## Versioning
 
 - Orchestrator MUST pin `agent-brain >= 0.23.0` for bridge fields; `>= 0.24.0` for `store_trajectory` and fact lineage.
-- Proto package `agent_brain.v1` is stable for v0.23–v0.24; breaking changes bump `v2`.
+- Proto package `agent_brain.v1`; breaking changes bump `v2`.
 - Run `agent-brain grpc serve` Health RPC to verify version before workflow execution.
 
 ## Example (grpcurl)
