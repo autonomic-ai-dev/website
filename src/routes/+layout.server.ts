@@ -1,5 +1,5 @@
 import type { LayoutServerLoad } from './$types';
-import { getAutonomicFormulae } from '$lib/server/formula';
+import { getAutonomicFormulae } from '#lib/server/formula';
 
 export const load: LayoutServerLoad = async () => {
 	const formulae = await getAutonomicFormulae();

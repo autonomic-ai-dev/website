@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { page } from "$app/state";
   import { Menu, X } from "lucide-svelte";
-  import AnimatedBackground from "$lib/components/AnimatedBackground.svelte";
+  import AnimatedBackground from "#lib/components/AnimatedBackground.svelte";
   let { children, data } = $props();
 
   let isMobileNavOpen = $state(false);
