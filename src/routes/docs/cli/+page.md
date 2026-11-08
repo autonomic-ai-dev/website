@@ -103,7 +103,7 @@ All Autonomic binaries adhere to POSIX / GNU command conventions built on Rust's
 | Flag | Short | Type | Description |
 | :--- | :--- | :--- | :--- |
 | `--help` | `-h` | Boolean | Print command syntax, options, and subcommand descriptions. |
-| `--version` | `-V` | Boolean | Print installed binary version (`1.0.0-rc2`). |
+| `--version` | `-V` | Boolean | Print installed binary version. |
 
 ---
 
