@@ -9,11 +9,11 @@ title: The Engineering Invariants That Never Fail — Autonomic AI
   </div>
 
   <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
-    The Engineering Invariants That Never Fail
+    The Engineering Invariants We Follow
   </h1>
 
   <p class="text-base sm:text-lg text-neutral-300 font-body leading-relaxed max-w-3xl">
-    Our core architectural pillars replace statistical hope with deterministic mathematical and runtime constraints. By stripping away stochastic drift, autonomous software engineering becomes reproducible, verifiable, and safe for production codebases.
+    The engineering rules behind agstack and agent-brain. Each one lists the runtime behaviour the product has, and the rules the repositories follow. Where a rule is policy, the page says so.
   </p>
 </div>
 
@@ -25,9 +25,9 @@ title: The Engineering Invariants That Never Fail — Autonomic AI
 
 ```mermaid
 flowchart LR
-    I1["01 Immutability First\n• SHA-256 Proof Sealing\n• Zero Background Mutations"] --> I2["02 Boundary Discipline\n• Fenced AST Sandbox\n• Strict Context Budgets"]
-    I2 --> I3["03 Fix Root Causes\n• Zero Token Burn Loops\n• Trace Fault Pinpointing"]
-    I3 --> I4["04 Zero Comment Slop\n• Pure Production Code\n• Pre-Commit AST Lints"]
+    I1["01 Immutability First\n• Append-only verify and workflow records\n• Fresh copies, not in-place edits"] --> I2["02 Boundary Discipline\n• Bash and read gates\n• Token-budgeted context"]
+    I2 --> I3["03 Fix Root Causes\n• Regression test per fix\n• No defensive masking"]
+    I3 --> I4["04 Zero Comment Slop\n• agstack added-comment check\n• Self-documenting code"]
 
     classDef invNode fill:#080808,stroke:#ffffff,stroke-width:1px,color:#ffffff;
     class I1,I2,I3,I4 invNode;
@@ -46,11 +46,11 @@ flowchart LR
   <span class="font-mono text-xs text-neutral-400">SHA-256 Proof Sealing</span>
 </div>
 
-Once an organ or workflow step validates, all artifacts are cryptographically hashed and sealed into immutable append-only snapshots. No background modifications, uncommitted state mutations, or hidden drift are allowed.
+Workflow steps and verify runs are recorded as they happen, and the record is not edited afterwards. Code changes that were not verified are shown as not verified.
 
 ### Runtime Guarantees
-* **Deterministic Checkpointing**: `agent-spine` commits workflow step states directly to local SQLite databases with strict WAL journal mode. Steps cannot retroactively alter previously passed nodes.
-* **Content Addressing**: Generated test fixtures, build outputs, and code patches receive SHA-256 fingerprints recorded in `.verify/artifacts/`.
+* **Deterministic Checkpointing**: `agent-spine` writes workflow step states to a local SQLite database. Snapshots are appended, not updated in place.
+* **Content Addressing**: `agent-brain verify` records a SHA-256 hash of the code tree it tested with each run, in the local brain database.
 * **State Immutability**: Functions must return fresh data copies rather than mutating shared runtime state references in-place.
 
 </section>
@@ -62,16 +62,16 @@ Once an organ or workflow step validates, all artifacts are cryptographically ha
 ## 02. Boundary Discipline
 
 <div class="not-prose my-4 p-4 rounded-xl bg-neutral-950 border border-white/10 flex items-center justify-between">
-  <span class="font-mono text-xs font-semibold text-white uppercase tracking-wider">Fence Pillar</span>
-  <span class="font-mono text-xs text-neutral-400">Fenced AST Sandbox</span>
+  <span class="font-mono text-xs font-semibold text-white uppercase tracking-wider">Gate Pillar</span>
+  <span class="font-mono text-xs text-neutral-400">Bash and read gates</span>
 </div>
 
-Strict context windows and AST tool fencing. Agents cannot exceed assigned scopes, traverse unauthorized directory boundaries, or hallucinate out-of-band parameters.
+Where a host supports hooks, agent-brain's bash gate blocks unsafe shell commands, and its read gate steers full-file reads toward bounded tools. VS Code and Claude Desktop have no gates. The gates do not cover every action an agent can take.
 
 ### Runtime Guarantees
-* **Bounded Turn Context**: `agent-brain route_task` limits injected context bundles to an exact budget (default 500 tokens), preventing context window saturation and reasoning degradation.
-* **AST Parameter Fencing**: All tool call arguments are strictly validated against JSON schema definitions before execution.
-* **Filesystem Isolation**: Tools must operate within the designated project root. Read scout guards (`read_file_head`, `read_file_tail`, `file_summary`) replace unconstrained full-file dumping.
+* **Bounded Turn Context**: `agent-brain route_task` fits its context into a token budget that depends on the task kind (350 to 700 tokens), which keeps routed context small.
+* **Typed Tool Arguments**: MCP tool arguments are parsed into typed request structures before the tool runs.
+* **Bounded Reads**: The read tools (`read_file_head`, `read_file_tail`, `file_summary`) return bounded slices instead of full files. Dependency and build folders such as `node_modules` and `dist` are blocked unless you allow them.
 
 </section>
 
@@ -83,15 +83,14 @@ Strict context windows and AST tool fencing. Agents cannot exceed assigned scope
 
 <div class="not-prose my-4 p-4 rounded-xl bg-neutral-950 border border-white/10 flex items-center justify-between">
   <span class="font-mono text-xs font-semibold text-white uppercase tracking-wider">Troubleshoot Pillar</span>
-  <span class="font-mono text-xs text-neutral-400">Zero Token Burn Loops</span>
+  <span class="font-mono text-xs text-neutral-400">Root Cause Fixes</span>
 </div>
 
-Automatic trace analysis pinpoints logic bugs rather than looping infinite token retries and burning operational budgets on speculative guesses.
+The engineering rules this repository follows for fixing defects, shown here as policy rather than product behaviour.
 
-### Runtime Guarantees
-* **Zero Speculative Prompt Retries**: When an execution fails, trace analysis and AST caller inspection isolate the underlying defect before any code patch is drafted.
-* **No Defensive Null Masking**: Masking root causes with defensive null-checks or swallow-catch blocks is strictly prohibited; fixes must resolve the causal logic flaw.
-* **Regression Test Verification**: Every defect resolution must include an isolated regression test in `.verify/` that fails before the fix and passes with clean exit code `0` after the fix.
+### Policy
+* **Root Cause First**: Fixes should address the cause of a failure, not mask it with defensive null-checks or swallowed errors.
+* **Regression Tests**: A defect fix should come with a test that fails before the fix and passes after it.
 
 </section>
 
@@ -108,8 +107,8 @@ Automatic trace analysis pinpoints logic bugs rather than looping infinite token
 
 Enforced clean, production-grade code output without redundant assistant narrative, conversational fluff, or noisy comments in code repositories.
 
-### Runtime Guarantees
-* **Pre-Commit AST Enforcement**: `check-added-comments.sh` automatically scans git diffs and blocks commits containing AI narrative commentary (e.g. `// Added by AI`, `// Ensure value is not null`).
+### Policy
+* **Added-Comment Check**: The agstack package ships `check-added-comments.sh`, which flags comment lines added in a git diff. Running it before a commit is up to the developer or the team's hooks.
 * **Self-Documenting Code**: Types, function signatures, and expressive symbol names replace prose commentary.
 * **Clean Code Diffs**: Repository history remains strictly focused on functional modifications, preserving developer velocity and signal-to-noise ratio.
 

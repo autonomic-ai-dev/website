@@ -17,7 +17,7 @@
   } from "lucide-svelte";
 
   let { data } = $props();
-  let version = $derived(data?.ecosystemVersion || 'v1.0.0-rc7');
+  let version = $derived(data?.ecosystemVersion ?? 'version unavailable');
   let activeTab = $state<'brew' | 'source'>('brew');
   let copied = $state(false);
 

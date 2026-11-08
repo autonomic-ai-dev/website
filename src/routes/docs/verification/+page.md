@@ -16,7 +16,7 @@ title: Deterministic Verification Harness — .verify/ Proof Engine
   </h1>
 
   <p class="text-base sm:text-lg text-neutral-300 font-body leading-relaxed max-w-3xl">
-    In Autonomic AI, claims of test success or code correctness are never accepted from conversational statements. Every claim must be backed by a cryptographically sealed verification record generated through <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">agent-brain verify</code> that exited 0.
+    In Autonomic AI, a claim that tests pass should be backed by a verification record from <code class="font-mono text-white bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">agent-brain verify</code> that exited 0. The record stores the command, the exit code, the commit and a hash of the code tree it tested.
   </p>
 </div>
 
@@ -30,7 +30,7 @@ The verification harness enforces a strict boundary between application runtime 
 
 ```mermaid
 flowchart LR
-    CMD["01 Command Dispatch\n• agent-brain verify\n• bash .verify/run.sh"] --> SBX["02 Isolated Sandbox\n• Playbook execution\n• Exit code capture"]
+    CMD["01 Command Dispatch\n• agent-brain verify\n• bash .verify/run.sh"] --> SBX["02 Allowlisted run\n• Command must match verify.toml\n• Exit code capture"]
     SBX --> PROOF["03 Proof Generation\n• SHA-256 scenario hash\n• UUID receipt sealing"]
     PROOF --> REC[("04 .verify/ Store\n• Append-only ledger\n• Exit 0 verified")]
 
@@ -128,11 +128,11 @@ Dispatch test suites through the verification wrapper:
 # Execute local verification suite through agent-brain
 agent-brain verify -- bash .verify/run.sh
 
-# Run specific playbook directly
-agent-brain verify -- bash .verify/playbooks/verify_versioning_and_docs.sh
+# Run one feature through the same runner
+agent-brain verify -- bash .verify/run.sh <feature>
 
-# Inspect verification history and last passing receipts
-agent-brain verify status
+# Show the receipt for the current commit and code state
+agent-brain verify receipt
 ```
 
 </section>

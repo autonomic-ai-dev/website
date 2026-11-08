@@ -95,7 +95,7 @@ Autonomic AI enforces four strict runtime invariants:
    Several editors can run agent-brain simultaneously. `agent-brain serve` acts as an stdio proxy to a single background daemon owning SQLite and HNSW indexes, ensuring concurrent turns never fight over file locks.
 
 2. **Route Before Action**:
-   Host hooks block agent-brain tools until the agent issues `route_task`. This guarantees every prompt receives a ranked, token-budgeted slice of skills and memories without token pollution.
+   In hosts with hooks, agent-brain tools are blocked until the agent calls `route_task`, so the agent gets a ranked, token-budgeted slice of skills and memories. Hosts without hooks, such as VS Code, rely on the instructions alone.
 
 3. **Deterministic State Replay**:
    Every step in an `agent-spine` workflow generates an immutable SQLite state checkpoint. If a task fails or requires auditing, `agent-spine replay <run-id>` recreates the exact state machine transition.

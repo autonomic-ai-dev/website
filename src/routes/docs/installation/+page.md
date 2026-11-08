@@ -32,7 +32,7 @@ agent-brain install --global   # configure MCP and host hooks for supported edit
 agent-brain doctor             # check the install
 ```
 
-`agent-brain doctor --fix` repairs common problems it can detect. Restart your editor after installing so it picks up the new MCP server.
+`agent-brain doctor --fix` re-signs the binary on macOS, aligns the MCP configuration, and refreshes the hooks. Restart your editor after installing so it picks up the new MCP server.
 
 ---
 
