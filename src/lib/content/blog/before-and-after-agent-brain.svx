@@ -3,6 +3,7 @@ title: "What changes in a real session with agent-brain"
 date: "2026-11-01"
 excerpt: "A plain comparison of one coding task run without agent-brain and with it. What changes in the prompt, in what the agent checks, and in what carries over to the next session, and how to measure the difference on your own repository."
 slug: "before-and-after-agent-brain"
+product: "agent-brain"
 category: "Engineering"
 author: "Abhiuday Gupta"
 ---

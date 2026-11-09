@@ -3,6 +3,7 @@ title: "Gates, not instructions: where agent-brain checks run"
 date: "2026-11-03"
 excerpt: "Writing a rule in the prompt asks the agent to follow it. A gate in the host checks the action before it runs. agent-brain has four gates. This post explains each one, the hosts that get them, what they cost in friction, and the cases they do not cover."
 slug: "gates-not-instructions"
+product: "agent-brain"
 category: "Engineering"
 author: "Abhiuday Gupta"
 ---

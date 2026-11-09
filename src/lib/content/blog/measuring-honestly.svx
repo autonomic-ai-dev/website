@@ -3,6 +3,7 @@ title: "Measuring honestly: why agent-brain's dashboard labels every estimate"
 date: "2026-11-09"
 excerpt: "Our first dashboard showed a large headline of tokens saved. Most of it was a model, not a measurement. This post explains what we got wrong, what each figure now means, and how a team can check the numbers on its own machine."
 slug: "measuring-honestly"
+product: "agent-brain"
 category: "Operations"
 author: "Abhiuday Gupta"
 ---

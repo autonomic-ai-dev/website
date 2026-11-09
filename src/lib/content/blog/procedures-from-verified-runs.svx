@@ -3,6 +3,7 @@ title: "Procedures learned from verified runs, and their limits"
 date: "2026-11-05"
 excerpt: "Every verify run leaves a trajectory. agent-brain groups trajectories into procedures and can recall them for a later task, with a success rate and the command that worked. This post explains how the grouping works, how the score is built, and where it is too coarse to trust."
 slug: "procedures-from-verified-runs"
+product: "agent-brain"
 category: "Engineering"
 author: "Abhiuday Gupta"
 ---

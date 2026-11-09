@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Playbook: Verify Website Versioning and Documentation
 # Asserts:
-# 1. Stack version matches autonomic-stack.rb (1.0.0-beta.3.1)
+# 1. Product version matches agent-brain.rb (1.0.0-rc8 format)
 # 2. Docs contain documentation for Model Usage & Budget Governance
 # 3. CLI references contain expanded practical examples
 # 4. SvelteKit typecheck and build pass cleanly
@@ -19,24 +19,24 @@ const fs = require("fs");
 const path = require("path");
 
 const tapDir = path.resolve(process.cwd(), "../homebrew-tap/Formula");
-const stackContent = fs.readFileSync(path.join(tapDir, "autonomic-stack.rb"), "utf8");
-const match = stackContent.match(/version\s+"([^"]+)"/);
+const formulaContent = fs.readFileSync(path.join(tapDir, "agent-brain.rb"), "utf8");
+const match = formulaContent.match(/version\s+"([^"]+)"/);
 if (!match || !/^1\.0\.0(-[a-zA-Z0-9.]+)?$/.test(match[1])) {
-  console.error("Invalid autonomic-stack version format:", match ? match[1] : "null");
+  console.error("Invalid agent-brain version format:", match ? match[1] : "null");
   process.exit(1);
 }
-console.log("Verified autonomic-stack formula version: " + match[1]);
+console.log("Verified agent-brain formula version: " + match[1]);
 '
 
 echo "==> [Playbook: Versioning & Docs] Verifying new usage governance documentation..."
-grep -rn "Model Usage & Budget Governance" src/routes/docs/ || {
+grep -rn "Model Usage & Budget Governance" src/routes/agent-brain/docs/ || {
   echo "FAIL: Missing Model Usage & Budget Governance documentation in docs"
   exit 1
 }
 
 echo "==> [Playbook: Versioning & Docs] Verifying extended CLI reference examples..."
 for organ in agent-brain agent-spine; do
-  file="src/routes/docs/cli/$organ/+page.md"
+  file="src/routes/$organ/docs/cli/$organ/+page.md"
   if [ -f "$file" ]; then
     count=$(grep -c '```bash' "$file" || true)
     if [ "$count" -lt 3 ]; then
