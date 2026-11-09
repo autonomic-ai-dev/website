@@ -41,7 +41,7 @@ agent-brain doctor             # check the install
 | Settings (`config.yaml`) | `~/.autonomic/memory/` | `AGENT_BRAIN_HOME` |
 | Database and route logs | `~/.autonomic/memory/` | `AGENT_BRAIN_HOME` |
 
-Routing, memory, verify and the gates run from local files. Network use is off by default. Auto-update, git sync and cloud sync are opt-in settings.
+Routing, memory, verify and the gates run from local files. Auto-update, git sync and cloud sync are controlled in `config.yaml`. Run `agent-brain config show` to see the active values.
 
 ---
 
