@@ -38,8 +38,8 @@
 
 <div class="mx-auto max-w-4xl px-4 py-16 sm:px-6">
   <p class="font-mono text-xs uppercase tracking-widest text-zinc-500">Blog</p>
-  <h1 class="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">{product.name}</h1>
-  <p class="mt-4 max-w-2xl text-zinc-400">Design decisions, trade-offs and what we measure, written by the people who build {product.name}.</p>
+  <h1 class="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-5xl">The decisions behind {product.name}, and what we measured.</h1>
+  <p class="mt-5 max-w-2xl text-zinc-400">Trade-offs, failures and fixes, written by the people who build {product.name}. Start with the newest post.</p>
 
   <ul class="mt-12 divide-y divide-zinc-900 border-y border-zinc-900">
     {#each paginatedPosts as post (post.slug)}

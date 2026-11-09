@@ -39,7 +39,14 @@
 			{/each}
 		</nav>
 	</aside>
-	<article class="prose prose-invert min-w-0 max-w-3xl flex-1 prose-pre:border prose-pre:border-zinc-800 prose-pre:bg-zinc-950">
-		{@render children()}
-	</article>
+	<div class="min-w-0 flex-1">
+		<nav class="mb-8 flex gap-5 overflow-x-auto border-b border-zinc-900 pb-3 text-sm md:hidden">
+			{#each product.docsNav.flatMap((group) => group.links) as link (link.href)}
+				<a href={link.href} class="whitespace-nowrap {path === link.href ? 'text-white' : 'text-zinc-400'}">{link.label}</a>
+			{/each}
+		</nav>
+		<article class="prose prose-invert max-w-3xl prose-pre:border prose-pre:border-zinc-800 prose-pre:bg-zinc-950 [&_table]:block [&_table]:overflow-x-auto">
+			{@render children()}
+		</article>
+	</div>
 </div>

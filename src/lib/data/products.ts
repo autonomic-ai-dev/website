@@ -2,6 +2,28 @@ export type ProductId = 'agent-brain' | 'agent-spine';
 
 export type NavLink = { label: string; href: string };
 
+export type IconName = 'route' | 'shield' | 'receipt' | 'play' | 'database' | 'eye' | 'terminal' | 'check';
+
+export type Product = {
+	id: ProductId;
+	name: string;
+	origin: string;
+	version: string;
+	tagline: string;
+	announce: { text: string; label: string; href: string };
+	headline: string;
+	subline: string;
+	install: string;
+	terminal: string[];
+	facts: { value: string; label: string }[];
+	features: { icon: IconName; title: string; body: string }[];
+	loop: { icon: IconName; title: string; body: string }[];
+	hosts?: { name: string; hooks: boolean; note?: string }[];
+	limits: string[];
+	finalCta: { headline: string; subline: string };
+	docsNav: { section: string; links: NavLink[] }[];
+};
+
 export const MAIN_ORIGIN = 'https://autonomic-ai.dev';
 
 const PRODUCT_HOSTS: Record<string, ProductId> = {
@@ -9,68 +31,94 @@ const PRODUCT_HOSTS: Record<string, ProductId> = {
 	'agent-spine.autonomic-ai.dev': 'agent-spine'
 };
 
-export function productForHost(hostname: string): Product | undefined {
-	const id = PRODUCT_HOSTS[hostname];
-	return id ? products[id] : undefined;
-}
-
-export function productPath(product: Product, pathname: string): string {
-	const prefix = `/${product.id}`;
-	const stripped = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : pathname;
-	return stripped.replace(/\/+$/, '') || '/';
-}
-
-export type Product = {
-	id: ProductId;
-	name: string;
-	origin: string;
-	tagline: string;
-	headline: string;
-	subline: string;
-	install: string;
-	features: { title: string; body: string }[];
-	steps: { label: string; command: string }[];
-	limits: string[];
-	docsNav: { section: string; links: NavLink[] }[];
-};
-
 export const products: Record<ProductId, Product> = {
 	'agent-brain': {
 		id: 'agent-brain',
 		name: 'agent-brain',
 		origin: 'https://agent-brain.autonomic-ai.dev',
+		version: '1.0.0-rc8',
 		tagline: 'Context engine and MCP server',
-		headline: 'Context for coding agents, routed and checked.',
+		announce: {
+			text: 'agent-brain 1.0.0-rc8 is in private beta.',
+			label: 'Read the install guide',
+			href: '/docs/installation'
+		},
+		headline: 'Stop your coding agent from skipping your rules.',
 		subline:
-			'A local MCP server that tells an agent which skills and rules apply to a task, blocks tools until the agent has routed, and keeps a receipt for every verify run.',
+			'agent-brain picks the skills and rules each task needs, inside a fixed token budget. It holds other tools until the agent has routed, and it writes a receipt for every verify run.',
 		install: 'brew install autonomic-ai-dev/tap/agent-brain',
+		terminal: [
+			'brew install autonomic-ai-dev/tap/agent-brain',
+			'agent-brain install',
+			'agent-brain doctor',
+			'agent-brain verify -- cargo test',
+			'agent-brain verify receipt'
+		],
+		facts: [
+			{ value: '350 to 700', label: 'tokens per route, set by task kind' },
+			{ value: '0', label: 'telemetry SDKs in the crate' },
+			{ value: '1', label: 'receipt per verify run, tied to a commit' }
+		],
 		features: [
 			{
+				icon: 'route',
 				title: 'Route before acting',
-				body: 'route_task returns the skills, rules and traps that match the task, within a fixed token budget. Other agent-brain tools stay blocked until the agent has routed.'
+				body: 'route_task returns the skills, rules and traps that match the task. Other agent-brain tools stay blocked until the agent has routed.'
 			},
 			{
-				title: 'Gates, not instructions',
-				body: 'In hosts with hooks, the route gate and bash gate check the agent before it acts. In hosts without hooks, the protection is the agent following the instructions.'
+				icon: 'shield',
+				title: 'Gates on hosts that support them',
+				body: 'A route gate and a bash gate check the agent before it acts. Hosts without hooks rely on the agent following instructions. The docs list which is which.'
 			},
 			{
-				title: 'Receipts you can check',
-				body: 'agent-brain verify records each command with its exit code and the commit it ran against. verify receipt reports PASSED, FAILED or NOT VERIFIED.'
+				icon: 'receipt',
+				title: 'Receipts you can read back',
+				body: 'verify records each command with its exit code and the commit it ran against. verify receipt reports PASSED, FAILED or NOT VERIFIED.'
 			}
 		],
-		steps: [
-			{ label: 'Install the binary', command: 'brew install autonomic-ai-dev/tap/agent-brain' },
-			{ label: 'Register it with your coding hosts', command: 'agent-brain install' },
-			{ label: 'Check the installed hosts', command: 'agent-brain doctor' },
-			{ label: 'Run a verify command and read its receipt', command: 'agent-brain verify -- cargo test\nagent-brain verify receipt' }
+		loop: [
+			{
+				icon: 'route',
+				title: 'Route',
+				body: 'Ask for context before the task starts. route_task returns the matching skills and rules.'
+			},
+			{
+				icon: 'shield',
+				title: 'Gate',
+				body: 'Hosts with hooks block unrouted tools and risky shell commands before they run.'
+			},
+			{
+				icon: 'play',
+				title: 'Verify',
+				body: 'Run your real check through agent-brain verify. The exit code is recorded.'
+			},
+			{
+				icon: 'receipt',
+				title: 'Receipt',
+				body: 'Read the receipt. It shows PASSED, FAILED or NOT VERIFIED for the commit you ran.'
+			}
+		],
+		hosts: [
+			{ name: 'Claude Code', hooks: true },
+			{ name: 'Cursor', hooks: true, note: 'one manual paste' },
+			{ name: 'Codex', hooks: true, note: 'trust hooks once' },
+			{ name: 'Gemini CLI', hooks: true },
+			{ name: 'Antigravity', hooks: true },
+			{ name: 'OpenCode', hooks: true, note: 'plugin' },
+			{ name: 'VS Code (Copilot)', hooks: false },
+			{ name: 'Claude Desktop', hooks: false }
 		],
 		limits: [
 			'VS Code (GitHub Copilot) and Claude Desktop have no hooks, so the gates do not run there.',
-			'Cursor needs one manual step: the installer prints the rule file path and you paste it into Cursor settings.',
+			'Cursor needs one manual step. The installer prints the rule file path and you paste it into Cursor settings.',
 			'Claude Code and Codex do not run new hooks until you trust them.',
 			'Codex has install and configuration tests but no end-to-end test that runs its hooks.',
-			'The dashboard reports measured counts and labelled estimates. It does not measure whether routed context made an agent finish a task better.'
+			'The dashboard reports measured counts and labelled estimates. It does not show whether routed context made an agent finish a task better.'
 		],
+		finalCta: {
+			headline: 'Run one verify command. Then read the receipt.',
+			subline: 'agent-brain runs on your machine. Install it, register your hosts, and check the first receipt yourself.'
+		},
 		docsNav: [
 			{
 				section: 'Start',
@@ -109,32 +157,66 @@ export const products: Record<ProductId, Product> = {
 		id: 'agent-spine',
 		name: 'agent-spine',
 		origin: 'https://agent-spine.autonomic-ai.dev',
+		version: '1.0.0-rc3',
 		tagline: 'Deterministic YAML workflows',
-		headline: 'Workflows for coding agents, with snapshots you can read.',
+		announce: {
+			text: 'agent-spine 1.0.0-rc3 is in private beta.',
+			label: 'Read the approval gate notes',
+			href: '/blog/spine-approval-gates-snapshots-replay'
+		},
+		headline: 'Your agent says the tests passed. Show the snapshot.',
 		subline:
-			'Describe a multi-step job as a YAML file of named nodes and edges. agent-spine runs it, writes a snapshot after each step, and lets you inspect the run afterwards.',
+			'agent-spine runs a workflow of verify, agent and approval steps. It writes a snapshot after every step, so a finished run is a record you can read, not a summary you have to trust.',
 		install: 'brew install autonomic-ai-dev/tap/agent-spine',
+		terminal: [
+			'brew install autonomic-ai-dev/tap/agent-spine',
+			'agent-spine init --with @bugfix',
+			'agent-spine validate bugfix.yaml',
+			"agent-spine run bugfix.yaml -p '{\"ticket\": \"BUG-42\"}'",
+			'agent-spine inspect <EXECUTION_ID>'
+		],
+		facts: [
+			{ value: '1', label: 'snapshot appended after every step' },
+			{ value: '0', label: 'steps re-run by replay' },
+			{ value: 'Halt', label: 'on a failed verify, unless the payload allows it' }
+		],
 		features: [
 			{
+				icon: 'play',
 				title: 'Verify steps run real commands',
-				body: 'A verify node runs its shell command with a timeout and records stdout, stderr and the exit code. A failing verify stops the run unless continue_on_failure is set.'
+				body: 'A verify node runs its shell command under a timeout and records stdout, stderr and the exit code. A failure halts the run unless the payload sets continue_on_failure.'
 			},
 			{
-				title: 'Snapshots, appended not edited',
-				body: 'Each step writes a row to the snapshots table in SQLite. Rows are only added, so the history reads as it happened.'
+				icon: 'database',
+				title: 'Snapshots are added, never edited',
+				body: 'Each step adds a row to the snapshots table in SQLite. Rows are never updated, so the history reads in the order it happened.'
 			},
 			{
+				icon: 'eye',
 				title: 'Inspect and replay, read-only',
-				body: 'agent-spine inspect prints the steps of one execution in order. replay recreates the final state from snapshots without running any step again.'
+				body: 'inspect prints one run step by step. replay rebuilds the final state from snapshots and runs no step again.'
 			}
 		],
-		steps: [
-			{ label: 'Install the binary', command: 'brew install autonomic-ai-dev/tap/agent-spine' },
-			{ label: 'Scaffold a built-in workflow', command: 'agent-spine init --with @bugfix' },
-			{ label: 'Check the file', command: 'agent-spine validate bugfix.yaml' },
+		loop: [
 			{
-				label: 'Run it, then read the history',
-				command: "agent-spine run bugfix.yaml -p '{\"ticket\": \"BUG-42\"}'\nagent-spine inspect <EXECUTION_ID>"
+				icon: 'terminal',
+				title: 'Define',
+				body: 'Describe the job as nodes and edges in a YAML file, or scaffold a built-in workflow.'
+			},
+			{
+				icon: 'check',
+				title: 'Validate',
+				body: 'agent-spine validate checks the file before anything runs.'
+			},
+			{
+				icon: 'play',
+				title: 'Run',
+				body: 'Verify steps run commands and agent steps do the work. Approval gates pass unless auto-approve is off.'
+			},
+			{
+				icon: 'eye',
+				title: 'Inspect',
+				body: 'agent-spine inspect prints the run from its snapshots, one step at a time.'
 			}
 		],
 		limits: [
@@ -144,6 +226,10 @@ export const products: Record<ProductId, Product> = {
 			'replay does not run steps again. To re-run a workflow, start a new execution.',
 			'Snapshots record the outcome the executor saw. A command that changed something outside the repository is not captured.'
 		],
+		finalCta: {
+			headline: 'Scaffold a workflow and run it once.',
+			subline: 'Start from a built-in template, validate it, then inspect the snapshots your run leaves behind.'
+		},
 		docsNav: [
 			{
 				section: 'Start',
@@ -160,3 +246,14 @@ export const products: Record<ProductId, Product> = {
 		]
 	}
 };
+
+export function productForHost(hostname: string): Product | undefined {
+	const id = PRODUCT_HOSTS[hostname];
+	return id ? products[id] : undefined;
+}
+
+export function productPath(product: Product, pathname: string): string {
+	const prefix = `/${product.id}`;
+	const stripped = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : pathname;
+	return stripped.replace(/\/+$/, '') || '/';
+}
