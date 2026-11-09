@@ -46,7 +46,7 @@
 			<div class="flex items-center gap-3">
 				<a href="/" class="text-sm font-semibold text-white">{product.name}</a>
 				<span class="rounded-full border border-zinc-800 px-2 py-0.5 font-mono text-[11px] text-zinc-400">{product.version}</span>
-					<a href="/" class="rounded-md border border-zinc-800 px-3 py-1 text-sm text-zinc-200 hover:bg-zinc-900">Home</a>
+					<a href="https://autonomic-ai.dev" class="rounded-md border border-zinc-800 px-3 py-1 text-sm text-zinc-200 hover:bg-zinc-900">Home</a>
 			</div>
 			<nav class="hidden items-center gap-7 text-sm md:flex">
 				{#each nav as item (item.href)}
