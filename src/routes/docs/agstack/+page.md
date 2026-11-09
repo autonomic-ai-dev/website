@@ -26,7 +26,7 @@ title: AGSTACK SDLC — Autonomous Software Development Lifecycle
 
 ## The Five Mandatory Engineering Invariants
 
-Modern LLMs degrade when given unbounded context or conversational feedback loops. AGSTACK establishes five non-negotiable runtime pillars enforced across both `agent-brain` and `agent-spine`:
+Modern LLMs degrade when given unbounded context or conversational feedback loops. AGSTACK sets out five engineering pillars. Some are product features in `agent-brain` and `agent-spine`, and some are policy the process asks agents to follow:
 
 ```mermaid
 flowchart LR
@@ -43,13 +43,13 @@ flowchart LR
 Once an agent or organ step validates, artifacts are cryptographically hashed and sealed. No background modifications or hidden side effects are allowed. State mutations must return fresh copies rather than modifying shared runtime references in-place.
 
 ### 2. Boundary Discipline
-Context windows are hard-capped (defaulting to 500 token contextual bundles in `agent-brain route_task`). AST tool parameters are strictly validated at invocation boundaries. Agents cannot exceed assigned scopes or hallucinate out-of-band parameters.
+`agent-brain route_task` fits routed context into a token budget of 350 to 700 tokens, depending on the task kind. Tool arguments are parsed into typed request structures. Keeping an agent inside its assigned scope is a rule the process asks for; the tools do not enforce it on their own.
 
 ### 3. Fix Root Causes & Model Usage Governance
 When an execution fails, trace analysis pinpoints the underlying architectural defect rather than burning operational tokens on repetitive speculative prompts. Defensive null-checks that mask underlying bugs are rejected; fixes must be verified with regression test coverage.
 
 ### Model Usage & Budget Governance
-AGSTACK enforces hard ceilings on LLM token usage and execution budgets. Rather than passing entire file trees or infinite conversational trajectories, `agent-brain route_task` limits context bundles to a strict budget (default 500 tokens). Real-time telemetry tracking (`agent-brain stats`) records per-turn token consumption and halts execution when budgets are exceeded, eliminating runaway token loops.
+Rather than passing entire file trees or long conversation histories, `agent-brain route_task` fits context into a budget of 350 to 700 tokens, depending on the task kind. `agent-brain stats` reports the tokens routed per turn. The budget limits what agent-brain routes; it does not cap the model's own token use, and it does not stop a session.
 
 ### 4. Zero Comment Slop
 Codebases must remain clean and maintainable. AGSTACK strictly rejects AI narrative padding, conversational comments, and redundant docstring chatter. Code must be self-documenting, and pre-commit checks automatically reject unnecessary comment lines.
@@ -101,7 +101,7 @@ EOF
 agent-brain verify -- bash .verify/run.sh
 ```
 
-When executed, `agent-brain verify` produces an immutable JSON outcome record:
+A verify run records its outcome in the local database. `agent-brain verify run --json` prints the report in this form:
 
 ```json
 {

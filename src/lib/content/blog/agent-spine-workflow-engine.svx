@@ -16,7 +16,7 @@ A pipeline is defined in `YAML`. Each node has a type, inputs, outputs, and opti
 - **Prompt** — calls an `LLM` with a template and returns structured output
 - **Tool** — executes a shell command or `HTTP` request
 - **Gate** — evaluates a condition and branches (success or skip)
-- **Approval** — pauses execution and sends a notification; resumes only on manual approve or reject
+- **Approval** — a gate auto-approves by default. When auto-approval is turned off, it waits until the node's payload carries `approved: true`. No CLI command approves gates.
 - **Event** — emits a typed event to the event bus
 - **Subworkflow** — invokes another pipeline, with its own snapshot isolation
 
@@ -58,7 +58,7 @@ nodes:
 
 ## Integrated Mode
 
-Connected to the ecosystem, spine listens on `:3100` for its event bus. Organs register themselves and publish typed events. A spine workflow can trigger on an event (e.g., `pr.opened`), route through brain for context, call muscle for execution, check immune for security, and end with an approval gate requiring human sign-off. The `BrainRouter` node queries brain's `route_task` to dynamically select which skill or agent to invoke for a given workflow step.
+When you run `agent-spine event serve`, the event bus listens on `:3100`. Other organs in the wider design would publish typed events there; only agent-brain and agent-spine are released today. A spine workflow can end with an approval gate, and it can use agent-brain for context through its `BrainRouter` node. The `BrainRouter` node queries brain's `route_task` to dynamically select which skill or agent to invoke for a given workflow step.
 
 ## Design Decisions
 

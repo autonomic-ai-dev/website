@@ -1,13 +1,13 @@
 ---
-title: "Introducing Autonomic AI: Biological Architecture for Self-Healing Systems"
+title: "Introducing Autonomic AI: A Biological Architecture for Autonomous Engineering"
 date: "2026-10-17"
-excerpt: "How eleven specialized organs compose into a self-healing multi-agent system — and why structure beats intelligence as the core design philosophy."
+excerpt: "How specialized organs are designed to compose into a multi-agent system, and why structure beats intelligence as the core design philosophy. agent-brain and agent-spine are released today; the other organs are in development."
 slug: "introducing-autonomic-ai"
 category: "Architecture"
 author: "Abhiuday Gupta"
 ---
 
-Autonomic AI is not another agent framework. It is an operating system for autonomous software maintenance — a set of long-running daemons, called organs, that together form a self-healing multi-agent system. Each organ has a bounded responsibility, a clear interface, and can run standalone or as part of the full ecosystem.
+Autonomic AI is not another agent framework. It is a design for autonomous software maintenance: long-running daemons, called organs, each with a bounded responsibility and a clear interface. Only agent-brain and agent-spine are released today. The other organs described here are in development, and the design is the goal, not a shipped system.
 
 ## The Biological Metaphor, Precisely
 
@@ -25,7 +25,7 @@ The architecture mirrors the human autonomic nervous system — the part that ke
 - **TUI** — Native terminal mission control HUD built with Ratatui and direct socket streaming
 - **CI Dashboard** — Real-time operations console built with SvelteKit 5 runes and telemetry rollup
 
-Each organ exposes an HTTP or stdio API, registers with the event bus, and can be health-checked independently. No single organ failure takes down the whole system.
+The design has each organ expose an HTTP or stdio API, register with the event bus, and be health-checked independently, so that one organ's failure does not stop the others.
 
 ## Why Structure Beats Intelligence
 
@@ -88,6 +88,6 @@ This workflow runs entirely unsupervised until the `human_approval` gate. Every 
 
 ## What This Enables
 
-A `CI` pipeline that catches a supply-chain vulnerability (`Immune`), opens a fix `PR` (`Muscle`), captures a screenshot of the fix rendering (`Eyes`), and surfaces a summary to `Slack` — all without a human watching. The organs coordinate through `Nerves` via typed events. Each step is auditable, replayable, and bounded by the `Heart`'s token gate.
+In the intended design, a `CI` pipeline catches a supply-chain vulnerability (`Immune`), opens a fix `PR` (`Muscle`), captures a screenshot of the fix rendering (`Eyes`), and surfaces a summary to `Slack`, with no human watching. This is a design example; these organs are not released. The organs coordinate through `Nerves` via typed events. Each step is auditable, replayable, and bounded by the `Heart`'s token gate.
 
-The real win is survivability. If `Eyes` crashes, the brain still routes context. If the brain is slow, the spine still executes. The system degrades gracefully because no organ depends on another organ's internals — only on its published `API` contract. Every organ registers a `/health` endpoint, and `Heart` polls these at 60-second intervals. A failing organ is marked degraded, and workflows that depend on it are routed around its absence.
+The design goal is resilience. If `Eyes` crashed, the brain would still route context, and if the brain were slow, the spine would still execute. The intent is graceful degradation: no organ depends on another organ's internals, only on its published `API` contract. The design also has every organ expose a `/health` endpoint that `Heart` polls every 60 seconds, with workflows routed around a degraded organ. These are design targets, not behaviour that agent-brain or agent-spine implements today.

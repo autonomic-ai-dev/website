@@ -66,7 +66,7 @@ flowchart LR
       <span class="font-mono text-xs text-neutral-300 bg-white/[0.04] px-2 py-0.5 rounded border border-white/10">Agent Node</span>
     </div>
     <p class="text-sm text-neutral-300 leading-relaxed">
-      Calculates concrete ROI metrics. Confirms willingness to pay and ensures the proposed solution saves tangible developer hours or cloud infrastructure spend. Synthesizes concise problem statements bounded strictly under 500 context tokens.
+      Asks for concrete estimates of the value the solution saves, such as developer hours or infrastructure spend, and checks whether customers would pay. Writes a concise problem statement, kept short enough to fit a small context budget.
     </p>
   </div>
 
