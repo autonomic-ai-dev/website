@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { Copy } from 'lucide-svelte';
+	import { ArrowRight, Check, Copy, Minus } from 'lucide-svelte';
+	import Icon from '#lib/components/ui/Icon.svelte';
+	import Terminal from '#lib/components/ui/Terminal.svelte';
 	import type { Product } from '#lib/data/products';
 
 	let { product }: { product: Product } = $props();
@@ -15,58 +17,178 @@
 			copied = false;
 		}
 	}
+
+	const pad = (index: number) => String(index + 1).padStart(2, '0');
 </script>
 
-<section class="mx-auto max-w-6xl px-4 pt-24 pb-20 sm:px-6">
-	<p class="font-mono text-xs uppercase tracking-widest text-zinc-500">{product.tagline}</p>
-	<h1 class="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-6xl">{product.headline}</h1>
-	<p class="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">{product.subline}</p>
+<section class="relative isolate overflow-hidden">
+	<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[620px] bg-[radial-gradient(45%_55%_at_50%_0%,rgba(56,189,248,0.13),transparent_70%)]"></div>
+	<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[620px] bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:linear-gradient(to_bottom,black,transparent)]"></div>
+	<div class="mx-auto max-w-5xl px-4 pt-24 pb-16 text-center sm:px-6 lg:pt-32">
+		<span class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950 px-3 py-1 font-mono text-[11px] text-zinc-300">
+			<span class="h-1.5 w-1.5 rounded-full bg-sky-400"></span>{product.badge}
+		</span>
+		<h1 class="mx-auto mt-7 max-w-4xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">{product.headline}</h1>
+		<p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">{product.subline}</p>
 
-	<div class="mt-10 flex max-w-2xl items-center justify-between gap-4 rounded-md border border-zinc-800 bg-zinc-950 px-4 py-3">
-		<code class="overflow-x-auto font-mono text-sm text-zinc-100">{product.install}</code>
-		<button
-			type="button"
-			onclick={copyInstall}
-			class="inline-flex shrink-0 items-center gap-1.5 rounded border border-zinc-700 px-3 py-1 text-xs text-zinc-300 hover:bg-zinc-900"
-		>
-			<Copy size={12} />{copied ? 'Copied' : 'Copy'}
-		</button>
-	</div>
+		<div id="install" class="mx-auto mt-10 max-w-xl scroll-mt-24 rounded-lg border border-zinc-800 bg-zinc-950 text-left">
+			<div class="flex items-center gap-4 border-b border-zinc-900 px-4 py-2 font-mono text-xs">
+				<span class="text-white">brew</span>
+				<span class="text-zinc-600">curl</span>
+				<span class="text-zinc-600">npm</span>
+			</div>
+			<div class="flex items-center justify-between gap-4 px-4 py-3">
+				<code class="overflow-x-auto font-mono text-sm text-zinc-100">{product.install}</code>
+				<button
+					type="button"
+					onclick={copyInstall}
+					aria-label="Copy install command"
+					class="inline-flex shrink-0 items-center gap-1.5 rounded border border-zinc-800 px-2.5 py-1 text-xs text-zinc-300 transition-colors hover:bg-zinc-900"
+				>
+					{#if copied}<Check size={12} />{:else}<Copy size={12} />{/if}
+				</button>
+			</div>
+		</div>
 
-	<div class="mt-6 flex flex-wrap gap-3 text-sm">
-		<a href="/docs" class="rounded-md bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200">Read the docs</a>
-		<a href="/blog" class="rounded-md border border-zinc-800 px-4 py-2 text-zinc-200 hover:bg-zinc-900">Blog</a>
+		<ul class="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-zinc-400">
+			{#each product.chips as chip (chip)}
+				<li class="inline-flex items-center gap-2"><Check size={14} class="text-sky-400" />{chip}</li>
+			{/each}
+		</ul>
+
+		<div class="mt-10 flex flex-wrap justify-center gap-3 text-sm">
+			<a href="/docs" class="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2.5 font-medium text-black transition-colors hover:bg-zinc-200">
+				Read the docs <ArrowRight size={14} />
+			</a>
+			<a href="/blog" class="rounded-md border border-zinc-800 px-4 py-2.5 text-zinc-200 transition-colors hover:bg-zinc-900">Read the blog</a>
+		</div>
 	</div>
 </section>
 
-<section class="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-	<div class="grid gap-px overflow-hidden rounded-md border border-zinc-800 bg-zinc-800 sm:grid-cols-3">
-		{#each product.features as feature (feature.title)}
-			<div class="bg-black p-6">
-				<h2 class="text-base font-medium text-white">{feature.title}</h2>
-				<p class="mt-2 text-sm leading-relaxed text-zinc-400">{feature.body}</p>
-			</div>
+<section class="mx-auto max-w-5xl px-4 pb-28 sm:px-6">
+	<Terminal title={product.showcase.title} lines={product.showcase.lines} prompt={product.showcase.prompt} />
+</section>
+
+<section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
+	<p class="font-mono text-[11px] uppercase tracking-widest text-sky-400">Capabilities</p>
+	<h2 class="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">What it gives you</h2>
+	<div class="mt-12 grid gap-4 md:grid-cols-3">
+		{#each product.features as feature, index (feature.title)}
+			<article class="flex flex-col rounded-xl border border-zinc-800 bg-zinc-950 p-7 transition-colors hover:border-zinc-600">
+				<div class="flex items-center justify-between">
+					<span class="font-mono text-[11px] text-sky-400">{pad(index)}</span>
+					<span class="text-zinc-500"><Icon name={feature.icon} size={16} /></span>
+				</div>
+				<h3 class="mt-8 text-lg font-semibold text-white">{feature.title}</h3>
+				<p class="mt-3 flex-1 text-sm leading-relaxed text-zinc-400">{feature.body}</p>
+				<code class="mt-6 block rounded-md border border-zinc-900 bg-black px-3 py-2 font-mono text-xs text-zinc-300">{feature.command}</code>
+			</article>
 		{/each}
 	</div>
 </section>
 
-<section class="mx-auto max-w-6xl border-t border-zinc-900 px-4 py-20 sm:px-6">
-	<h2 class="text-2xl font-semibold tracking-tight text-white">Get started</h2>
-	<ol class="mt-8 space-y-3">
-		{#each product.steps as step, index (step.command)}
-			<li class="rounded-md border border-zinc-800 bg-zinc-950 p-4">
-				<p class="text-xs text-zinc-500"><span class="font-mono">{index + 1}.</span> {step.label}</p>
-				<pre class="mt-2 overflow-x-auto font-mono text-sm text-zinc-100"><code>{step.command}</code></pre>
+<section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
+	<p class="font-mono text-[11px] uppercase tracking-widest text-sky-400">How it works</p>
+	<h2 class="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">Four steps, and each one leaves evidence.</h2>
+	<ol class="mt-12 grid gap-4 md:grid-cols-4">
+		{#each product.loop as step, index (step.title)}
+			<li class="flex flex-col rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+				<div class="flex items-center justify-between">
+					<span class="font-mono text-xs text-zinc-500">{pad(index)}</span>
+					<span class="text-sky-400"><Icon name={step.icon} size={16} /></span>
+				</div>
+				<h3 class="mt-8 text-base font-semibold text-white">{step.title}</h3>
+				<p class="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">{step.body}</p>
+				<code class="mt-6 block truncate rounded-md border border-zinc-900 bg-black px-3 py-2 font-mono text-xs text-zinc-300">{step.command}</code>
 			</li>
 		{/each}
 	</ol>
 </section>
 
-<section class="mx-auto max-w-6xl border-t border-zinc-900 px-4 py-20 sm:px-6">
-	<h2 class="text-2xl font-semibold tracking-tight text-white">What it does not do yet</h2>
-	<ul class="mt-6 space-y-3 text-sm text-zinc-400">
+{#if product.hosts}
+	<section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
+		<p class="font-mono text-[11px] uppercase tracking-widest text-sky-400">Hosts</p>
+		<h2 class="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">Where the gates run, and where they do not.</h2>
+		<div class="mt-12 overflow-x-auto rounded-xl border border-zinc-800">
+			<table class="w-full min-w-[520px] text-left text-sm">
+				<thead class="border-b border-zinc-800 bg-zinc-950 font-mono text-[11px] uppercase tracking-widest text-zinc-500">
+					<tr>
+						<th class="px-6 py-3 font-normal">Host</th>
+						<th class="px-6 py-3 font-normal">Protection</th>
+						<th class="px-6 py-3 font-normal">Note</th>
+					</tr>
+				</thead>
+				<tbody class="divide-y divide-zinc-900">
+					{#each product.hosts as host (host.name)}
+						<tr class="bg-black">
+							<td class="px-6 py-4 font-medium text-white">{host.name}</td>
+							<td class="px-6 py-4">
+								{#if host.hooks}
+									<span class="rounded-full border border-sky-500/30 bg-sky-500/10 px-2.5 py-0.5 font-mono text-[11px] text-sky-300">gates</span>
+								{:else}
+									<span class="rounded-full border border-zinc-800 px-2.5 py-0.5 font-mono text-[11px] text-zinc-400">instructions only</span>
+								{/if}
+							</td>
+							<td class="px-6 py-4 text-zinc-500">{host.note ?? ''}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	</section>
+{/if}
+
+{#if product.nodeKinds}
+	<section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
+		<p class="font-mono text-[11px] uppercase tracking-widest text-sky-400">Node kinds</p>
+		<h2 class="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">Eight building blocks for a workflow.</h2>
+		<ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			{#each product.nodeKinds as kind (kind.name)}
+				<li class="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
+					<p class="font-mono text-sm text-white">{kind.name}</p>
+					<p class="mt-2 text-sm leading-relaxed text-zinc-400">{kind.body}</p>
+				</li>
+			{/each}
+		</ul>
+		{#if product.nodeKindsNote}
+			<p class="mt-6 rounded-lg border border-zinc-900 px-5 py-3 text-sm text-zinc-500">{product.nodeKindsNote}</p>
+		{/if}
+	</section>
+{/if}
+
+<section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
+	<p class="font-mono text-[11px] uppercase tracking-widest text-sky-400">Numbers you can check</p>
+	<h2 class="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">Each figure comes from the code or the docs.</h2>
+	<dl class="mt-12 grid gap-4 sm:grid-cols-3">
+		{#each product.facts as fact (fact.label)}
+			<div class="rounded-xl border border-zinc-800 bg-zinc-950 p-7">
+				<dt class="font-mono text-3xl font-semibold tracking-tight text-white">{fact.value}</dt>
+				<dd class="mt-3 text-sm text-zinc-400">{fact.label}</dd>
+			</div>
+		{/each}
+	</dl>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
+	<p class="font-mono text-[11px] uppercase tracking-widest text-sky-400">Known limits</p>
+	<h2 class="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">What it does not do yet.</h2>
+	<ul class="mt-12 divide-y divide-zinc-900 rounded-xl border border-zinc-800 bg-zinc-950">
 		{#each product.limits as limit (limit)}
-			<li class="flex gap-3"><span class="text-zinc-600">—</span><span>{limit}</span></li>
+			<li class="flex gap-4 px-6 py-5 text-sm leading-relaxed text-zinc-300">
+				<Minus size={16} class="mt-0.5 shrink-0 text-zinc-600" />
+				<span>{limit}</span>
+			</li>
 		{/each}
 	</ul>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
+	<div class="rounded-2xl border border-zinc-800 bg-zinc-950 px-6 py-16 text-center sm:px-12">
+		<h2 class="mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">{product.finalCta.headline}</h2>
+		<p class="mx-auto mt-4 max-w-xl text-zinc-400">{product.finalCta.subline}</p>
+		<div class="mt-8 flex flex-wrap justify-center gap-3 text-sm">
+			<a href="#install" class="rounded-md bg-white px-4 py-2.5 font-medium text-black transition-colors hover:bg-zinc-200">Install {product.name}</a>
+			<a href="/docs" class="rounded-md border border-zinc-800 px-4 py-2.5 text-zinc-200 transition-colors hover:bg-zinc-900">Read the docs</a>
+		</div>
+	</div>
 </section>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ArrowRight } from 'lucide-svelte';
 	import { products } from '#lib/data/products';
 
 	const list = [products['agent-brain'], products['agent-spine']];
@@ -6,31 +7,39 @@
 
 <svelte:head>
 	<title>Products — Autonomic AI</title>
-	<meta name="description" content="The Autonomic AI products: agent-brain and agent-spine. Each has its own site, docs and install." />
+	<meta name="description" content="The Autonomic AI products: agent-brain and agent-spine. Each has its own site, docs, blog and install command." />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="Products — Autonomic AI" />
-	<meta property="og:description" content="The Autonomic AI products: agent-brain and agent-spine. Each has its own site, docs and install." />
+	<meta property="og:description" content="Install one, or both. Each product has its own site, docs and blog." />
 </svelte:head>
 
-<section class="mx-auto max-w-6xl px-4 pt-28 pb-20 sm:px-6">
-	<p class="font-mono text-xs uppercase tracking-widest text-zinc-500">Products</p>
-	<h1 class="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Two tools. Each installs on its own.</h1>
-	<p class="mt-6 max-w-2xl text-lg text-zinc-400">Pick the one you need. Each product has its own site, documentation and blog.</p>
+<section class="relative isolate overflow-hidden">
+	<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(50%_60%_at_50%_0%,rgba(56,189,248,0.12),transparent_70%)]"></div>
+	<div class="mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6">
+		<p class="font-mono text-xs uppercase tracking-widest text-sky-400">Products</p>
+		<h1 class="mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">Install one. Or both. Each stands alone.</h1>
+		<p class="mt-6 max-w-xl text-lg text-zinc-400">Pick the job you have today. Each product has its own site, its own docs, and its own install command.</p>
+	</div>
 </section>
 
-<section class="mx-auto max-w-6xl space-y-6 px-4 pb-24 sm:px-6">
+<section class="mx-auto max-w-6xl space-y-5 px-4 pb-28 sm:px-6">
 	{#each list as product (product.id)}
-		<article class="rounded-md border border-zinc-800 bg-zinc-950 p-8">
-			<div class="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
-				<h2 class="text-2xl font-semibold text-white">{product.name}</h2>
-				<span class="font-mono text-xs text-zinc-500">{product.tagline}</span>
+		<article class="grid gap-8 rounded-xl border border-zinc-800 bg-zinc-950 p-8 transition-colors hover:border-zinc-600 md:grid-cols-[1fr_auto] md:items-center md:p-10">
+			<div>
+				<div class="flex flex-wrap items-baseline gap-3">
+					<h2 class="text-2xl font-semibold text-white">{product.name}</h2>
+					<span class="font-mono text-xs text-zinc-500">{product.version}</span>
+				</div>
+				<p class="mt-2 font-mono text-xs uppercase tracking-widest text-zinc-500">{product.tagline}</p>
+				<p class="mt-5 max-w-2xl leading-relaxed text-zinc-400">{product.subline}</p>
+				<code class="mt-6 inline-block rounded border border-zinc-800 bg-black px-3 py-2 font-mono text-sm text-zinc-100">{product.install}</code>
 			</div>
-			<p class="mt-4 max-w-2xl text-zinc-400">{product.subline}</p>
-			<pre class="mt-6 overflow-x-auto rounded border border-zinc-800 bg-black p-4 font-mono text-sm text-zinc-100"><code>{product.install}</code></pre>
-			<div class="mt-6 flex flex-wrap gap-3 text-sm">
-				<a href={product.origin} class="rounded-md bg-white px-4 py-2 font-medium text-black hover:bg-zinc-200">Open {product.name}</a>
-				<a href={`${product.origin}/docs`} class="rounded-md border border-zinc-800 px-4 py-2 text-zinc-200 hover:bg-zinc-900">Docs</a>
-				<a href={`${product.origin}/blog`} class="rounded-md border border-zinc-800 px-4 py-2 text-zinc-200 hover:bg-zinc-900">Blog</a>
+			<div class="flex flex-wrap gap-3 text-sm md:flex-col">
+				<a href={product.origin} class="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2.5 font-medium text-black transition-colors hover:bg-zinc-200">
+					Open {product.name} <ArrowRight size={14} />
+				</a>
+				<a href={`${product.origin}/docs`} class="rounded-md border border-zinc-800 px-4 py-2.5 text-center text-zinc-200 transition-colors hover:bg-zinc-900">Docs</a>
+				<a href={`${product.origin}/blog`} class="rounded-md border border-zinc-800 px-4 py-2.5 text-center text-zinc-200 transition-colors hover:bg-zinc-900">Blog</a>
 			</div>
 		</article>
 	{/each}
