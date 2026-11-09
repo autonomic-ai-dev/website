@@ -8,7 +8,7 @@ title: AGSTACK SDLC — Autonomous Software Development Lifecycle
     <span>Autonomous SDLC Specification — AGSTACK Invariants</span>
   </div>
 
-  <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
+  <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-semibold tracking-tight text-white leading-[1.15]">
     AGSTACK SDLC — <br/>
     <span class="text-neutral-400 font-normal">
       Deterministic Engineering Invariants

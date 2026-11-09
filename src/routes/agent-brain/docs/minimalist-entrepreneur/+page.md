@@ -8,7 +8,7 @@ title: Minimalist Entrepreneurship — Autonomous Product Lifecycle
     <span>Autonomous SDLC Specification — AGSTACK Framework</span>
   </div>
 
-  <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
+  <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-semibold tracking-tight text-white leading-[1.15]">
     Minimalist Entrepreneurship — <br/>
     <span class="text-neutral-400 font-normal">
       Deterministic Product Lifecycle
