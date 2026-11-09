@@ -36,7 +36,7 @@
 	},
 	"dependencies": {
 		"lucide-svelte": "^1.0.1",
-		"mermaid": "^12.2.0",
+		"mermaid": "11.17.2",
 		"motion": "^14.7.1"
 	}
 }

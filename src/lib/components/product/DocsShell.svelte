@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/state';
+	import { renderMermaidBlocks } from '#lib/diagrams';
 	import { productPath, type Product } from '#lib/data/products';
 
 	let { product, children }: { product: Product; children: Snippet } = $props();
@@ -8,6 +9,13 @@
 	const path = $derived(productPath(product, page.url.pathname));
 	const current = $derived(product.docsNav.flatMap((group) => group.links).find((link) => link.href === path));
 	const title = $derived(current ? `${current.label} — ${product.name} docs` : `${product.name} docs`);
+
+	let article: HTMLElement | undefined = $state();
+
+	$effect(() => {
+		void page.url.pathname;
+		if (article) renderMermaidBlocks(article);
+	});
 </script>
 
 <svelte:head>
@@ -45,7 +53,7 @@
 				<a href={link.href} class="whitespace-nowrap {path === link.href ? 'text-white' : 'text-zinc-400'}">{link.label}</a>
 			{/each}
 		</nav>
-		<article class="prose prose-invert max-w-3xl prose-pre:border prose-pre:border-zinc-800 prose-pre:bg-zinc-950 [&_table]:block [&_table]:overflow-x-auto">
+		<article bind:this={article} class="prose prose-invert max-w-3xl prose-pre:border prose-pre:border-zinc-800 prose-pre:bg-zinc-950 [&_table]:block [&_table]:overflow-x-auto">
 			{@render children()}
 		</article>
 	</div>
