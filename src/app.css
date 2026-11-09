@@ -73,7 +73,7 @@
     color: inherit;
     padding: 0;
     border: 0;
-    font-family: inherit;
+    font-family: var(--font-mono);
   }
 }
 
