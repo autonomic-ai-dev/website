@@ -34,7 +34,9 @@ export const MAIN_ORIGIN = 'https://autonomic-ai.dev';
 
 const PRODUCT_HOSTS: Record<string, ProductId> = {
 	'agent-brain.autonomic-ai.dev': 'agent-brain',
-	'agent-spine.autonomic-ai.dev': 'agent-spine'
+	'agent-spine.autonomic-ai.dev': 'agent-spine',
+	'agent-brain.localhost': 'agent-brain',
+	'agent-spine.localhost': 'agent-spine'
 };
 
 export const products: Record<ProductId, Product> = {
