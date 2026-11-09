@@ -57,7 +57,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 				return match ? match[1] : null;
 			};
 
-			const stack = readVer('autonomic-stack.rb') || '1.0.0-rc2';
+			const stack = readVer('agent-brain.rb') || '1.0.0-rc2';
 			const brain = readVer('agent-brain.rb') || stack;
 			const spine = readVer('agent-spine.rb') || stack;
 
@@ -103,13 +103,12 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 			return null;
 		};
 
-		const [stack, brain, spine] = await Promise.all([
-			fetchVer('autonomic-stack.rb'),
+		const [brain, spine] = await Promise.all([
 			fetchVer('agent-brain.rb'),
 			fetchVer('agent-spine.rb')
 		]);
 
-		const stackVer = stack || '1.0.0-rc2';
+		const stackVer = brain || '1.0.0-rc2';
 		const brainVer = brain || stackVer;
 		const spineVer = spine || stackVer;
 
