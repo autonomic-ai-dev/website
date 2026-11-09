@@ -4,24 +4,22 @@ title: Installation & Deployment
 
 # Installation & Deployment
 
-Autonomic AI is two components: **agent-brain** and **agent-spine**. Homebrew provides pre-built binaries for **macOS (Apple Silicon)**. Building from source works on any platform Rust supports.
+agent-brain is a single binary. Homebrew provides a pre-built binary for **macOS (Apple Silicon)**. Building from source works on any platform Rust supports.
 
 ---
 
-## 1. Homebrew (macOS, recommended)
+## 1. Install with Homebrew
 
 ```bash
 brew tap autonomic-ai-dev/tap
-brew install agent-brain agent-spine
+brew install agent-brain
 ```
 
-Update both with:
+Update with:
 
 ```bash
-brew upgrade agent-brain agent-spine
+brew upgrade agent-brain
 ```
-
-`agent-spine update` prints this command. It does not download releases itself.
 
 ---
 
@@ -36,55 +34,24 @@ agent-brain doctor             # check the install
 
 ---
 
-## 3. Set up agent-spine
-
-```bash
-agent-spine init
-```
-
-`init` creates agent-spine's state directory under `~/.autonomic/state/spine` and writes an example workflow.
-
----
-
-## 4. Where settings and data live
+## 3. Where settings and data live
 
 | Item | Location | Override |
 | :--- | :--- | :--- |
-| agent-brain settings (`config.yaml`) | `~/.autonomic/memory/` | `AGENT_BRAIN_HOME` |
-| agent-brain database and route logs | `~/.autonomic/memory/` | `AGENT_BRAIN_HOME` |
-| agent-spine state | `~/.autonomic/state/spine/` | none |
-| agent-spine execution logs | `~/.autonomic/logs/spine/` | none |
+| Settings (`config.yaml`) | `~/.autonomic/memory/` | `AGENT_BRAIN_HOME` |
+| Database and route logs | `~/.autonomic/memory/` | `AGENT_BRAIN_HOME` |
 
-Everything stays on your machine unless you configure a NATS server or a remote model API.
+Routing, memory, verify and the gates run from local files. Network use is off by default. Auto-update, git sync and cloud sync are opt-in settings.
 
 ---
 
-## 5. Optional: NATS for agent-spine events
-
-agent-spine publishes workflow events to NATS only if you set `AUTONOMIC_NATS_URL`. Credentials come from the environment:
-
-```bash
-export AUTONOMIC_NATS_URL=nats://127.0.0.1:4222
-export AUTONOMIC_NATS_USER=...           # optional
-export AUTONOMIC_NATS_PASSWORD=...       # optional
-export AUTONOMIC_NATS_TLS=1              # optional; add AUTONOMIC_NATS_CA, _CERT, _KEY as needed
-export AUTONOMIC_NATS_INSECURE=1         # optional; skips user and password
-```
-
-The credentials-file fallback from earlier releases has been removed.
-
----
-
-## 6. Build from source
-
-The repositories are private for now, so you need access to clone them.
+## 4. Build from source
 
 ```bash
 git clone git@github.com:autonomic-ai-dev/agent-brain.git
 cargo build --release --manifest-path agent-brain/agent-brain/Cargo.toml --bin agent-brain
-
-git clone git@github.com:autonomic-ai-dev/agent-spine.git
-cargo build --release --manifest-path agent-spine/agent-spine/Cargo.toml
 ```
 
-Copy the resulting binaries from `target/release/` into a directory on your `PATH`.
+Copy the binary from `target/release/` into a directory on your `PATH`.
+
+The repository is private for now, so you need access to clone it.

@@ -14,9 +14,8 @@
 </svelte:head>
 
 <section class="relative isolate overflow-hidden">
-	<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(50%_60%_at_50%_0%,rgba(56,189,248,0.12),transparent_70%)]"></div>
 	<div class="mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6">
-		<p class="font-mono text-xs uppercase tracking-widest text-sky-400">Products</p>
+		<p class="font-mono text-xs uppercase tracking-widest text-zinc-300">Products</p>
 		<h1 class="mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">Install one. Or both. Each stands alone.</h1>
 		<p class="mt-6 max-w-xl text-lg text-zinc-400">Pick the job you have today. Each product has its own site, its own docs, and its own install command.</p>
 	</div>
@@ -24,7 +23,7 @@
 
 <section class="mx-auto max-w-6xl space-y-5 px-4 pb-28 sm:px-6">
 	{#each list as product (product.id)}
-		<article class="grid gap-8 rounded-xl border border-zinc-800 bg-zinc-950 p-8 transition-colors hover:border-zinc-600 md:grid-cols-[1fr_auto] md:items-center md:p-10">
+		<article class="grid gap-8 rounded-xl border border-zinc-800 bg-black p-8 transition-colors hover:border-zinc-600 md:grid-cols-[1fr_auto] md:items-center md:p-10">
 			<div>
 				<div class="flex flex-wrap items-baseline gap-3">
 					<h2 class="text-2xl font-semibold text-white">{product.name}</h2>

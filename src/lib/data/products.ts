@@ -292,11 +292,11 @@ export const products: Record<ProductId, Product> = {
 		docsNav: [
 			{
 				section: 'Start',
-				links: [{ label: 'Overview', href: '/docs' }]
+				links: [{ label: 'Overview', href: '/docs' }, { label: 'Installation', href: '/docs/installation' }]
 			},
 			{
 				section: 'Concepts',
-				links: [{ label: 'Workflows and node kinds', href: '/docs/workflows' }]
+				links: [{ label: 'Workflows and node kinds', href: '/docs/workflows' }, { label: 'Using with agent-brain', href: '/docs/with-agent-brain' }]
 			},
 			{
 				section: 'Reference',

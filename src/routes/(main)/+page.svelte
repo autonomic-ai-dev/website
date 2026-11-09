@@ -38,10 +38,9 @@
 </svelte:head>
 
 <section class="relative isolate overflow-hidden">
-	<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] bg-[radial-gradient(50%_60%_at_50%_0%,rgba(56,189,248,0.14),transparent_70%)]"></div>
 	<div class="mx-auto grid max-w-6xl gap-14 px-4 pt-24 pb-24 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pt-32">
 		<div>
-			<p class="font-mono text-xs uppercase tracking-widest text-sky-400">Autonomic AI</p>
+			<p class="font-mono text-xs uppercase tracking-widest text-zinc-300">Autonomic AI</p>
 			<h1 class="mt-5 text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">Coding agents skip steps. These tools make them show their work.</h1>
 			<p class="mt-6 max-w-xl text-lg leading-relaxed text-zinc-400">
 				Two open tools for AI coding agents. agent-brain routes your rules into each task and records what was verified. agent-spine runs multi-step workflows and keeps a snapshot of every step.
@@ -61,7 +60,7 @@
 	<p class="font-mono text-xs uppercase tracking-widest text-zinc-500">Pick the one your team needs</p>
 	<div class="mt-8 grid gap-4 md:grid-cols-2">
 		{#each list as item (item.product.id)}
-			<a href={item.product.origin} class="group flex flex-col gap-5 rounded-xl border border-zinc-800 bg-zinc-950 p-8 transition-colors hover:border-zinc-600">
+			<a href={item.product.origin} class="group flex flex-col gap-5 rounded-xl border border-zinc-800 bg-black p-8 transition-colors hover:border-zinc-600">
 				<p class="font-mono text-xs uppercase tracking-widest text-zinc-500">{item.product.tagline}</p>
 				<h2 class="text-2xl font-semibold text-white">{item.hook}</h2>
 				<p class="text-sm leading-relaxed text-zinc-400">{item.product.subline}</p>
@@ -75,7 +74,7 @@
 </section>
 
 <section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
-	<div class="rounded-xl border border-zinc-800 bg-zinc-950 p-10 text-center md:p-16">
+	<div class="rounded-xl border border-zinc-800 bg-black p-10 text-center md:p-16">
 		<h2 class="mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">Install one. Check its first result yourself.</h2>
 		<p class="mx-auto mt-4 max-w-xl text-zinc-400">Each product installs on its own. agent-brain makes no model calls and ships no telemetry SDK.</p>
 		<div class="mt-8 flex flex-wrap justify-center gap-3 text-sm">
