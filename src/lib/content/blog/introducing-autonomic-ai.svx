@@ -3,6 +3,7 @@ title: "Introducing agent-brain and agent-spine"
 date: "2026-10-30"
 excerpt: "Two local tools for coding agents. agent-brain decides what context an agent sees and checks that its claims are backed by runs. agent-spine runs multi-step workflows with snapshots and approval gates. Here is what each does, what it costs, and where it stops."
 slug: "introducing-autonomic-ai"
+product: "agent-brain"
 category: "Architecture"
 author: "Abhiuday Gupta"
 ---
@@ -45,4 +46,4 @@ They are separate on purpose. agent-brain answers "what should the agent know an
 
 - [Routing context inside a budget](/blog/agent-brain-context-engine) explains how agent-brain picks what to show.
 - [Gates, not instructions](/blog/gates-not-instructions) explains why we put checks in the host instead of the prompt.
-- [agent-spine as a state machine](/blog/agent-spine-workflow-engine) explains the workflow model and its limits.
+- [agent-spine as a state machine](https://agent-spine.autonomic-ai.dev/blog/agent-spine-workflow-engine) explains the workflow model and its limits.
