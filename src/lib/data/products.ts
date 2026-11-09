@@ -154,7 +154,9 @@ export const products: Record<ProductId, Product> = {
 					{ label: 'Architecture', href: '/docs/architecture' },
 					{ label: 'Memory', href: '/docs/memory' },
 					{ label: 'Verification', href: '/docs/verification' },
-					{ label: 'Invariants', href: '/docs/invariants' }
+					{ label: 'Invariants', href: '/docs/invariants' },
+					{ label: 'How it works', href: '/docs/concepts' },
+					{ label: 'Design decisions', href: '/docs/decisions' }
 				]
 			},
 			{
@@ -169,7 +171,10 @@ export const products: Record<ProductId, Product> = {
 				section: 'Reference',
 				links: [
 					{ label: 'CLI overview', href: '/docs/cli' },
-					{ label: 'agent-brain CLI', href: '/docs/cli/agent-brain' }
+					{ label: 'agent-brain CLI', href: '/docs/cli/agent-brain' },
+					{ label: 'MCP tools', href: '/docs/mcp-tools' },
+					{ label: 'Configuration', href: '/docs/configuration' },
+					{ label: 'Troubleshooting', href: '/docs/troubleshooting' }
 				]
 			}
 		]
@@ -298,11 +303,15 @@ export const products: Record<ProductId, Product> = {
 			},
 			{
 				section: 'Concepts',
-				links: [{ label: 'Workflows and node kinds', href: '/docs/workflows' }, { label: 'Using with agent-brain', href: '/docs/with-agent-brain' }]
+				links: [{ label: 'Workflows and node kinds', href: '/docs/workflows' },
+					{ label: 'Using with agent-brain', href: '/docs/with-agent-brain' },
+					{ label: 'Design decisions', href: '/docs/decisions' }]
 			},
 			{
 				section: 'Reference',
-				links: [{ label: 'agent-spine CLI', href: '/docs/cli/agent-spine' }]
+				links: [{ label: 'agent-spine CLI', href: '/docs/cli/agent-spine' },
+					{ label: 'MCP tools', href: '/docs/mcp-tools' },
+					{ label: 'Troubleshooting', href: '/docs/troubleshooting' }]
 			}
 		]
 	}

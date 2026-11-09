@@ -53,7 +53,7 @@
 				<a href={link.href} class="whitespace-nowrap {path === link.href ? 'text-white' : 'text-zinc-400'}">{link.label}</a>
 			{/each}
 		</nav>
-		<article bind:this={article} class="prose prose-invert max-w-3xl prose-pre:border prose-pre:border-zinc-800 prose-pre:bg-black [&_table]:block [&_table]:overflow-x-auto">
+		<article bind:this={article} class="prose prose-invert max-w-3xl prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-white prose-h1:text-4xl prose-h2:text-2xl prose-h3:text-lg prose-p:leading-relaxed prose-pre:border prose-pre:border-zinc-800 prose-pre:bg-black [&_table]:block [&_table]:overflow-x-auto">
 			{@render children()}
 		</article>
 	</div>

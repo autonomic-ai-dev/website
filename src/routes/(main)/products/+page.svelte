@@ -26,7 +26,7 @@
 		<article class="grid gap-8 rounded-xl border border-zinc-800 bg-black p-8 transition-colors hover:border-zinc-600 md:grid-cols-[1fr_auto] md:items-center md:p-10">
 			<div>
 				<div class="flex flex-wrap items-baseline gap-3">
-					<h2 class="text-2xl font-semibold text-white">{product.name}</h2>
+					<h2 class="text-xl font-semibold text-white">{product.name}</h2>
 					<span class="font-mono text-xs text-zinc-500">{product.version}</span>
 				</div>
 				<p class="mt-2 font-mono text-xs uppercase tracking-widest text-zinc-500">{product.tagline}</p>

@@ -8,7 +8,7 @@ title: Garry Tan gstack Review Engine — Autonomous YC Operating Rigor
     <span>Autonomous SDLC Specification — AGSTACK Framework</span>
   </div>
 
-  <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
+  <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-semibold tracking-tight text-white leading-[1.15]">
     Garry Tan gstack — <br/>
     <span class="text-neutral-400 font-normal">
       Autonomous Review Engine

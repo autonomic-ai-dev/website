@@ -8,7 +8,7 @@ title: The Engineering Invariants That Never Fail — Autonomic AI
     <span>Architectural Specification — Core Invariants</span>
   </div>
 
-  <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-extrabold tracking-tight text-white leading-[1.15]">
+  <h1 class="text-3xl sm:text-4xl lg:text-5xl font-headline font-semibold tracking-tight text-white leading-[1.15]">
     The Engineering Invariants We Follow
   </h1>
 

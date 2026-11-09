@@ -62,7 +62,7 @@
 		{#each list as item (item.product.id)}
 			<a href={item.product.origin} class="group flex flex-col gap-5 rounded-xl border border-zinc-800 bg-black p-8 transition-colors hover:border-zinc-600">
 				<p class="font-mono text-xs uppercase tracking-widest text-zinc-500">{item.product.tagline}</p>
-				<h2 class="text-2xl font-semibold text-white">{item.hook}</h2>
+				<h2 class="text-xl font-semibold text-white">{item.hook}</h2>
 				<p class="text-sm leading-relaxed text-zinc-400">{item.product.subline}</p>
 				<code class="mt-auto font-mono text-xs text-zinc-300">{item.product.install}</code>
 				<span class="inline-flex items-center gap-2 text-sm text-zinc-300 group-hover:text-white">

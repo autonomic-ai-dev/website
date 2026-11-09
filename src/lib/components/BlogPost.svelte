@@ -74,7 +74,7 @@
     <span>← Back to blog</span>
   </a>
 
-  <article class="prose max-w-none">
+  <article class="prose prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-white prose-h2:text-2xl prose-h3:text-lg prose-p:leading-relaxed">
     <div class="not-prose mb-10 pb-6 border-b border-white/[0.08]">
       <div class="flex items-center gap-3 mb-4 flex-wrap">
         <span class="px-2.5 py-0.5 rounded bg-white/[0.04] text-neutral-300 border border-white/10 text-[10px] font-mono font-medium uppercase">
@@ -92,7 +92,7 @@
           </div>
         {/if}
       </div>
-      <h1 class="text-2xl md:text-4xl font-extrabold text-white tracking-tight font-sans leading-tight">
+      <h1 class="text-2xl md:text-4xl font-semibold text-white tracking-tight font-sans leading-tight">
         {data.metadata.title}
       </h1>
     </div>
