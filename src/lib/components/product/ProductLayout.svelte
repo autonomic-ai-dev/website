@@ -33,12 +33,12 @@
 <div class="min-h-screen bg-black font-sans text-zinc-100 antialiased">
 	<a
 		href={product.announce.href}
-		class="group flex items-center justify-center gap-2 border-b border-zinc-900 bg-zinc-950 px-4 py-2 text-center text-xs text-zinc-300 transition-colors hover:text-white"
+		class="group flex items-center justify-center gap-2 border-b border-zinc-900 bg-black px-4 py-2 text-center text-xs text-zinc-300 transition-colors hover:text-white"
 	>
-		<span class="inline-flex h-1.5 w-1.5 rounded-full bg-sky-400"></span>
+		<span class="inline-flex h-1.5 w-1.5 rounded-full bg-white"></span>
 		<span>{product.announce.text}</span>
-		<span class="font-medium text-sky-300">{product.announce.label}</span>
-		<ArrowRight size={12} class="text-sky-300 transition-transform group-hover:translate-x-0.5" />
+		<span class="font-medium text-zinc-200">{product.announce.label}</span>
+		<ArrowRight size={12} class="text-zinc-200 transition-transform group-hover:translate-x-0.5" />
 	</a>
 
 	<header class="sticky top-0 z-40 border-b border-zinc-900/80 bg-black/80 backdrop-blur-md">
@@ -46,6 +46,7 @@
 			<div class="flex items-center gap-3">
 				<a href="/" class="text-sm font-semibold text-white">{product.name}</a>
 				<span class="rounded-full border border-zinc-800 px-2 py-0.5 font-mono text-[11px] text-zinc-400">{product.version}</span>
+					<a href="/" class="rounded-md border border-zinc-800 px-3 py-1 text-sm text-zinc-200 hover:bg-zinc-900">Home</a>
 			</div>
 			<nav class="hidden items-center gap-7 text-sm md:flex">
 				{#each nav as item (item.href)}

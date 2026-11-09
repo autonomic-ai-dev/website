@@ -1,214 +1,373 @@
 ---
-title: agent-spine CLI Reference
+title: agent-spine CLI reference
 ---
 
-# `agent-spine` CLI Reference
+# agent-spine CLI reference
 
-`agent-spine` is a workflow engine for coding agents. It loads declarative YAML workflows of named nodes and edges, runs ready steps concurrently where the workflow forks, appends a snapshot to SQLite after each step, and can use `agent-brain` for routed context with `run --brain`. Workflows may contain cycles.
+Every command below is printed by the `agent-spine` binary. Each block is the output of `agent-spine COMMAND --help` for release 1.0.0-rc3, including the nested subcommands for `brain`, `event` and `agent`. For a short list and the workflow concepts, see the [CLI overview](/docs/cli) and the [workflows](/docs/workflows) page.
 
----
+## Common workflows
 
-## Synopsis
-
-```bash
-agent-spine [OPTIONS] <COMMAND>
-```
-
----
-
-## Global Options
-
-| Flag | Short | Type | Description |
-| :--- | :--- | :--- | :--- |
-| `--help` | `-h` | Boolean | Print help and command usage. |
-| `--version` | `-V` | Boolean | Print installed `agent-spine` version. |
-
----
-
-## Commands
-
-### `run`
-
-Execute a YAML workflow locally.
+Scaffold a built-in workflow, check it, and run it:
 
 ```bash
-agent-spine run [OPTIONS] <WORKFLOW>
-```
-
-#### Arguments
-
-| Argument | Type | Description |
-| :--- | :--- | :--- |
-| `WORKFLOW` | Path | Path to YAML workflow definition file (e.g., `workflow.yaml`). |
-
-#### Options
-
-| Flag | Short | Type | Default | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| `--payload` | `-p` | String | `{}` | Initial JSON input payload passed to the workflow root. |
-| `--db` | `-d` | Path | `~/.autonomic/logs/spine/state.db` | Path to SQLite state database for step snapshot persistence. |
-| `--brain` | `-b` | Boolean | `false` | Enable `agent-brain` routing, rule injection, and step enrichment. |
-| `--meta` | `-m` | String | `None` | Query `agent-brain` to dynamically select the workflow based on prompt. |
-
-#### Examples
-
-```bash
-# Run bugfix workflow with JSON payload
-agent-spine run ~/.autonomic/state/spine/bugfix.yaml \
-  --payload '{"issue_id": "AUT-402", "branch": "fix/memory-leak"}'
-
-# Execute workflow with agent-brain dynamic routing
-agent-spine run ~/.autonomic/state/spine/release.yaml --brain
-
-# Meta-routing: select workflow automatically based on user task
-agent-spine run workflow.yaml --meta "Review open PRs and generate changelog"
-
-# Run workflow with offline budget gating disabled
-AUTONOMIC_BUDGET_GATE=0 agent-spine run workflow.yaml
-```
-
----
-
-### `validate`
-
-Parse and validate a YAML workflow definition against schema rules, budget preconditions, and cyclic dependency checks.
-
-```bash
-agent-spine validate <WORKFLOW>
-```
-
-#### Checks Performed
-
-- Validates YAML syntax and structural types.
-- Validates `budget` blocks (`max_cost_usd`, `max_tokens`) and node preconditions (`budget_headroom`, `quota_available`).
-- Detects cyclic dependencies using Kahn's topological sorting algorithm.
-- Verifies that all referenced tool names exist in the configured MCP servers.
-- Validates timeout values and retry policies.
-
-#### Examples
-
-```bash
-# Validate workflow DAG and preconditions
-agent-spine validate .autonomic/workflows/ci.yaml
-
-# Validate feature release workflow before scheduling
-agent-spine validate workflow.yaml
-```
-
----
-
-### `init`
-
-Initialize `agent-spine` configuration, create state directories, and generate built-in workflow templates.
-
-```bash
-agent-spine init [OPTIONS]
-```
-
-#### Options
-
-| Flag | Short | Type | Default | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| `--force` | `-f` | Boolean | `false` | Skip prerequisite checks (`protoc`, `bun`, `agent-brain`). |
-| `--dir` | `-d` | Path | `~/.autonomic/state/spine` | Target directory for generated workflow files. |
-| `--with` | `-w` | String | `None` | Generate a specific built-in template (`@bugfix`, `@stacked-pr`, `@release-notes`, `@feature-from-spec`, `@mcp-health-check`, or `list`). |
-
-#### Examples
-
-```bash
-# List available built-in workflow templates
-agent-spine init --with list
-
-# Scaffold bugfix workflow
 agent-spine init --with @bugfix
+agent-spine validate bugfix.yaml
+agent-spine run bugfix.yaml -p '{"ticket": "BUG-42"}'
+```
+
+Read the history of a finished run, and recreate its final state:
+
+```bash
+agent-spine inspect <EXECUTION_ID>
+agent-spine replay <EXECUTION_ID>
+```
+
+Run the same workflow with agent-brain routing and check the connection:
+
+```bash
+agent-spine run bugfix.yaml --brain
+agent-spine brain health
 ```
 
 ---
 
-### `inspect`
+### agent-spine init
 
-Inspect the complete historical trace and step outcomes of an execution.
+```text
+Initialize agent-spine: config, example workflow, and prerequisites check
 
-```bash
-agent-spine inspect [OPTIONS] <EXECUTION_ID>
+Usage: agent-spine init [OPTIONS]
+
+Options:
+  -f, --force        Skip prerequisite checks (protoc, bun, agent-brain)
+  -d, --dir <DIR>    Target directory for workflow files (default: ~/.autonomic/state/spine)
+  -w, --with <WITH>  Generate a specific built-in workflow instead of the generic example. Use `--with list` to see available workflows
+  -h, --help         Print help
+
 ```
 
-#### Arguments
+### agent-spine status
 
-| Argument | Type | Description |
-| :--- | :--- | :--- |
-| `EXECUTION_ID` | String | Unique execution UUID. |
+```text
+Display the capabilities planned for the current scaffold
 
-#### Options
+Usage: agent-spine status
 
-| Flag | Short | Type | Default | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| `--db` | `-d` | Path | `~/.autonomic/logs/spine/state.db` | State database file path. |
+Options:
+  -h, --help  Print help
 
----
-
-### `replay`
-
-Replay a past workflow execution from its checkpoints to recreate or verify the final state.
-
-```bash
-agent-spine replay [OPTIONS] <EXECUTION_ID>
 ```
 
----
+### agent-spine doctor
 
-### `serve`
+```text
+Diagnose common setup issues
 
-Start the agent-spine HTTP API and live web DAG visualizer.
+Usage: agent-spine doctor
 
-```bash
-agent-spine serve [OPTIONS]
+Options:
+  -h, --help  Print help
+
 ```
 
-#### Options
+### agent-spine log
 
-| Flag | Short | Type | Default | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| `--port` | `-p` | Integer | `3000` | Port for the Spine HTTP management API. |
-| `--dashboard-port` | — | Integer | `3001` | Port for the web DAG visualization dashboard. |
-| `--db` | `-d` | Path | `~/.autonomic/logs/spine/state.db` | State database path. |
-| `--nats-url` | — | String | `nats://127.0.0.1:4222` | NATS JetStream broker URL for distributed events. |
+```text
+Display daemon logs
 
----
+Usage: agent-spine log [OPTIONS] [NAME]
 
-### `mcp-serve`
+Arguments:
+  [NAME]  Daemon name (e.g. spine) or "all"
 
-Start the Model Context Protocol (MCP) server over standard I/O (stdio).
+Options:
+  -f, --follow  Follow log output (tail -f)
+  -l, --list    List available log files
+  -h, --help    Print help
 
-```bash
-agent-spine mcp-serve [OPTIONS]
 ```
 
-Provides tool interfaces (`spine_submit_workflow`, `spine_list_workflows`, `spine_check_status`) for external agent hosts such as Cursor and Claude Code.
+### agent-spine validate
 
----
+```text
+Parse and validate a YAML workflow definition
 
-### `doctor`
+Usage: agent-spine validate <WORKFLOW>
 
-Diagnose common configuration issues, prerequisite tools, SQLite schema integrity, and NATS broker connectivity.
+Arguments:
+  <WORKFLOW>  Path to a workflow definition file
 
-```bash
-agent-spine doctor
+Options:
+  -h, --help  Print help
+
 ```
 
----
+### agent-spine run
 
-### `log`
+```text
+Execute a YAML workflow locally
 
-Display or tail supervisor logs for the spine daemon.
+Usage: agent-spine run [OPTIONS] <WORKFLOW>
 
-```bash
-agent-spine log [OPTIONS] [NAME]
+Arguments:
+  <WORKFLOW>  Path to a workflow definition file
+
+Options:
+  -p, --payload <PAYLOAD>  Initial JSON payload [default: {}]
+  -d, --db <DB>            Path to SQLite database (default: ~/.autonomic/logs/spine/state.db)
+  -b, --brain              Enable agent-brain routing and enrichment
+  -m, --meta <META>        Enable meta-router: query agent-brain to select the workflow YAML based on this task prompt before execution
+  -h, --help               Print help
+
 ```
 
-#### Options
+### agent-spine inspect
 
-| Flag | Short | Type | Default | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| `--follow` | `-f` | Boolean | `false` | Follow log output (`tail -f`). |
-| `--list` | `-l` | Boolean | `false` | List available log files. |
+```text
+Inspect the history of a specific execution
+
+Usage: agent-spine inspect [OPTIONS] <EXECUTION_ID>
+
+Arguments:
+  <EXECUTION_ID>  Execution ID to inspect
+
+Options:
+  -d, --db <DB>  Path to SQLite database
+  -h, --help     Print help
+
+```
+
+### agent-spine replay
+
+```text
+Replay an execution to recreate its final state
+
+Usage: agent-spine replay [OPTIONS] <EXECUTION_ID>
+
+Arguments:
+  <EXECUTION_ID>  Execution ID to replay
+
+Options:
+  -d, --db <DB>  Path to SQLite database
+  -h, --help     Print help
+
+```
+
+### agent-spine brain
+
+```text
+Interact with the agent-brain MCP server
+
+Usage: agent-spine brain <COMMAND>
+
+Commands:
+  health  Check if agent-brain is reachable
+  route   Send a route_task query and show the response
+  status  Show agent-brain index and status info
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+
+```
+
+### agent-spine event
+
+```text
+Event bus operations
+
+Usage: agent-spine event <COMMAND>
+
+Commands:
+  serve  Start the event bus server
+  pub    Publish an event to the bus
+  sub    Subscribe to events from the bus (prints to stdout as JSON)
+  help   Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+
+```
+
+### agent-spine agent
+
+```text
+Agent registry operations
+
+Usage: agent-spine agent <COMMAND>
+
+Commands:
+  list      List registered agents
+  register  Register an agent with the bus
+  info      Get info about a specific agent
+  help      Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+
+```
+
+### agent-spine update
+
+```text
+Check for and apply updates
+
+Usage: agent-spine update [OPTIONS]
+
+Options:
+  -f, --force  Apply update even if already at latest version
+  -h, --help   Print help
+
+```
+
+### agent-spine mcp-serve
+
+```text
+Serve the MCP stdio server for workflow management
+
+Usage: agent-spine mcp-serve [OPTIONS]
+
+Options:
+  -d, --db <DB>  Path to SQLite database (default: ~/.autonomic/logs/spine/state.db)
+  -h, --help     Print help
+
+```
+
+### agent-spine serve
+
+```text
+Serve the Live Dashboard API
+
+Usage: agent-spine serve [OPTIONS]
+
+Options:
+  -d, --db <DB>
+          Path to SQLite database
+  -p, --port <PORT>
+          Port to listen on [default: 3000]
+      --dashboard-port <DASHBOARD_PORT>
+          Dashboard HTTP port (defaults to port + 1) [default: 3001]
+      --nats-url <NATS_URL>
+          NATS URL for JetStream event sourcing (or set AUTONOMIC_NATS_URL)
+  -h, --help
+          Print help
+
+```
+
+### agent-spine brain health
+
+```text
+error: unrecognized subcommand 'brain health'
+
+  tip: a similar subcommand exists: 'brain'
+
+Usage: agent-spine <COMMAND>
+
+For more information, try '--help'.
+
+```
+
+### agent-spine brain route
+
+```text
+error: unrecognized subcommand 'brain route'
+
+  tip: a similar subcommand exists: 'brain'
+
+Usage: agent-spine <COMMAND>
+
+For more information, try '--help'.
+
+```
+
+### agent-spine brain status
+
+```text
+error: unrecognized subcommand 'brain status'
+
+  tip: a similar subcommand exists: 'brain'
+
+Usage: agent-spine <COMMAND>
+
+For more information, try '--help'.
+
+```
+
+### agent-spine event serve
+
+```text
+error: unrecognized subcommand 'event serve'
+
+  tip: a similar subcommand exists: 'event'
+
+Usage: agent-spine <COMMAND>
+
+For more information, try '--help'.
+
+```
+
+### agent-spine event pub
+
+```text
+error: unrecognized subcommand 'event pub'
+
+  tip: a similar subcommand exists: 'event'
+
+Usage: agent-spine <COMMAND>
+
+For more information, try '--help'.
+
+```
+
+### agent-spine event sub
+
+```text
+error: unrecognized subcommand 'event sub'
+
+  tip: a similar subcommand exists: 'event'
+
+Usage: agent-spine <COMMAND>
+
+For more information, try '--help'.
+
+```
+
+### agent-spine agent list
+
+```text
+error: unrecognized subcommand 'agent list'
+
+  tip: a similar subcommand exists: 'agent'
+
+Usage: agent-spine <COMMAND>
+
+For more information, try '--help'.
+
+```
+
+### agent-spine agent register
+
+```text
+error: unrecognized subcommand 'agent register'
+
+  tip: a similar subcommand exists: 'agent'
+
+Usage: agent-spine <COMMAND>
+
+For more information, try '--help'.
+
+```
+
+### agent-spine agent info
+
+```text
+error: unrecognized subcommand 'agent info'
+
+  tip: a similar subcommand exists: 'agent'
+
+Usage: agent-spine <COMMAND>
+
+For more information, try '--help'.
+
+```

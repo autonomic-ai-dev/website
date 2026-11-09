@@ -1,546 +1,562 @@
 ---
-title: agent-brain CLI Reference
+title: agent-brain CLI reference
 ---
 
-# `agent-brain` CLI Reference
+# agent-brain CLI reference
 
-`agent-brain` is the local context, memory, and MCP router for the Autonomic ecosystem. It features an embedded SQLite vector database with HNSW indexing, an upstream Model Context Protocol (MCP) tool gateway, curated skill package management, and turn-by-turn prompt routing.
+Every command below is printed by the `agent-brain` binary. Each block is the output of `agent-brain COMMAND --help` for release 1.0.0-rc8, so flags and examples match what you see in your terminal. For a short list, see the [CLI overview](/docs/cli).
 
----
+## Common workflows
 
-## Synopsis
+Install, connect your editors, and check the install:
 
 ```bash
-agent-brain [OPTIONS] <COMMAND>
+brew tap autonomic-ai-dev/tap
+brew install agent-brain
+agent-brain install --global
+agent-brain doctor
 ```
 
-When invoked without subcommands, `agent-brain` defaults to launching the stdio MCP server for agent hosts.
-
----
-
-## Global Options
-
-| Flag | Short | Type | Description |
-| :--- | :--- | :--- | :--- |
-| `--help` | `-h` | Boolean | Display command syntax, available subcommands, or help for a specific command. |
-| `--version` | `-V` | Boolean | Print the installed `agent-brain` version and exit. |
-
----
-
-## Command Groups
-
-```mermaid
-flowchart LR
-    Root["agent-brain"] --> Common["Common"]
-    Root --> Pkg["Packages & MCP"]
-    Root --> Config["Configuration"]
-    Root --> Memory["Memory & Sync"]
-    Root --> Ops["Operations"]
-    Root --> Extras["Extras (Advanced)"]
-
-    Common --> serve["serve · install · doctor · briefing"]
-    Pkg --> package["package add/list/update/remove\nmcp add/list/sync/test\nregistry list/sync"]
-    Config --> config["config init/show · mode · secrets"]
-    Memory --> sync["sync git/cloud · export/import · gc"]
-    Ops --> ops["stats · dashboard · inspect · learn · verify"]
-    Extras --> extras["graphify · distill · dataset · eval · grpc"]
-
-    classDef default fill:#0d0d0d,stroke:#333333,stroke-width:1px,color:#f4f4f5;
-```
-
----
-
-## Common Commands
-
-### `serve`
-
-Start the MCP server over standard input/output (`stdio`).
+Record a verify run for the current commit, then read the receipt. Exit status is 0 only when the receipt says PASSED:
 
 ```bash
-agent-brain serve
+agent-brain verify -- cargo test
+agent-brain verify receipt --markdown
 ```
 
-> [!NOTE]
-> Agent hosts (Cursor, Claude Desktop, Antigravity) launch `agent-brain serve` automatically. Manual execution is typically reserved for debugging via the MCP Inspector.
-
----
-
-### `install`
-
-Configure MCP connections and editor hooks for supported agent hosts.
+Add a skill package and check what is installed:
 
 ```bash
-agent-brain install [OPTIONS]
+agent-brain package add @matt-skills
+agent-brain package list
 ```
 
-#### Options
-
-| Flag | Type | Description |
-| :--- | :--- | :--- |
-| `--global` | Boolean | Install into global/user editor directories instead of workspace level. |
-| `--reload` | Boolean | Refresh Cursor MCP entry signature after updating the binary. |
-| `--claude-desktop` | Boolean | Configure Claude Desktop (`claude_desktop_config.json`). |
-| `--vscode` | Boolean | Configure VS Code (`.vscode/mcp.json`). |
-| `--claude-code` | Boolean | Configure Claude Code CLI (`~/.claude.json`). |
-| `--opencode` | Boolean | Configure OpenCode (`opencode.json`). |
-| `--codex` | Boolean | Configure Codex (`config.toml` + `hooks.json`). |
-| `--gemini` | Boolean | Configure Gemini CLI (`settings.json`). |
-| `--antigravity` | Boolean | Configure Google Antigravity (`mcp_config.json`). |
-| `--all` | Boolean | Install across all detected editor platforms simultaneously. |
-| `--starter` | Boolean | Automatically install the `@starter` skill pack during setup. |
-
-#### Examples
-
-```bash
-# Global configuration across all supported editors
-agent-brain install --all --global
-
-# Install with starter skills for Cursor
-agent-brain install --global --starter
-```
-
----
-
-### `doctor`
-
-Audit the local installation, binary codesigning, and MCP client configurations.
-
-```bash
-agent-brain doctor [OPTIONS]
-```
-
-#### Options
-
-| Flag | Type | Description |
-| :--- | :--- | :--- |
-| `--fix` | Boolean | Re-sign macOS binary, align `mcp.json`, and regenerate hook symlinks. |
-
----
-
-### `briefing`
-
-Print the last human-readable routing summary (`~/.agent_brain/logs/last-route.md`).
+Read the last route summary and the local metrics:
 
 ```bash
 agent-brain briefing
-```
-
-Outputs the exact memory items, verified skills, and prompt additions selected for the most recent user turn.
-
----
-
-### `onboarding`
-
-Print the getting-started checklist and verification workflow.
-
-```bash
-agent-brain onboarding
+agent-brain stats --days 7
 ```
 
 ---
 
-## Package & MCP Commands
+### agent-brain serve
 
-### `package`
+```text
+Usage:  agent-brain serve
 
-Manage installed skill packs, domain rules, and workflow definitions.
+Start the MCP server on stdio.
 
-```bash
-agent-brain package <COMMAND>
+Cursor (and other hosts) launch this automatically after install —
+you usually do not run serve yourself.
+
 ```
 
-#### Subcommands
+### agent-brain install
 
-| Subcommand | Syntax | Description |
-| :--- | :--- | :--- |
-| `add` | `agent-brain package add <source> [--ref <ref>] [--no-index]` | Install a package from `@alias`, `owner/repo`, or GitHub URL. |
-| `list` | `agent-brain package list` | List all installed packages and local filesystem locations. |
-| `update` | `agent-brain package update [name]` | Update a single package, or all packages if name is omitted. |
-| `remove` | `agent-brain package remove <name>` | Delete an installed package and purge indexed vectors from SQLite. |
+```text
+Usage:  agent-brain install [OPTIONS]
 
-#### Options for `package add`
+Configure MCP + hooks for an editor host.
 
-| Flag | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `--ref` | String | `main` | Git branch, tag, or commit hash to check out. |
-| `--no-index` | Boolean | `false` | Clone package repository without immediately re-indexing vector embeddings. |
+Options:
+      --global              User/global scope (where supported)
+      --reload              Refresh Cursor MCP entry after install
+      --claude-desktop      Claude Desktop MCP config
+      --vscode              VS Code mcp.json (workspace or --global)
+      --claude-code         Claude Code .mcp.json / ~/.claude.json
+      --opencode            OpenCode opencode.json
+      --codex               Codex config.toml + hooks.json
+      --gemini              Gemini CLI settings.json
+      --antigravity         Antigravity mcp_config.json
+      --all                 All of the above (user/global scope)
+      --starter             Also install the @starter pack
 
-#### Examples
+Examples:
+  agent-brain install --global
+  agent-brain install --all --global
+  agent-brain install --claude-code --global
 
-```bash
-# Canonical package installation
-agent-brain package add @agstack
-agent-brain package add @starter
-agent-brain package add anthropics/skills --ref v2.0
-agent-brain package list
-agent-brain package remove starter
 ```
 
-> [!TIP]
-> `agent-brain add <pkg>` is fully supported as a convenient top-level alias for `agent-brain package add`.
+### agent-brain doctor
 
----
+```text
+Usage:  agent-brain doctor [OPTIONS]
 
-### `mcp`
+Check MCP install, binary, hooks, and codesign.
 
-Manage external upstream Model Context Protocol (MCP) servers, tool indexing, and schemas directly through `agent-brain`.
+Options:
+      --fix       Re-sign binary (macOS), align mcp.json, refresh hooks
 
-```bash
-agent-brain mcp <COMMAND>
 ```
 
-#### Subcommands
+### agent-brain package
 
-| Subcommand | Syntax | Description |
-| :--- | :--- | :--- |
-| `list` | `agent-brain mcp list` | Display all registered servers, active status, and discovered tool counts. |
-| `add` | `agent-brain mcp add <name> [--env KEY=VAL] -- <cmd> [args...]` | Register an external MCP server and index its tools into SQLite. |
-| `remove` | `agent-brain mcp remove <name>` | Unregister an upstream MCP server and purge its tools from vector memory. |
-| `sync` | `agent-brain mcp sync` | Re-query all registered servers and refresh vector tool embeddings. |
-| `test` | `agent-brain mcp test <name>` | Probe stdio connection and print tool schemas with descriptions. |
+```text
+Usage:  agent-brain package COMMAND [OPTIONS]
 
-#### Examples
+Manage installed skill and prompt packages.
 
-```bash
-# Register GitHub MCP server
-agent-brain mcp add github -- npx -y @modelcontextprotocol/server-github
+Commands:
+  add <source> [--ref <git_ref>] [--no-index]
+                    Install a package (@alias, owner/repo, or GitHub URL)
+  list              List all installed packages and their local paths
+  update [name]     Update one package, or all if name omitted
+  remove <name>     Remove an installed package and purge indexed items
 
-# Register Postgres MCP server with environment variables
-agent-brain mcp add postgres --env DATABASE_URL=postgres://localhost:5432/app -- npx -y @modelcontextprotocol/server-postgres
+Examples:
+  agent-brain package add @matt-skills
+  agent-brain package add anthropics/skills
+  agent-brain package list
+  agent-brain package remove matt-skills
 
-# Register Linear remote MCP server with OAuth proxy
-agent-brain mcp add linear -- npx -y mcp-remote https://mcp.linear.app/mcp
-
-# Probe connection and view available tools
-agent-brain mcp test github
-
-# Test upstream connectivity and verify argument schema for a specific tool
-agent-brain mcp test linear --tool save_issue
-
-# Refresh tool catalog and index tool descriptions into vector memory
-agent-brain mcp sync
-
-# Display turn telemetry token usage and prompt cache savings
-agent-brain stats --telemetry
 ```
 
----
+### agent-brain mcp
 
-### `registry`
+```text
+Usage:  agent-brain mcp COMMAND [OPTIONS]
 
-Explore and synchronize curated community `@aliases`.
+Manage upstream MCP servers, dynamic tool indexing, and schemas.
 
-```bash
-agent-brain registry <COMMAND>
+Commands:
+  list                          List registered MCP servers, statuses, and tool counts
+  add <name> -- <cmd> [args...] Register a new upstream MCP server and index its tools
+  remove <name>                 Remove a registered MCP server and purge its tools
+  sync                          Re-query all servers and refresh vector tool catalog
+  test <name>                   Probe connection and list available tool schemas
+
+Examples:
+  agent-brain mcp add github -- npx -y @modelcontextprotocol/server-github
+  agent-brain mcp add postgres --env=DATABASE_URL=postgres://... -- npx -y @modelcontextprotocol/server-postgres
+  agent-brain mcp list
+  agent-brain mcp test github
+  agent-brain mcp sync
+
 ```
 
-#### Subcommands
+### agent-brain index
 
-| Subcommand | Syntax | Description |
-| :--- | :--- | :--- |
-| `list` | `agent-brain registry list [--kind KIND]` | List curated packages, utilities, and workflows (`--kind skill_package\|utility\|workflow`). |
-| `sync` | `agent-brain registry sync` | Dynamically pull the central registry (`agent-registry`) into local cache, update package manifests, and automatically index workflows into SQLite. |
+```text
+Usage:  agent-brain index [OPTIONS]
 
-#### Examples
+Reindex skills, rules, and memory from installed packages + home.
 
-```bash
-# Sync central registry repository and auto-index workflows into SQLite
-agent-brain registry sync
+Options:
+  -c, --changed-only   Skip files whose mtime is unchanged
+      --no-ast         Skip AST symbol extraction
 
-# List all available curated items
-agent-brain registry list
-
-# List only available workflows
-agent-brain registry list --kind workflow
-
-# Install the gold-standard agstack engineering package
-agent-brain package add @agstack
 ```
 
-> [!NOTE]
-> `agent-brain registry sync` automatically executes vector indexing across all discovered workflow files (`workflows/*.yaml`) without requiring a separate manual indexing command. Packages like `@agstack` are decoupled from binary compilation and downloaded on demand to keep binary sizes minimal.
+### agent-brain briefing
 
----
+```text
+Usage:  agent-brain briefing
 
-## Configuration Commands
+Print the last human-readable route summary
+(~/.agent_brain/logs/last-route.md).
 
-### `config`
-
-Manage the core configuration at `~/.agent_brain/config.yaml`.
-
-```bash
-agent-brain config <init|show>
 ```
 
-- `init`: Generates clean configuration defaults with sensible token limits and paths.
-- `show`: Prints active configuration values and file resolution path.
+### agent-brain onboarding
 
----
+```text
+Usage:  agent-brain onboarding
 
-### `mode`
+Print the USP tagline and a 5-minute getting-started checklist.
 
-Inspect and install editor mode snippets.
-
-```bash
-agent-brain mode <paths|show|install> [--global]
 ```
 
-- `paths`: Output file paths for system prompt injection across editors.
-- `show`: Output the Autonomic system prompt rules markdown to stdout.
-- `install`: Synchronize system prompt files across all supported IDEs.
+### agent-brain version
 
----
+```text
+Usage:  agent-brain version
+        agent-brain --version
 
-### `secrets`
+Print the installed agent-brain version.
 
-Manage macOS Keychain secret references for upstream MCP servers.
-
-```bash
-agent-brain secrets <status|setup|add>
 ```
 
-- `status`: Show configured keychain references without leaking values.
-- `setup`: Interactive guided prompt for missing upstream API tokens.
-- `add <name> <value>`: Store a secret securely in the OS keychain.
+### agent-brain config
 
----
+```text
+Usage:  agent-brain config COMMAND
 
-## Memory & Synchronization Commands
+Commands:
+  init    Write ~/.agent_brain/config.yaml defaults
+  show    Print the active config file path / contents
 
-### `sync`
-
-Distributed context synchronization via Git or encrypted cloud storage.
-
-```bash
-agent-brain sync <COMMAND>
 ```
 
-#### Subcommands
+### agent-brain mode
 
-| Subcommand | Description |
-| :--- | :--- |
-| `status` | Summary of sync state, remote commit, and unresolved conflicts. |
-| `restore <conflict_id>` | Re-promote a discarded fact from `conflict_log`. |
-| `git init [--remote URL]` | Initialize `~/.agent_brain/sync` local Git repository. |
-| `git clone --remote URL` | Clone context repository on a secondary developer machine. |
-| `git push` | Export state bundle, commit, and push to remote. |
-| `git pull` | Pull remote bundle, merge facts, and re-index vector space. |
-| `cloud push\|pull` | Encrypted S3/R2/MinIO cloud sync. |
+```text
+Usage:  agent-brain mode COMMAND
 
----
+Commands:
+  paths                 List mode files per host
+  show                  Print the mode snippet (markdown)
+  install [--global]    Install mode files for all hosts
 
-### `memory`
-
-Observe, extract, and maintain the vector knowledge graph.
-
-```bash
-agent-brain memory <COMMAND>
 ```
 
-#### Subcommands
+### agent-brain update
 
-| Subcommand | Options | Description |
-| :--- | :--- | :--- |
-| `gc` | `[--apply] [--force] [--stale-days N]` | Archive stale, unreferenced memory facts (dry-run by default; `--apply` writes). |
-| `observe` | — | Run observation pass over recent turn interactions. |
-| `extract` | — | Extract candidate skills and invariant facts from execution traces. |
+```text
+Usage:  agent-brain update [OPTIONS]
 
----
+Run auto-update (release redirect; API fallback uses GITHUB_TOKEN/GH_TOKEN).
 
-### `suggest-memory`
+Options:
+      --force       Force update even if already current
+      --mcp-only    Only refresh MCP / hook wiring
 
-Review and promote pending hook anti-pattern suggestions into durable memory.
-
-```bash
-agent-brain suggest-memory [approve|reject]
 ```
 
----
+### agent-brain secrets
 
-### `promote`
+```text
+Usage:  agent-brain secrets COMMAND
 
-Human approval gate for newly generated skills before inclusion in routing.
+Keychain secret refs for upstream MCP.
 
-```bash
-agent-brain promote <list|approve|reject> <staging_id>
+Commands:
+  status              Show configured secret refs
+  setup               Interactive setup for missing secrets
+  add <name> <value>  Store a secret in the keychain
+
 ```
 
----
+### agent-brain export
 
-## Memory Facts
+```text
+Usage:  agent-brain export [dir]
 
-Read, write, and import facts from the shell. These commands use the same store as the MCP tools, so a fact written here is visible to every connected host.
+Export a sync bundle (manifest + facts.jsonl).
+Default dir: ~/.agent_brain/export/
 
-### `recall`
-
-Read stored facts, by text, tag, or meaning.
-
-```bash
-agent-brain recall [QUERY WORDS] [--tag TAG ...] [--limit N] [--since 30d|12h|90m] [--semantic] [--min-score F] [--json]
 ```
 
-- Without a query, facts come back newest first with score `null`.
-- With a query, facts sharing a token with it are scored by token overlap.
-- `--semantic` embeds the query and scores facts by cosine similarity. `--min-score` keeps only close matches.
-- Tags match a fact's topic or any of its tags. `--limit` is 1 to 200, default 20. Empty results print `[]` with exit 0.
+### agent-brain import
 
-```bash
-agent-brain recall "release notes" --tag posted --since 30d --semantic --min-score 0.8
+```text
+Usage:  agent-brain import <dir> [--policy POLICY]
+
+Import a sync bundle.
+
+Options:
+      --policy POLICY   Conflict policy (default: newer_wins)
+
 ```
 
----
+### agent-brain sync
 
-### `remember`
+```text
+Usage:  agent-brain sync COMMAND
 
-Store one fact.
+Git / cloud sync and conflict restore.
 
-```bash
-agent-brain remember --text TEXT --tag TAG [--tag TAG ...] [--source SOURCE]
+Commands:
+  status                      Git sync + recent conflicts summary
+  restore <conflict-id>       Re-promote a fact from conflict_log
+  git init [--remote URL]     Init ~/.agent_brain/sync git repo
+  git clone [--remote URL]    Clone sync repo on a second machine
+  git push                    Export bundle, commit, push
+  git pull                    Pull and import bundle
+  git status                  Show git sync repo state
+  cloud push|pull             Encrypted cloud sync (S3 / local)
+
 ```
 
-- The first tag becomes the fact's topic, and every tag is recorded.
-- Secret-shaped text and text over 20,000 characters are refused.
-- Text that is already stored returns the existing id with `deduplicated: true`.
+### agent-brain sessions
 
----
+```text
+Usage:  agent-brain sessions COMMAND
 
-### `import-corpus`
+Commands:
+  ingest [--source SRCS] [--legacy]
+      Import session digests (cursor,codex,gemini,opencode)
+  status
+      Discoverable vs stored session digests
 
-Store every paragraph of a folder of Markdown files.
+Options:
+      --source SRCS   Comma-separated sources (default: all known)
+      --legacy        Include legacy digest paths
 
-```bash
-agent-brain import-corpus DIR --tag TAG [--tag TAG ...]
 ```
 
-- Paragraphs are split on blank lines. Each fact's source is `FILE#paragraph-N`, so a reviewer can open the original.
-- Paragraphs already stored, matched by content hash, are skipped. Running the same import twice creates no new facts.
-- Secret-shaped and over-long paragraphs are counted in the report and not stored.
+### agent-brain bootstrap
 
----
+```text
+Usage:  agent-brain bootstrap [--remote URL] [--skip-install]
 
-## Extensions & Memorable
+Join this device to a shared sync repo. Without --remote, uses sync.git.remote from config.yaml.
 
-### `ext`
-
-Install optional subcommands from the agent-registry. Each extension is a separate executable, so the core binary stays small.
-
-```bash
-agent-brain ext list
-agent-brain ext add <NAME>
-agent-brain ext remove <NAME>
 ```
 
-- `ext add` downloads the build for this platform, checks its SHA-256 against the registry manifest, and installs it under the brain home.
-- An installed extension runs as a subcommand, for example `agent-brain bench` after `agent-brain ext add bench`.
+### agent-brain memory
 
----
+```text
+Usage:  agent-brain memory COMMAND
 
-### `memorable`
+Commands:
+  gc [--apply] [--force] [--stale-days N] [--very-stale-days N]
+      Archive stale facts (dry-run by default; pass --apply to write)
+  observe
+      Run observation pass over recent activity
+  extract
+      Explain / extract pending traces
 
-Control the opt-in Memorable integration. It is off by default, and nothing leaves the machine until you enable it.
+See also: agent-brain gc
 
-```bash
-agent-brain memorable [status | enable [--capture] | capture <trace.json> | disable]
 ```
 
-- `enable` registers Memorable's read-only MCP server. Run `agent-brain mcp sync` to index it. Traces stay on the machine.
-- `enable --capture` also allows `capture`, which sends a session trace to Memorable's extraction service. Capture refuses unless the repository's last `agent-brain verify` passed. Use it only when you accept that trace leaving the machine.
-- `disable` turns both off.
+### agent-brain gc
 
----
+```text
+Usage:  agent-brain gc [OPTIONS]
 
-## Operations & Diagnostics
+Run DB garbage collection: dedup, prune, vacuum.
 
-### `stats`
+Options:
+      --min-confidence N   Drop facts below this confidence
+      --max-age-days N     Age hint for prune (reserved)
 
-Local retrieval, turn routing, and vector latency metrics.
+See also: agent-brain memory gc
 
-```bash
-agent-brain stats [OPTIONS]
 ```
 
-#### Options
+### agent-brain suggest-memory
 
-| Flag | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `--days` | Integer | `7` | Lookback window in days. |
-| `--json` | Boolean | `false` | Output metrics in structured JSON for automation. |
-| `--markdown` | Boolean | `false` | Print a shareable summary of measured figures only, for a weekly update. Estimated savings are left out. |
+```text
+Usage:  agent-brain suggest-memory [approve|reject]
 
----
+Show or promote a pending hook anti-pattern suggestion
+into store_memory.
 
-### `dashboard`
+Commands:
+  (default)   Show pending suggestion
+  approve     Commit suggestion as memory
+  reject      Discard pending suggestion
 
-Generate a local HTML metrics dashboard presenting tokens saved via knapsack packing, dangerous/unscouted blocks, and verified recipes auto-promoted.
-
-```bash
-agent-brain dashboard [--days N] [--open]
 ```
 
----
+### agent-brain promote
 
-### Procedure recall (MCP tool)
+```text
+Usage:  agent-brain promote COMMAND
 
-There is no `recall-procedures` CLI command. Procedure recall is the `recall_procedures` MCP tool, which an agent host calls with `query`, `task_kind` and `limit`. It walks the procedure graph and returns execution sequences that worked for similar tasks.
+Skill promotion workflow (human approval required).
 
----
+Commands:
+  list [--status pending|approved|rejected]
+  approve <staging-id>
+  reject <staging-id>
 
-### `inspect`
-
-Deep inspection of internal SQLite tables, vector retrievals, and facts.
-
-```bash
-agent-brain inspect <COMMAND>
 ```
 
-- `inspect log [--last] [--limit N]`: Inspect turn route decisions and token usage.
-- `inspect fact <id>`: View raw JSON attributes and vector embeddings of a stored fact.
-- `inspect conflicts [--limit N]`: Inspect superseded memories and conflict logs.
+### agent-brain recall
 
----
+```text
+Usage: agent-brain recall [QUERY WORDS] [--tag TAG ...] [--limit N] [--since 30d|12h|90m] [--semantic] [--min-score F] [--json]
 
-### `learn`
-
-Ingest documentation websites into local skills and memory.
-
-```bash
-agent-brain learn url <HTTPS_URL> [--topic NAME] [--dry-run]
-agent-brain learn allowlist
+Read stored facts. Tags match a fact's topic or any of its tags.
+Without a query, facts come back newest first with score null.
+With a query, facts sharing a token with it come back scored by token overlap.
+With --semantic, the query is embedded and facts are scored by cosine similarity
+against their stored embeddings. Use --min-score to keep only close matches
+(for repeat checks, for example `recall "<topic>" --tag posted --since 30d --semantic --min-score 0.8`).
+Empty results print [] with exit 0. --limit is 1 to 200, default 20.
+Conventional tags: voice (writing samples), posted (approved posts), project.
 ```
 
-Crawls documentation URLs against the configured `docs.allowed_domains`, extracts markdown content, and generates indexed reference skills.
+### agent-brain remember
 
----
+```text
+Usage: agent-brain remember --text TEXT --tag TAG [--tag TAG ...] [--source SOURCE]
 
-### `verify`
-
-Run an allowlisted verification script and record a trusted outcome into memory.
-
-```bash
-agent-brain verify [OPTIONS] -- <COMMAND...>
-agent-brain verify init [--dir DIR]
-agent-brain verify receipt [--project DIR] [--markdown|--json]
-agent-brain verify record --exit CODE [OPTIONS] -- <SUMMARY...>
+Store one fact. The first tag becomes its topic, and every tag is recorded.
+The text is embedded with the same model as MCP writes. Secret-shaped text and
+text over 20,000 characters are refused. Text that is already stored returns the
+existing id with deduplicated true. There is no word cap for shell writes.
+Conventional tags: voice (writing samples), posted (approved posts), project.
 ```
 
-`verify init` writes the agstack verification layout under `.verify/`: `verify.toml` (the allowlist), `run.sh`, and `artifacts/` and `functional/` folders. `run.sh` runs its phases in order: doctor, unit, static and functional. It skips a phase the repository lacks and says so. Each run writes a `summary.txt` and one log per phase under `.verify/artifacts/<RUN_ID>/`. Run the whole suite with `agent-brain verify -- .verify/run.sh`, or one feature with `agent-brain verify -- .verify/run.sh <feature>`.
+### agent-brain import-corpus
 
-`verify receipt` reports `PASSED`, `FAILED` or `NOT VERIFIED` for the current commit and code state. It exits 0 only when the verdict is `PASSED`. A receipt counts only runs that `verify --` executed, and a run from another commit or an edited tree does not count. `--markdown` prints a block to paste into a pull request.
+```text
+Usage: agent-brain import-corpus DIR --tag TAG [--tag TAG ...]
 
-Pass `--save-artifact` to keep the command's full output. It is written to `${AUTONOMIC_HOME:-~/.autonomic}/artifacts/<project>/<report-id>.log`, and the path is printed to stderr. Without the flag, no log is written.
+Store each paragraph of every *.md file under DIR. Paragraphs are split on blank
+lines, and each fact's source is FILE#paragraph-N. Paragraphs already stored
+(by content hash) are skipped. Secret-shaped and over-long paragraphs are
+counted in the report and not stored.
+```
 
----
+### agent-brain stats
 
-## Extras (`--features extras`)
+```text
+Usage:  agent-brain stats [OPTIONS]
 
-Advanced tools compiled when building with `--features extras`:
+Local index / routing / latency metrics (not product ROI claims).
 
-| Command | Purpose |
-| :--- | :--- |
-| `dataset` | Export execution trajectories into JSONL format for LoRA training. |
-| `digest` | Generate weekly operator summary digest of agent activity. |
-| `eval` | Recall benchmark gates (`Recall@3`, BEAM memory tests). |
-| `bench` | Moved out of the core binary. Install with `agent-brain ext add bench`. |
-| `distill` | Perform semantic clustering over memory nodes to merge redundant facts. |
-| `graphify` | Build codebase entity-relationship graphs from AST symbols. |
-| `grpc` | Launch high-performance gRPC orchestrator bridge. |
+Options:
+      --days N    Lookback window (default: 7)
+      --json      Machine-readable JSON
+      --markdown  Shareable summary of measured figures only, for a weekly update
+
+```
+
+### agent-brain dashboard
+
+```text
+Usage:  agent-brain dashboard [OPTIONS]
+
+Write a local HTML metrics page (routes, latency, activity).
+
+Options:
+      --days N    Lookback window (default: 7)
+      --open      Open the HTML file in the default browser
+
+```
+
+### agent-brain inspect
+
+```text
+Usage:  agent-brain inspect COMMAND
+
+Commands:
+  log [--last] [--limit N]   List retrieval logs (route_task output)
+  fact <id>                  Show a stored memory fact
+  conflicts [--limit N]      Topic supersession conflict log
+
+```
+
+### agent-brain learn
+
+```text
+Usage:  agent-brain learn COMMAND
+
+Ingest allowlisted docs into skills + memory.
+
+Commands:
+  url <https-url> [--topic NAME] [--dry-run]
+  allowlist | domains
+      Show docs.allowed_domains from config
+
+```
+
+### agent-brain log
+
+```text
+Usage:  agent-brain log <name> [--follow]
+        agent-brain log --list
+
+Print or follow a named log under the agent-brain home.
+
+Options:
+      --follow    Tail the log
+      --list      List available logs
+
+```
+
+### agent-brain verify
+
+```text
+Usage:  agent-brain verify [OPTIONS] -- <cmd> [args...]
+        agent-brain verify init [--force] [--dir <DIR>]
+        agent-brain verify record --exit N [OPTIONS] -- <cmd summary...>
+        agent-brain verify run [--project <DIR>] [--json]
+        agent-brain verify receipt [--project <DIR>] [--markdown|--json]
+
+Run an allowlisted verification command and record trusted outcome.
+
+Subcommands:
+  init                  Initialize .verify/ directory with verify.toml and run.sh template
+  record                Record already-known exit code without executing
+  run                   Run the [verify.default] step declared in verify.toml, with its timeout
+  receipt               Show whether the current commit and code state passed its verify run.
+                        Exit 0 only when PASSED. --markdown prints a block to paste into a PR.
+
+Options:
+      --source <SOURCE>    Outcome source: cli (default) or orchestrator (spine/muscle)
+      --config <PATH>      Path to config to hash for drift detection
+      --scenarios <DIR>    Path to scenario dir (defaults to .verify/ in ancestor)
+      --route-log-id <ID>  Route log ID that prompted this verification
+      --cause <TAG>        Failure cause tag (defaults to cmd if exit non-zero)
+      --force              Overwrite existing .verify files during init
+      --dir <DIR>          Target project directory for init (defaults to cwd)
+
+Allowlist:
+  Configured in .verify/verify.toml or verify.toml under project root.
+  Default fallback matches common test runners (cargo test, pytest, make test, .verify/).
+
+```
+
+### agent-brain report
+
+```text
+Usage:  agent-brain report
+
+Print the verify report by source.
+
+```
+
+### agent-brain status
+
+```text
+Usage:  agent-brain status
+
+Show brain status for the current directory.
+
+```
+
+### agent-brain rules
+
+```text
+Usage:  agent-brain rules [list | add KEY=VALUE... | remove ID | reset]
+
+Command rules for the Bash gate. Run these yourself; agents cannot change rules.
+
+```
+
+### agent-brain ext
+
+```text
+Usage:  agent-brain ext [list | add NAME | remove NAME]
+
+Install or remove an extension.
+
+```
+
+### agent-brain memorable
+
+```text
+Usage:  agent-brain memorable [status | enable [--capture] | disable | list | capture TRACE.json | capture-transcript ...]
+
+Optional Memorable integration. With --capture, verified sessions are sent to Memorable's extraction service.
+
+```
+
+### agent-brain feature-graph
+
+```text
+Usage:  agent-brain feature-graph [DIR]
+
+Print the feature maps as a JSON graph of nodes, sub-features, code
+paths, and [[wikilink]] edges. DIR defaults to .verify/features.
+
+```
+
+## Extensions
+
+`agent-brain ext` installs and removes extensions. An extension adds commands that the core binary does not ship on its own.
+
+```text
+agent-brain ext list          # show installed extensions
+agent-brain ext add NAME      # install an extension by name
+agent-brain ext remove NAME   # remove an installed extension
+```
+
+The help text names `graphify`, a codebase graph, as installed with `agent-brain ext add graphify`. The bench extension provides `eval`, the recall gates. Commands that reach `https://skills.sh`, such as the `skills-sh` refresh, do so only when you run them. Extensions are listed as network paths in the egress statement, so review that before you install one.
