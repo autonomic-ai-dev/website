@@ -1,68 +1,49 @@
 ---
-title: "Agent Brain: The Context Engine and Local MCP Router"
-date: "2026-10-17"
-excerpt: "How agent-brain solves context bloat with filterable HNSW retrieval, durable memory via temporal knowledge graphs, and hook-based enforcement as every organ's information substrate."
+title: "Routing context inside a budget"
+date: "2026-10-31"
+excerpt: "How agent-brain chooses what an agent sees on each turn: candidates from keyword and vector search, a score for each, and a greedy fill under a token budget that depends on the kind of task. What it costs, and what it leaves out."
 slug: "agent-brain-context-engine"
 category: "Engineering"
 author: "Abhiuday Gupta"
 ---
 
-Agent Brain is the memory and routing substrate of the Autonomic ecosystem. It provides every other organ with structured context — not raw `LLM` prompt stuffing, but filtered, scoped, and ranked retrieval from a durable store.
+The usual fix for a coding agent that knows too little is a bigger context window. Load the whole rules folder, the skills folder and the project notes, and let the model sort it out. We tried that shape first in our own sessions. It works until the library grows. Past a few hundred items, the prompt is mostly material that does not apply to the task in front of the agent, and the model is slower and less focused.
 
-## Architecture
+agent-brain takes the other route. Each turn, it selects a small set of items and puts a hard limit on how many tokens they may use. This post explains how that selection works, what it costs, and what it leaves out.
 
-Brain uses a multi-layered storage model. Short-term context lives in an `HNSW` (`Hierarchical Navigable Small World`) vector index, filtered by scope, topic, and recency before retrieval. Long-term facts are stored in a `SQLite`-backed knowledge graph with temporal edges — a fact is a triple of `(subject, predicate, object)` with valid-from and invalid-at timestamps. This lets memory expire naturally rather than requiring explicit deletion.
+## The shape of one route
 
-The `route_task` endpoint is the core primitive. Given a task description and open file list, it returns ranked agents, skills, rules, and memory items under a token budget. This prevents the context bloat that plagues naive `RAG`: instead of dumping every relevant document into the prompt, brain scores each candidate and selects the top-N that fit the budget.
+When the host calls `route_task`, agent-brain does four things in order.
 
-```json
-POST /route_task
-{
-  "user_message": "Fix the failing test in src/parser.rs",
-  "open_files": ["src/parser.rs", "tests/parser_test.rs"],
-  "max_tokens": 500,
-  "limits": { "skills": 3, "memory": 5, "rules": 5, "agents": 2 }
-}
+1. **Retrieves candidates.** A keyword search over the indexed items (skills, rules, agent definitions, memories and workflows) runs in SQLite's FTS5 engine, which ranks matches with BM25. A vector search runs over the same items. Both return ranked lists, and the two lists are merged with reciprocal rank fusion. Exact matches on a symbol name get a boost.
+2. **Scores each candidate.** The merged score is adjusted for the item's type, for whether it applies to the current project, and for a few signals from past runs: items that helped recently rank a little higher, and items that were followed by failures rank a little lower.
+3. **Fills a budget.** The candidates are walked in score order. Each one is added only if it fits in the remaining tokens. If a memory is wanted, 120 tokens are held back for it first, so rules and skills cannot crowd every memory out.
+4. **Returns the packed result**: the items chosen, the tokens used and the budget. The route is also logged, so the dashboard can count it later.
 
-Response:
-{
-  "recommended_skills": ["rust-patterns", "rust-testing"],
-  "relevant_memory": [
-    { "topic": "parser-module", "fact": "Parser uses nom 7.0 combinators", "score": 0.89 }
-  ],
-  "applicable_rules": ["test-before-commit"],
-  "tokens_used": 420,
-  "latency_ms": 34
-}
-```
+The budget is set by the kind of task. In our code, a verification request gets 350 tokens, a review gets 550, an implementation gets 600, a debugging request gets 650, and an architecture request gets 700. These apply to the default request. A caller that asks for a specific budget gets that budget.
 
-## Standalone Mode
+## Why a budget and not a bigger window
 
-Run `agent-brain serve` to start an `MCP` `stdio` server. This exposes every memory operation — store, retrieve, delete, grep, route — as `MCP` tools. Any `MCP`-compatible client (`Claude Code`, `Copilot`, `Cursor`) can use brain as its memory backend without running the full ecosystem.
+A budget makes the cost of each turn known before the model sees it. The alternative, letting the host load everything, has a cost that grows with the library. The team pays for every token on every turn, and the model has more to ignore.
 
-`agent-brain export` writes all facts to a portable `JSON` bundle. `agent-brain import` restores from one. This makes memory migration between environments a file copy.
+The budget also forces a choice. Something has to lose. We decided that a small set of relevant items is better than a large set of mostly irrelevant ones, and that a person who wants more can ask for a larger budget explicitly.
 
-The `HNSW` index is configurable via `~/.agent_brain/config.yaml`:
+## What it costs
 
-```yaml
-hnsw:
-  ef_construction: 200
-  ef_search: 50
-  m: 16
-  distance: cosine
-storage:
-  sqlite_path: ~/.agent_brain/memory.db
-  export_dir: ~/.agent_brain/export/
-```
+The budget has three real costs, and we would rather name them than hide them.
 
-These parameters follow the standard `HNSW` tuning trade-offs: higher `ef_construction` improves recall at the cost of slower inserts, while higher `m` increases memory usage but produces better graph connectivity.
+- **Things get left out.** A rule that matters for an edge case can rank below the cut. The route output lists what was chosen, so a person can see the cut and raise the budget. We do not claim that a budget finds everything.
+- **Scoring is heuristic.** The weights were tuned on our own sessions and our test cases. A different codebase may need different weights. The routing regression suite has 250 cases, and it checks that the right kinds of items come back for each query. It does not prove the ranking is best for your repository.
+- **Two searches cost time.** Keyword and vector search both run on each route. Our CI benchmark measured a warm route at 3 ms, but that run used a deterministic test embedder, not the production model, so it does not describe a real route. We have not yet published a latency for the default model. A cold start also loads the model, which takes longer, so the first route after a restart is the slow one.
 
-## Integrated Mode
+## The vector index
 
-In a full deployment, every organ calls brain's `route_task` before acting. Spine queries brain for the rules and skills relevant to each workflow node. Heart triggers periodic `GC` — deduplicating facts, pruning expired edges, vacuuming the vector index. Nerves publishes memory change events so subscribers can invalidate caches.
+The vector side uses the all-MiniLM-L6-v2 model through the fastembed library. Vectors are stored as 8-bit scalar codes, one byte per dimension plus a scale per vector. That takes about 384 bytes per 384-dimension vector, against about 1.5 kilobytes for 32-bit floats. The price is a little precision.
 
-## Design Decisions
+For small indexes the search is brute force, which is simple and exact enough. For larger indexes it uses a single-layer graph with extra links per filter. We call that an HNSW-style index in our docs, but it is not the full multi-layer HNSW structure from the paper. We chose the simpler version because it was enough for the index sizes we see, and we have not measured it against the full structure at large scale.
 
-We chose `HNSW` over flat cosine-similarity search because the index grows with use, and flat search gets slower as it grows. The temporal knowledge graph model was chosen over a simple key-value store because `AI` agents produce inherently relational data — a memory is only meaningful in the context of what task was running, what files were open, what decision was made.
+## What we would change
 
-The trade-off is write latency. Inserting a vector and multiple `KG` edges in a transaction is slower than writing to a flat cache. For brain's use case this is acceptable — writes are rare, reads are constant.
+The scoring weights are the part we trust least. We would like them to learn from the outcomes that verification records, and right now they only use a small, fixed set of signals. That is the next piece of work in this area.
+
+If you want to see the routing for your own project, run `agent-brain briefing` or ask the host to call `route_task` and read what comes back. The output names the items and the budget it used.

@@ -46,8 +46,8 @@ Every successful node transition creates an append-only snapshot in `state.db`. 
 ### 4. Zero-Daemon Local Execution with Durable DLQ
 In local development environments without an external message broker, `agent-spine` automatically falls back to an embedded SQLite event log and persists failed nodes to `~/.autonomic/state/spine/dlq.jsonl`, providing full durability with zero daemon dependencies.
 
-### 5. Speculative Multi-Branch Worktrees
-For non-deterministic or high-risk engineering tasks, `SpeculativeFork` nodes spin up isolated Git worktrees concurrently. The first branch to satisfy verification criteria is merged into the mainline execution snapshot, and temporary worktrees are pruned cleanly.
+### 5. Speculative Forks (planned)
+`SpeculativeFork` is part of the workflow model, but the released executor passes its payload through unchanged. It does not yet create Git worktrees or pick a winning branch. Treat it as planned, not shipped.
 
 ---
 
@@ -58,7 +58,7 @@ For non-deterministic or high-risk engineering tasks, `SpeculativeFork` nodes sp
 | **`Agent`** | Discrete cognitive subtask | Hydrates a 350–700 token knapsack from `agent-brain`, delegates to worker, snapshots output |
 | **`Verify`** | Machine validation | Actively executes `command`, captures exit code and output streams, asserts `verified` |
 | **`ApprovalGate`** | Human-in-the-loop safety | Auto-approves by default. When auto-approval is turned off, waits until the node payload carries `approved: true` |
-| **`SpeculativeFork`** | Parallel exploration | Evaluates multiple candidate branches in isolated Git worktrees |
+| **`SpeculativeFork`** | Planned | Passes its payload through; worktree exploration is not implemented yet |
 | **`Fork` / `Join`** | Concurrency barrier | Fans out across parallel branches, continuing only when all dependencies resolve |
 | **`Debate`** | Iterative refinement | Alternates between coder and critic agents in multi-turn feedback rounds |
 | **`Vote`** | Consensus sampling | Runs prompt N times with temperature variance, selecting highest-quality output |
@@ -116,7 +116,7 @@ Check a file with `agent-spine validate <file>`. The built-in workflows are list
 ## CLI Reference
 
 ```bash
-# Validate workflow DAG acyclicity and syntax
+# Validate workflow syntax (cycles are allowed)
 agent-spine validate workflows/bugfix_pipeline.yaml
 
 # Run a workflow synchronously; -p passes a JSON payload, -b enables agent-brain routing

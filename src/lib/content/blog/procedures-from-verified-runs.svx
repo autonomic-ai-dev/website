@@ -1,0 +1,64 @@
+---
+title: "Procedures learned from verified runs, and their limits"
+date: "2026-11-05"
+excerpt: "Every verify run leaves a trajectory. agent-brain groups trajectories into procedures and can recall them for a later task, with a success rate and the command that worked. This post explains how the grouping works, how the score is built, and where it is too coarse to trust."
+slug: "procedures-from-verified-runs"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+A team that runs the same tests every day learns a set of habits. Which command to run first. Which failure is usually a stale build artifact. Which step is always slow. None of that is written down, and a new person, or an agent starting a fresh session, has to rediscover it.
+
+agent-brain tries to keep part of that knowledge. Each verify run is stored as a trajectory, trajectories are grouped into procedures, and a later task can recall the procedures that match it. This post describes how that works, using the code as it stands, and says plainly where it is weak.
+
+## What gets recorded
+
+Each `agent-brain verify -- <command>` run writes a trajectory. The fields that matter are:
+
+- the workflow, which is the project's key, or `project` when no key is known;
+- the node, which is the first word of the command. So `make test` is recorded under the node `make`;
+- the outcome, `success` for exit code 0 and `failure` otherwise;
+- the task kind, which is `verification`;
+- the notes, which hold the exit code and the full command.
+
+Trajectories from other sources are also possible. Session digests can produce procedure edges between nodes, which records which step tends to follow which. That path is separate, and this post is about the verify path.
+
+## How trajectories become procedures
+
+Recall groups the stored trajectories by the pair of workflow and node. For each group it counts the runs and the successes, and it keeps the task kind and the most recent notes.
+
+When a task asks for procedures, each group gets a score in three parts:
+
+- half a point if the group's task kind matches the request;
+- up to three tenths of a point for how many words in the query appear in the workflow, node or notes text;
+- up to two tenths of a point for the group's success rate.
+
+The top results come back with their total runs, their success rate, and the nodes that tend to follow them, found through a recursive query over the procedure edges. A caller asks for the top few, usually five.
+
+## An example, with the numbers it produces
+
+Take the demo the repository tests. In task one, `make test` fails because a marker file is missing. The fix is to create the file, and the second `make test` run passes. The stored trajectories are one failure and one success under the node `make`.
+
+A second task asks for procedures matching "make test" with the task kind `verification`. The `make` group has two runs and one success, so its success rate is one half. The score is above zero, and it comes back at the top. The notes show the most recent command text, so the agent sees what was run last.
+
+That is the whole mechanism. A success rate of one half from two runs is not evidence of anything except that two runs happened. We report it as such.
+
+## Where it is too coarse
+
+The node is the first word of the command, and that is the weakest part of the design.
+
+`make test`, `make build` and `make deploy` all become the node `make`. A success rate for `make` mixes all three. If `make deploy` fails every time and `make test` passes every time, the group shows a middling rate that describes neither. We knew this when we chose the first word. It was the simplest key that worked across most toolchains, and it breaks down exactly where a team has several commands that start the same way.
+
+Samples are small. A procedure built from three runs can look solid when it is not. The recall result includes the run count, but a rate is easy to read without it, and the two should always be shown together.
+
+Procedures do not learn from the code they were run against. A passing `make test` last month and a passing `make test` today look the same to the grouping, even if the code changed in between. Receipts do track the commit and the code hash. Procedures do not, yet.
+
+Finally, the score is a hand-set mix of three signals. We chose the weights from our own repository. They are not tuned across projects, and a different codebase may rank procedures differently.
+
+## What we would change
+
+The first change is to key procedures on the full normalised command, not the first word. That splits `make test` from `make deploy` and makes the groups honest. The second is to show the sample size beside every rate. The third is to attach the commit to each trajectory, so a procedure can say which code state its successes came from.
+
+## How to use this today
+
+Treat a recalled procedure as a hint, not a rule. Use the notes to find the command that last worked, and run it yourself. If a procedure is wrong, the next verify run adds a trajectory that moves the rate, so the record corrects itself over time. It corrects slowly, which is part of the cost.

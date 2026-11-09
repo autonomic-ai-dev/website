@@ -1,0 +1,54 @@
+---
+title: "Measuring honestly: why agent-brain's dashboard labels every estimate"
+date: "2026-11-09"
+excerpt: "Our first dashboard showed a large headline of tokens saved. Most of it was a model, not a measurement. This post explains what we got wrong, what each figure now means, and how a team can check the numbers on its own machine."
+slug: "measuring-honestly"
+category: "Operations"
+author: "Abhiuday Gupta"
+---
+
+It is easy to build a dashboard that looks impressive. Pick a counterfactual that makes the tool look good, subtract the tool's output from it, and put the difference in a large number at the top. The number moves in the right direction, and nobody asks what it means.
+
+That is what our first dashboard did. This post is about why we changed it, what each figure now means, and how to check them yourself.
+
+## What was wrong
+
+The headline figure was labelled "Total Tokens Saved". It was the sum of two things. The first was a model: each indexed item was assumed to cost 120 tokens if it were loaded, so the naive cost was the number of indexed items times 120, minus the tokens actually routed. That is arithmetic on an assumption. Nobody loaded the library and counted. The second was a bounded-read estimate, which assumed the agent would otherwise have read every file that a directory search matched in full.
+
+Both are reasonable as estimates. Neither is a measurement, and the headline gave them the weight of one. We found the problem when we checked the bounded-read figure against the code. For a directory search, it added up the size of every file the search walked, not just the files that matched. Many of those files would probably never have been read in full, so the figure likely overstated the saving, and it was labelled as if it were measured.
+
+The fix was not a better estimate. It was to stop presenting estimates as results.
+
+## What the dashboard shows now
+
+Every tile on the dashboard says what it counts, where the data comes from, and whether the figure is measured or an estimate. The tiles that count recorded events are measured. Among them are the routed turns, the average and the 95th percentile of route latency, the cache hit rate, the number of turns that carried a must-apply rule, the verify runs that passed and failed, and the full-file reads that were steered toward bounded tools.
+
+The estimated figures are still on the page, under their own names. The naive-load figure is labelled as a model that assumes 120 tokens per indexed item, and it is left out of the weekly summary. The bounded-read saving is labelled as an upper bound: it counts only files that matched, and it assumes the agent would have read them in full. A reader who wants a smaller number can take the lower figure from the routed tokens.
+
+The headline now reads "Context tokens returned by route_task". That is what the tool did, counted from its own log. It does not claim what the tool saved.
+
+## The weekly summary
+
+`agent-brain stats --markdown` prints a summary that uses only the measured figures. It has no estimates in it, and it says so at the bottom. The idea is that a team can paste it into a weekly note without a reader needing to know which numbers were modelled.
+
+We are cautious about what the summary can show. It counts what the tool did. It does not say the tool made anyone faster. A routed turn that returned unhelpful context is still a routed turn.
+
+## How to check it on your machine
+
+Three commands show the same things the dashboard does.
+
+- `agent-brain stats --markdown` prints the measured summary for the last seven days.
+- `agent-brain dashboard` writes the HTML page. Click a tile to see its definition and source.
+- `agent-brain verify receipt` shows whether the current commit and code state has a passing run.
+
+Each figure comes from the local database. Nothing is sent anywhere to produce it.
+
+## What we still do not know
+
+We do not yet have outside users reporting these figures. The numbers describe the machines we run them on. A team that installs agent-brain could see different routing volumes, different cache rates and different verify outcomes, because their repositories and commands differ. We would like to see those numbers, and we would want them reported with the same labels.
+
+We also do not yet know whether the routed context makes agents complete tasks better. The dashboard can show that context was returned and that verify runs passed. It cannot show that the agent would have done worse without the context. That needs a comparison we have not run.
+
+## The rule we follow
+
+If a figure is modelled, the label says so before the number, and the number is not the headline. If a figure is measured, the label says what was measured and from where. If we cannot say which one a figure is, we do not show it. We would rather publish a smaller page that is true than a larger one that needs an explanation.

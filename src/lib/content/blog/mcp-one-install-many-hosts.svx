@@ -1,0 +1,54 @@
+---
+title: "One install, many hosts: MCP as the integration layer, and what each host gets"
+date: "2026-11-07"
+excerpt: "agent-brain talks to each coding host through the Model Context Protocol, plus whatever hook system the host offers. This post explains why we chose MCP, what the installer writes for each host, and why the same install gives different protection in different editors."
+slug: "mcp-one-install-many-hosts"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Every coding host has its own way to load tools, rules and hooks. Claude Code reads a settings file and a rules folder. Cursor has its own rules and a hook for shell commands. Codex has a TOML file. Gemini CLI and Antigravity have a settings file with their own hook names. VS Code reads a different configuration entirely. A tool that wanted to work in all of them would have to know all of them, and to change every time one of them changed.
+
+agent-brain uses the Model Context Protocol, MCP, for the part that can be shared, and a thin layer per host for the rest. This post explains that split, what the installer writes for each host, and why one install gives different protection in different hosts.
+
+## What MCP gives us
+
+MCP is a protocol for a host to call tools that a separate process provides. agent-brain runs as an MCP server, using the stdio transport, which means the host starts the process and talks to it over standard input and output. The tools include `route_task`, `store_memory`, `recall_procedures`, `skill_get` and the read tools, among others.
+
+Because every host can use MCP, the tools are the same everywhere. A rule about how to call `route_task` is written once. The host decides how to show the tools to the agent, and agent-brain decides what they do.
+
+The cost is that MCP only carries tools. It does not carry hooks, and it does not decide when the agent is allowed to act. For those, we need the host.
+
+## What the installer writes
+
+For each host, `agent-brain install` writes three kinds of file, and only the first is common:
+
+1. **The MCP entry.** This tells the host how to start the agent-brain server. The entry names the binary that is running the install, so the install must be done with the binary you intend to keep.
+2. **Hooks, where the host has them.** Claude Code gets prompt and tool hooks. Cursor gets a shell hook. Gemini CLI and Antigravity get before-agent and before-tool hooks. Codex gets a hooks file, and OpenCode gets a plugin.
+3. **Instructions.** A mode file and a rule that describes the workflow: route first, verify before claiming done, and keep to the project's conventions. Each host gets the instructions in the file it reads for project instructions.
+
+The support matrix in the repository lists each file. We keep it current when the installer changes, and each row names the test that checks it.
+
+## Why the same install protects differently
+
+The protection depends on the hooks, and the hooks are not the same everywhere.
+
+In a host with hooks, the route gate can block agent-brain's tools until the agent has routed, and the bash gate can check shell commands before they run. In a host without hooks, the same tools are available, and the instructions say to use them, but nothing checks that the agent does.
+
+VS Code and GitHub Copilot get the MCP entry and instructions only. Claude Desktop gets the MCP entry only. For those hosts, the protection is the agent's willingness to follow the instructions, plus the verify records you run yourself. We think a reader should know that before installing, which is why the matrix states it.
+
+Cursor needs one manual step. Its user rules are set in its settings, and the installer prints the path of the rule file and asks you to paste it. The installer does not paste it, because we do not know a supported way to do that from outside Cursor.
+
+Claude Code and Codex ask you to trust new hooks. Until you do, the hooks do not run. This is a good safety property, and it is also a first-run step that people miss.
+
+## Trade-offs of the design
+
+MCP is a protocol that hosts are still adopting, so the surface can change. We keep the tools small and stable and put the variable parts in the host layer, so a change in one host does not break the others.
+
+The per-host files are the part that drifts. Each host changes its settings format, and the installer has to change with it. Our tests check the files the installer writes, and the support matrix says which tests cover which host. Codex has install and configuration tests but no end-to-end test that runs its hooks, and we say so in the matrix.
+
+Tools are gated until the agent has routed. Route results include a warning when other tools are blocked. That keeps the agent honest about what context it has, and it also means a tool that works in one session may refuse in another if the route was not made. That surprise is worth knowing.
+
+## What to check after install
+
+Run `agent-brain doctor` to see the installed hosts and their configuration. Start your host and look at the MCP server list. Ask the agent to call `route_task` on a small task and read the result. If the host has hooks, trust them when asked. Then run one verify command and check the receipt.
