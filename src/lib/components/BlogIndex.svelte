@@ -28,7 +28,6 @@
 <svelte:head>
   <title>Blog — {product.name}</title>
   <meta name="description" content={`Posts about ${product.name}: design decisions, trade-offs and how it is measured.`} />
-  <link rel="canonical" href={`${product.origin}/blog`} />
   <meta property="og:type" content="website" />
   <meta property="og:title" content={`Blog — ${product.name}`} />
   <meta property="og:url" content={`${product.origin}/blog`} />

@@ -1,12 +1,11 @@
-const PRODUCT_HOSTS: Record<string, string> = {
-	'agent-brain.autonomic-ai.dev': 'agent-brain',
-	'agent-spine.autonomic-ai.dev': 'agent-spine'
-};
+import { productForHost } from '#lib/data/products';
+
+const ROOT_LEVEL_FILES = ['/robots.txt', '/sitemap.xml'];
 
 export const reroute = ({ url }: { url: URL }): string | undefined => {
-	const product = PRODUCT_HOSTS[url.hostname];
-	if (!product) return;
-	const prefix = `/${product}`;
+	const product = productForHost(url.hostname);
+	if (!product || ROOT_LEVEL_FILES.includes(url.pathname)) return;
+	const prefix = `/${product.id}`;
 	if (url.pathname === prefix || url.pathname.startsWith(`${prefix}/`)) return;
 	return `${prefix}${url.pathname}`;
 };

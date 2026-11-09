@@ -54,7 +54,6 @@
 <svelte:head>
   <title>{data.metadata.title} — {product.name}</title>
   <meta name="description" content={data.metadata.excerpt} />
-  <link rel="canonical" href={`${product.origin}/blog/${data.metadata.slug}`} />
   <meta property="og:type" content="article" />
   <meta property="og:title" content={`${data.metadata.title} — ${product.name}`} />
   <meta property="og:description" content={data.metadata.excerpt} />

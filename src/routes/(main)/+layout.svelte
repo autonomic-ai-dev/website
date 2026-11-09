@@ -1,10 +1,11 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/state';
-	import { products } from '#lib/data/products';
+	import { MAIN_ORIGIN, products } from '#lib/data/products';
 
 	let { children }: { children: Snippet } = $props();
 
+	const canonical = $derived(`${MAIN_ORIGIN}${page.url.pathname.replace(/\/+$/, '') || '/'}`);
 	const brain = products['agent-brain'];
 	const spine = products['agent-spine'];
 
@@ -12,6 +13,12 @@
 		return page.url.pathname === href;
 	}
 </script>
+
+<svelte:head>
+	<link rel="canonical" href={canonical} />
+	<meta property="og:site_name" content="Autonomic AI" />
+	<meta property="og:url" content={canonical} />
+</svelte:head>
 
 <div class="min-h-screen bg-black text-zinc-100 font-sans">
 	<header class="sticky top-0 z-40 border-b border-zinc-900 bg-black/90 backdrop-blur">

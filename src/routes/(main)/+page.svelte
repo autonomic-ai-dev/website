@@ -2,6 +2,19 @@
 	import { products } from '#lib/data/products';
 
 	const list = [products['agent-brain'], products['agent-spine']];
+	const schema = {
+		'@context': 'https://schema.org',
+		'@graph': [
+			{
+				'@type': 'Organization',
+				name: 'Autonomic AI',
+				url: 'https://autonomic-ai.dev',
+				sameAs: ['https://github.com/autonomic-ai-dev'],
+				makesOffer: list.map((product) => ({ '@type': 'SoftwareApplication', name: product.name, url: product.origin }))
+			},
+			{ '@type': 'WebSite', name: 'Autonomic AI', url: 'https://autonomic-ai.dev' }
+		]
+	};
 </script>
 
 <svelte:head>
@@ -10,7 +23,13 @@
 		name="description"
 		content="Autonomic AI builds agent-brain, a context engine and MCP server, and agent-spine, a deterministic workflow engine for coding agents. Each installs on its own."
 	/>
-	<link rel="canonical" href="https://autonomic-ai.dev" />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Autonomic AI — tools for coding agents" />
+	<meta
+		property="og:description"
+		content="Autonomic AI builds agent-brain, a context engine and MCP server, and agent-spine, a deterministic workflow engine for coding agents."
+	/>
+	{@html `<script type="application/ld+json">${JSON.stringify(schema)}</script>`}
 </svelte:head>
 
 <section class="mx-auto max-w-6xl px-4 pt-28 pb-20 sm:px-6">

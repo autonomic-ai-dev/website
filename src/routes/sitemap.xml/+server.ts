@@ -1,13 +1,13 @@
-export const prerender = true;
+import { originForHost, sitemapPaths } from '#lib/seo';
+import type { RequestHandler } from './$types';
 
-const pages = ['', '/products'];
-
-export function GET() {
+export const GET: RequestHandler = ({ url }) => {
+	const origin = originForHost(url.hostname);
 	const today = new Date().toISOString().split('T')[0];
-	const entries = pages
+	const entries = sitemapPaths(url.hostname)
 		.map(
 			(path) => `  <url>
-    <loc>https://autonomic-ai.dev${path}</loc>
+    <loc>${origin}${path}</loc>
     <lastmod>${today}</lastmod>
   </url>`
 		)
@@ -20,4 +20,4 @@ ${entries}
 </urlset>`,
 		{ headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'max-age=0, s-maxage=3600' } }
 	);
-}
+};

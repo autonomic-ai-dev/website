@@ -7,7 +7,9 @@
 <svelte:head>
 	<title>Products — Autonomic AI</title>
 	<meta name="description" content="The Autonomic AI products: agent-brain and agent-spine. Each has its own site, docs and install." />
-	<link rel="canonical" href="https://autonomic-ai.dev/products" />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content="Products — Autonomic AI" />
+	<meta property="og:description" content="The Autonomic AI products: agent-brain and agent-spine. Each has its own site, docs and install." />
 </svelte:head>
 
 <section class="mx-auto max-w-6xl px-4 pt-28 pb-20 sm:px-6">

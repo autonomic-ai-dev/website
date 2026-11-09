@@ -1,10 +1,21 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/state';
-	import type { Product } from '#lib/data/products';
+	import { productPath, type Product } from '#lib/data/products';
 
 	let { product, children }: { product: Product; children: Snippet } = $props();
+
+	const path = $derived(productPath(product, page.url.pathname));
+	const current = $derived(product.docsNav.flatMap((group) => group.links).find((link) => link.href === path));
+	const title = $derived(current ? `${current.label} — ${product.name} docs` : `${product.name} docs`);
 </script>
+
+<svelte:head>
+	<title>{title}</title>
+	<meta name="description" content={`${current?.label ?? 'Documentation'} for ${product.name}: ${product.subline}`} />
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content={title} />
+</svelte:head>
 
 <div class="mx-auto flex max-w-6xl gap-12 px-4 py-12 sm:px-6">
 	<aside class="hidden w-56 shrink-0 md:block">

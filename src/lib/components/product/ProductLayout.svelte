@@ -1,11 +1,13 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/state';
-	import { products, type Product } from '#lib/data/products';
+	import { products, productPath, type Product } from '#lib/data/products';
 
 	let { product, children }: { product: Product; children: Snippet } = $props();
 
 	const version = $derived(page.data.organVersions?.[product.id] as string | undefined);
+	const path = $derived(productPath(product, page.url.pathname));
+	const canonical = $derived(`${product.origin}${path === '/' ? '' : path}`);
 	const other = $derived(Object.values(products).find((p) => p.id !== product.id));
 
 	const nav = [
@@ -16,10 +18,17 @@
 	];
 
 	function isActive(href: string) {
-		if (href === '/') return page.url.pathname === '/';
-		return page.url.pathname === href || page.url.pathname.startsWith(href + '/');
+		if (href === '/') return path === '/';
+		return path === href || path.startsWith(href + '/');
 	}
 </script>
+
+<svelte:head>
+	<link rel="canonical" href={canonical} />
+	<meta property="og:site_name" content={product.name} />
+	<meta property="og:url" content={canonical} />
+	<meta name="twitter:card" content="summary_large_image" />
+</svelte:head>
 
 <div class="min-h-screen bg-black text-zinc-100 font-sans">
 	<header class="sticky top-0 z-40 border-b border-zinc-900 bg-black/90 backdrop-blur">

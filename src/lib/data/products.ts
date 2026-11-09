@@ -2,6 +2,24 @@ export type ProductId = 'agent-brain' | 'agent-spine';
 
 export type NavLink = { label: string; href: string };
 
+export const MAIN_ORIGIN = 'https://autonomic-ai.dev';
+
+const PRODUCT_HOSTS: Record<string, ProductId> = {
+	'agent-brain.autonomic-ai.dev': 'agent-brain',
+	'agent-spine.autonomic-ai.dev': 'agent-spine'
+};
+
+export function productForHost(hostname: string): Product | undefined {
+	const id = PRODUCT_HOSTS[hostname];
+	return id ? products[id] : undefined;
+}
+
+export function productPath(product: Product, pathname: string): string {
+	const prefix = `/${product.id}`;
+	const stripped = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : pathname;
+	return stripped.replace(/\/+$/, '') || '/';
+}
+
 export type Product = {
 	id: ProductId;
 	name: string;
