@@ -4,7 +4,7 @@ title: agent-spine CLI Reference
 
 # `agent-spine` CLI Reference
 
-`agent-spine` is the deterministic DAG workflow execution engine for the Autonomic ecosystem. It compiles declarative YAML workflows into directed acyclic graphs, executes steps in parallel or sequential pipelines, preserves immutable execution checkpoints in SQLite, and bridges with `agent-brain` for dynamic task routing.
+`agent-spine` is a workflow engine for coding agents. It loads declarative YAML workflows of named nodes and edges, runs ready steps concurrently where the workflow forks, appends a snapshot to SQLite after each step, and can use `agent-brain` for routed context with `run --brain`. Workflows may contain cycles.
 
 ---
 

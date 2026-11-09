@@ -1,0 +1,56 @@
+---
+title: "One local daemon, one SQLite file: why agent-brain runs on your machine"
+date: "2026-11-09"
+excerpt: "agent-brain runs as one background process that owns a SQLite database, with a small proxy for each editor. This post explains the process layout, why we chose a single local writer over a hosted service, and what that choice costs when a team wants to share memory."
+slug: "one-daemon-local-first"
+category: "Architecture"
+author: "Abhiuday Gupta"
+---
+
+Many of the agent memory tools people have tried run as a service. The memory lives on someone else's machine, the agent sends it what it knows, and the service sends back what it remembers. That design has real advantages for teams. It also means that the code, the prompts and the notes about your work leave your laptop on every turn.
+
+agent-brain is built the other way. It runs on your machine, keeps its state in one SQLite file, and talks to your editors over local channels. This post describes that layout, the reasons for it, and the costs.
+
+## The process layout
+
+When you install agent-brain and configure a host, each host starts a small process when it needs the tools. That process is a stdio proxy. It does not hold any state. It forwards each request over a Unix socket to a single background daemon, and copies the replies back.
+
+If the daemon is not running, the proxy starts it. The daemon is started with a flag and then listens on a socket named `serve.sock` in the agent-brain home directory. There is one daemon per home directory, and a lock file keeps a second one from starting.
+
+The daemon owns the database. Every write goes through a write queue, which serialises the writes that come from different hosts. Reads can run alongside writes. This matters because several editors may be open on the same project, and two of them may ask for a route at the same moment.
+
+A TCP health endpoint exists, but only when you start the daemon with a health address. Nothing opens a network port by default. The complete list of network paths, with their defaults, is in the egress statement that the repository checks with a test.
+
+## The database
+
+The database is SQLite, in WAL mode. WAL lets readers and the single writer work at the same time, and it makes writes cheap. Everything the product remembers lives in that file: the index of skills, rules and memories, the routing log, the verify outcomes, the trajectories, the procedure edges and the facts. The default location is `~/.autonomic/memory`, and `AGENT_BRAIN_HOME` moves it.
+
+Vectors are kept in the index that is built from the database. The embedding model runs locally through fastembed. The first start downloads the model, which is a network request the product makes on its own. The egress statement lists it with the other paths.
+
+## Why local
+
+We could have built a hosted service. We did not, for three reasons.
+
+The first is trust. A memory of your repository, your decisions and the commands you run is sensitive, even if no single item looks like a secret. Keeping it on the machine means the question of who can read it has a short answer.
+
+The second is operations. A local daemon has no server for us to run, no uptime to promise, and no data-processing agreement to negotiate. For a small product, that is a large amount of work we did not have to take on.
+
+The third is latency and failure. A route should not wait on a network round trip. A laptop that loses its connection still gets routes, verify runs and the dashboard.
+
+## What the choice costs
+
+The costs are real, and a team should weigh them before adopting the tool.
+
+Memory does not move between people. Two developers on one repository each have their own database, and their routing and procedures differ. We offer an optional sync feature that writes encrypted data to storage you control, and it is off by default. It is a way to carry state between your own machines, not a shared team memory. We are not claiming a team product here.
+
+SQLite has one writer. The write queue makes that safe, but it means heavy write load from many processes would queue. We have not measured this on a large team, and we would not claim it scales beyond a single person's work without that measurement.
+
+The proxy starts the daemon on demand, and the daemon keeps running after that. We have not documented when it shuts down, so do not assume it is always up, and do not assume it stops when your editors close. Check with `agent-brain doctor` when something seems stale.
+
+Finally, a local daemon depends on the machine. A new laptop starts with an empty database unless you copy the home directory or set up sync. The install guide says so, but it is easy to miss.
+
+## When to choose something else
+
+If your team needs one shared memory across many people and many machines, agent-brain as it stands is the wrong tool. Run it locally for your own work, and treat any team sharing as a separate design problem that we have not solved.
+
+If you are working alone, or in a small group that wants to keep its repository notes on its own machines, the local layout is the point.

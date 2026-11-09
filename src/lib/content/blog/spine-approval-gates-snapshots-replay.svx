@@ -1,0 +1,48 @@
+---
+title: "Approval gates, snapshots and replay in agent-spine"
+date: "2026-11-09"
+excerpt: "agent-spine can pause a workflow at an approval gate until a person signs off. This post explains the default, which is auto-approve, how a gate waits when auto-approve is off, how snapshots record each step, and what replay does and does not do."
+slug: "spine-approval-gates-snapshots-replay"
+category: "Operations"
+author: "Abhiuday Gupta"
+---
+
+A workflow that changes a repository should not finish without a person looking at it. An approval gate is the place in the workflow where that person looks. A snapshot is the record of what the workflow had done up to that point. Replay is how you read the record later. Together they make a long run something you can stop, inspect and explain.
+
+This post covers how these three work in agent-spine, what the defaults are, and what they do not do. The defaults matter more than they look, so we start there.
+
+## The approval gate, and its default
+
+An approval gate is a node of kind `ApprovalGate`. When the executor reaches it, the gate checks its payload. If the payload carries `approved: true`, the gate passes and the workflow continues. If not, the gate waits.
+
+The default is auto-approve. In the released binary, gates pass without waiting, unless you turn auto-approve off. We chose that default because the most common use of agent-spine is an unattended run that a developer started on purpose, and a gate that always waits would make every run stop. That choice has a cost, and it is worth stating: a workflow that has an approval gate in its YAML will not pause for a person unless someone has turned auto-approve off. The gate's name suggests a check that the file does not enforce.
+
+When auto-approve is off, the gate waits. Nothing in the released command line approves it, so the approval comes from whatever writes the payload: the workflow file, a wrapper script, or a host integration. We do not have an approve command, and older documentation that described one was wrong. We are working on a supported way to approve a waiting gate, and until it exists, a waiting gate needs a process that sets the flag.
+
+The tradeoff is one of control against throughput. A default that waits is safer and makes every unattended run fail to finish. A default that passes lets workflows run, and puts the burden of turning the check on in the hands of whoever writes the workflow. We chose the second, and the docs say so.
+
+## Snapshots
+
+After each step, the executor writes a snapshot. The snapshot holds the execution identifier, a sequence number and the state at that point, and it is written to a table named `snapshots` in SQLite. Rows are appended. They are not updated.
+
+Appending matters. If a later step changes its mind, the earlier state is still there, so the history reads as it happened. If you want to know why step seven ran, you read the snapshot before it.
+
+Snapshots are also how a failed run becomes readable. `agent-spine inspect` prints the steps of one execution in order, with their outcomes, so you see where it stopped and what it had recorded. Failed nodes that exhaust their retries also go to the dead-letter record, which is a file by default and a stream if you run NATS.
+
+## Replay
+
+`agent-spine replay` recreates the final state of an execution from its snapshots. It is a read. It does not run the agent steps again, and it does not run the verify commands again. It shows the state the run left behind.
+
+This is the part people most often misread. Replay is for understanding a run, not for re-running it. If you want to run the workflow again from some point, you start a new execution, which gets its own history, and the original stays as it was. We made that choice so that a re-run cannot quietly overwrite the record of the first one.
+
+## What this does not give you
+
+Snapshots record the state the executor knows about. They do not capture everything a step did. A command that wrote to a file outside the repository, or called a service, leaves that effect outside the snapshot. The snapshot records the outcome the executor saw.
+
+Approval gates do not know who approved. The payload flag says the gate may pass. It does not say a person looked at the change, or that the change is correct. A gate with a flag set by a script is still a gate.
+
+Replay is not a time machine. It does not undo a command. If a step pushed a commit, the commit stays pushed.
+
+## How to use these today
+
+Keep auto-approve on for runs you start yourself, and write the gate where you want a pause, so the position is visible in the workflow file. For a run that must wait, turn auto-approve off and have a process set the payload flag only after a person has reviewed the change. Then run `agent-spine inspect` on the execution after it finishes, and keep the record next to the pull request.

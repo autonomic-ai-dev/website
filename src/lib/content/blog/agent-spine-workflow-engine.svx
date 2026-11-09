@@ -1,91 +1,62 @@
 ---
-title: "Agent Spine: Deterministic Workflow DAG Engine"
-date: "2026-10-17"
-excerpt: "How agent-spine enforces structured execution through YAML-defined DAG pipelines, immutable snapshots, parallel fan-out, and human-in-the-loop approval gates."
+title: "agent-spine as a state machine: what runs, what does not, and why"
+date: "2026-11-09"
+excerpt: "agent-spine runs YAML workflows of named nodes and edges, records a snapshot after each step, retries failed nodes, and keeps dead-letter entries. This post covers the parts that run for real, the kinds that are only partly implemented, and why we chose a local state machine over a hosted orchestrator."
 slug: "agent-spine-workflow-engine"
-category: "Engineering"
+category: "Architecture"
 author: "Abhiuday Gupta"
 ---
 
-Agent Spine is the deterministic execution engine that prevents `AI` workflows from turning into spaghetti. Every pipeline is a directed acyclic graph of typed nodes — no cycles, no implicit control flow, no surprises.
+Agent workflows fail in a specific way. A job with five steps runs steps one and two, the agent makes a call in step three that looks reasonable, step four fails, and now nobody knows what state the repository is in. Re-running from the start repeats the work. Re-running by hand is error-prone. agent-spine exists to make that failure smaller and easier to read.
 
-## Architecture
+It is a Rust binary. You describe a workflow in YAML, run it on your machine, and get a record of every step. It is released, and this post describes what the released binary does.
 
-A pipeline is defined in `YAML`. Each node has a type, inputs, outputs, and optional error handlers. The node types are:
+## The model
 
-- **Prompt** — calls an `LLM` with a template and returns structured output
-- **Tool** — executes a shell command or `HTTP` request
-- **Gate** — evaluates a condition and branches (success or skip)
-- **Approval** — a gate auto-approves by default. When auto-approval is turned off, it waits until the node's payload carries `approved: true`. No CLI command approves gates.
-- **Event** — emits a typed event to the event bus
-- **Subworkflow** — invokes another pipeline, with its own snapshot isolation
+A workflow has a name, a version, a start node, a list of nodes and a list of edges. A node has a name, a kind, and optional fields such as a command, a description, a retry policy and a payload. An edge has a from node, a to node and an optional condition. The start node is where the run begins.
 
-At every node boundary, spine takes an immutable snapshot of the workflow state — all inputs, outputs, and metadata up to that point. This enables full replay: given a snapshot, spine can re-execute from any node with identical results.
+We call the model a state machine rather than a DAG on purpose. The validator accepts cycles. We tested it with a two-node loop, and `agent-spine validate` reports the workflow as valid. Loops are useful when a step should go back: a fix that fails verification returns to the fix step. The cost is that a cycle can run forever unless a node or a retry limit stops it. We rely on the retry policy and the surrounding process to bound loops, and we do not detect infinite loops ahead of time.
 
-```json
-{
-  "snapshot_id": "snap_abc123",
-  "run_id": "run_456def",
-  "pipeline": "security-fix-pr",
-  "node": "apply_patch",
-  "inputs": {
-    "payload": { "cve_id": "CVE-2026-1234", "file_path": "src/auth.rs" }
-  },
-  "outputs": {
-    "patch": "diff --git a/src/auth.rs b/src/auth.rs\n--- a/src/auth.rs\n+++ b/src/auth.rs\n@@ -42,6 +42,7 @@"
-  },
-  "timestamp": "2026-06-21T10:00:00Z"
-}
-```
+We should correct a claim made elsewhere: some older documentation described the validator as checking for acyclicity. It does not. The docs are being updated.
 
-## Error Handling
+## The node kinds, and which ones do real work
 
-Every node can declare an `on_error` handler. Unlike try-catch in general-purpose code, spine error handlers are themselves `DAG` nodes — they have access to the failure snapshot and can branch, notify, or retry. A common pattern is a three-attempt retry with exponential backoff before routing to a human approval gate:
+The model defines eleven kinds. They are not equally developed, and it helps to know which is which.
 
-```yaml
-nodes:
-  - id: flaky_test
-    type: tool
-    command: cargo test --test integration
-    retry: 3
-    backoff: exponential
-    on_error: [notify_oncall]
-```
+- **Agent** runs a task described by the node, with its payload. This is the main kind for work that needs judgement.
+- **Verify** runs a command and records whether it exited with code 0. A workflow can rely on this step as evidence.
+- **Checkpoint** marks a point where the author wants the state recorded explicitly, on top of the snapshot each step already writes.
+- **ApprovalGate** pauses until its payload carries an approval. More on this in the approval post.
+- **Fork** and **Join** run parallel branches. The executor uses a Tokio join set, so ready branches run concurrently and a join waits for its inputs.
+- **Hydrate** gathers context before an agent step. With `--brain`, the executor asks agent-brain for routed context and adds it to the payload.
+- **Router** is meant for conditional branching. Edges can carry a condition. Test your condition on a real run before you rely on it.
+- **Debate** and **Vote** tag the payload with a role for an agent node. They do not yet run several rounds of debate or a vote over outputs. We describe them as partly implemented for that reason.
+- **SpeculativeFork** currently passes its payload through unchanged. It does not create isolated git worktrees, although earlier docs said it did. That is planned, not shipped.
 
-## Standalone Mode
+The honest summary: the kinds that do the most work are Agent, Verify, Checkpoint, ApprovalGate, Fork and Join. The others are partly built, and we say so in the docs.
 
-`agent-spine run workflow.yaml` executes a pipeline in the current process. Output is written to stdout as `JSON Lines` — one event per state transition. Snapshot files go to `./spine-snapshots/<run-id>/`. This is useful for batch processing, `CI` pipelines, and local testing of workflow logic.
+## Retries and failure
 
-## Integrated Mode
+A node can have a retry policy with two fields: `max_attempts` and `backoff_ms`. The delay before attempt `n` is `backoff_ms` multiplied by two to the power of `n`. Retries stop at `max_attempts`, and the node then fails. The executor also has a circuit breaker type for repeated failures. We have not documented its thresholds, so treat that behaviour as something to test on your own workflow before you rely on it.
 
-When you run `agent-spine event serve`, the event bus listens on `:3100`. Other organs in the wider design would publish typed events there; only agent-brain and agent-spine are released today. A spine workflow can end with an approval gate, and it can use agent-brain for context through its `BrainRouter` node. The `BrainRouter` node queries brain's `route_task` to dynamically select which skill or agent to invoke for a given workflow step.
+When a node fails for good, its failure is written to a dead-letter record. If you configure NATS JetStream, the record goes to the `system.dlq` subject. If you do not, it is appended to a local file, `dlq.jsonl`, in the spine state directory. We chose the file as the default because it works on a laptop with no broker.
 
-## Design Decisions
+The tradeoff is that retries are only as good as the failure they hide. Retrying a flaky network call helps. Retrying a wrong fix three times only produces three wrong fixes. Retries should be paired with a verify step after the fix, and we recommend that in every example.
 
-The `DAG` constraint is deliberate. In testing, we found that allowing cycles in workflows led to runaway execution — a buggy prompt would loop forever generating and re-generating the same output. A `DAG` with explicit error handlers forces the programmer to think about terminal states. Every pipeline must terminate, either in success or in a named error state.
+## Snapshots
 
-Parallel fan-out and fan-in are supported natively. A node can emit to multiple downstream nodes that execute concurrently, and a fan-in barrier waits for all branches to complete before proceeding. This mirrors real engineering workflows where linting, testing, and building happen in parallel while deployment waits for all three:
+After each step, the executor appends a snapshot to a SQLite table named `snapshots`, keyed by execution and sequence number. Snapshots are appended, not updated, so the history of a run is kept as written. `agent-spine inspect` prints the history of one run, and `agent-spine replay` rebuilds the final state from it.
 
-```yaml
-- id: run_all_checks
-  type: fan_out
-  outputs: [lint, test, build]
+Replay is a read. It does not re-run the agent steps or the commands. It shows what the state was. If you want to run again from a point, you start a new run, and the old one stays as the record.
 
-- id: lint
-  type: tool
-  command: cargo clippy
+## Why a local state machine
 
-- id: test
-  type: tool
-  command: cargo test
+Hosted orchestrators offer retries, scheduling and a dashboard across machines. We did not build a hosted service for three reasons.
 
-- id: build
-  type: tool
-  command: cargo build
+First, the work that agent-spine orchestrates touches a developer's repository, credentials and local tools. Running that remotely adds a trust boundary we did not want to own. Second, a local binary has no server to operate, which fits a single developer or a small team on their own machines. Third, the failure modes are easier to read when the record sits next to the code it describes.
 
-- id: deploy
-  type: fan_in
-  wait_for: [lint, test, build]
-  type: tool
-  command: cargo deploy
-```
+The cost is real. There is no shared scheduler, so two machines cannot see each other's runs unless you wire up NATS or copy the database. There is no hosted dashboard, only the local one, which listens on port 3001 when you run `agent-spine serve`. And a workflow that runs for hours on a laptop stops when the laptop sleeps.
+
+## What to try
+
+Run `agent-spine init --with list` to see the built-in workflows, then `agent-spine validate` on one of them. Run it with `agent-spine run` and then `agent-spine inspect` on its execution ID. You will see each step, its snapshot and its outcome. That is the whole model in one run.

@@ -1,69 +1,48 @@
 ---
-title: "Before vs After: Scaling Cursor Agents to 2,000+ Skills without Context Bloat"
-date: "2026-10-17"
-excerpt: "How agent-brain keeps routed context small for large skill libraries, using hybrid BM25 + HNSW vector routing, hook gating in supported hosts, and durable memory across agent turns."
+title: "What changes in a real session with agent-brain"
+date: "2026-11-09"
+excerpt: "A plain comparison of one coding task run without agent-brain and with it. What changes in the prompt, in what the agent checks, and in what carries over to the next session, and how to measure the difference on your own repository."
 slug: "before-and-after-agent-brain"
 category: "Engineering"
 author: "Abhiuday Gupta"
 ---
 
-Power users and engineering organizations quickly hit three walls when scaling agentic workflows with static rules and giant skill repositories:
+Most posts about context tools show a number: tokens saved, latency cut, something like that. We will not start with a number, because the number depends on your repository, your rules and your host, and we have not measured it across other people's setups. What we can describe is what changes in a session, step by step, and how to check it.
 
-1. **Context Bloat** — Loading hundreds of rules or skills on every turn adds a large, unbounded amount of context to each interaction, which raises API costs and can degrade reasoning. (Illustration only: 200 rules at about 1,200 tokens each would be about 240,000 tokens per turn. This is arithmetic, not a measurement.)
-2. **Soft Enforcement** — Conventional instructions like *"always read coding guidelines first"* are routinely ignored by LLMs when executing spontaneous tool loops.
-3. **Session Amnesia** — Hard-won conventions and architectural decisions established last week vanish when starting a fresh session.
+Take a task that comes up often: a test fails in a Rust module, and the fix has to follow the team's conventions.
 
-`agent-brain` routes context through `route_task`: in hosts with hooks, the gate blocks agent-brain tools until it has run. Retrieval fits a token budget of 350 to 700 tokens, depending on the task kind, and memory is stored in a temporal graph.
+## Without agent-brain
 
----
+The agent starts from whatever the host loads. Often that is a long instructions file and some rules. The agent reads the failing test, then searches the code for the function under test, then reads files it thinks are related. Whether it reads the team's testing rule depends on whether the rule fits the prompt and whether the agent decides to look at it.
 
-## The Scenario
+When it writes the fix, it may use the wrong test framework, or add a comment the team does not allow, or claim the test passes without running it. Nothing in the host stops the claim. The person reviewing the change has to check every step.
 
-Suppose your organization maintains a curated library of over 2,000 specialized engineering skills. A developer types:
-> *"Optimize React Server Components and data fetching performance in our dashboard."*
+The next session starts from zero. If the team decided last week to use one mocking style, the agent does not know that unless someone pastes it in again.
 
-### Before: Static Rules & Naive Prompt Stuffing
+## With agent-brain
 
-| Behavior | Cost & Impact |
-| :--- | :--- |
-| **200+ rules loaded** | **Illustrative: about 240,000 tokens** added to every turn to seed the prompt |
-| **Agent skips rules** | The model ignores guidelines and runs unstructured `grep` and `find` commands |
-| **No ranking** | Relevant skills compete in a giant unstructured blob; key patterns get truncated |
-| **Session amnesia** | The agent forgets *"use Vitest, never Jest"* unless manually repasted |
+The same task goes through a few extra steps, and each one is visible.
 
-### After: agent-brain Hook Gating & Dynamic Routing
+1. **The host asks for routing first.** In hosts with hooks, agent-brain's gate blocks its own tools until `route_task` has run. The routed context comes back as a short list of the skills, rules and memories that match the task, within a budget set by the task kind.
+2. **The rule that applies is in the context.** The testing rule ranks high for a failing test, so it is among the items the agent sees, instead of depending on the agent's search.
+3. **The fix is checked by running it.** The agent runs the test command through `agent-brain verify`. The run is recorded with its exit code, the command, and the commit and code hash it tested.
+4. **The stop gate checks the end.** If the agent tries to finish while code has changed and no passing run covers that code, the gate blocks the session and says why.
+5. **The result is recorded for later.** A verified run becomes part of a procedure. The next time a similar test fails, the procedure can be recalled with its success rate and the command that worked.
 
-| Behavior | Cost & Impact |
-| :--- | :--- |
-| **Mandatory Hook Gate** | Host hooks block MCP execution until `route_task` returns approved context |
-| **Budgeted Token Routing** | Hybrid BM25 + HNSW vector engine selects the top relevant skills, rules and memory within a per-task budget of 350–700 tokens |
-| **Token Figures** | `agent-brain dashboard` shows the tokens routed for your repo as measured figures, and labels any savings figure that is an estimate |
-| **Durable Conventions** | `store_memory` keeps verified architectural rules until you remove them |
+## What is different, and what is not
 
----
+The difference is not that the model becomes smarter. The model is the same. What changes is the information it has, and what is checked before the work is called finished.
 
-## Benchmark Gates
+Some things stay the same. The agent can still write a bad fix. The routed rule can be the wrong one. A passing test proves only that the test passed, and a weak test proves little. agent-brain does not review the code for you.
 
-The bench extension checks routing quality and latency against fixtures. These proofs run on a schedule or on demand, not in every pull request:
+The honest version of the benefit is narrower: the context is bounded and visible, the completion claim is backed by a record, and the next session can use what this one learned.
 
-* **Recall@3 gate**: the bench extension fails a run below 0.85. That is a pass/fail threshold, not a published result.
-* **Warm-Route Latency p95 target**: &le; 100ms. The recorded CI run measured 3 ms with a deterministic embedder, not the production embedding model.
-* **Token Budget**: 350–700 tokens per task kind, with a 120-token memory reservation
-* **Memory Deduplication**: HNSW cosine similarity thresholding
+## How to measure it on your repository
 
-```bash
-# Verify benchmarks locally:
-agent-brain doctor
-agent-brain briefing
-```
+You do not have to take our word for any of this. Three commands show it on your own machine:
 
----
+- `agent-brain stats --markdown` prints the measured figures for the last week: routed turns, tokens returned, the cache hit rate, the verify runs that passed and failed, and how many turns carried a must-apply rule.
+- `agent-brain dashboard` writes an HTML page. Each tile says whether its figure is measured or an estimate, and what it counts.
+- `agent-brain verify receipt` shows whether the current commit and code state has a passing run.
 
-## Real-World Workflow
-
-With `agent-brain install --global` configured on your developer workstation:
-
-1. **Turn Start**: Your editor triggers `route_task` with the user query and open files.
-2. **Context Resolution**: `agent-brain` extracts verified recipes and high-confidence memory facts locally, within a per-task token budget.
-3. **Execution**: The agent solves the task strictly adhering to loaded conventions.
-4. **Verification**: Executed commands record exit codes via `agent-brain verify`, reinforcing successful patterns and dampening failures.
+Compare a week of work with agent-brain installed against a week without it, on the same kind of task. If the numbers do not move, the tool is not helping, and you should say so.

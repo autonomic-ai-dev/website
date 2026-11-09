@@ -1,0 +1,63 @@
+---
+title: "Verify receipts: tying a claim of 'tests pass' to the code that was tested"
+date: "2026-11-09"
+excerpt: "An agent that says the tests pass is making a claim. A receipt is a record that a specific command exited 0 for a specific commit and code state. This post explains what agent-brain records, how a receipt matches it, and what a receipt cannot tell you."
+slug: "verify-receipts"
+category: "Verification"
+author: "Abhiuday Gupta"
+---
+
+When an agent says "all tests pass", the sentence is a claim about the past. It may be true. It may be a guess, or a run of a different command, or a run before the last edit. The reviewer has no easy way to tell which. We kept hitting this, so we made the claim checkable.
+
+agent-brain's verify receipts are a record that a command ran, what it returned, and which code it ran against. This post covers how that record is made, how a receipt matches it, and where the receipt stops being useful.
+
+## What a verify run records
+
+You run a verify command with `agent-brain verify -- <command>`. The command must match an entry in the project's allowlist, a file named `verify.toml`. The allowlist is a plain list of commands the team has agreed to trust. Anything outside the list is refused, and the refusal is itself visible.
+
+agent-brain runs the command itself and records:
+
+- the command, as written;
+- the exit code;
+- the source of the run. Runs executed through `verify --` are recorded as `cli`. Records that an agent or a hook reports are stored, but they do not count as a receipt, because agent-brain did not run the command;
+- the git commit that was checked out, from `git rev-parse HEAD`;
+- a SHA-256 hash of the uncommitted code. The hash covers changed files under `src/`, `crates/`, `tests/` and `hooks/`, plus `Cargo.*` and `build.rs`. Changes outside those paths, such as documentation, do not change it;
+- the full output of the run, saved to `.verify/artifacts/<id>.log` in projects that have a `.verify/` folder.
+
+The commit and the code hash are the important parts. Together they name the state that was tested.
+
+## How a receipt matches
+
+`agent-brain verify receipt` looks at the current commit and the current code hash. It searches the project's recent runs, newest first, for one that matches both and was executed by the verify runner. The first match decides the verdict:
+
+- **PASSED** if that run exited with 0.
+- **FAILED** if it exited with any other code. The receipt shows the code.
+- **NOT VERIFIED** if no run matches. This is the answer after a new commit, after an edit to code, or in a repository with no runs. It is not a failure, but it is not a pass either.
+
+The command exits 0 only for PASSED, so the same check can gate a CI job or a pull request template.
+
+A few details matter in practice. Runs recorded before schema version 26 have no commit, so they never match. Hook records and records reported by an agent never match. An edit to a file under `src/` makes earlier receipts stale, even if the edit was small and the tests would still pass. That is intentional: a receipt should describe the code that is on disk.
+
+## Why the hash covers only some paths
+
+If the hash covered every file, a change to a README would invalidate a receipt for a Rust project, and people would stop paying attention to receipts. If it covered nothing, a code edit would leave a stale receipt looking valid. We picked a set of paths that usually hold code and tests, and we are open about the choice. A project that keeps behaviour in unusual places should add those places to the list in a future version, and until then a receipt will not notice a change there.
+
+## What a receipt does not prove
+
+A receipt proves that the command you ran passed for that state. It does not prove that the command tests the change.
+
+If `make test` runs twenty unit tests and your change breaks a path none of them touch, the receipt still says PASSED. A receipt is only as strong as the command in the allowlist. Choosing that command is the team's job, and it is worth reviewing when the project grows.
+
+A receipt also does not prove the run was not flaky. A test that passes on one run and fails on the next will give a receipt for whichever run it hit. We do not retry runs automatically, because a retry that hides flakiness would be worse than the flakiness.
+
+Finally, a receipt is local. It lives in the local database and in the artifact folder. Another person who checks out the same commit has no receipt until they run the command themselves. Sharing receipts in a pull request is done by pasting the markdown block that `agent-brain verify receipt --markdown` prints. That paste is a claim as well, although it is one the reviewer can check by running the command.
+
+## The stop gate
+
+The stop gate uses the same records. When an agent tries to finish a session in a host with hooks, the gate asks whether code changed and whether a passing run covers the current code state. If not, the session is blocked and the block names the repository and the missing run. Documentation and feature map updates are checked separately.
+
+The gate is strict on purpose. The tradeoff is that some sessions are blocked when the work is correct but unrecorded, and the person has to run the command. We think a few extra minutes beat a session that ends with an unverified claim.
+
+## What to do
+
+Put the commands your team actually trusts in `verify.toml`, run `agent-brain verify -- <command>` after each change, and run `agent-brain verify receipt` before you open a pull request. If the receipt says NOT VERIFIED, the honest state is that the change has not been checked yet.

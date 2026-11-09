@@ -1,0 +1,58 @@
+---
+title: "Gates, not instructions: where agent-brain checks run"
+date: "2026-11-09"
+excerpt: "Writing a rule in the prompt asks the agent to follow it. A gate in the host checks the action before it runs. agent-brain has four gates. This post explains each one, the hosts that get them, what they cost in friction, and the cases they do not cover."
+slug: "gates-not-instructions"
+category: "Engineering"
+author: "Abhiuday Gupta"
+---
+
+Most agent rules are written as instructions. "Always run the tests before you finish." "Never use `rm -rf` on the project." "Read the routing notes first." The agent is asked to do these things, and most of the time it does. When it does not, nothing happens. The rule was a request, and the agent decided against it.
+
+We wanted a different kind of check for the few rules that must hold. A gate runs in the host, before an action, and can say no. This post is about those gates: what they are, which hosts get them, what they cost, and where they stop.
+
+## The four gates
+
+agent-brain installs four gates, each for a different moment.
+
+**The route gate** runs when the agent starts work. In hosts with hooks, it blocks agent-brain's own tools until the agent has called `route_task` in this session. The routed context is what the agent should work from, so the gate makes sure there is one. The route itself is cheap, and the check stops an agent from skipping straight to tools with no context.
+
+**The bash gate** runs before a shell command. It checks the command against a policy. Known safe patterns pass. Shell keywords and builtins such as `for`, `export` and `echo` pass without a warning. Commands with no rule get a warning, and the warning tells the user how to allow the command. Agents cannot change the command rules themselves. That is deliberate. If an agent could widen its own permissions, the gate would not be a gate.
+
+**The read gate** steers full-file reads toward bounded reads. The read tools return a head, a tail or a summary of a file, and the gate counts the native full-file reads it steers away. The count is on the dashboard as "full-read steers". It is a steer, not a block. An agent that really needs the whole file can still read it.
+
+**The stop gate** runs when the agent tries to finish. It blocks the session when code changed and no passing verify run covers the current code tree, or when the feature map and knowledge base were not updated for the change. The block names the repository it applies to and says what is missing.
+
+## Which hosts get which gates
+
+The gates depend on the host's hook system, and the hosts differ.
+
+- Claude Code has prompt and tool hooks, so the route gate and the bash gate run there, and the stop gate runs at the end of a session.
+- Cursor has a hook for shell commands, so the bash gate runs there. Its route step depends on the rule files the installer writes, which the agent is asked to follow.
+- Gemini CLI and Antigravity have before-agent and before-tool hooks, and Codex has a hooks file. OpenCode has a plugin.
+- VS Code and GitHub Copilot get instructions only. Claude Desktop gets the MCP tools and no hooks.
+
+The support matrix in the repository lists the exact files for each host. The important point is that where there are no hooks, there are no gates. The instructions still apply, but nothing stops an action. We say this on the site and in the installer output, and we would rather a reader know it before installing.
+
+## What the gates cost
+
+A gate is friction, and friction is a cost to the person using it.
+
+- Hooks have to be trusted. Claude Code and Codex ask you to review new hooks, and until you do, they do not run. That is a good safety property and an annoying first run.
+- A bash gate that warns on an unknown command interrupts the flow of work. An agent that hits many warnings is slower. We tuned the builtins list to remove the common false alarms, but it is still a tradeoff.
+- The stop gate can block work that is correct but not yet recorded. A documentation change that touches a code path, or a refactor with no behaviour change, may need a passing run and a feature map entry before the session can end. That is the intent: a claim of done has to be backed. It is also a reason some people turn the gate off, which we do not recommend.
+
+## What the gates do not do
+
+A gate checks what passes through it. It does not check intent.
+
+- A bash gate sees the command. It does not understand a script that the command runs, or a program that writes its own code and runs that.
+- A read gate steers reads. It does not stop a determined agent from getting the same information another way.
+- The stop gate checks that a run exists and covers the code tree. It does not check that the tests are good. A weak test that passes will pass the gate.
+- VS Code and Claude Desktop have no gates. Anything that depends on a gate does not hold there.
+
+We think a gate plus a verify record is worth more than instructions alone, because the gate makes the lack of evidence visible. It does not make the work correct. That still depends on the people and the tests.
+
+## What to do with this
+
+If a rule matters, put it in a gate, not only in the instructions. If the host has no hooks, write the rule down anyway, and check the result yourself. Run `agent-brain doctor` to see which gates are installed, and read the support matrix before you rely on one.
