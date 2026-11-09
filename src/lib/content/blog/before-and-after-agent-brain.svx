@@ -1,7 +1,7 @@
 ---
 title: "Before vs After: Scaling Cursor Agents to 2,000+ Skills without Context Bloat"
 date: "2026-10-17"
-excerpt: "How agent-brain eliminates the 240k-token prompt stuffing penalty using hybrid BM25 + HNSW vector routing, mandatory hook gating, and durable memory across agent turns."
+excerpt: "How agent-brain keeps routed context small for large skill libraries, using hybrid BM25 + HNSW vector routing, hook gating in supported hosts, and durable memory across agent turns."
 slug: "before-and-after-agent-brain"
 category: "Engineering"
 author: "Abhiuday Gupta"
@@ -9,11 +9,11 @@ author: "Abhiuday Gupta"
 
 Power users and engineering organizations quickly hit three walls when scaling agentic workflows with static rules and giant skill repositories:
 
-1. **Context Bloat** — Loading hundreds of rules or skills on every turn burns up to 240,000 tokens per interaction, ballooning API costs and degrading model reasoning quality.
+1. **Context Bloat** — Loading hundreds of rules or skills on every turn adds a large, unbounded amount of context to each interaction, which raises API costs and can degrade reasoning. (Illustration only: 200 rules at about 1,200 tokens each would be about 240,000 tokens per turn. This is arithmetic, not a measurement.)
 2. **Soft Enforcement** — Conventional instructions like *"always read coding guidelines first"* are routinely ignored by LLMs when executing spontaneous tool loops.
 3. **Session Amnesia** — Hard-won conventions and architectural decisions established last week vanish when starting a fresh session.
 
-`agent-brain` treats context routing as **critical infrastructure**: hard-enforced `route_task` gates, strictly budgeted retrieval (under 500 tokens), and temporal memory graphs.
+`agent-brain` routes context through `route_task`: in hosts with hooks, the gate blocks agent-brain tools until it has run. Retrieval fits a token budget of 350 to 700 tokens, depending on the task kind, and memory is stored in a temporal graph.
 
 ---
 
@@ -26,7 +26,7 @@ Suppose your organization maintains a curated library of over 2,000 specialized 
 
 | Behavior | Cost & Impact |
 | :--- | :--- |
-| **200+ rules loaded** | **~240,000 tokens burned** on every turn just to seed the prompt |
+| **200+ rules loaded** | **Illustrative: about 240,000 tokens** added to every turn to seed the prompt |
 | **Agent skips rules** | The model ignores guidelines and runs unstructured `grep` and `find` commands |
 | **No ranking** | Relevant skills compete in a giant unstructured blob; key patterns get truncated |
 | **Session amnesia** | The agent forgets *"use Vitest, never Jest"* unless manually repasted |
@@ -37,16 +37,16 @@ Suppose your organization maintains a curated library of over 2,000 specialized 
 | :--- | :--- |
 | **Mandatory Hook Gate** | Host hooks block MCP execution until `route_task` returns approved context |
 | **Budgeted Token Routing** | Hybrid BM25 + HNSW vector engine selects the top relevant skills, rules and memory within a per-task budget of 350–700 tokens |
-| **Measured Token Savings** | `agent-brain dashboard` reports the total tokens saved for your repo, so the number is yours to check |
-| **Durable Conventions** | `store_memory` persists verified architectural rules forever |
+| **Token Figures** | `agent-brain dashboard` shows the tokens routed for your repo as measured figures, and labels any savings figure that is an estimate |
+| **Durable Conventions** | `store_memory` keeps verified architectural rules until you remove them |
 
 ---
 
-## Benchmark Performance (CI Proofs)
+## Benchmark Gates
 
-Every release of `agent-brain` executes strict verification tests against standardized fixtures:
+The bench extension checks routing quality and latency against fixtures. These proofs run on a schedule or on demand, not in every pull request:
 
-* **Isolated Recall@3**: &ge; 0.85
+* **Recall@3 gate**: the bench extension fails a run below 0.85. That is a pass/fail threshold, not a published result.
 * **Warm-Route Latency p95 target**: &le; 100ms. The recorded CI run measured 3 ms with a deterministic embedder, not the production embedding model.
 * **Token Budget**: 350–700 tokens per task kind, with a 120-token memory reservation
 * **Memory Deduplication**: HNSW cosine similarity thresholding

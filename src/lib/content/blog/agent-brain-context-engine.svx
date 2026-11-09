@@ -63,6 +63,6 @@ In a full deployment, every organ calls brain's `route_task` before acting. Spin
 
 ## Design Decisions
 
-We chose `HNSW` over flat cosine-similarity search because real deployments accumulate tens of thousands of facts. The temporal knowledge graph model was chosen over a simple key-value store because `AI` agents produce inherently relational data — a memory is only meaningful in the context of what task was running, what files were open, what decision was made.
+We chose `HNSW` over flat cosine-similarity search because the index grows with use, and flat search gets slower as it grows. The temporal knowledge graph model was chosen over a simple key-value store because `AI` agents produce inherently relational data — a memory is only meaningful in the context of what task was running, what files were open, what decision was made.
 
 The trade-off is write latency. Inserting a vector and multiple `KG` edges in a transaction is slower than writing to a flat cache. For brain's use case this is acceptable — writes are rare, reads are constant.

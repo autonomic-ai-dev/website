@@ -97,7 +97,7 @@ flowchart LR
       <span class="font-mono text-xs text-purple-400 bg-purple-950/60 px-2 py-0.5 rounded border border-purple-500/30">Approval Gate</span>
     </div>
     <p class="text-sm text-slate-300 leading-relaxed">
-      Human founder or lead engineer signs off on functional architecture and customer experience before deployment. The engine blocks progression until approved via CLI or signed approval token.
+      Human founder or lead engineer signs off on functional architecture and customer experience before deployment. An approval gate waits until its payload carries `approved: true`. Auto-approval is the default, so the gate only waits when it has been turned off. No CLI command approves a gate.
     </p>
   </div>
 
