@@ -53,7 +53,7 @@
 				<a href={spine.origin} class="rounded-md border border-zinc-800 px-4 py-2.5 text-zinc-200 transition-colors hover:bg-zinc-900">Start with {spine.name}</a>
 			</div>
 		</div>
-		<Terminal lines={brain.terminal} />
+		<Terminal title={brain.showcase.title} lines={brain.showcase.lines} />
 	</div>
 </section>
 
