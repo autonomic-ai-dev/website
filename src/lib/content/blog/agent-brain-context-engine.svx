@@ -1,6 +1,6 @@
 ---
 title: "Routing context inside a budget"
-date: "2026-11-09"
+date: "2026-10-31"
 excerpt: "How agent-brain chooses what an agent sees on each turn: candidates from keyword and vector search, a score for each, and a greedy fill under a token budget that depends on the kind of task. What it costs, and what it leaves out."
 slug: "agent-brain-context-engine"
 category: "Engineering"

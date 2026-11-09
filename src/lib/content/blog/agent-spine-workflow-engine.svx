@@ -1,6 +1,6 @@
 ---
 title: "agent-spine as a state machine: what runs, what does not, and why"
-date: "2026-11-09"
+date: "2026-11-02"
 excerpt: "agent-spine runs YAML workflows of named nodes and edges, records a snapshot after each step, retries failed nodes, and keeps dead-letter entries. This post covers the parts that run for real, the kinds that are only partly implemented, and why we chose a local state machine over a hosted orchestrator."
 slug: "agent-spine-workflow-engine"
 category: "Architecture"

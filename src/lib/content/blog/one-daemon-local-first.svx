@@ -1,6 +1,6 @@
 ---
 title: "One local daemon, one SQLite file: why agent-brain runs on your machine"
-date: "2026-11-09"
+date: "2026-11-06"
 excerpt: "agent-brain runs as one background process that owns a SQLite database, with a small proxy for each editor. This post explains the process layout, why we chose a single local writer over a hosted service, and what that choice costs when a team wants to share memory."
 slug: "one-daemon-local-first"
 category: "Architecture"

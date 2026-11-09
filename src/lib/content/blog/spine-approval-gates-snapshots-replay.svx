@@ -1,6 +1,6 @@
 ---
 title: "Approval gates, snapshots and replay in agent-spine"
-date: "2026-11-09"
+date: "2026-11-08"
 excerpt: "agent-spine can pause a workflow at an approval gate until a person signs off. This post explains the default, which is auto-approve, how a gate waits when auto-approve is off, how snapshots record each step, and what replay does and does not do."
 slug: "spine-approval-gates-snapshots-replay"
 category: "Operations"

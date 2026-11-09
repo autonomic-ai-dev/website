@@ -1,6 +1,6 @@
 ---
 title: "One install, many hosts: MCP as the integration layer, and what each host gets"
-date: "2026-11-09"
+date: "2026-11-07"
 excerpt: "agent-brain talks to each coding host through the Model Context Protocol, plus whatever hook system the host offers. This post explains why we chose MCP, what the installer writes for each host, and why the same install gives different protection in different editors."
 slug: "mcp-one-install-many-hosts"
 category: "Engineering"

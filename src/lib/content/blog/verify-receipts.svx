@@ -1,6 +1,6 @@
 ---
 title: "Verify receipts: tying a claim of 'tests pass' to the code that was tested"
-date: "2026-11-09"
+date: "2026-11-04"
 excerpt: "An agent that says the tests pass is making a claim. A receipt is a record that a specific command exited 0 for a specific commit and code state. This post explains what agent-brain records, how a receipt matches it, and what a receipt cannot tell you."
 slug: "verify-receipts"
 category: "Verification"
