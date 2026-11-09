@@ -115,6 +115,7 @@
         <a class="transition-colors duration-150 hover:text-white {page.url.pathname === '/' ? 'text-white font-semibold' : ''}" href="/#platform">Platform</a>
         <a class="transition-colors duration-150 hover:text-white {page.url.pathname.startsWith('/docs/architecture') ? 'text-white font-semibold' : ''}" href="/docs/architecture">Architecture</a>
         <a class="transition-colors duration-150 hover:text-white {page.url.pathname.startsWith('/registry') ? 'text-white font-semibold' : ''}" href="/registry">Registry</a>
+        <a class="transition-colors duration-150 hover:text-white {page.url.pathname.startsWith('/blog') ? 'text-white font-semibold' : ''}" href="/blog">Blog</a>
         <a class="transition-colors duration-150 hover:text-white {page.url.pathname.startsWith('/docs') && !page.url.pathname.startsWith('/docs/cli') ? 'text-white font-semibold' : ''}" href="/docs">Docs</a>
         <a class="transition-colors duration-150 hover:text-white {page.url.pathname.startsWith('/docs/cli') ? 'text-white font-semibold' : ''}" href="/docs/cli">CLI Reference</a>
         <a class="text-neutral-400 hover:text-emerald-400 transition-colors duration-150 flex items-center gap-1.5" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">
@@ -176,6 +177,13 @@
           href="/registry"
         >
           Registry
+        </a>
+        <a
+          onclick={() => isMobileNavOpen = false}
+          class="px-3 py-2 rounded-lg transition-colors {page.url.pathname.startsWith('/blog') ? 'text-white bg-white/[0.06] font-semibold' : 'text-neutral-400 hover:text-white hover:bg-white/[0.03]'}"
+          href="/blog"
+        >
+          Blog
         </a>
         <a 
           onclick={() => isMobileNavOpen = false} 
