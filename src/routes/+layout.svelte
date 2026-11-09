@@ -237,6 +237,7 @@
           <a class="hover:text-white transition-colors duration-150" href="/#platform">Platform</a>
           <a class="hover:text-white transition-colors duration-150" href="/docs/architecture">Architecture</a>
           <a class="hover:text-white transition-colors duration-150" href="/registry">Registry</a>
+          <a class="hover:text-white transition-colors duration-150" href="/blog">Blog</a>
           <a class="hover:text-white transition-colors duration-150" href="/docs">Docs</a>
           <a class="hover:text-white transition-colors duration-150" href="/docs/cli">CLI Reference</a>
           <a class="hover:text-emerald-400 transition-colors duration-150 flex items-center gap-1.5" href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer">
