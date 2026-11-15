@@ -57,15 +57,13 @@
 
 			<!-- Desktop Primary Nav (visible on lg and above with roomy spacing) -->
 			<nav
-				class="hidden lg:flex items-center gap-5 xl:gap-7 text-[13px] font-medium text-neutral-400"
+				class="hidden lg:flex items-center gap-6 xl:gap-8 text-[13px] font-medium text-neutral-400"
 			>
-				<a href="/#features" class="hover:text-white transition-colors">Features</a>
-				<a href="/#inspector" class="hover:text-white transition-colors">Receipt Proof</a>
-				<a href="/#benchmarks" class="hover:text-white transition-colors">Benchmarks</a>
-				<a href="/#how-it-works" class="hover:text-white transition-colors">How it works</a>
-				<a href="/docs" class="hover:text-white transition-colors">Docs</a>
-				<a href="/blog" class="hover:text-white transition-colors">Blog</a>
-				<a href="/changelog" class="hover:text-white transition-colors">Changelog</a>
+				<a href="/tekmor" class="hover:text-white transition-colors {isActive('/tekmor') ? 'text-white' : ''}">Tekmor</a>
+				<a href="/thesmos" class="hover:text-white transition-colors {isActive('/thesmos') ? 'text-white' : ''}">Thesmos</a>
+				<a href="/docs" class="hover:text-white transition-colors {isActive('/docs') ? 'text-white' : ''}">Docs</a>
+				<a href="/blog" class="hover:text-white transition-colors {isActive('/blog') ? 'text-white' : ''}">Blog</a>
+				<a href="/changelog" class="hover:text-white transition-colors {isActive('/changelog') ? 'text-white' : ''}">Changelog</a>
 				<a
 					href="https://autonomic-ai.openstatus.dev"
 					target="_blank"
@@ -165,34 +163,6 @@
 						>Navigation</span
 					>
 					<div class="mt-2.5 flex flex-col space-y-1">
-						<a
-							href="/#features"
-							onclick={() => (mobileMenuOpen = false)}
-							class="rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/[0.05] hover:text-white"
-						>
-							Features & Invariants
-						</a>
-						<a
-							href="/#how-it-works"
-							onclick={() => (mobileMenuOpen = false)}
-							class="rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/[0.05] hover:text-white"
-						>
-							How it works
-						</a>
-						<a
-							href="/#inspector"
-							onclick={() => (mobileMenuOpen = false)}
-							class="rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/[0.05] hover:text-white"
-						>
-							Receipt Proof Inspector
-						</a>
-						<a
-							href="/#benchmarks"
-							onclick={() => (mobileMenuOpen = false)}
-							class="rounded-lg px-3 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/[0.05] hover:text-white"
-						>
-							Empirical Benchmarks
-						</a>
 						<a
 							href="/docs"
 							onclick={() => (mobileMenuOpen = false)}
