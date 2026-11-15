@@ -5,12 +5,28 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
 		<link rel="icon" href="/logo.svg" type="image/svg+xml" />
-		<!-- High-Performance Local Geist Fonts (Caveman & Vercel) -->
-		<link rel="preload" href="/fonts/geist-sans.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-		<link rel="preload" href="/fonts/geist-mono.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+		<!-- High-Performance Local Geist Fonts -->
+		<link
+			rel="preload"
+			href="/fonts/geist-sans.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
+		<link
+			rel="preload"
+			href="/fonts/geist-mono.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin="anonymous"
+		/>
 		<style>
 			.material-symbols-outlined {
-				font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+				font-variation-settings:
+					'FILL' 0,
+					'wght' 400,
+					'GRAD' 0,
+					'opsz' 24;
 				display: inline-block;
 				vertical-align: middle;
 				line-height: 1;
@@ -22,18 +38,22 @@
 				border: 0 !important;
 				font-size: inherit !important;
 				font-weight: inherit !important;
-				font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+				font-family:
+					'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 			}
 			/* Remove Tailwind Typography backtick pseudo-elements that show raw ` around inline code */
-			.prose :where(code):not(:where([class~="not-prose"] *))::before,
-			.prose :where(code):not(:where([class~="not-prose"] *))::after {
+			.prose :where(code):not(:where([class~='not-prose'] *))::before,
+			.prose :where(code):not(:where([class~='not-prose'] *))::after {
 				content: none !important;
 			}
 		</style>
 		%sveltekit.head%
 		<script defer src="/_vercel/insights/script.js"></script>
 	</head>
-	<body data-sveltekit-preload-data="hover" class="bg-[#070709] text-neutral-100 font-sans selection:bg-[#5fd39a]/25 selection:text-white antialiased relative min-h-screen overflow-x-hidden">
+	<body
+		data-sveltekit-preload-data="hover"
+		class="text-neutral-100 font-sans selection:text-white relative min-h-screen overflow-x-hidden bg-[#070709] antialiased selection:bg-[#5fd39a]/25"
+	>
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>
