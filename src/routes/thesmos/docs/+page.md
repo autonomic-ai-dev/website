@@ -18,10 +18,10 @@ flowchart TD
     Validate --> Engine["Tokio Asynchronous Graph Walker"]
     
     subgraph Execution ["Node Execution Types"]
-        Engine --> Agent["Agent Node (Injects ~500-token Knapsack)"]
+        Engine --> Agent["Agent Node (Runs with its payload)"]
         Engine --> Verify["Verify Node (Active Shell Command Execution)"]
         Engine --> Gate["ApprovalGate (Halts until Approved)"]
-        Engine --> Fork["SpeculativeFork (Isolated Git Worktrees)"]
+        Engine --> Fork["SpeculativeFork (Planned)"]
     end
 
     Agent --> Snapshot[("Append-Only SQLite Snapshot<br/>(state.db)")]
@@ -29,7 +29,7 @@ flowchart TD
     Gate --> Snapshot
     Fork --> Snapshot
 
-    Snapshot --> Replay["agent-spine replay &lt;ID&gt;<br/>(Reconstructs state with 0 LLM re-runs)"]
+    Snapshot --> Replay["agent-spine replay &lt;ID&gt;<br/>(Reconstructs the final state and runs no step)"]
 ```
 
 ## Requirements
@@ -46,8 +46,8 @@ flowchart TD
 1. **Declarative Control Flow**: Topologies are strictly declared in YAML files. The worker agent does not decide what happens next; the graph transitions do.
 2. **Active Machine Validation**: `Verify` nodes asynchronously execute shell validation commands under timeouts, capturing stdout, stderr, and exit codes.
 3. **Append-Only SQLite Snapshots**: Every state transition appends an immutable row to `state.db`. A completed execution is an audit trail, not an ungrounded summary.
-4. **Cognitive Knapsack Injection**: `Agent` nodes are injected with surgical ~500-token knapsacks from `tekmor route_task`, eliminating context pollution.
-5. **Zero-Re-Run Replay**: `agent-spine replay <ID>` recreates the final state purely from SQLite snapshots without re-spending API tokens or re-running steps.
+4. **Declared Context**: `Agent` nodes receive the context in their payload. The `--brain` flag depends on the retired agent-brain.
+5. **Replay Reads the Record**: `agent-spine replay <ID>` recreates the final state from SQLite snapshots and runs no step again.
 
 ---
 
@@ -55,9 +55,9 @@ flowchart TD
 
 ### Get Started
 - [Installation](installation) — Single-binary Homebrew tap, global shell setup, and doctor diagnostics.
-- [Workflows & Node Kinds](workflows) — Full YAML specification, all 10 `NodeKind` definitions, and retry policies.
+- [Workflows & Node Kinds](workflows) — Full YAML specification, the node kinds, and retry policies.
 
 ### Reference
 - [agent-spine CLI](cli/agent-spine) — CLI options for `run`, `validate`, `inspect`, `replay`, and template scaffolding.
-- [Design Decisions](decisions) — Rationale for append-only SQLite tables, local DLQ fallbacks, and worktree isolation.
+- [Design Decisions](decisions) — Rationale for append-only SQLite tables, local DLQ fallbacks, and the planned SpeculativeFork.
 - [Troubleshooting](troubleshooting) — Dead-letter queue analysis (`dlq.jsonl`) and execution failure recovery.

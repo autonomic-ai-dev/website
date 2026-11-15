@@ -151,14 +151,14 @@
 
 				<!-- YC Headline with Negative Letter Spacing -->
 				<h1 class="mt-7 text-3xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-semibold leading-[1.1] tracking-[-0.035em] text-white max-w-xl">
-					Coding agents skip steps. <br class="hidden sm:inline" />
-					<span class="text-neutral-500 block mt-1.5">These tools make them show their work.</span>
+					Agents say the work is done. <br class="hidden sm:inline" />
+					<span class="text-neutral-500 block mt-1.5">Make them show the receipt.</span>
 				</h1>
 
 				<p class="mt-5 max-w-lg text-base leading-relaxed text-neutral-400 sm:text-lg">
-					Two open-source, local-first tools for autonomous coding agents.
-					<strong class="font-medium text-neutral-200">tekmor</strong> enforces allowlisted checks and signs verifiable tree receipts.
-					<strong class="font-medium text-neutral-200">thesmos</strong> executes deterministic DAG pipelines with append-only SQLite snapshots.
+					Two local-first tools for coding agents.
+					<strong class="font-medium text-neutral-200">tekmor</strong> checks an agent's pass claim against a receipt for the exact code on disk.
+					<strong class="font-medium text-neutral-200">thesmos</strong> runs a multi-step workflow in a fixed order and keeps a record of every step.
 				</p>
 
 				<!-- YC Button Row -->

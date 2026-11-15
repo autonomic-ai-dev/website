@@ -1,14 +1,14 @@
 ---
-title: "thesmos Workflows: YAML specification and 10 NodeKinds"
-description: "Authoring deterministic workflows for thesmos (agent-spine). Covers YAML schema, all 10 NodeKind definitions, active verify nodes, and retry policies."
+title: "thesmos Workflows: YAML specification and node kinds"
+description: "Authoring deterministic workflows for thesmos (agent-spine). Covers the YAML schema, the node kinds, active verify nodes, and retry policies."
 canonical: https://thesmos.autonomic-ai.dev/docs/workflows
 product: thesmos
 group: Get Started
 ---
 
-# thesmos Workflows: YAML specification and 10 NodeKinds
+# thesmos Workflows: YAML specification and node kinds
 
-> Authoring deterministic workflows for thesmos (command: agent-spine). Covers YAML schema, all 10 NodeKind definitions, active verify nodes, and retry policies.
+> Authoring deterministic workflows for thesmos (command: agent-spine). Covers the YAML schema, the node kinds, active verify nodes, and retry policies.
 
 A workflow is a version-controlled YAML document defining named nodes, edge transitions, retry policies, and timeout constraints. `thesmos` executes nodes in the topological order described by the edges, appending an immutable snapshot to SQLite after every step.
 
@@ -57,16 +57,16 @@ edges:
 
 ---
 
-## The 10 Node Kinds (`NodeKind`)
+## Node kinds
 
 Every node defines exactly one `kind` determining its execution semantics:
 
 | NodeKind | Purpose | Behavior & Guarantees |
 | :--- | :--- | :--- |
-| **`Agent`** | Cognitive Task | Injects surgical ~500-token `_brain_knapsack` from `tekmor route_task`, delegates to worker model, snapshots result. |
+| **`Agent`** | Agent Task | Runs an agent step with the context in its payload. |
 | **`Verify`** | Machine Validation | Actively executes `command` under a timeout. Captures exit code, stdout, and stderr. Halts execution on failure unless `continue_on_failure: true`. |
 | **`ApprovalGate`** | Human-in-the-Loop | Pauses workflow until `approved: true` is provided in the node payload. Auto-approves by default unless `auto_approve: false`. |
-| **`SpeculativeFork`** | Isolated Branching | Spawns temporary Git worktrees to evaluate multiple solutions concurrently without branch pollution. |
+| **`SpeculativeFork`** | Planned | Passes its payload through unchanged. It does not create worktrees yet. |
 | **`Fork` / `Join`** | Concurrency Barrier | Fans out across parallel branches; `Join` continues only after all incoming prerequisite branches resolve. |
 | **`Debate`** | Multi-Agent Refinement | Alternates between coder and critic models over iterative rounds until convergence or max rounds reached. |
 | **`Vote`** | Consensus Selection | Runs a prompt $N$ times with temperature variance, selecting the best output by consensus. |
@@ -102,7 +102,7 @@ agent-spine run bugfix.yaml -p '{"ticket": "BUG-42"}'
 # 3. Inspect execution steps from SQLite
 agent-spine inspect <EXECUTION_ID>
 
-# 4. Replay execution final state (0 LLM re-runs)
+# 4. Replay the final state of an execution (runs no step)
 agent-spine replay <EXECUTION_ID>
 ```
 
