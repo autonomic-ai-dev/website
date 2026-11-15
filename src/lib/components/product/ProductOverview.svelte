@@ -22,18 +22,16 @@
 </script>
 
 <section class="relative isolate overflow-hidden">
-	<div class="mx-auto max-w-5xl px-4 pt-24 pb-16 text-center sm:px-6 lg:pt-32">
-		<span class="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-black px-3 py-1 font-mono text-[11px] text-zinc-300">
-			<span class="h-1.5 w-1.5 rounded-full bg-white"></span>{product.badge}
-		</span>
-		<h1 class="mx-auto mt-7 max-w-4xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">{product.headline}</h1>
-		<p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">{product.subline}</p>
+	<div class="mx-auto max-w-5xl px-4 pt-24 pb-16 sm:px-6 lg:pt-32">
+		<p class="font-mono text-xs text-zinc-400">{product.badge}</p>
+		<h1 class="mt-6 max-w-4xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">
+			{product.headline} <span class="text-zinc-500">{product.headlineMuted}</span>
+		</h1>
+		<p class="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">{product.subline}</p>
 
-		<div id="install" class="mx-auto mt-10 max-w-xl scroll-mt-24 rounded-lg border border-zinc-800 bg-black text-left">
+		<div id="install" class="mt-10 max-w-xl scroll-mt-24 rounded-lg border border-zinc-800 bg-black">
 			<div class="flex items-center gap-4 border-b border-zinc-900 px-4 py-2 font-mono text-xs">
 				<span class="text-white">brew</span>
-				<span class="text-zinc-600">curl</span>
-				<span class="text-zinc-600">npm</span>
 			</div>
 			<div class="flex items-center justify-between gap-4 px-4 py-3">
 				<code class="overflow-x-auto font-mono text-sm text-zinc-100">{product.install}</code>
@@ -48,13 +46,13 @@
 			</div>
 		</div>
 
-		<ul class="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-zinc-400">
+		<ul class="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm text-zinc-400">
 			{#each product.chips as chip (chip)}
 				<li class="inline-flex items-center gap-2"><Check size={14} class="text-zinc-300" />{chip}</li>
 			{/each}
 		</ul>
 
-		<div class="mt-10 flex flex-wrap justify-center gap-3 text-sm">
+		<div class="mt-10 flex flex-wrap gap-3 text-sm">
 			<a href="/docs" class="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2.5 font-medium text-black transition-colors hover:bg-zinc-200">
 				Read the docs <ArrowRight size={14} />
 			</a>

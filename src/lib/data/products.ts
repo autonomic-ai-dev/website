@@ -15,6 +15,7 @@ export type Product = {
 	announce: { text: string; label: string; href: string };
 	badge: string;
 	headline: string;
+	headlineMuted: string;
 	subline: string;
 	install: string;
 	chips: string[];
@@ -54,20 +55,24 @@ export const products: Record<ProductId, Product> = {
 			href: 'https://github.com/autonomic-ai-dev/tekmor/releases/tag/v1.0.0'
 		},
 		badge: 'v1.0.0 · Runs locally · No model calls',
-		headline: 'Your agent says the tests pass. Check the receipt.',
+		headline: 'Your agent says the tests pass.',
+		headlineMuted: 'Check the receipt.',
 		subline:
 			'tekmor runs the checks your project allows, records each result against the commit and code it ran on, and writes a receipt. A stop gate blocks a turn that claims a pass without one. It makes no model calls and opens no network connection on its own.',
 		install: 'brew install autonomic-ai-dev/tap/tekmor',
 		chips: ['Allowlisted commands only', 'Receipts tied to the code', 'Stop gate on unverified claims'],
 		showcase: {
-			title: 'zsh',
-			prompt: true,
+			title: 'zsh · my-project',
+			prompt: false,
 			lines: [
-				'brew install autonomic-ai-dev/tap/tekmor',
-				'tekmor install',
-				'tekmor verify init',
-				'tekmor verify -- .verify/run.sh',
-				'tekmor verify receipt'
+				'$ tekmor verify -- sh check.sh',
+				'tests: 3 passed',
+				'  recorded: exit 0, source cli',
+				'',
+				'$ tekmor verify receipt',
+				'Verify receipt: PASSED',
+				'  command:   sh check.sh',
+				'  exit code: 0'
 			]
 		},
 		features: [
@@ -172,7 +177,8 @@ export const products: Record<ProductId, Product> = {
 			href: '/blog/spine-approval-gates-snapshots-replay'
 		},
 		badge: 'v1.0.0-rc3 · Private beta · Runs locally',
-		headline: 'Your agent says the tests passed. Show the snapshot.',
+		headline: 'Your agent says the tests passed.',
+		headlineMuted: 'Show the snapshot.',
 		subline:
 			'thesmos runs a workflow of verify, agent and approval steps. It writes a snapshot after every step, so a finished run is a record you can read, not a summary you have to trust. In this release the command is still named agent-spine.',
 		install: 'brew install autonomic-ai-dev/tap/agent-spine',
