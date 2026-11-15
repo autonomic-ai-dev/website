@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { ArrowRight } from 'lucide-svelte';
-	import { products } from '#lib/data/products';
+	import { mainProducts } from '#lib/data/products';
 
-	const list = [products['agent-brain'], products['agent-spine']];
+	const list = mainProducts;
 </script>
 
 <svelte:head>
 	<title>Products — Autonomic AI</title>
-	<meta name="description" content="The Autonomic AI products: agent-brain and agent-spine. Each has its own site, docs, blog and install command." />
+	<meta name="description" content="The Autonomic AI products: tekmor and agent-spine. Each installs on its own with its own install command." />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="Products — Autonomic AI" />
 	<meta property="og:description" content="Install one, or both. Each product has its own site, docs and blog." />
@@ -17,7 +17,7 @@
 	<div class="mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6">
 		<p class="font-mono text-xs uppercase tracking-widest text-zinc-300">Products</p>
 		<h1 class="mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">Install one. Or both. Each stands alone.</h1>
-		<p class="mt-6 max-w-xl text-lg text-zinc-400">Pick the job you have today. Each product has its own site, its own docs, and its own install command.</p>
+		<p class="mt-6 max-w-xl text-lg text-zinc-400">Pick the job you have today. Each product installs on its own with its own install command.</p>
 	</div>
 </section>
 
@@ -37,8 +37,12 @@
 				<a href={product.origin} class="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2.5 font-medium text-black transition-colors hover:bg-zinc-200">
 					Open {product.name} <ArrowRight size={14} />
 				</a>
-				<a href={`${product.origin}/docs`} class="rounded-md border border-zinc-800 px-4 py-2.5 text-center text-zinc-200 transition-colors hover:bg-zinc-900">Docs</a>
-				<a href={`${product.origin}/blog`} class="rounded-md border border-zinc-800 px-4 py-2.5 text-center text-zinc-200 transition-colors hover:bg-zinc-900">Blog</a>
+				{#if product.docs}
+					<a href={product.docs} class="rounded-md border border-zinc-800 px-4 py-2.5 text-center text-zinc-200 transition-colors hover:bg-zinc-900">Docs</a>
+				{/if}
+				{#if product.blog}
+					<a href={product.blog} class="rounded-md border border-zinc-800 px-4 py-2.5 text-center text-zinc-200 transition-colors hover:bg-zinc-900">Blog</a>
+				{/if}
 			</div>
 		</article>
 	{/each}

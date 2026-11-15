@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/state';
-	import { MAIN_ORIGIN, products } from '#lib/data/products';
+	import { MAIN_ORIGIN, mainProducts } from '#lib/data/products';
 
 	let { children }: { children: Snippet } = $props();
 
 	const canonical = $derived(`${MAIN_ORIGIN}${page.url.pathname.replace(/\/+$/, '') || '/'}`);
-	const brain = products['agent-brain'];
-	const spine = products['agent-spine'];
+	const tool = mainProducts[0];
+	const spine = mainProducts[1];
 
 	function isActive(href: string) {
 		return page.url.pathname === href;
@@ -47,7 +47,7 @@
 		<div class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
 			<p>Autonomic AI builds tools for coding agents.</p>
 			<div class="flex flex-wrap gap-5">
-				<a href={brain.origin} class="hover:text-white">{brain.name}</a>
+				<a href={tool.origin} class="hover:text-white">{tool.name}</a>
 				<a href={spine.origin} class="hover:text-white">{spine.name}</a>
 				<a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="hover:text-white">Status</a>
 			</div>

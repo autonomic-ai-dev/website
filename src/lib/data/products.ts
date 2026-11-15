@@ -317,6 +317,51 @@ export const products: Record<ProductId, Product> = {
 	}
 };
 
+export type MainProduct = {
+	id: string;
+	name: string;
+	origin: string;
+	version: string;
+	tagline: string;
+	subline: string;
+	install: string;
+	showcase: { title: string; lines: string[]; prompt: boolean };
+	docs?: string;
+	blog?: string;
+};
+
+export const tekmor: MainProduct = {
+	id: 'tekmor',
+	name: 'tekmor',
+	origin: 'https://github.com/autonomic-ai-dev/tekmor',
+	version: '1.0.0',
+	tagline: 'Proof eval for coding agents',
+	subline:
+		'tekmor runs the checks your project allows, records each result against the commit and code it ran on, and writes a receipt. A stop gate blocks a turn that claims a pass without one. It makes no model calls and opens no network connection on its own.',
+	install: 'brew install autonomic-ai-dev/tap/tekmor',
+	showcase: {
+		title: 'zsh',
+		prompt: true,
+		lines: [
+			'brew install autonomic-ai-dev/tap/tekmor',
+			'tekmor install',
+			'tekmor verify init',
+			'tekmor verify -- .verify/run.sh',
+			'tekmor verify receipt'
+		]
+	},
+	docs: 'https://github.com/autonomic-ai-dev/tekmor#readme'
+};
+
+export const mainProducts: MainProduct[] = [
+	tekmor,
+	{
+		...products['agent-spine'],
+		docs: `${products['agent-spine'].origin}/docs`,
+		blog: `${products['agent-spine'].origin}/blog`
+	}
+];
+
 export function productForHost(hostname: string): Product | undefined {
 	const id = PRODUCT_HOSTS[hostname];
 	return id ? products[id] : undefined;
