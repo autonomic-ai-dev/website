@@ -68,6 +68,27 @@
 </section>
 
 <section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
+	<p class="font-mono text-[11px] uppercase tracking-widest text-zinc-300">The story</p>
+	<h2 class="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">{product.story.headline}</h2>
+	<ol class="mt-16 space-y-24">
+		{#each product.story.chapters as chapter, index (chapter.title)}
+			<li class="grid gap-10 md:grid-cols-2 md:items-start">
+				<div class={index % 2 ? 'md:order-2' : ''}>
+					<p class="font-mono text-xs text-zinc-500">{pad(index)}</p>
+					<h3 class="mt-3 text-2xl font-semibold tracking-tight text-white">{chapter.title}</h3>
+					<p class="mt-4 text-base leading-relaxed text-zinc-400">{chapter.body}</p>
+				</div>
+				{#if chapter.transcript.length > 0}
+					<div class={index % 2 ? 'md:order-1' : ''}>
+						<Terminal title={product.name} lines={chapter.transcript} prompt={false} />
+					</div>
+				{/if}
+			</li>
+		{/each}
+	</ol>
+</section>
+
+<section class="mx-auto max-w-6xl px-4 pb-28 sm:px-6">
 	<p class="font-mono text-[11px] uppercase tracking-widest text-zinc-300">Capabilities</p>
 	<h2 class="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">What it gives you</h2>
 	<div class="mt-12 grid gap-4 md:grid-cols-3">

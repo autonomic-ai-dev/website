@@ -30,6 +30,7 @@ export type Product = {
 	finalCta: { headline: string; subline: string };
 	docsNav: { section: string; links: NavLink[] }[];
 	hasBlog: boolean;
+	story: { headline: string; chapters: { title: string; body: string; transcript: string[] }[] };
 };
 
 export const MAIN_ORIGIN = 'https://autonomic-ai.dev';
@@ -45,6 +46,66 @@ export const products: Record<ProductId, Product> = {
 	tekmor: {
 		id: 'tekmor',
 		hasBlog: false,
+		story: {
+			headline: 'An agent says the tests pass. tekmor makes that a receipt.',
+			chapters: [
+				{
+					title: 'The claim is cheap',
+					body: 'A coding agent finishes a change and says the tests pass. The tests may have run once, earlier, on different code, and the chat does not show which. tekmor sits in Claude Code. When a turn ends with a pass claim and no receipt for the code on disk, the stop gate blocks the turn and says why.',
+					transcript: [
+						'$ echo \'{"transcript_path": "...", "cwd": "..."}\' | tekmor stop-gate',
+						'{"decision":"block","reason":"Repo is blocked: Verification is missing. Files changed in this repo have no passing `tekmor verify -- <cmd>` run recorded after the last edit. Run the project\'s checks, let them pass, then finish."}'
+					]
+				},
+				{
+					title: 'The receipt is for this code',
+					body: 'tekmor runs only the commands listed in .verify/verify.toml. Each result is stored with the commit and a hash of the code that ran. A receipt answers for the code on disk now, not for the last run anyone remembers.',
+					transcript: [
+						'$ tekmor verify -- sh check.sh',
+						'tests: 3 passed',
+						'  recorded: exit 0, source cli',
+						'',
+						'$ tekmor verify receipt',
+						'Verify receipt: PASSED',
+						'  command:   sh check.sh',
+						'  exit code: 0'
+					]
+				},
+				{
+					title: 'One edit makes it stale',
+					body: 'Change any file that counts toward the tree and the old pass stops counting. Documentation files, the artifacts folder, the feature maps and the knowledge base do not count. The allowlist itself does, so editing what the project is allowed to prove also needs a new run.',
+					transcript: [
+						'$ echo "x" >> check.sh',
+						'$ tekmor verify receipt',
+						'Verify receipt: NOT VERIFIED',
+						'  no verify run recorded for this commit and code state; run `tekmor verify -- <cmd>`'
+					]
+				},
+				{
+					title: 'A flaky run is not proof',
+					body: 'tekmor verify --repeat N runs one command N times on one tree. If the runs disagree, the command is flaky. The receipt and the stop gate leave flaky commands out, so a lucky pass cannot stand in for a check that fails half the time.',
+					transcript: [
+						'$ tekmor verify --repeat 3 -- sh flaky.sh',
+						'  (three recorded runs, one per line of JSON)',
+						'$ tekmor verify summary',
+						'2/3 failed  last exit 1  sh flaky.sh'
+					]
+				},
+				{
+					title: 'Guardrails around the proof',
+					body: 'The allowlist decides what counts as proof. tekmor install adds a stop gate for claims and a bash gate that blocks commands reading the review key. A commit gate refuses commits that skip git hooks. A ratchet stops lint counts from rising. Drift flags feature maps that point at code or checks that no longer exist.',
+					transcript: [
+						'$ tekmor verify ratchet',
+						'no-unwrap-in-binary   309 / baseline 332   ok'
+					]
+				},
+				{
+					title: 'What it does not do',
+					body: 'A session that can read the review key can sign a review, because the Keychain blocks the shell path but not the Read tool. The claim check is a pattern match on the last assistant message, so it can miss a claim worded differently. Runs recorded before 1.0.0 are not valid receipts after the upgrade.',
+					transcript: []
+				}
+			]
+		},
 		name: 'tekmor',
 		origin: 'https://tekmor.autonomic-ai.dev',
 		version: '1.0.0',
@@ -167,6 +228,79 @@ export const products: Record<ProductId, Product> = {
 	thesmos: {
 		id: 'thesmos',
 		hasBlog: true,
+		story: {
+			headline: 'An agent improvises. A workflow decides the order, and keeps the record.',
+			chapters: [
+				{
+					title: 'A loop with no record',
+					body: 'A prompt loop can take a different path on every run, and it leaves no record of the path it took. thesmos writes the path down before the run starts: named steps, the edges between them, and the checks that must pass.',
+					transcript: [
+						'name: halt_demo',
+						'version: 1',
+						'start_node: build',
+						'nodes:',
+						'  - name: build',
+						'    kind: verify',
+						'    command: "echo compiling"',
+						'  - name: test',
+						'    kind: verify',
+						'    command: "echo 2 failed >&2; exit 1"',
+						'  - name: ship',
+						'    kind: verify',
+						'    command: "echo shipped"',
+						'edges:',
+						'  - from: build',
+						'    to: test',
+						'  - from: test',
+						'    to: ship'
+					]
+				},
+				{
+					title: 'Checked before anything runs',
+					body: 'agent-spine validate parses the file and checks it before any command runs. A file that fails the check does not start a run.',
+					transcript: [
+						'$ agent-spine validate halt.yaml',
+						"validated state-machine workflow 'halt_demo' starting at node: build"
+					]
+				},
+				{
+					title: 'A failed check stops the run',
+					body: 'A verify node runs its command under a timeout and records the exit code. When the command fails, the run stops with an error, and the steps after it do not run. The ship step in the example never prints.',
+					transcript: [
+						'$ agent-spine run halt.yaml',
+						'Error: command node failed: 2 failed',
+						'$ echo $?',
+						'1'
+					]
+				},
+				{
+					title: 'Every step leaves a row',
+					body: 'After each step, thesmos appends a snapshot to SQLite. Rows are only added, so a finished run reads in the order it happened. inspect prints one run from its snapshots.',
+					transcript: [
+						'$ agent-spine inspect <EXECUTION_ID>',
+						'Sequence: 0',
+						'Payload: {}',
+						'Transition: Initial',
+						'---',
+						'Sequence: 1',
+						'Payload: {'
+					]
+				},
+				{
+					title: 'Replay reads the record',
+					body: 'replay rebuilds the final state from the snapshots. It runs no agent step and no verify command. To run the workflow again, start a new execution, and the old record stays as it was.',
+					transcript: [
+						'$ agent-spine replay <EXECUTION_ID>',
+						'Replay complete. Final sequence: 1'
+					]
+				},
+				{
+					title: 'What it does not do yet',
+					body: 'Approval gates pass unless auto-approve is turned off, and nothing in the released command line sets approved: true. SpeculativeFork is planned and passes its payload through unchanged. In this release the command is still named agent-spine, and its --brain and --meta flags depend on the retired agent-brain.',
+					transcript: []
+				}
+			]
+		},
 		name: 'thesmos',
 		origin: 'https://thesmos.autonomic-ai.dev',
 		version: '1.0.0-rc3',

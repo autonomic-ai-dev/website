@@ -7,7 +7,7 @@
 
 <svelte:head>
 	<title>Products — Autonomic AI</title>
-	<meta name="description" content="The Autonomic AI products: tekmor and agent-spine. Each installs on its own with its own install command." />
+	<meta name="description" content="The Autonomic AI products: tekmor and thesmos. Each installs on its own with its own install command." />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="Products — Autonomic AI" />
 	<meta property="og:description" content="Install one, or both. Each product has its own site, docs and blog." />
