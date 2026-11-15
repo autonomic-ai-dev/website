@@ -10,12 +10,11 @@
 	const canonical = $derived(`${product.origin}${path === '/' ? '' : path}`);
 	const other = $derived(Object.values(products).find((p) => p.id !== product.id));
 
-	const nav = [
+	const nav = $derived([
 		{ label: 'Overview', href: '/' },
 		{ label: 'Docs', href: '/docs' },
-		{ label: 'Blog', href: '/blog' },
-		{ label: 'Registry', href: '/registry' }
-	];
+		...(product.hasBlog ? [{ label: 'Blog', href: '/blog' }] : [])
+	]);
 
 	function isActive(href: string) {
 		if (href === '/') return path === '/';

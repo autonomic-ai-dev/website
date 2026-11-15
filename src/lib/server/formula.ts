@@ -29,7 +29,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 			ecosystemVersion: `v${cleanVer}`,
 			stackVersion: `v${cleanVer}`,
 			organs: {
-				'agent-brain': `v${cleanVer}`,
+				'tekmor': `v${cleanVer}`,
 				'agent-spine': `v${cleanVer}`,
 				'agstack': `v${cleanVer}`
 			}
@@ -57,8 +57,8 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 				return match ? match[1] : null;
 			};
 
-			const stack = readVer('agent-brain.rb') || '1.0.0-rc2';
-			const brain = readVer('agent-brain.rb') || stack;
+			const stack = readVer('tekmor.rb') || '1.0.0-rc2';
+			const brain = readVer('tekmor.rb') || stack;
 			const spine = readVer('agent-spine.rb') || stack;
 
 			cached = {
@@ -67,7 +67,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 				ecosystemVersion: `v${stack}`,
 				stackVersion: `v${stack}`,
 				organs: {
-					'agent-brain': `v${brain}`,
+					'tekmor': `v${brain}`,
 					'agent-spine': `v${spine}`,
 					'agstack': `v${stack}`
 				}
@@ -104,7 +104,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 		};
 
 		const [brain, spine] = await Promise.all([
-			fetchVer('agent-brain.rb'),
+			fetchVer('tekmor.rb'),
 			fetchVer('agent-spine.rb')
 		]);
 
@@ -118,7 +118,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 			ecosystemVersion: `v${stackVer}`,
 			stackVersion: `v${stackVer}`,
 			organs: {
-				'agent-brain': `v${brainVer}`,
+				'tekmor': `v${brainVer}`,
 				'agent-spine': `v${spineVer}`,
 				'agstack': `v${stackVer}`
 			}
@@ -133,7 +133,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 			ecosystemVersion: 'v1.0.0-rc2',
 			stackVersion: 'v1.0.0-rc2',
 			organs: {
-				'agent-brain': 'v1.0.0-rc2',
+				'tekmor': 'v1.0.0-rc2',
 				'agent-spine': 'v1.0.0-rc2',
 				'agstack': 'v1.0.0-rc2'
 			}

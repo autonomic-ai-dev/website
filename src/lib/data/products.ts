@@ -1,4 +1,4 @@
-export type ProductId = 'agent-brain' | 'agent-spine';
+export type ProductId = 'tekmor' | 'thesmos';
 
 export type NavLink = { label: string; href: string };
 
@@ -28,117 +28,118 @@ export type Product = {
 	limits: string[];
 	finalCta: { headline: string; subline: string };
 	docsNav: { section: string; links: NavLink[] }[];
+	hasBlog: boolean;
 };
 
 export const MAIN_ORIGIN = 'https://autonomic-ai.dev';
 
 const PRODUCT_HOSTS: Record<string, ProductId> = {
-	'agent-brain.autonomic-ai.dev': 'agent-brain',
-	'agent-spine.autonomic-ai.dev': 'agent-spine',
-	'agent-brain.localhost': 'agent-brain',
-	'agent-spine.localhost': 'agent-spine'
+	'tekmor.autonomic-ai.dev': 'tekmor',
+	'tekmor.localhost': 'tekmor',
+	'thesmos.autonomic-ai.dev': 'thesmos',
+	'thesmos.localhost': 'thesmos'
 };
 
 export const products: Record<ProductId, Product> = {
-	'agent-brain': {
-		id: 'agent-brain',
-		name: 'agent-brain',
-		origin: 'https://agent-brain.autonomic-ai.dev',
-		version: '1.0.0-rc8',
-		tagline: 'Context engine and MCP server',
+	tekmor: {
+		id: 'tekmor',
+		hasBlog: false,
+		name: 'tekmor',
+		origin: 'https://tekmor.autonomic-ai.dev',
+		version: '1.0.0',
+		tagline: 'Proof eval for coding agents',
 		announce: {
-			text: 'agent-brain 1.0.0-rc8 is in private beta.',
-			label: 'Read the install guide',
-			href: '/docs/installation'
+			text: 'tekmor 1.0.0 is out.',
+			label: 'Read the release notes',
+			href: 'https://github.com/autonomic-ai-dev/tekmor/releases/tag/v1.0.0'
 		},
-		badge: 'v1.0.0-rc8 · Private beta · Runs locally',
-		headline: 'Stop your coding agent from skipping your rules.',
+		badge: 'v1.0.0 · Runs locally · No model calls',
+		headline: 'Your agent says the tests pass. Check the receipt.',
 		subline:
-			'agent-brain picks the skills and rules each task needs, inside a fixed token budget. It holds other tools until the agent has routed, and it writes a receipt for every verify run.',
-		install: 'brew install autonomic-ai-dev/tap/agent-brain',
-		chips: ['Routing reads local files', 'No telemetry SDK in the crate', 'Receipts tied to commits'],
+			'tekmor runs the checks your project allows, records each result against the commit and code it ran on, and writes a receipt. A stop gate blocks a turn that claims a pass without one. It makes no model calls and opens no network connection on its own.',
+		install: 'brew install autonomic-ai-dev/tap/tekmor',
+		chips: ['Allowlisted commands only', 'Receipts tied to the code', 'Stop gate on unverified claims'],
 		showcase: {
 			title: 'zsh',
 			prompt: true,
 			lines: [
-				'brew install autonomic-ai-dev/tap/agent-brain',
-				'agent-brain install',
-				'agent-brain doctor',
-				'agent-brain verify -- cargo test',
-				'agent-brain verify receipt'
+				'brew install autonomic-ai-dev/tap/tekmor',
+				'tekmor install',
+				'tekmor verify init',
+				'tekmor verify -- .verify/run.sh',
+				'tekmor verify receipt'
 			]
 		},
 		features: [
 			{
-				icon: 'route',
-				title: 'Route before acting',
-				body: 'route_task returns the skills, rules and traps that match the task. Other agent-brain tools stay blocked until the agent has routed.',
-				command: 'route_task'
-			},
-			{
-				icon: 'shield',
-				title: 'Gates on hosts that support them',
-				body: 'A route gate and a bash gate check the agent before it acts. Hosts without hooks rely on the agent following instructions. The docs list which is which.',
-				command: 'bash gate · route gate'
+				icon: 'terminal',
+				title: 'Allowlisted commands only',
+				body: 'tekmor verify runs only the commands listed in .verify/verify.toml. Anything else is refused and not recorded as a pass.',
+				command: 'tekmor verify -- <cmd>'
 			},
 			{
 				icon: 'receipt',
-				title: 'Receipts you can read back',
-				body: 'verify records each command with its exit code and the commit it ran against. verify receipt reports PASSED, FAILED or NOT VERIFIED.',
-				command: 'agent-brain verify receipt'
+				title: 'Receipts tied to the tree',
+				body: 'Each run is stored with the commit and a hash of the code that ran. Changing a file that counts toward the tree makes an earlier pass stale.',
+				command: 'tekmor verify receipt'
+			},
+			{
+				icon: 'shield',
+				title: 'A stop gate for claims',
+				body: 'tekmor install adds a Stop hook to Claude Code. A turn that says the tests pass, without a PASSED receipt for the current code, is blocked.',
+				command: 'tekmor install'
+			},
+			{
+				icon: 'check',
+				title: 'Flaky runs do not count',
+				body: 'tekmor verify --repeat N runs a command N times on one tree. If the runs disagree, the command is marked flaky and is not proof.',
+				command: 'tekmor verify --repeat 3 -- <cmd>'
 			}
 		],
 		loop: [
 			{
-				icon: 'route',
-				title: 'Route',
-				body: 'Ask for context before the task starts. route_task returns the matching skills and rules.',
-				command: 'route_task'
+				icon: 'terminal',
+				title: 'Install',
+				body: 'Install the binary, then register the gates in Claude Code.',
+				command: 'tekmor install'
 			},
 			{
-				icon: 'shield',
-				title: 'Gate',
-				body: 'Hosts with hooks block unrouted tools and risky shell commands before they run.',
-				command: 'bash gate'
+				icon: 'check',
+				title: 'Allow',
+				body: 'Create .verify/ with an allowlist. Add the commands your team trusts to verify.toml.',
+				command: 'tekmor verify init'
 			},
 			{
 				icon: 'play',
-				title: 'Verify',
-				body: 'Run your real check through agent-brain verify. The exit code is recorded.',
-				command: 'agent-brain verify -- <cmd>'
+				title: 'Run',
+				body: 'Run the allowed commands. Each result is recorded with the commit and code it ran on.',
+				command: 'tekmor verify -- .verify/run.sh'
 			},
 			{
 				icon: 'receipt',
-				title: 'Receipt',
-				body: 'Read the receipt. It shows PASSED, FAILED or NOT VERIFIED for the commit you ran.',
-				command: 'agent-brain verify receipt'
+				title: 'Read the receipt',
+				body: 'The receipt says PASSED, FAILED or NOT VERIFIED for the current code. Only PASSED is proof.',
+				command: 'tekmor verify receipt'
 			}
 		],
 		hosts: [
-			{ name: 'Claude Code', hooks: true },
-			{ name: 'Cursor', hooks: true, note: 'one manual paste' },
-			{ name: 'Codex', hooks: true, note: 'trust hooks once' },
-			{ name: 'Gemini CLI', hooks: true },
-			{ name: 'Antigravity', hooks: true },
-			{ name: 'OpenCode', hooks: true, note: 'plugin' },
-			{ name: 'VS Code (Copilot)', hooks: false },
-			{ name: 'Claude Desktop', hooks: false }
+			{ name: 'Claude Code', hooks: true, note: 'The stop gate and bash gate are added by tekmor install.' },
+			{ name: 'Other shells and CI', hooks: false, note: 'Receipts work from any shell. Gates need host hooks.' }
 		],
 		facts: [
-			{ value: '350 to 700', label: 'tokens per route, set by task kind' },
-			{ value: '0', label: 'telemetry SDKs in the crate' },
-			{ value: '1', label: 'receipt per verify run, tied to a commit' }
+			{ value: '0', label: 'model calls made by tekmor' },
+			{ value: '1', label: 'network path, used only for an extension install' },
+			{ value: 'PASSED', label: 'the only receipt verdict that counts as proof' }
 		],
 		limits: [
-			'VS Code (GitHub Copilot) and Claude Desktop have no hooks, so the gates do not run there.',
-			'Cursor needs one manual step. The installer prints the rule file path and you paste it into Cursor settings.',
-			'Claude Code and Codex do not run new hooks until you trust them.',
-			'Codex has install and configuration tests but no end-to-end test that runs its hooks.',
-			'The dashboard reports measured counts and labelled estimates. It does not show whether routed context made an agent finish a task better.'
+			'A session that can read the review key can sign a review. The Keychain blocks the shell path, not the Read tool.',
+			'The claim check is a pattern match on the last assistant message. It can miss a claim worded differently.',
+			'Runs recorded before 1.0.0 are not valid receipts after upgrade, because the tree hash covers more files. Run the checks again.',
+			'The published binary is for arm64 macOS only.'
 		],
 		finalCta: {
-			headline: 'Run one verify command. Then read the receipt.',
-			subline: 'agent-brain runs on your machine. Install it, register your hosts, and check the first receipt yourself.'
+			headline: 'Allow one command. Read its receipt.',
+			subline: 'Start with the command your team already trusts. Check the receipt for the current code before you believe the claim.'
 		},
 		docsNav: [
 			{
@@ -149,51 +150,31 @@ export const products: Record<ProductId, Product> = {
 				]
 			},
 			{
-				section: 'Concepts',
-				links: [
-					{ label: 'Architecture', href: '/docs/architecture' },
-					{ label: 'Memory', href: '/docs/memory' },
-					{ label: 'Verification', href: '/docs/verification' },
-					{ label: 'Invariants', href: '/docs/invariants' },
-					{ label: 'How it works', href: '/docs/concepts' },
-					{ label: 'Design decisions', href: '/docs/decisions' }
-				]
-			},
-			{
-				section: 'Packages',
-				links: [
-					{ label: 'agstack', href: '/docs/agstack' },
-					{ label: 'gstack', href: '/docs/gstack' },
-					{ label: 'Minimalist entrepreneur', href: '/docs/minimalist-entrepreneur' }
-				]
-			},
-			{
 				section: 'Reference',
 				links: [
-					{ label: 'CLI overview', href: '/docs/cli' },
-					{ label: 'agent-brain CLI', href: '/docs/cli/agent-brain' },
-					{ label: 'MCP tools', href: '/docs/mcp-tools' },
-					{ label: 'Configuration', href: '/docs/configuration' },
-					{ label: 'Troubleshooting', href: '/docs/troubleshooting' }
+					{ label: 'CLI', href: '/docs/cli' },
+					{ label: 'Verification and receipts', href: '/docs/verification' },
+					{ label: 'Known limits', href: '/docs/limits' }
 				]
 			}
 		]
 	},
-	'agent-spine': {
-		id: 'agent-spine',
-		name: 'agent-spine',
-		origin: 'https://agent-spine.autonomic-ai.dev',
+	thesmos: {
+		id: 'thesmos',
+		hasBlog: true,
+		name: 'thesmos',
+		origin: 'https://thesmos.autonomic-ai.dev',
 		version: '1.0.0-rc3',
 		tagline: 'Deterministic YAML workflows',
 		announce: {
-			text: 'agent-spine 1.0.0-rc3 is in private beta.',
+			text: 'thesmos 1.0.0-rc3 is in private beta.',
 			label: 'Read the approval gate notes',
 			href: '/blog/spine-approval-gates-snapshots-replay'
 		},
 		badge: 'v1.0.0-rc3 · Private beta · Runs locally',
 		headline: 'Your agent says the tests passed. Show the snapshot.',
 		subline:
-			'agent-spine runs a workflow of verify, agent and approval steps. It writes a snapshot after every step, so a finished run is a record you can read, not a summary you have to trust.',
+			'thesmos runs a workflow of verify, agent and approval steps. It writes a snapshot after every step, so a finished run is a record you can read, not a summary you have to trust. In this release the command is still named agent-spine.',
 		install: 'brew install autonomic-ai-dev/tap/agent-spine',
 		chips: ['Verify steps run real commands', 'Snapshots are append-only', 'Replay runs no steps'],
 		showcase: {
@@ -248,7 +229,7 @@ export const products: Record<ProductId, Product> = {
 				icon: 'terminal',
 				title: 'Define',
 				body: 'Describe the job as nodes and edges in a YAML file, or scaffold a built-in workflow.',
-				command: 'agent-spine init --with @bugfix'
+				command: 'agent-spine init --with universal-developer'
 			},
 			{
 				icon: 'check',
@@ -270,7 +251,7 @@ export const products: Record<ProductId, Product> = {
 			}
 		],
 		nodeKinds: [
-			{ name: 'Agent', body: 'Runs an agent step. With --brain, its context comes from agent-brain.' },
+			{ name: 'Agent', body: 'Runs an agent step with the context its node provides.' },
 			{ name: 'Verify', body: 'Runs a shell command under a timeout and records its output and exit code.' },
 			{ name: 'ApprovalGate', body: 'Passes by default. With auto-approve off, waits for approved: true in the payload.' },
 			{ name: 'Fork & Join', body: 'Runs branches in parallel and continues when all of them finish.' },
@@ -299,19 +280,24 @@ export const products: Record<ProductId, Product> = {
 		docsNav: [
 			{
 				section: 'Start',
-				links: [{ label: 'Overview', href: '/docs' }, { label: 'Installation', href: '/docs/installation' }]
+				links: [
+					{ label: 'Overview', href: '/docs' },
+					{ label: 'Installation', href: '/docs/installation' }
+				]
 			},
 			{
 				section: 'Concepts',
-				links: [{ label: 'Workflows and node kinds', href: '/docs/workflows' },
-					{ label: 'Using with agent-brain', href: '/docs/with-agent-brain' },
-					{ label: 'Design decisions', href: '/docs/decisions' }]
+				links: [
+					{ label: 'Workflows and node kinds', href: '/docs/workflows' },
+					{ label: 'Design decisions', href: '/docs/decisions' }
+				]
 			},
 			{
 				section: 'Reference',
-				links: [{ label: 'agent-spine CLI', href: '/docs/cli/agent-spine' },
-					{ label: 'MCP tools', href: '/docs/mcp-tools' },
-					{ label: 'Troubleshooting', href: '/docs/troubleshooting' }]
+				links: [
+					{ label: 'agent-spine CLI', href: '/docs/cli/agent-spine' },
+					{ label: 'Troubleshooting', href: '/docs/troubleshooting' }
+				]
 			}
 		]
 	}
@@ -330,35 +316,12 @@ export type MainProduct = {
 	blog?: string;
 };
 
-export const tekmor: MainProduct = {
-	id: 'tekmor',
-	name: 'tekmor',
-	origin: 'https://github.com/autonomic-ai-dev/tekmor',
-	version: '1.0.0',
-	tagline: 'Proof eval for coding agents',
-	subline:
-		'tekmor runs the checks your project allows, records each result against the commit and code it ran on, and writes a receipt. A stop gate blocks a turn that claims a pass without one. It makes no model calls and opens no network connection on its own.',
-	install: 'brew install autonomic-ai-dev/tap/tekmor',
-	showcase: {
-		title: 'zsh',
-		prompt: true,
-		lines: [
-			'brew install autonomic-ai-dev/tap/tekmor',
-			'tekmor install',
-			'tekmor verify init',
-			'tekmor verify -- .verify/run.sh',
-			'tekmor verify receipt'
-		]
-	},
-	docs: 'https://github.com/autonomic-ai-dev/tekmor#readme'
-};
-
 export const mainProducts: MainProduct[] = [
-	tekmor,
+	{ ...products.tekmor, docs: `${products.tekmor.origin}/docs` },
 	{
-		...products['agent-spine'],
-		docs: `${products['agent-spine'].origin}/docs`,
-		blog: `${products['agent-spine'].origin}/blog`
+		...products.thesmos,
+		docs: `${products.thesmos.origin}/docs`,
+		blog: `${products.thesmos.origin}/blog`
 	}
 ];
 

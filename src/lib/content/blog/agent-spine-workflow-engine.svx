@@ -3,7 +3,7 @@ title: "agent-spine as a state machine: what runs, what does not, and why"
 date: "2026-11-02"
 excerpt: "agent-spine runs YAML workflows of named nodes and edges, records a snapshot after each step, retries failed nodes, and keeps dead-letter entries. This post covers the parts that run for real, the kinds that are only partly implemented, and why we chose a local state machine over a hosted orchestrator."
 slug: "agent-spine-workflow-engine"
-product: "agent-spine"
+product: "thesmos"
 category: "Architecture"
 author: "Abhiuday Gupta"
 ---
@@ -29,7 +29,7 @@ The model defines eleven kinds. They are not equally developed, and it helps to 
 - **Checkpoint** marks a point where the author wants the state recorded explicitly, on top of the snapshot each step already writes.
 - **ApprovalGate** pauses until its payload carries an approval. More on this in the approval post.
 - **Fork** and **Join** run parallel branches. The executor uses a Tokio join set, so ready branches run concurrently and a join waits for its inputs.
-- **Hydrate** gathers context before an agent step. With `--brain`, the executor asks agent-brain for routed context and adds it to the payload.
+- **Hydrate** gathers context before an agent step and adds it to the payload.
 - **Router** is meant for conditional branching. Edges can carry a condition. Test your condition on a real run before you rely on it.
 - **Debate** and **Vote** tag the payload with a role for an agent node. They do not yet run several rounds of debate or a vote over outputs. We describe them as partly implemented for that reason.
 - **SpeculativeFork** currently passes its payload through unchanged. It does not create isolated git worktrees, although earlier docs said it did. That is planned, not shipped.
