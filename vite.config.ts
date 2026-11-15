@@ -6,8 +6,10 @@ import { mdsvex } from 'mdsvex';
 import { defineConfig } from 'vite';
 
 const PRODUCT_HOSTS = [
-	'agent-spine.autonomic-ai.dev',
-	'agent-spine.localhost'
+	'tekmor.autonomic-ai.dev',
+	'thesmos.autonomic-ai.dev',
+	'tekmor.localhost',
+	'thesmos.localhost'
 ];
 
 export default defineConfig({

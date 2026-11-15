@@ -5,4 +5,4 @@
 	let { data } = $props();
 </script>
 
-<BlogIndex {data} product={products['agent-spine']} />
+<BlogIndex {data} product={products.thesmos} />

@@ -4,7 +4,7 @@ title: agent-spine installation
 
 # agent-spine installation
 
-agent-spine is a single binary. Homebrew provides a pre-built binary for **macOS (Apple Silicon)**. Building from source works on any platform Rust supports. agent-spine does not need agent-brain to run. See [using it with agent-brain](/docs/with-agent-brain) for the optional integration.
+thesmos ships as one binary, named `agent-spine` in this release. Homebrew provides a pre-built binary for **macOS (Apple Silicon)**. Building from source works on any platform Rust supports.
 
 ---
 
@@ -62,10 +62,9 @@ Without NATS, failed nodes go to a local dead-letter file, `~/.autonomic/state/s
 ## 5. Build from source
 
 ```bash
-git clone git@github.com:autonomic-ai-dev/agent-spine.git
-cargo build --release --manifest-path agent-spine/agent-spine/Cargo.toml
+git clone git@github.com:autonomic-ai-dev/thesmos.git
+cd thesmos
+cargo build --release -p thesmos
 ```
 
 Copy the binary from `target/release/` into a directory on your `PATH`.
-
-The repository is private for now, so you need access to clone it.

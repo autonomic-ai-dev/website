@@ -5,6 +5,6 @@
 	let { children } = $props();
 </script>
 
-<ProductLayout product={products['agent-spine']}>
+<ProductLayout product={products.tekmor}>
 	{@render children()}
 </ProductLayout>

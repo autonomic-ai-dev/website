@@ -5,4 +5,4 @@
 	let { data } = $props();
 </script>
 
-<BlogPost {data} product={products['agent-spine']} />
+<BlogPost {data} product={products.thesmos} />

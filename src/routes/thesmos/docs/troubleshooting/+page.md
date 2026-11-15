@@ -11,7 +11,7 @@ agent-spine doctor
 agent-spine log --list
 ```
 
-`doctor` checks rustc, protoc, bun, the `agent-brain` binary, the state directory and the example workflow.
+`doctor` checks rustc, protoc, bun, the state directory and the example workflow.
 
 ## A workflow is waiting at an approval gate
 
@@ -54,16 +54,13 @@ Check the file first. If you use NATS, check that the broker is reachable with t
 
 Events go to NATS only when `AUTONOMIC_NATS_URL` is set, or when `serve` is started with `--nats-url`. Confirm the variable is set in the environment of the process that runs the workflow, then check the broker with your NATS tooling.
 
-## agent-brain does not respond to `--brain` or `--meta`
+## `init` reports that agent-brain is not reachable
 
-Check that agent-brain is reachable from spine:
+`init` checks for agent-brain and prints a warning when it is missing. agent-brain has been retired, and nothing in this workflow needs it. The warning does not stop `init`, and you can ignore it.
 
-```bash
-agent-spine brain health
-agent-spine brain status
-```
+## `run --brain` or `run --meta` does not do what the flag says
 
-If agent-brain is unavailable, `--brain` falls back to spine's built-in router, and `--meta` logs a warning and runs the default workflow. The run still completes. See [using agent-spine with agent-brain](/docs/with-agent-brain).
+Both flags call agent-brain, which has been retired. Leave them out. A plain `agent-spine run <file>` does not use either one.
 
 ## Read the daemon logs
 

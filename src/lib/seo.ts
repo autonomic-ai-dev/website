@@ -11,5 +11,6 @@ export function sitemapPaths(hostname: string): string[] {
 
 	const docs = product.docsNav.flatMap((group) => group.links.map((link) => link.href));
 	const posts = postsFor(product.id).map((post) => `/blog/${post.slug}`);
-	return ['/', '/blog', '/registry', ...docs, ...posts];
+	const blog = product.hasBlog ? ['/blog'] : [];
+	return ['/', ...blog, ...docs, ...posts];
 }

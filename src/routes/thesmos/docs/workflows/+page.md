@@ -8,7 +8,7 @@ A workflow is a YAML file of named nodes and edges. agent-spine runs the nodes i
 
 ## A workflow file
 
-This is the `bugfix_pipeline` workflow, abridged. The built-in template has the full version: `agent-spine init --with @bugfix`.
+This is the `bugfix_pipeline` workflow, abridged. It is an example to copy from, not a built-in template.
 
 ```yaml
 name: bugfix_pipeline
@@ -53,7 +53,7 @@ Each node has one `kind`. These are the kinds the released binary defines.
 
 | Kind | What it does |
 | :--- | :--- |
-| `Agent` | Runs an agent step. With `--brain`, its context comes from agent-brain, added to the payload as `_brain_knapsack`. |
+| `Agent` | Runs an agent step with the context in its payload. |
 | `Checkpoint` | Writes an explicit, append-only state barrier. |
 | `Verify` | Runs a shell command under a timeout and records its output and exit code. |
 | `ApprovalGate` | Passes by default. With auto-approve off, waits for `approved: true` in the payload. |
@@ -94,10 +94,9 @@ agent-spine replay <EXECUTION_ID>
 
 ## Built-in workflows
 
-`agent-spine init --with list` lists the templates. They include `@bugfix`, `@feature`, `@release-notes` and `@stacked-pr`, from the [registry](/registry).
+`agent-spine init --with list` lists the templates. The released binary includes nine, among them `universal-developer`, `engineering-safety` and `root-cause-analysis`. Start one with `agent-spine init --with universal-developer`.
 
 ## Read next
 
-- [Using agent-spine with agent-brain](/docs/with-agent-brain)
 - [Design decisions](/docs/decisions)
-- [MCP tools](/docs/mcp-tools)
+- [Troubleshooting](/docs/troubleshooting)

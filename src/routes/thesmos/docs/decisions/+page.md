@@ -46,14 +46,6 @@ An `ApprovalGate` node passes unless auto-approve is turned off. When auto-appro
 
 **Cost:** a loop can run for as long as its condition holds. Put a verify or approval node on the loop, so a check or a person decides when it stops.
 
-## agent-brain is optional and fails open
-
-`--brain` adds routed context to agent nodes, and `--meta` chooses a workflow by task. Neither is required. If agent-brain cannot be reached, `--brain` falls back to spine's built-in router, and `--meta` runs the default workflow.
-
-**Why:** a missing helper should not stop a workflow that can run without it.
-
-**Cost:** a run can finish without the context it was meant to have. Check the node outputs when the result matters.
-
 ## Failed nodes go to a dead-letter record
 
 A failed node is written to `system.dlq` when the binary has NATS support and the broker accepts it. Otherwise it is appended to `~/.autonomic/state/spine/dlq.jsonl`.

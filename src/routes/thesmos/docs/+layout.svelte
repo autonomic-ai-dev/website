@@ -5,6 +5,6 @@
 	let { children } = $props();
 </script>
 
-<DocsShell product={products['agent-spine']}>
+<DocsShell product={products.thesmos}>
 	{@render children()}
 </DocsShell>

@@ -2,7 +2,7 @@
 	import ProductOverview from '#lib/components/product/ProductOverview.svelte';
 	import { products } from '#lib/data/products';
 
-	const product = products['agent-spine'];
+	const product = products.thesmos;
 	const schema = {
 		'@context': 'https://schema.org',
 		'@type': 'SoftwareApplication',

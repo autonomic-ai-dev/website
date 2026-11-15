@@ -58,7 +58,9 @@
 			<a href="/docs" class="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2.5 font-medium text-black transition-colors hover:bg-zinc-200">
 				Read the docs <ArrowRight size={14} />
 			</a>
-			<a href="/blog" class="rounded-md border border-zinc-800 px-4 py-2.5 text-zinc-200 transition-colors hover:bg-zinc-900">Read the blog</a>
+			{#if product.hasBlog}
+				<a href="/blog" class="rounded-md border border-zinc-800 px-4 py-2.5 text-zinc-200 transition-colors hover:bg-zinc-900">Read the blog</a>
+			{/if}
 		</div>
 	</div>
 </section>
