@@ -1,49 +1,112 @@
 <script lang="ts">
-	import { ArrowRight } from 'lucide-svelte';
-	import { mainProducts } from '#lib/data/products';
+	import { ArrowRight, Check, Copy } from 'lucide-svelte';
+	import { products } from '#lib/data/products';
 
-	const list = mainProducts;
+	const list = [products.tekmor, products.thesmos];
+	let copiedId = $state<string | null>(null);
+
+	async function copyCommand(id: string, cmd: string) {
+		try {
+			await navigator.clipboard.writeText(cmd);
+			copiedId = id;
+			setTimeout(() => (copiedId = null), 1500);
+		} catch {
+			copiedId = null;
+		}
+	}
 </script>
 
 <svelte:head>
 	<title>Products — Autonomic AI</title>
-	<meta name="description" content="The Autonomic AI products: tekmor and agent-spine. Each installs on its own with its own install command." />
+	<meta name="description" content="The Autonomic AI products: tekmor and thesmos. Each installs on its own with its own install command." />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content="Products — Autonomic AI" />
 	<meta property="og:description" content="Install one, or both. Each product has its own site, docs and blog." />
 </svelte:head>
 
-<section class="relative isolate overflow-hidden">
-	<div class="mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6">
-		<p class="font-mono text-xs uppercase tracking-widest text-zinc-300">Products</p>
-		<h1 class="mt-5 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">Install one. Or both. Each stands alone.</h1>
-		<p class="mt-6 max-w-xl text-lg text-zinc-400">Pick the job you have today. Each product installs on its own with its own install command.</p>
-	</div>
-</section>
+<div class="yc-container">
+	<!-- Header Section -->
+	<section class="yc-section yc-section-first dotgrid relative overflow-hidden">
+		<div class="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[450px] w-[700px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(95,211,154,0.1),transparent_70%)] blur-3xl"></div>
 
-<section class="mx-auto max-w-6xl space-y-5 px-4 pb-28 sm:px-6">
-	{#each list as product (product.id)}
-		<article class="grid gap-8 rounded-xl border border-zinc-800 bg-black p-8 transition-colors hover:border-zinc-600 md:grid-cols-[1fr_auto] md:items-center md:p-10">
-			<div>
-				<div class="flex flex-wrap items-baseline gap-3">
-					<h2 class="text-xl font-semibold text-white">{product.name}</h2>
-					<span class="font-mono text-xs text-zinc-500">{product.version}</span>
+		<div>
+			<span class="yc-label">Catalog <b>/</b> Standalone Tools</span>
+			<h1 class="mt-6 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">
+				Install one. Or both. <br />
+				<span class="text-neutral-500">Each stands alone.</span>
+			</h1>
+			<p class="mt-4 max-w-xl text-base text-neutral-400 sm:text-lg">
+				Pick the job you have today. Each product installs on its own with its own single-binary Homebrew tap.
+			</p>
+		</div>
+	</section>
+
+	<!-- Products List Section -->
+	<section class="yc-section yc-crosshair space-y-6">
+		{#each list as product, index (product.id)}
+			<article class="yc-card p-8 md:p-10">
+				<div class="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
+					<div>
+						<div class="flex flex-wrap items-center gap-3">
+							<span class="rounded border border-white/[0.1] bg-white/[0.03] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#5fd39a]">
+								0{index + 1}
+							</span>
+							<h2 class="text-2xl font-semibold text-white">{product.name}</h2>
+							<span class="rounded-full border border-white/[0.08] px-2 py-0.5 font-mono text-xs text-neutral-400">
+								{product.version}
+							</span>
+						</div>
+
+						<p class="mt-2 font-mono text-xs uppercase tracking-wider text-neutral-400">{product.tagline}</p>
+						<p class="mt-4 max-w-2xl text-sm leading-relaxed text-neutral-300">{product.subline}</p>
+
+						<!-- Install Command Box -->
+						<div class="mt-6 flex max-w-xl items-center justify-between gap-3 rounded-xl border border-white/[0.08] bg-[#070709] px-3.5 py-2 font-mono text-xs text-neutral-200">
+							<div class="flex items-center gap-2 overflow-x-auto">
+								<span class="select-none text-[#5fd39a]">$</span>
+								<span>{product.install}</span>
+							</div>
+							<button
+								type="button"
+								onclick={() => copyCommand(product.id, product.install)}
+								aria-label="Copy install command"
+								class="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[11px] text-neutral-300 transition-colors hover:bg-white/[0.1] hover:text-white"
+							>
+								{#if copiedId === product.id}
+									<Check size={11} class="text-[#5fd39a]" />
+									<span class="text-[#5fd39a]">Copied</span>
+								{:else}
+									<Copy size={11} />
+									<span>Copy</span>
+								{/if}
+							</button>
+						</div>
+					</div>
+
+					<div class="flex flex-wrap gap-3 text-sm md:flex-col md:min-w-[170px]">
+						<a href={product.origin} class="yc-btn yc-btn-primary">
+							<span>Open {product.name}</span>
+							<span class="yc-btn-icon">
+								<ArrowRight size={12} />
+							</span>
+						</a>
+						<a href={`${product.origin}/docs`} class="yc-btn yc-btn-secondary">
+							<span>Documentation</span>
+							<span class="yc-btn-icon">
+								<ArrowRight size={12} />
+							</span>
+						</a>
+						{#if product.hasBlog}
+							<a href={`${product.origin}/blog`} class="yc-btn yc-btn-secondary">
+								<span>Release Blog</span>
+								<span class="yc-btn-icon">
+									<ArrowRight size={12} />
+								</span>
+							</a>
+						{/if}
+					</div>
 				</div>
-				<p class="mt-2 font-mono text-xs uppercase tracking-widest text-zinc-500">{product.tagline}</p>
-				<p class="mt-5 max-w-2xl leading-relaxed text-zinc-400">{product.subline}</p>
-				<code class="mt-6 inline-block rounded border border-zinc-800 bg-black px-3 py-2 font-mono text-sm text-zinc-100">{product.install}</code>
-			</div>
-			<div class="flex flex-wrap gap-3 text-sm md:flex-col">
-				<a href={product.origin} class="inline-flex items-center justify-center gap-2 rounded-md bg-white px-4 py-2.5 font-medium text-black transition-colors hover:bg-zinc-200">
-					Open {product.name} <ArrowRight size={14} />
-				</a>
-				{#if product.docs}
-					<a href={product.docs} class="rounded-md border border-zinc-800 px-4 py-2.5 text-center text-zinc-200 transition-colors hover:bg-zinc-900">Docs</a>
-				{/if}
-				{#if product.blog}
-					<a href={product.blog} class="rounded-md border border-zinc-800 px-4 py-2.5 text-center text-zinc-200 transition-colors hover:bg-zinc-900">Blog</a>
-				{/if}
-			</div>
-		</article>
-	{/each}
-</section>
+			</article>
+		{/each}
+	</section>
+</div>

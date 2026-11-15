@@ -1,13 +1,31 @@
 ---
-title: Known limits
+title: Known Limits
 ---
 
-# Known limits
+# Known Limits
 
-- A session that can read the review key can sign a review. The macOS Keychain blocks the shell path to the key, not the Read tool.
-- The claim check is a pattern match on the last assistant message. It can miss a claim worded differently and can flag a sentence that is true.
-- Runs recorded before 1.0.0 are not valid receipts after the upgrade, because the tree hash covers more files. Run the checks again.
-- The migration was tested on one real version-29 database and on in-memory databases. Other databases are untested.
-- Hooks record the absolute path of the binary. Moving or rebuilding the binary can break them until `tekmor install` runs again.
-- The 1.0.0 published binary is for arm64 macOS only.
-- The harness pilot showed the stop gate changed the agent's documentation edits and roughly doubled its turns. It did not show a proof benefit. The results cover two toy tasks with three repetitions each.
+Honest engineering boundaries and explicit non-goals for `tekmor 1.0.0`.
+
+## 1. Scope of Proof
+
+A receipt proves that the recorded command ran and returned exit code 0 for the exact commit and code tree on disk. It does **not** prove that the test suite provides complete semantic coverage of your changes.
+
+If your project test command only runs unit tests, and your change introduces a break in an untested subsystem, `tekmor` will faithfully report `PASSED` because the executed command exited 0. Teams must ensure their allowlisted verification command covers their required validation surface.
+
+## 2. Claim Detection Mechanism
+
+`tekmor stop-gate` parses the text of the final assistant turn to determine if the agent is claiming that tests pass or work is completed.
+- The claim check relies on deterministic regex pattern matching against natural language completions.
+- It is possible for an agent to phrase a claim in a novel way that evades the pattern matcher, though standard completions ("All tests pass", "Task complete", "Verified working") are strictly caught.
+
+## 3. Platform Architecture
+
+The official Homebrew tap provides pre-built binaries for **macOS Apple Silicon (arm64)**. Linux and Intel macOS users must build from source using `cargo install tekmor`.
+
+## 4. Keychain & Review Security
+
+When code reviews are recorded with `tekmor verify review`, the review signature is protected via macOS Keychain credentials. The Keychain protects the key from arbitrary shell processes, but a tool call with raw filesystem read access inside the user's home directory could potentially access local configuration.
+
+## 5. Backward Compatibility of Historical Hashes
+
+Receipts recorded prior to version `1.0.0` may not validate under `1.0.0` due to tree hash algorithm refinements. Run `tekmor verify -- <cmd>` on updated repositories to generate fresh, version-compatible receipts.

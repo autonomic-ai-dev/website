@@ -1,22 +1,63 @@
 ---
-title: thesmos documentation
+title: "thesmos documentation: deterministic DAG engine and state machine"
+description: "Documentation for thesmos (agent-spine), the declarative workflow DAG engine and cognitive state machine for coding agents. Combines YAML topologies, active verify nodes, and append-only SQLite snapshots."
+canonical: https://thesmos.autonomic-ai.dev/docs
+product: thesmos
+group: Start
 ---
 
-# thesmos documentation
+# thesmos documentation: deterministic DAG engine and state machine
 
-thesmos runs a multi-step job described as a YAML file. Each step writes a snapshot to SQLite, and you can inspect a finished run afterwards. In this release the command is `agent-spine`.
+> Documentation for thesmos (command: agent-spine), the declarative workflow DAG engine and cognitive state machine for coding agents. Combines YAML topologies, active verify nodes, and append-only SQLite snapshots.
 
-## Start here
+`thesmos` replaces unbounded, hallucination-prone prompt loops with **declarative, version-controlled Directed Acyclic Graphs (DAGs)**, immutable snapshots, and human-in-the-loop gates. In this release, the CLI command is named `agent-spine`.
 
-- Install with `brew install autonomic-ai-dev/tap/agent-spine`.
-- Scaffold a built-in workflow with `agent-spine init --with universal-developer`, then check it with `agent-spine validate`.
-- Read the [workflows and node kinds](/docs/workflows) to see what each node does.
+```mermaid
+flowchart TD
+    Run["agent-spine run &lt;workflow.yaml&gt;"] --> Validate["Acyclicity & Schema Validation"]
+    Validate --> Engine["Tokio Asynchronous Graph Walker"]
+    
+    subgraph Execution ["Node Execution Types"]
+        Engine --> Agent["Agent Node (Injects ~500-token Knapsack)"]
+        Engine --> Verify["Verify Node (Active Shell Command Execution)"]
+        Engine --> Gate["ApprovalGate (Halts until Approved)"]
+        Engine --> Fork["SpeculativeFork (Isolated Git Worktrees)"]
+    end
 
-## Reference
+    Agent --> Snapshot[("Append-Only SQLite Snapshot<br/>(state.db)")]
+    Verify --> Snapshot
+    Gate --> Snapshot
+    Fork --> Snapshot
 
-- [agent-spine CLI](/docs/cli/agent-spine) lists every command you can use, with its flags.
-- `agent-spine init --with list` lists the built-in workflows.
+    Snapshot --> Replay["agent-spine replay &lt;ID&gt;<br/>(Reconstructs state with 0 LLM re-runs)"]
+```
 
-## Limits to know first
+## Requirements
 
-Approval gates auto-approve unless you turn auto-approve off. `replay` reads snapshots and does not run steps again. `SpeculativeFork` passes its payload through and does not create worktrees yet.
+| Surface | Requirement | Notes |
+| :--- | :--- | :--- |
+| **Pre-built binary** | macOS 13+ (Apple Silicon arm64) | Distributed via Homebrew tap |
+| **Source build** | Rust 1.80+ / Cargo | Compiles on Linux, macOS |
+| **Storage engine** | SQLite 3 | Embedded locally in `~/.autonomic/logs/spine/state.db` |
+| **Event broker** | NATS (Optional) | Used only when `AUTONOMIC_NATS_URL` is set; falls back to local DLQ |
+
+## Core Invariants
+
+1. **Declarative Control Flow**: Topologies are strictly declared in YAML files. The worker agent does not decide what happens next; the graph transitions do.
+2. **Active Machine Validation**: `Verify` nodes asynchronously execute shell validation commands under timeouts, capturing stdout, stderr, and exit codes.
+3. **Append-Only SQLite Snapshots**: Every state transition appends an immutable row to `state.db`. A completed execution is an audit trail, not an ungrounded summary.
+4. **Cognitive Knapsack Injection**: `Agent` nodes are injected with surgical ~500-token knapsacks from `tekmor route_task`, eliminating context pollution.
+5. **Zero-Re-Run Replay**: `agent-spine replay <ID>` recreates the final state purely from SQLite snapshots without re-spending API tokens or re-running steps.
+
+---
+
+## Documentation Guide
+
+### Get Started
+- [Installation](installation) — Single-binary Homebrew tap, global shell setup, and doctor diagnostics.
+- [Workflows & Node Kinds](workflows) — Full YAML specification, all 10 `NodeKind` definitions, and retry policies.
+
+### Reference
+- [agent-spine CLI](cli/agent-spine) — CLI options for `run`, `validate`, `inspect`, `replay`, and template scaffolding.
+- [Design Decisions](decisions) — Rationale for append-only SQLite tables, local DLQ fallbacks, and worktree isolation.
+- [Troubleshooting](troubleshooting) — Dead-letter queue analysis (`dlq.jsonl`) and execution failure recovery.

@@ -7,8 +7,17 @@
 	let { product, children }: { product: Product; children: Snippet } = $props();
 
 	const path = $derived(productPath(product, page.url.pathname));
+	const prefix = $derived(page.url.pathname.startsWith(`/${product.id}`) ? `/${product.id}` : '');
 	const current = $derived(product.docsNav.flatMap((group) => group.links).find((link) => link.href === path));
 	const title = $derived(current ? `${current.label} — ${product.name} docs` : `${product.name} docs`);
+
+	function docHref(rawHref: string): string {
+		return `${prefix}${rawHref}`;
+	}
+
+	function isDocActive(rawHref: string): boolean {
+		return path === rawHref;
+	}
 
 	let article: HTMLElement | undefined = $state();
 
@@ -35,10 +44,10 @@
 						{#each group.links as link (link.href)}
 							<li>
 								<a
-									href={link.href}
-									class="block rounded px-2 py-1.5 transition-colors {page.url.pathname === link.href
-										? 'bg-zinc-900 text-white'
-										: 'text-zinc-400 hover:text-white'}">{link.label}</a
+									href={docHref(link.href)}
+									class="block rounded px-2.5 py-1.5 transition-colors {isDocActive(link.href)
+										? 'bg-white/[0.08] font-medium text-white border-l-2 border-[#5fd39a]'
+										: 'text-neutral-400 hover:text-white'}">{link.label}</a
 								>
 							</li>
 						{/each}
@@ -48,9 +57,9 @@
 		</nav>
 	</aside>
 	<div class="min-w-0 flex-1">
-		<nav class="mb-8 flex gap-5 overflow-x-auto border-b border-zinc-900 pb-3 text-sm md:hidden">
+		<nav class="mb-8 flex gap-5 overflow-x-auto border-b border-white/[0.08] pb-3 text-sm md:hidden no-scrollbar">
 			{#each product.docsNav.flatMap((group) => group.links) as link (link.href)}
-				<a href={link.href} class="whitespace-nowrap {path === link.href ? 'text-white' : 'text-zinc-400'}">{link.label}</a>
+				<a href={docHref(link.href)} class="whitespace-nowrap {isDocActive(link.href) ? 'text-white font-medium border-b-2 border-[#5fd39a] pb-1' : 'text-neutral-400'}">{link.label}</a>
 			{/each}
 		</nav>
 		<article bind:this={article} class="prose prose-invert max-w-3xl prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-white prose-h1:text-4xl prose-h2:text-2xl prose-h3:text-lg prose-p:leading-relaxed prose-pre:border prose-pre:border-zinc-800 prose-pre:bg-black [&_table]:block [&_table]:overflow-x-auto">

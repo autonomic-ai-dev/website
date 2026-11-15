@@ -5,11 +5,9 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
 		<link rel="icon" href="/logo.svg" type="image/svg+xml" />
-		<!-- Google Fonts & Material Symbols -->
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+		<!-- High-Performance Local Geist Fonts (Caveman & Vercel) -->
+		<link rel="preload" href="/fonts/geist-sans.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+		<link rel="preload" href="/fonts/geist-mono.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 		<style>
 			.material-symbols-outlined {
 				font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -35,7 +33,7 @@
 		%sveltekit.head%
 		<script defer src="/_vercel/insights/script.js"></script>
 	</head>
-	<body data-sveltekit-preload-data="hover" class="bg-black text-neutral-100 font-body selection:bg-neutral-800 selection:text-white antialiased relative min-h-screen overflow-x-hidden">
+	<body data-sveltekit-preload-data="hover" class="bg-[#070709] text-neutral-100 font-sans selection:bg-[#5fd39a]/25 selection:text-white antialiased relative min-h-screen overflow-x-hidden">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

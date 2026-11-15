@@ -1,1 +1,185 @@
-@import 'tailwindcss';
+/* YC Startup Design Tokens & Components */
+
+:root {
+	--bg: #070709;
+	--card-surface: #0c0d10;
+	--card-surface-hover: #121318;
+	--card-border: rgba(255, 255, 255, 0.1);
+	--card-border-hover: rgba(255, 255, 255, 0.2);
+	--ink: #f4f4f5;
+	--ink-2: #a1a1aa;
+	--ink-3: #71717a;
+	--ink-4: #3f3f46;
+	--accent: #5fd39a;
+}
+
+/* YC Constrained Width Container */
+.yc-container {
+	width: 100%;
+	max-width: 1140px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: clamp(16px, 3.5vw, 32px);
+	padding-right: clamp(16px, 3.5vw, 32px);
+}
+
+.yc-section {
+	position: relative;
+	padding-top: clamp(64px, 8vw, 104px);
+	padding-bottom: clamp(64px, 8vw, 104px);
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yc-section-first {
+	border-top: 0;
+}
+
+/* Dot Grid Background */
+.dotgrid {
+	background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+	background-size: 24px 24px;
+}
+
+/* Premium Tactile Bento Card (Orca & Memorable style) */
+.yc-card {
+	position: relative;
+	background-color: var(--card-surface);
+	border: 1px solid var(--card-border);
+	border-radius: 18px;
+	box-shadow: 
+		inset 0 1px 1px 0 rgba(255, 255, 255, 0.09),
+		0 14px 30px -10px rgba(0, 0, 0, 0.8);
+	transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+	            background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+	            transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+	            box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yc-card:hover {
+	background-color: var(--card-surface-hover);
+	border-color: var(--card-border-hover);
+	transform: translateY(-2px);
+	box-shadow: 
+		inset 0 1px 1px 0 rgba(255, 255, 255, 0.14),
+		0 20px 40px -10px rgba(0, 0, 0, 0.9);
+}
+
+/* Subtle top glow highlight on cards */
+.yc-card-glow::before {
+	content: "";
+	position: absolute;
+	top: -1px;
+	left: 20%;
+	right: 20%;
+	height: 1px;
+	background: linear-gradient(90deg, transparent, rgba(95, 211, 154, 0.5), transparent);
+	pointer-events: none;
+}
+
+/* YC Button System */
+.yc-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 44px;
+	padding: 0 8px 0 18px;
+	gap: 12px;
+	border-radius: 9999px;
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	white-space: nowrap;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.yc-btn:hover {
+	transform: translateY(-1px);
+}
+
+.yc-btn:active {
+	transform: scale(0.98);
+}
+
+.yc-btn-primary {
+	background: #f4f4f4;
+	color: #0c0c0e;
+	border: 1px solid #ffffff;
+	box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
+}
+
+.yc-btn-primary:hover {
+	background: #ffffff;
+	box-shadow: 0 0 22px rgba(255, 255, 255, 0.3);
+}
+
+.yc-btn-secondary {
+	background: #141519;
+	color: #e4e4e7;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.yc-btn-secondary:hover {
+	background: #1b1c22;
+	border-color: rgba(255, 255, 255, 0.28);
+}
+
+.yc-btn-icon {
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 9999px;
+	flex-shrink: 0;
+	transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.yc-btn-primary .yc-btn-icon {
+	background: #e4e4e7;
+	color: #18181b;
+}
+
+.yc-btn-secondary .yc-btn-icon {
+	background: rgba(255, 255, 255, 0.08);
+	color: #e4e4e7;
+}
+
+.yc-btn:hover .yc-btn-icon svg {
+	transform: translateX(1px);
+}
+
+/* Monospace Taxonomy Badge */
+.yc-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-family: var(--font-mono);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--accent);
+}
+
+.yc-label b {
+	font-weight: 400;
+	color: var(--ink-4);
+}
+
+.live-beacon {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #5fd39a;
+	box-shadow: 0 0 0 3px rgba(95, 211, 154, 0.2);
+}
+
+/* Hide scrollbars for clean touch scrolling */
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+.no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}

