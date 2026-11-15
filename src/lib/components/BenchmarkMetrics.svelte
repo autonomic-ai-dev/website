@@ -23,7 +23,7 @@
 
 <section id="benchmarks" bind:this={containerRef} class="yc-section yc-crosshair relative">
 	<div class="mb-12 flex flex-col gap-2">
-		<span class="yc-label">03 <b>/</b> Empirical Benchmarks</span>
+		<span class="yc-label">02 <b>/</b> Empirical Benchmarks</span>
 		<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 			Deterministic Verification vs Prompt Hallucinations
 		</h2>

