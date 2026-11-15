@@ -227,6 +227,29 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 		</div>
 	</section>
 
+	<section class="yc-section">
+		<div class="flex items-center gap-2">
+			<span class="yc-label">The story</span>
+		</div>
+		<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">{product.story.headline}</h2>
+		<ol class="mt-14 space-y-20">
+			{#each product.story.chapters as chapter, index (chapter.title)}
+				<li class="grid gap-10 md:grid-cols-2 md:items-start">
+					<div class={index % 2 ? 'md:order-2' : ''}>
+						<p class="font-mono text-xs text-neutral-500">{pad(index)}</p>
+						<h3 class="mt-3 text-2xl font-semibold tracking-tight text-white">{chapter.title}</h3>
+						<p class="mt-4 text-base leading-relaxed text-neutral-400">{chapter.body}</p>
+					</div>
+					{#if chapter.transcript.length > 0}
+						<div class={index % 2 ? 'md:order-1' : ''}>
+							<pre class="overflow-x-auto rounded-xl border border-white/[0.08] bg-[#0b0c10] p-5 font-mono text-[13px] leading-6 text-neutral-200">{chapter.transcript.join('\n')}</pre>
+						</div>
+					{/if}
+				</li>
+			{/each}
+		</ol>
+	</section>
+
 	<!-- Section 01: Capabilities (Bento Grid with real architectural depth) -->
 	<section class="yc-section">
 		<div class="flex items-center gap-2">
