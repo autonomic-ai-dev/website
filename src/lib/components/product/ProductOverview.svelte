@@ -113,12 +113,12 @@
 
 		<!-- Interactive Evidence Inspector (Tactile Depth) -->
 		<div class="mx-auto mt-14 max-w-3xl rounded-2xl border border-white/[0.12] bg-[#07080a] text-left shadow-2xl overflow-hidden">
-			<div class="flex items-center justify-between border-b border-white/[0.08] bg-[#0c0d10] px-4 py-2.5">
+			<div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] bg-[#0c0d10] px-4 py-2.5">
 				<div class="flex items-center gap-2">
 					<span class="h-3 w-3 rounded-full bg-[#ff5f56]"></span>
 					<span class="h-3 w-3 rounded-full bg-[#ffbd2e]"></span>
 					<span class="h-3 w-3 rounded-full bg-[#27c93f]"></span>
-					<span class="ml-2 font-mono text-xs text-neutral-400">
+					<span class="ml-2 font-mono text-xs text-neutral-400 hidden sm:inline">
 						{product.id === 'tekmor' ? '.verify / proof engine' : 'thesmos / execution engine'}
 					</span>
 				</div>
@@ -150,11 +150,11 @@
 			</div>
 
 			<!-- Tab Content -->
-			<div class="p-5 font-mono text-xs leading-relaxed text-neutral-300">
+			<div class="p-5 font-mono text-xs leading-relaxed text-neutral-300 overflow-x-auto">
 				{#if product.id === 'tekmor'}
 					{#if activeTab === 'config'}
 						<div class="text-neutral-500 mb-2"># .verify/verify.toml — Allowlist of trusted commands</div>
-						<pre class="text-neutral-200"><span class="text-[#5fd39a]">[verify]</span>
+						<pre class="overflow-x-auto text-neutral-200"><span class="text-[#5fd39a]">[verify]</span>
 version = <span class="text-amber-300">"1.0.0"</span>
 timeout_seconds = <span class="text-amber-300">60</span>
 
@@ -168,7 +168,7 @@ name = <span class="text-amber-300">"lint"</span>
 run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 					{:else if activeTab === 'receipt'}
 						<div class="text-neutral-500 mb-2">// .verify/receipt.json — Cryptographic proof of execution</div>
-						<pre class="text-[#5fd39a]">&#123;
+						<pre class="overflow-x-auto text-[#5fd39a]">&#123;
   <span class="text-neutral-400">"schema":</span> <span class="text-amber-300">"v1.0.0"</span>,
   <span class="text-neutral-400">"command":</span> <span class="text-amber-300">".verify/run.sh"</span>,
   <span class="text-neutral-400">"exit_code":</span> <span class="text-white">0</span>,
@@ -180,7 +180,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 &#125;</pre>
 					{:else}
 						<div class="text-neutral-500 mb-2"># Claude Code Stop Gate Hook Interception</div>
-						<div class="space-y-1.5">
+						<div class="space-y-1.5 overflow-x-auto">
 							<div class="text-neutral-400"><span class="text-blue-400">Claude Code:</span> "I fixed the issue. All test assertions pass!"</div>
 							<div class="text-neutral-500">▶ Executing Hook: tekmor stop-gate</div>
 							<div class="text-amber-300">Checking current git tree SHA: <span class="text-white">8c12a0f7...</span></div>
@@ -192,7 +192,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 				{:else}
 					{#if activeTab === 'config'}
 						<div class="text-neutral-500 mb-2"># bugfix.yaml — Deterministic DAG definition</div>
-						<pre class="text-neutral-200"><span class="text-blue-400">name:</span> bugfix_pipeline
+						<pre class="overflow-x-auto text-neutral-200"><span class="text-blue-400">name:</span> bugfix_pipeline
 <span class="text-blue-400">start_node:</span> reproduce_failure
 <span class="text-blue-400">nodes:</span>
   - <span class="text-white">name:</span> reproduce_failure
@@ -207,7 +207,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
     <span class="text-white">kind:</span> approval_gate</pre>
 					{:else if activeTab === 'receipt'}
 						<div class="text-neutral-500 mb-2">-- SQLite snapshots table (state.db)</div>
-						<pre class="text-blue-400">step_id | node_name         | status   | exit_code | timestamp
+						<pre class="overflow-x-auto text-blue-400">step_id | node_name         | status   | exit_code | timestamp
 --------+-------------------+----------+-----------+---------------------
 001     | reproduce_failure | FAILED   | 1         | 2026-10-28 14:10:02
 002     | isolate_and_patch | COMPLETE | 0         | 2026-10-28 14:11:15
@@ -215,7 +215,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 004     | sign_off          | APPROVED | 0         | 2026-10-28 14:12:01</pre>
 					{:else}
 						<div class="text-neutral-500 mb-2"># Zero-Re-run Replay</div>
-						<div class="space-y-1.5">
+						<div class="space-y-1.5 overflow-x-auto">
 							<div class="text-neutral-400"><span class="text-[#5fd39a]">$ </span>agent-spine replay exec_8f12a0</div>
 							<div class="text-blue-400">✔ Loaded 4 immutable snapshots from ~/.autonomic/state/spine/state.db</div>
 							<div class="text-neutral-300">✔ Reconstructed DAG state graph in 0.04s</div>
@@ -308,8 +308,8 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 		<p class="mt-2 text-sm text-neutral-400 max-w-xl">A complete verification lifecycle with tamper-proof cryptographic receipts.</p>
 
 		<!-- Horizontal Connected Flow -->
-		<div class="mt-9 rounded-2xl border border-white/[0.12] bg-[#090a0d] p-6 sm:p-8 shadow-2xl">
-			<div class="grid gap-6 md:grid-cols-4 relative">
+		<div class="mt-9 rounded-2xl border border-white/[0.12] bg-[#090a0d] p-5 sm:p-8 shadow-2xl">
+			<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 relative">
 				{#each product.loop as step, index (step.title)}
 					<div class="flex flex-col justify-between rounded-xl border border-white/[0.06] bg-[#050608] p-5">
 						<div>
