@@ -1,0 +1,80 @@
+---
+title: "Why Exit Codes Aren't Enough: The Architecture of Tree-Hashed Receipts"
+date: "2026-11-10"
+excerpt: "Autonomous coding agents frequently touch files after running test suites, invalidating previous test results. Here is how tekmor binds verification verdicts directly to git tree SHAs."
+slug: "tekmor-tree-hashed-receipts"
+category: "Architecture"
+author: "Abhiuday Sharma"
+product: "tekmor"
+---
+
+When an autonomous coding agent works inside a repository, the traditional assumption of CI breaks down. In standard human development, tests run in CI *after* code is committed and pushed. But in agentic loops, Claude Code or Cursor runs test commands *during* an iterative editing session.
+
+A common failure mode is **post-test modification**:
+1. The agent runs `cargo test` or `npm test`. The process exits with code 0.
+2. The agent notices a lint warning, cleans up a comment, or attempts a minor refactoring.
+3. The agent declares to the user: *"All tests pass and the task is complete."*
+4. But the code that was tested is **not** the code that is now on disk. A broken syntax error or regression was introduced in step 2.
+
+```mermaid
+sequenceDiagram
+    participant Agent as Autonomous Agent
+    participant Shell as Bash Subshell
+    participant Tekmor as tekmor verify
+    participant Hook as Claude Code Stop Gate
+
+    Agent->>Tekmor: tekmor verify -- cargo test
+    Tekmor->>Shell: executes allowlisted command
+    Shell-->>Tekmor: exit code 0
+    Tekmor->>Tekmor: Compute Git Tree SHA (e.g. 4f9a2b)
+    Tekmor->>Tekmor: Write .verify/receipt.json
+    Agent->>Agent: Modifies file (Tree SHA -> 8c12a0)
+    Agent->>Hook: Claims "Task complete, tests pass"
+    Hook->>Tekmor: Check receipt for current tree
+    Tekmor-->>Hook: STALE_RECEIPT (4f9a2b != 8c12a0)
+    Hook-->>Agent: TURN BLOCKED: Run tekmor verify again
+```
+
+## How Tekmor Hashes the Tree
+
+Instead of checking filesystem modification timestamps (`mtime`), which are notoriously noisy and unstable, `tekmor` computes a cryptographic tree hash covering all project files that influence execution:
+
+```rust
+// From tekmor/src/receipt.rs
+pub struct Receipt {
+    pub schema_version: String,
+    pub command: String,
+    pub exit_code: i32,
+    pub git_commit: String,
+    pub tree_sha: String,
+    pub verdict: Verdict,
+    pub recorded_at: String,
+    pub artifact_path: Option<PathBuf>,
+}
+```
+
+Files ignored by default include documentation (`*.md`, `*.rst`), `.claude/` state, and `.verify/artifacts`. Every other tracked file contributes directly to the tree hash.
+
+If an agent touches a single byte of source code after running `tekmor verify -- <cmd>`, the tree SHA on disk no longer matches the receipt. The receipt verdict transitions immediately from `PASSED` to `STALE_RECEIPT`.
+
+## The Cryptographic Receipt Format
+
+Receipts are persisted locally in `.verify/receipt.json`:
+
+```json
+{
+  "schema": "v1.0.0",
+  "command": "cargo test --all-features",
+  "exit_code": 0,
+  "git_commit": "a8f3b12c4",
+  "tree_sha": "4f9a2b8e19c02d7e",
+  "verdict": "PASSED",
+  "source": "cli",
+  "recorded_at": "2026-11-10T14:22:01Z",
+  "artifact": ".verify/artifacts/run-a8f3b12c4.log"
+}
+```
+
+## Determinism with Zero Model Calls
+
+Unlike "evaluator agents" that run expensive LLM prompts to decide if an agent solved a bug, `tekmor` makes **0 model calls**. It is written entirely in pure Rust, executes in milliseconds, and provides mathematical certainty.

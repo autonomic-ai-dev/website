@@ -1,0 +1,50 @@
+---
+title: "Eliminating Flaky Proofs and Preventing Regressions with Tekmor Ratchet"
+date: "2026-10-30"
+excerpt: "How tekmor verify --repeat N identifies nondeterministic tests, and tekmor verify ratchet locks baselines against codebase degradation."
+slug: "tekmor-flaky-test-ratchet"
+category: "Reliability"
+author: "Abhiuday Sharma"
+product: "tekmor"
+---
+
+A test that passes 9 times out of 10 is not proof of correctness; it is a liability. In agentic software development, flaky tests are dangerous because an agent that triggers a lucky pass will accept the outcome, commit the code, and leave a time-bomb for CI or production.
+
+Tekmor addresses this with two core verification features:
+
+1. **Flaky Command Elimination (`--repeat N`)**
+2. **Deterministic Ratchet Enforcers (`verify ratchet`)**
+
+## Flaky Command Detection
+
+When running tests with:
+
+```bash
+tekmor verify --repeat 3 -- cargo test
+```
+
+Tekmor runs the exact command $N$ times consecutively against the identical git tree. If any iteration returns a non-zero exit code while another returns 0, the check is marked `FLAKY_DISAGREEMENT`.
+
+A flaky check **never** generates a `PASSED` receipt. It is recorded as untrusted, preventing the Claude Code stop gate from approving the turn until the flakiness is investigated and resolved.
+
+## The Ratchet Mechanism
+
+Code quality degrades through papercuts: an agent adds "just one more" ignored compiler warning, or skips a slow integration test suite.
+
+Tekmor provides a ratchet mechanism in `.verify/ratchet.toml`:
+
+```toml
+[ratchet.clippy]
+command = "cargo clippy --message-format=json"
+max_warnings = 0
+
+[ratchet.coverage]
+command = "cargo tarpaulin --print-summary"
+min_percentage = 85.0
+```
+
+Running `tekmor verify ratchet` checks whether metrics violate established baselines. When `--update` is passed:
+- Baselines are lowered if the code improved (e.g., warnings reduced from 4 to 0).
+- Baselines are never raised if warnings increased.
+
+This prevents codebase drift and ensures autonomous coding agents leave repositories cleaner than they found them.

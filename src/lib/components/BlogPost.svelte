@@ -1,7 +1,10 @@
 <script lang="ts">
   import { ArrowLeft, Calendar, User } from "lucide-svelte";
+  import { page } from "$app/state";
   import type { Product } from "#lib/data/products";
   let { data, product }: { data: any; product: Product } = $props();
+
+  const prefix = $derived(page.url.pathname.startsWith(`/${product.id}`) ? `/${product.id}` : '');
 
   const articleSchema = $derived({
     "@context": "https://schema.org",
@@ -69,7 +72,7 @@
 
 <div class="mx-auto max-w-4xl px-4 py-16 sm:px-6">
   
-  <a href="/blog" class="inline-flex items-center gap-2 text-xs font-mono text-neutral-400 hover:text-white mb-8 transition-colors">
+  <a href="{prefix}/blog" class="inline-flex items-center gap-2 text-xs font-mono text-neutral-400 hover:text-white mb-8 transition-colors">
     <ArrowLeft size={14} />
     <span>← Back to blog</span>
   </a>

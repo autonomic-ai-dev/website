@@ -26,6 +26,7 @@ export type Product = {
 	nodeKindsNote?: string;
 	facts: { value: string; label: string }[];
 	limits: string[];
+	faqs?: { q: string; a: string }[];
 	finalCta: { headline: string; subline: string };
 	docsNav: { section: string; links: NavLink[] }[];
 	hasBlog: boolean;
@@ -43,7 +44,7 @@ const PRODUCT_HOSTS: Record<string, ProductId> = {
 export const products: Record<ProductId, Product> = {
 	tekmor: {
 		id: 'tekmor',
-		hasBlog: false,
+		hasBlog: true,
 		name: 'tekmor',
 		origin: 'https://tekmor.autonomic-ai.dev',
 		version: '1.0.0',
@@ -51,7 +52,7 @@ export const products: Record<ProductId, Product> = {
 		announce: {
 			text: 'tekmor 1.0.0 is out.',
 			label: 'Read the release notes',
-			href: 'https://github.com/autonomic-ai-dev/tekmor/releases/tag/v1.0.0'
+			href: '/tekmor/changelog'
 		},
 		badge: 'v1.0.0 · Runs locally · No model calls',
 		headline: 'Your agent says the tests pass. Check the receipt.',
@@ -137,6 +138,28 @@ export const products: Record<ProductId, Product> = {
 			'Runs recorded before 1.0.0 are not valid receipts after upgrade, because the tree hash covers more files. Run the checks again.',
 			'The published binary is for arm64 macOS only.'
 		],
+		faqs: [
+			{
+				q: 'How does Tekmor physically block an agent turn in Claude Code?',
+				a: 'When you run tekmor install, it registers a Stop hook and a PreToolUse bash gate in .claude/settings.json. When Claude Code attempts to finalize an assistant response, the stop hook executes tekmor stop-gate. If the agent response claims that tests passed or the task is complete, the gate checks .verify/receipt.json. If no receipt exists, or if the current git tree hash does not match the receipt tree SHA, the process exits non-zero, returning a hard blocker message to Claude Code.'
+			},
+			{
+				q: 'What files count toward the cryptographic tree hash?',
+				a: 'Every tracked source file under your project (src/, crates/, tests/, hooks/, etc.) and configuration manifests (Cargo.*, package.json, verify.toml) contribute directly to the SHA. Documentation files (*.md, *.rst), .claude/ session state, and .verify/artifacts/ logs are explicitly excluded so that updating documentation or notes does not invalidate your test passes.'
+			},
+			{
+				q: 'Does Tekmor run or call an LLM during verification?',
+				a: 'No. Tekmor makes exactly 0 model calls and spends 0 API tokens. It is written in 100% deterministic local Rust. Verdicts are decided strictly by process exit codes and git tree hashing.'
+			},
+			{
+				q: 'How does flaky test detection work with --repeat N?',
+				a: 'Running tekmor verify --repeat 3 -- <cmd> executes the allowlisted test command 3 consecutive times against the identical git tree. If any run returns a different exit code from the others, the command is classified as FLAKY_DISAGREEMENT and will not produce a PASSED receipt.'
+			},
+			{
+				q: 'How do we prevent developers or CI from accepting forged local receipts?',
+				a: 'Under ADR 0004, CI does not trust local receipts produced on developer laptops. The .github/workflows/receipt.yml workflow runs tekmor verify -- .verify/run.sh in clean-room mode on the GitHub Actions runner, writes the receipt directly to $GITHUB_STEP_SUMMARY, and gates branch merges.'
+			}
+		],
 		finalCta: {
 			headline: 'Allow one command. Read its receipt.',
 			subline: 'Start with the command your team already trusts. Check the receipt for the current code before you believe the claim.'
@@ -168,8 +191,8 @@ export const products: Record<ProductId, Product> = {
 		tagline: 'Deterministic YAML workflows',
 		announce: {
 			text: 'thesmos 1.0.0-rc3 is in private beta.',
-			label: 'Read the approval gate notes',
-			href: '/blog/spine-approval-gates-snapshots-replay'
+			label: 'Read the changelog',
+			href: '/thesmos/changelog'
 		},
 		badge: 'v1.0.0-rc3 · Private beta · Runs locally',
 		headline: 'Your agent says the tests passed. Show the snapshot.',
@@ -273,6 +296,28 @@ export const products: Record<ProductId, Product> = {
 			'replay does not run steps again. To re-run a workflow, start a new execution.',
 			'Snapshots record the outcome the executor saw. A command that changed something outside the repository is not captured.'
 		],
+		faqs: [
+			{
+				q: 'Why run a declarative YAML DAG instead of a standard prompt loop?',
+				a: 'Prompt loops are nondeterministic: an agent improvises different steps each time, can get trapped in repetitive retries, and leaves no verifiable execution trace. In Thesmos, the graph topology, verification checkpoints, and approval barriers are pre-declared in version-controlled YAML. The agent works inside bounded steps; the graph controls transitions.'
+			},
+			{
+				q: 'How do Verify nodes differ from Agent nodes?',
+				a: 'Agent nodes invoke cognitive worker models with injected context. Verify nodes run active shell validation commands under strict timeouts without any model in the loop, capturing stdout, stderr, and exit codes. A non-zero exit code halts the workflow immediately unless continue_on_failure: true is set.'
+			},
+			{
+				q: 'What is Cognitive Knapsack Injection?',
+				a: 'Before delegating to an Agent node, Thesmos calls tekmor route_task to generate a compact, surgical payload of relevant functions, types, and past trajectories (_brain_knapsack). This knapsack is strictly bounded to ~500 tokens, preventing context window pollution and avoiding degraded model reasoning.'
+			},
+			{
+				q: 'How does replay work without spending LLM tokens?',
+				a: 'Every node transition appends an immutable point-in-time snapshot to the SQLite database (~/.autonomic/logs/spine/state.db). Running agent-spine replay <EXECUTION_ID> reconstructs the final DAG state by reading the recorded snapshots in sequence. It executes 0 agent turns and makes 0 model calls.'
+			},
+			{
+				q: 'What happens if an external NATS broker is not available?',
+				a: 'Thesmos runs entirely local-first. If AUTONOMIC_NATS_URL is unset or unavailable, failed nodes and dead-letter events are automatically written to a zero-daemon local JSONL file at ~/.autonomic/state/spine/dlq.jsonl.'
+			}
+		],
 		finalCta: {
 			headline: 'Scaffold a workflow and run it once.',
 			subline: 'Start from a built-in template, validate it, then inspect the snapshots your run leaves behind.'
@@ -317,7 +362,11 @@ export type MainProduct = {
 };
 
 export const mainProducts: MainProduct[] = [
-	{ ...products.tekmor, docs: `${products.tekmor.origin}/docs` },
+	{
+		...products.tekmor,
+		docs: `${products.tekmor.origin}/docs`,
+		blog: `${products.tekmor.origin}/blog`
+	},
 	{
 		...products.thesmos,
 		docs: `${products.thesmos.origin}/docs`,

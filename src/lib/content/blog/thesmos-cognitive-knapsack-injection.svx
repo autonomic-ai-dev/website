@@ -1,0 +1,44 @@
+---
+title: "Surgical 500-Token Knapsacks: How Thesmos Integrates with Agent-Brain"
+date: "2026-10-25"
+excerpt: "Why dumping full repositories into agent context windows degrades reasoning, and how thesmos injects surgical ~500-token knapsacks before worker node delegation."
+slug: "thesmos-cognitive-knapsack-injection"
+category: "Context Architecture"
+author: "Abhiuday Sharma"
+product: "thesmos"
+---
+
+Language model performance degrades rapidly as context window size expands—the well-documented "lost in the middle" phenomenon. In complex software development workflows, passing thousands of lines of irrelevant codebase context into an agent node increases latency, token cost, and hallucination rates.
+
+Thesmos (agent-spine) solves this through **Cognitive Knapsack Injection**.
+
+```mermaid
+flowchart LR
+    Task["Incoming Task Intent"] --> Router["tekmor route_task<br/>(Semantic Embedding & Index)"]
+    Router --> Knapsack["_brain_knapsack<br/>(~500 surgical tokens)"]
+    Knapsack --> AgentNode["Thesmos Agent Node<br/>(Bounded Sub-Agent)"]
+    AgentNode --> Verify["Verify Node<br/>(Deterministic Bash Execution)"]
+```
+
+## The Knapsack Mechanism
+
+When a DAG reaches a `NodeKind::Agent` execution step:
+1. Thesmos calls `tekmor route_task` with the step's prompt and intent.
+2. `tekmor` uses local embeddings (`all-MiniLM-L6-v2`) and procedure graph transitions to extract precisely the required functions, interfaces, and past trajectories.
+3. It packages these into a compact JSON object named `_brain_knapsack` (strictly constrained to under 500 tokens).
+4. The worker agent receives only this surgical knapsack rather than an entire codebase dump.
+
+## Example Injected Payload
+
+```json
+{
+  "_brain_knapsack": {
+    "target_symbol": "tekmor::receipt::compute_tree_hash",
+    "relevant_types": ["Receipt", "Verdict", "TreeSha"],
+    "procedure_edge": "reproduce_failure -> isolate_and_patch",
+    "invariant": "Tree SHA must ignore *.md and .claude/ directory"
+  }
+}
+```
+
+By keeping context windows ultra-compact, agent worker turns run with higher accuracy, lower cost, and deterministic predictability.

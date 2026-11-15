@@ -1,14 +1,18 @@
 ---
-title: Workflows and node kinds
+title: "thesmos Workflows: YAML specification and 10 NodeKinds"
+description: "Authoring deterministic workflows for thesmos (agent-spine). Covers YAML schema, all 10 NodeKind definitions, active verify nodes, and retry policies."
+canonical: https://thesmos.autonomic-ai.dev/docs/workflows
+product: thesmos
+group: Get Started
 ---
 
-# Workflows and node kinds
+# thesmos Workflows: YAML specification and 10 NodeKinds
 
-A workflow is a YAML file of named nodes and edges. agent-spine runs the nodes in the order the edges describe, records a snapshot after each step, and lets you read the run afterwards.
+> Authoring deterministic workflows for thesmos (command: agent-spine). Covers YAML schema, all 10 NodeKind definitions, active verify nodes, and retry policies.
 
-## A workflow file
+A workflow is a version-controlled YAML document defining named nodes, edge transitions, retry policies, and timeout constraints. `thesmos` executes nodes in the topological order described by the edges, appending an immutable snapshot to SQLite after every step.
 
-This is the `bugfix_pipeline` workflow, abridged. It is an example to copy from, not a built-in template.
+## Example: `bugfix_pipeline.yaml`
 
 ```yaml
 name: bugfix_pipeline
@@ -20,11 +24,13 @@ nodes:
   - name: reproduce_failure
     kind: verify
     command: "cargo test --test reproduce_bug"
+    timeout_secs: 60
+    continue_on_failure: false
     description: "Run the reproduction test"
 
   - name: isolate_and_patch
     kind: agent
-    description: "Analyze the test failure, isolate the root cause, and apply a minimal patch"
+    description: "Analyze test failure, isolate root cause, and apply minimal patch"
     retry_policy:
       max_attempts: 2
       backoff_ms: 1000
@@ -32,11 +38,13 @@ nodes:
   - name: verify_fix
     kind: verify
     command: "cargo test --all-features"
+    timeout_secs: 120
     description: "Confirm all tests pass after the patch"
 
   - name: human_review
     kind: approval_gate
-    description: "Review the diff and the verification output before committing"
+    auto_approve: false
+    description: "Review diff and verification output before committing"
 
 edges:
   - from: reproduce_failure
@@ -47,27 +55,30 @@ edges:
     to: human_review
 ```
 
-## Node kinds
+---
 
-Each node has one `kind`. These are the kinds the released binary defines.
+## The 10 Node Kinds (`NodeKind`)
 
-| Kind | What it does |
-| :--- | :--- |
-| `Agent` | Runs an agent step with the context in its payload. |
-| `Checkpoint` | Writes an explicit, append-only state barrier. |
-| `Verify` | Runs a shell command under a timeout and records its output and exit code. |
-| `ApprovalGate` | Passes by default. With auto-approve off, waits for `approved: true` in the payload. |
-| `Fork` | Splits into one branch per outgoing edge. The branches run in parallel. |
-| `Join` | Waits for all the branches of the matching `Fork` before it continues. |
-| `Router` | Sets the variables that conditional edges use. |
-| `Debate` | Alternates between a coder and a critic over several rounds. It stops after a set number of rounds or when the critic approves. |
-| `Vote` | Runs the same prompt several times and selects the best output, by majority or by the lowest validation error. |
-| `Hydrate` | Collects static context, such as the git diff, test output or file contents, and adds it to the payload before an agent runs. |
-| `SpeculativeFork` | Planned. The released executor passes its payload through unchanged. |
+Every node defines exactly one `kind` determining its execution semantics:
 
-## Retries
+| NodeKind | Purpose | Behavior & Guarantees |
+| :--- | :--- | :--- |
+| **`Agent`** | Cognitive Task | Injects surgical ~500-token `_brain_knapsack` from `tekmor route_task`, delegates to worker model, snapshots result. |
+| **`Verify`** | Machine Validation | Actively executes `command` under a timeout. Captures exit code, stdout, and stderr. Halts execution on failure unless `continue_on_failure: true`. |
+| **`ApprovalGate`** | Human-in-the-Loop | Pauses workflow until `approved: true` is provided in the node payload. Auto-approves by default unless `auto_approve: false`. |
+| **`SpeculativeFork`** | Isolated Branching | Spawns temporary Git worktrees to evaluate multiple solutions concurrently without branch pollution. |
+| **`Fork` / `Join`** | Concurrency Barrier | Fans out across parallel branches; `Join` continues only after all incoming prerequisite branches resolve. |
+| **`Debate`** | Multi-Agent Refinement | Alternates between coder and critic models over iterative rounds until convergence or max rounds reached. |
+| **`Vote`** | Consensus Selection | Runs a prompt $N$ times with temperature variance, selecting the best output by consensus. |
+| **`Router`** | Dynamic Branching | Evaluates variables in the payload to choose conditional edge transitions. |
+| **`Hydrate`** | Context Assembly | Gathers environment diagnostics (diffs, test outputs, file trees) before agent execution. |
+| **`Checkpoint`** | State Barrier | Appends an immutable point-in-time state snapshot to SQLite. |
 
-A node can retry a failed step with exponential backoff:
+---
+
+## Retry Policies & Exponential Backoff
+
+Nodes can specify automated retry policies to handle transient failures:
 
 ```yaml
 retry_policy:
@@ -75,28 +86,46 @@ retry_policy:
   backoff_ms: 1000
 ```
 
-When the attempts run out, the node fails. A failed node is recorded in the dead-letter file. See [troubleshooting](/docs/troubleshooting).
+If attempts are exhausted, the node fails. Failed executions are routed to the local dead-letter queue at `~/.autonomic/state/spine/dlq.jsonl`.
 
-## Parallel branches
+---
 
-A node with more than one outgoing edge fans out. A `Join` node waits for every branch before the workflow moves on.
-
-## Validate, run, inspect
+## Validation & Execution Lifecycle
 
 ```bash
+# 1. Validate YAML syntax and graph topology
 agent-spine validate bugfix.yaml
+
+# 2. Execute workflow with initial payload
 agent-spine run bugfix.yaml -p '{"ticket": "BUG-42"}'
+
+# 3. Inspect execution steps from SQLite
 agent-spine inspect <EXECUTION_ID>
+
+# 4. Replay execution final state (0 LLM re-runs)
 agent-spine replay <EXECUTION_ID>
 ```
 
-`validate` checks the syntax and the node types. It accepts workflows with loops. `run` executes the file and writes its snapshots. `inspect` prints the steps of one run. `replay` recreates its final state without running any step again.
+---
 
-## Built-in workflows
+## Built-In Templates
 
-`agent-spine init --with list` lists the templates. The released binary includes nine, among them `universal-developer`, `engineering-safety` and `root-cause-analysis`. Start one with `agent-spine init --with universal-developer`.
+`thesmos` ships with pre-configured, tested templates:
 
-## Read next
+```bash
+agent-spine init --with list
+```
 
-- [Design decisions](/docs/decisions)
-- [Troubleshooting](/docs/troubleshooting)
+- **`universal-developer`**: Standard plan → implement → verify loop.
+- **`engineering-safety`**: 5-gate safety pipeline (Understand, Predict Failure, Minimal Diff, Break It, Verify).
+- **`root-cause-analysis`**: Automated diagnostic tree for production incidents.
+
+Scaffold a template with:
+
+```bash
+agent-spine init --with universal-developer
+```
+
+## Next Step
+
+- Read [agent-spine CLI Reference](cli/agent-spine) for command line options.
