@@ -13,15 +13,15 @@ group: Start
 `thesmos` replaces unbounded, hallucination-prone prompt loops with **declarative, version-controlled Directed Acyclic Graphs (DAGs)**, immutable snapshots, and human-in-the-loop gates. In this release, the CLI command is named `agent-spine`.
 
 ```mermaid
-flowchart TD
+flowchart LR
     Run["agent-spine run &lt;workflow.yaml&gt;"] --> Validate["Acyclicity & Schema Validation"]
-    Validate --> Engine["Tokio Asynchronous Graph Walker"]
+    Validate --> Engine["Tokio Graph Walker"]
     
     subgraph Execution ["Node Execution Types"]
-        Engine --> Agent["Agent Node (Runs with its payload)"]
-        Engine --> Verify["Verify Node (Active Shell Command Execution)"]
-        Engine --> Gate["ApprovalGate (Halts until Approved)"]
-        Engine --> Fork["SpeculativeFork (Planned)"]
+        Engine --> Agent["Agent Node"]
+        Engine --> Verify["Verify Node"]
+        Engine --> Gate["ApprovalGate"]
+        Engine --> Fork["SpeculativeFork"]
     end
 
     Agent --> Snapshot[("Append-Only SQLite Snapshot<br/>(state.db)")]
@@ -29,7 +29,7 @@ flowchart TD
     Gate --> Snapshot
     Fork --> Snapshot
 
-    Snapshot --> Replay["agent-spine replay &lt;ID&gt;<br/>(Reconstructs the final state and runs no step)"]
+    Snapshot --> Replay["agent-spine replay &lt;ID&gt;"]
 ```
 
 ## Requirements

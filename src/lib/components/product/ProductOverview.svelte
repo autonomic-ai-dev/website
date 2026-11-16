@@ -15,6 +15,7 @@
 	import Icon from '#lib/components/ui/Icon.svelte';
 	import ContinuousConduit from '#lib/components/ContinuousConduit.svelte';
 	import AnimatedNumber from '#lib/components/AnimatedNumber.svelte';
+	import { scrollReveal } from '#lib/actions/scrollReveal';
 	import type { Product } from '#lib/data/products';
 
 	let { product }: { product: Product } = $props();
@@ -172,6 +173,7 @@
 
 			<!-- Interactive Evidence Inspector (Tactile Depth) -->
 			<div
+				use:scrollReveal={{ delay: 80 }}
 				class="mx-auto mt-14 max-w-3xl rounded-2xl border border-white/[0.12] bg-[#07080a] text-left shadow-2xl overflow-hidden"
 			>
 				<div
@@ -323,7 +325,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 		</section>
 
 		<!-- The Story (Redesigned Tactile Architecture Narrative) -->
-		<section class="yc-section yc-crosshair">
+		<section use:scrollReveal class="yc-section yc-crosshair">
 			<div class="flex items-center gap-2">
 				<span class="yc-label">The Story <b>/</b> Ground Truth</span>
 			</div>
@@ -338,6 +340,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 			<div class="mt-14 space-y-8">
 				{#each product.story.chapters as chapter, index (chapter.title)}
 					<article
+						use:scrollReveal={{ delay: (index % 2) * 80 }}
 						class="group relative rounded-2xl border border-white/[0.1] bg-[#08090c] p-6 sm:p-8 transition-all hover:border-white/[0.18] shadow-2xl"
 					>
 						<!-- Top Accent Glow on Hover -->
@@ -427,7 +430,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 		</section>
 
 		<!-- Section 01: Capabilities (Bento Grid with real architectural depth) -->
-		<section class="yc-section">
+		<section use:scrollReveal class="yc-section">
 			<div class="flex items-center gap-2">
 				<span class="yc-label">01 <b>/</b> Capabilities</span>
 			</div>
@@ -442,6 +445,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 				<div class="grid gap-[1px] bg-white/[0.08] sm:grid-cols-2 rounded-[15px] overflow-hidden">
 					{#each product.features as feature, index (feature.title)}
 						<article
+							use:scrollReveal={{ delay: (index % 2) * 90 }}
 							class="group relative bg-[#090a0d] p-7 transition-colors hover:bg-[#0e1015] flex flex-col justify-between"
 						>
 							<div>
@@ -484,7 +488,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 		</section>
 
 		<!-- Section 02: Execution Loop (Linear Connected Stepper) -->
-		<section class="yc-section">
+		<section use:scrollReveal class="yc-section">
 			<span class="yc-label">02 <b>/</b> Execution Loop</span>
 			<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 				Four steps. Each one leaves evidence.
@@ -498,6 +502,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 				<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 relative">
 					{#each product.loop as step, index (step.title)}
 						<div
+							use:scrollReveal={{ delay: (index % 4) * 80 }}
 							class="flex flex-col justify-between rounded-xl border border-white/[0.06] bg-[#050608] p-5"
 						>
 							<div>
@@ -536,7 +541,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 
 		<!-- Section 03: Environment Compatibility (If Present) -->
 		{#if product.hosts}
-			<section class="yc-section">
+			<section use:scrollReveal class="yc-section">
 				<span class="yc-label">03 <b>/</b> Compatibility</span>
 				<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 					Where the gates run, and where they do not.
@@ -589,15 +594,15 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 
 		<!-- Section 04: Node Kinds (If Present) -->
 		{#if product.nodeKinds}
-			<section class="yc-section">
+			<section use:scrollReveal class="yc-section">
 				<span class="yc-label">03 <b>/</b> Building Blocks</span>
 				<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 					Eight node kinds for deterministic execution.
 				</h2>
 
 				<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-					{#each product.nodeKinds as kind (kind.name)}
-						<div class="yc-card p-5">
+					{#each product.nodeKinds as kind, index (kind.name)}
+						<div use:scrollReveal={{ delay: (index % 4) * 60 }} class="yc-card p-5">
 							<p class="font-mono text-sm font-semibold text-white">{kind.name}</p>
 							<p class="mt-2 text-xs leading-relaxed text-neutral-400">{kind.body}</p>
 						</div>
@@ -614,7 +619,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 		{/if}
 
 		<!-- Section 05: Numbers You Can Check (With Rolling Number Animations) -->
-		<section class="yc-section">
+		<section use:scrollReveal class="yc-section">
 			<span class="yc-label">04 <b>/</b> Invariants</span>
 			<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 				Numbers you can check.
@@ -624,8 +629,8 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 			</p>
 
 			<dl class="mt-8 grid gap-5 sm:grid-cols-3">
-				{#each product.facts as fact (fact.label)}
-					<div class="yc-card p-7 relative overflow-hidden">
+				{#each product.facts as fact, index (fact.label)}
+					<div use:scrollReveal={{ delay: index * 90 }} class="yc-card p-7 relative overflow-hidden">
 						<dt
 							class="font-mono text-4xl sm:text-5xl font-semibold tracking-tight text-white flex items-baseline gap-1"
 						>
@@ -642,7 +647,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 		</section>
 
 		<!-- Section 06: Known Limits -->
-		<section class="yc-section">
+		<section use:scrollReveal class="yc-section">
 			<span class="yc-label">05 <b>/</b> Honest Boundaries</span>
 			<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 				What it does not do yet.
@@ -665,7 +670,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 
 		<!-- Section 07: Frequently Asked Questions -->
 		{#if product.faqs && product.faqs.length > 0}
-			<section id="faq" class="yc-section yc-crosshair">
+			<section id="faq" use:scrollReveal class="yc-section yc-crosshair">
 				<span class="yc-label">06 <b>/</b> Questions</span>
 				<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 					Frequently asked questions
@@ -692,42 +697,5 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 				</div>
 			</section>
 		{/if}
-
-		<!-- Section 08: Final CTA -->
-		<section class="yc-section text-center relative overflow-hidden">
-			<div
-				class="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[300px] w-[600px] -translate-x-1/2 rounded-full {glowCtaBg} blur-3xl"
-			></div>
-
-			<div class="yc-card p-8 sm:p-14 max-w-3xl mx-auto">
-				<span
-					class="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-mono text-[11px] text-neutral-300"
-				>
-					<span class="live-beacon"></span>
-					ARM64 MACOS · LOCAL FIRST
-				</span>
-
-				<h2 class="mx-auto mt-6 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-					{product.finalCta.headline}
-				</h2>
-				<p class="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-neutral-400">
-					{product.finalCta.subline}
-				</p>
-				<div class="mt-8 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 text-sm">
-					<a href="#install" class="yc-btn yc-btn-primary w-full sm:w-auto">
-						<span>Install {product.name}</span>
-						<span class="yc-btn-icon">
-							<ArrowRight size={13} />
-						</span>
-					</a>
-					<a href="/{product.id}/docs" class="yc-btn yc-btn-secondary w-full sm:w-auto">
-						<span>Read the docs</span>
-						<span class="yc-btn-icon">
-							<ArrowRight size={13} />
-						</span>
-					</a>
-				</div>
-			</div>
-		</section>
 	</div>
 </div>

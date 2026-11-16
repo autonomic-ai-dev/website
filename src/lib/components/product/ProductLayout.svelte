@@ -3,6 +3,7 @@
 	import { ArrowRight, Menu, X } from 'lucide-svelte';
 	import { page } from '$app/state';
 	import { products, productPath, type Product } from '#lib/data/products';
+	import Footer from '#lib/components/Footer.svelte';
 
 	let { product, children }: { product: Product; children: Snippet } = $props();
 
@@ -144,27 +145,5 @@
 		{@render children()}
 	</main>
 
-	<footer class="mt-20 border-t border-white/[0.08] bg-[#070709]">
-		<div class="yc-container py-12">
-			<div class="flex flex-col gap-6 text-sm text-neutral-400 sm:flex-row sm:items-center sm:justify-between">
-				<div>
-					<div class="flex items-center gap-2">
-						<span class="font-medium text-white">{product.name}</span>
-						<span class="rounded border border-white/[0.08] px-1.5 py-0.2 font-mono text-[10px] text-neutral-400">{product.version}</span>
-					</div>
-					<p class="mt-1 text-xs text-neutral-500">Part of the Autonomic AI ecosystem. Installs on its own.</p>
-				</div>
-				<div class="flex flex-wrap items-center gap-6 text-xs font-mono">
-					{#if other}
-						<a href={other.origin} class="text-neutral-400 hover:text-white transition-colors">{other.name}</a>
-					{/if}
-					<a href="https://autonomic-ai.dev" class="text-neutral-400 hover:text-white transition-colors">Autonomic AI</a>
-					<a href="https://autonomic-ai.openstatus.dev" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-neutral-400 hover:text-white transition-colors">
-						<span class="live-beacon"></span>
-						Status
-					</a>
-				</div>
-			</div>
-		</div>
-	</footer>
+	<Footer brand={product.id === 'thesmos' ? 'thesmos' : 'tekmor'} {product} />
 </div>

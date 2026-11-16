@@ -21,6 +21,7 @@
 	import ContinuousConduit from '#lib/components/ContinuousConduit.svelte';
 	import BenchmarkMetrics from '#lib/components/BenchmarkMetrics.svelte';
 	import AnimatedNumber from '#lib/components/AnimatedNumber.svelte';
+	import { scrollReveal } from '#lib/actions/scrollReveal';
 	import { products } from '#lib/data/products';
 
 	const tool = products.tekmor;
@@ -477,13 +478,14 @@
 		</section>
 
 		<!-- The Four Invariants (YC Unified Bento Grid with 1px hairline dividers) -->
-		<section id="features" class="yc-section yc-crosshair">
+		<section id="features" use:scrollReveal class="yc-section yc-crosshair">
 			<div class="rounded-2xl border border-white/[0.12] bg-white/[0.08] p-[1px] shadow-2xl">
 				<div
 					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[1px] bg-white/[0.08] rounded-[15px] overflow-hidden"
 				>
-					{#each invariants as inv (inv.badge)}
+					{#each invariants as inv, index (inv.badge)}
 						<div
+							use:scrollReveal={{ delay: (index % 4) * 70 }}
 							class="group relative bg-[#090a0d] p-7 transition-colors hover:bg-[#0e1015] flex flex-col justify-between"
 						>
 							<div>
@@ -506,7 +508,7 @@
 		</section>
 
 		<!-- Platform Architecture: Closed-Loop Governor -->
-		<section id="inspector" class="yc-section yc-crosshair">
+		<section id="inspector" use:scrollReveal class="yc-section yc-crosshair">
 			<div class="flex flex-col gap-2">
 				<span class="yc-label">01 <b>/</b> Architecture</span>
 				<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
@@ -518,7 +520,10 @@
 			</div>
 
 			<!-- Interactive Inspector Component -->
-			<div class="mt-10 rounded-2xl border border-white/[0.12] bg-[#090a0d] p-6 sm:p-8 shadow-2xl">
+			<div
+				use:scrollReveal={{ delay: 80 }}
+				class="mt-10 rounded-2xl border border-white/[0.12] bg-[#090a0d] p-6 sm:p-8 shadow-2xl"
+			>
 				<div
 					class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/[0.08]"
 				>
@@ -685,7 +690,7 @@
 		<BenchmarkMetrics />
 
 		<!-- Side-by-Side Product Chapters (01 & 02 Bento) -->
-		<section id="how-it-works" class="yc-section yc-crosshair">
+		<section id="how-it-works" use:scrollReveal class="yc-section yc-crosshair">
 			<div class="flex flex-col gap-2">
 				<span class="yc-label">03 <b>/</b> Execution Engine</span>
 				<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
@@ -698,7 +703,7 @@
 
 			<div class="mt-12 grid gap-8 lg:grid-cols-2">
 				<!-- Product Card 1: Tekmor -->
-				<div class="yc-card yc-card-glow p-7 sm:p-8 flex flex-col justify-between">
+				<div use:scrollReveal={{ delay: 0 }} class="yc-card yc-card-glow p-7 sm:p-8 flex flex-col justify-between">
 					<div>
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2.5">
@@ -806,7 +811,7 @@
 				</div>
 
 				<!-- Product Card 2: Thesmos -->
-				<div class="yc-card yc-card-glow p-7 sm:p-8 flex flex-col justify-between">
+				<div use:scrollReveal={{ delay: 100 }} class="yc-card yc-card-glow p-7 sm:p-8 flex flex-col justify-between">
 					<div>
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2.5">
@@ -908,7 +913,7 @@
 		</section>
 
 		<!-- Comparison Matrix (Why Gates > Instructions) -->
-		<section id="comparison" class="yc-section yc-crosshair bg-[#050507]">
+		<section id="comparison" use:scrollReveal class="yc-section yc-crosshair bg-[#050507]">
 			<span class="yc-label">04 <b>/</b> Comparison</span>
 			<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 				Unrestricted Agents vs The Autonomic Governor
@@ -958,7 +963,7 @@
 		</section>
 
 		<!-- FAQ Accordion with Monospace Operators -->
-		<section id="faq" class="yc-section yc-crosshair">
+		<section id="faq" use:scrollReveal class="yc-section yc-crosshair">
 			<span class="yc-label">05 <b>/</b> Details</span>
 			<h2 class="mt-2 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
 				Frequently asked questions
@@ -982,48 +987,6 @@
 						</div>
 					</details>
 				{/each}
-			</div>
-		</section>
-
-		<!-- Final CTA Bento Section -->
-		<section
-			id="quickstart"
-			class="yc-section yc-crosshair bg-[#060608] text-center relative overflow-hidden"
-		>
-			<div
-				class="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,83,26,0.15),transparent_70%)] blur-3xl"
-			></div>
-
-			<span
-				class="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 font-mono text-[11px] text-neutral-300"
-			>
-				<span class="live-beacon"></span>
-				ARM64 MACOS · HOMEBREW TAP · 0 MODEL CALLS
-			</span>
-
-			<h2
-				class="mx-auto mt-6 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl"
-			>
-				Deterministic Workflows. Cryptographic Proof.
-			</h2>
-			<p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-neutral-400">
-				Start with the test commands and workflow DAGs your team already trusts. Enforce deterministic
-				state transitions before accepting any autonomous change.
-			</p>
-
-			<div class="mt-9 flex flex-wrap justify-center gap-4">
-				<a href="/tekmor" class="yc-btn yc-btn-primary">
-					<span>Explore Tekmor</span>
-					<span class="yc-btn-icon">
-						<ArrowRight size={13} />
-					</span>
-				</a>
-				<a href="/thesmos" class="yc-btn yc-btn-secondary">
-					<span>Explore Thesmos</span>
-					<span class="yc-btn-icon">
-						<ArrowRight size={13} />
-					</span>
-				</a>
 			</div>
 		</section>
 	</div>

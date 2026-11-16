@@ -1,0 +1,23 @@
+# Autonomic AI
+> Local-first deterministic verification engine and execution governor for autonomous coding agents.
+
+## Core Products
+- **Tekmor**: Local-first proof evaluation engine and process stop gate for coding agents. Binds test execution to cryptographic git tree SHAs. Emits tamper-proof receipts to `.verify/receipt.json`. Enforces hard process boundaries via Claude Code stop hooks with 0 model calls.
+- **Thesmos (agent-spine)**: Deterministic Directed Acyclic Graph (DAG) execution engine for multi-step agent workflows. Replaces unbounded prompt loops with validated YAML specifications, immutable append-only SQLite snapshots, human approval gates, and zero-token time-travel replay.
+
+## CLI Commands
+- `brew tap autonomic-ai-dev/tap`
+- `brew install autonomic-ai-dev/tap/tekmor`
+- `brew install autonomic-ai-dev/tap/agent-spine`
+- `tekmor verify -- <command>`: Runs allowlisted check in subshell, writes `.verify/receipt.json`.
+- `tekmor verify receipt`: Validates status and freshness against current git tree.
+- `agent-spine run <workflow.yaml>`: Executes deterministic DAG workflow.
+- `agent-spine replay <execution_id>`: Reconstructs state from SQLite with 0 LLM tokens re-spent.
+
+## Repositories & Resources
+- Website: https://autonomic-ai.dev
+- Tekmor: https://tekmor.autonomic-ai.dev
+- Thesmos: https://thesmos.autonomic-ai.dev
+- GitHub Organization: https://github.com/autonomic-ai-dev
+- Homebrew Tap: https://github.com/autonomic-ai-dev/homebrew-tap
+- Status: https://autonomic-ai.openstatus.dev

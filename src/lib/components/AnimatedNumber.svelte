@@ -5,7 +5,7 @@
 		value,
 		prefix = '',
 		suffix = '',
-		duration = 1.2,
+		duration = 1.0,
 		decimals = 0,
 		class: className = ''
 	}: {
@@ -29,8 +29,9 @@
 
 		let frameId: number;
 		let startTime: number | null = null;
-		const startValue = 0;
 		const targetValue = value;
+		// Count down to 0 from 18 so zero-values have an unmistakable, tactile countdown
+		const startValue = targetValue === 0 ? 18 : 0;
 		const durationMs = duration * 1000;
 
 		function easeOutCubic(t: number): number {
@@ -72,12 +73,12 @@
 					if (entry.isIntersecting) {
 						startAnimation();
 					} else {
-						// Reset for bidirectional re-animation
+						// Bidirectional: reset when out of view so re-scrolling triggers animation
 						reset();
 					}
 				}
 			},
-			{ threshold: 0.2 }
+			{ threshold: 0.15 }
 		);
 
 		observer.observe(spanRef);

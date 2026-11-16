@@ -1,8 +1,25 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { ArrowLeft, Calendar, User } from "lucide-svelte";
   import { page } from "$app/state";
+  import { renderMermaidBlocks } from "#lib/diagrams";
   import type { Product } from "#lib/data/products";
+
   let { data, product }: { data: any; product: Product } = $props();
+
+  let articleRef: HTMLElement | undefined = $state();
+
+  onMount(() => {
+    if (articleRef) {
+      renderMermaidBlocks(articleRef);
+    }
+  });
+
+  $effect(() => {
+    if (articleRef && data) {
+      renderMermaidBlocks(articleRef);
+    }
+  });
 
   const prefix = $derived(page.url.pathname.startsWith(`/${product.id}`) ? `/${product.id}` : '');
 
@@ -77,7 +94,7 @@
     <span>← Back to blog</span>
   </a>
 
-  <article class="prose prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-white prose-h2:text-2xl prose-h3:text-lg prose-p:leading-relaxed">
+  <article bind:this={articleRef} class="prose prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-white prose-h2:text-2xl prose-h3:text-lg prose-p:leading-relaxed">
     <div class="not-prose mb-10 pb-6 border-b border-white/[0.08]">
       <div class="flex items-center gap-3 mb-4 flex-wrap">
         <span class="px-2.5 py-0.5 rounded bg-white/[0.04] text-neutral-300 border border-white/10 text-[10px] font-mono font-medium uppercase">

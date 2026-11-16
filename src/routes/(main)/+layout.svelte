@@ -3,6 +3,7 @@
 	import { Menu, X, ArrowRight, ExternalLink } from 'lucide-svelte';
 	import { page } from '$app/state';
 	import { MAIN_ORIGIN, mainProducts } from '#lib/data/products';
+	import Footer from '#lib/components/Footer.svelte';
 
 	let { children }: { children: Snippet } = $props();
 
@@ -234,44 +235,5 @@
 	</main>
 
 	<!-- Architectural Footer -->
-	<footer class="border-t border-white/[0.08] bg-[#070709]">
-		<div class="yc-container py-14">
-			<div class="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
-				<div>
-					<div class="flex items-center gap-2.5">
-						<span
-							class="flex h-5 w-5 items-center justify-center rounded border border-white/20 bg-white/[0.05] font-mono text-[10px] text-[#5fd39a]"
-							>A</span
-						>
-						<span class="font-medium text-white text-sm">Autonomic AI</span>
-					</div>
-					<p class="mt-2 text-xs text-neutral-500 max-w-sm">
-						Deterministic execution, proof receipts, and workflow snapshots for coding agents.
-					</p>
-				</div>
-				<div class="flex flex-wrap items-center gap-6 text-xs font-mono">
-					<a href="/tekmor" class="text-neutral-400 hover:text-white transition-colors"
-						>{tool.name}</a
-					>
-					<a href="/thesmos" class="text-neutral-400 hover:text-white transition-colors"
-						>{spine.name}</a
-					>
-					<a href="/docs" class="text-neutral-400 hover:text-white transition-colors">Docs</a>
-					<a href="/blog" class="text-neutral-400 hover:text-white transition-colors">Blog</a>
-					<a href="/changelog" class="text-neutral-400 hover:text-white transition-colors"
-						>Changelog</a
-					>
-					<a
-						href="https://autonomic-ai.openstatus.dev"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="inline-flex items-center gap-1.5 text-neutral-400 hover:text-white transition-colors"
-					>
-						<span class="live-beacon"></span>
-						All systems normal
-					</a>
-				</div>
-			</div>
-		</div>
-	</footer>
+	<Footer brand="org" />
 </div>
