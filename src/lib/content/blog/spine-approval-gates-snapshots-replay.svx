@@ -5,7 +5,7 @@ excerpt: "agent-spine can pause a workflow at an approval gate until a person si
 slug: "spine-approval-gates-snapshots-replay"
 product: "thesmos"
 category: "Operations"
-author: "Abhiuday Gupta"
+author: "Abhiuday"
 ---
 
 A workflow that changes a repository should not finish without a person looking at it. An approval gate is the place in the workflow where that person looks. A snapshot is the record of what the workflow had done up to that point. Replay is how you read the record later. Together they make a long run something you can stop, inspect and explain.

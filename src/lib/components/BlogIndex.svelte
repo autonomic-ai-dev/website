@@ -47,14 +47,17 @@
 
 <div class="yc-container py-12 md:py-20">
 	<header class="max-w-3xl">
-		<div class="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.04] px-3.5 py-1.5 font-mono text-xs text-neutral-300">
+		<div class="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-3.5 py-1.5 font-mono text-xs text-neutral-300">
 			<span class="live-beacon"></span>
 			<span>{product.name} Engineering Blog</span>
 		</div>
-		<h1 class="mt-6 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-			The engineering behind {product.name}.
+		<h1 class="mt-6 text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.05]">
+			<span class="capitalize">{product.name}</span> Journal.
+			<span class="block text-neutral-400 sm:text-neutral-500 font-bold mt-2 text-2xl sm:text-3xl leading-[1.15]">
+				The engineering behind {product.name}.
+			</span>
 		</h1>
-		<p class="mt-4 text-base leading-relaxed text-neutral-400 sm:text-lg">
+		<p class="mt-4 text-base leading-relaxed text-neutral-300 sm:text-lg">
 			Trade-offs, performance measurements, and architecture decisions written by the engineers building {product.name}.
 		</p>
 	</header>

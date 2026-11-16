@@ -4,7 +4,7 @@ date: "2026-11-10"
 excerpt: "Autonomous coding agents frequently touch files after running test suites, invalidating previous test results. Here is how tekmor binds verification verdicts directly to git tree SHAs."
 slug: "tekmor-tree-hashed-receipts"
 category: "Architecture"
-author: "Abhiuday Sharma"
+author: "Abhiuday"
 product: "tekmor"
 ---
 

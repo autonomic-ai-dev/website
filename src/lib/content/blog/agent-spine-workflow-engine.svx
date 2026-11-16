@@ -5,7 +5,7 @@ excerpt: "agent-spine runs YAML workflows of named nodes and edges, records a sn
 slug: "agent-spine-workflow-engine"
 product: "thesmos"
 category: "Architecture"
-author: "Abhiuday Gupta"
+author: "Abhiuday"
 ---
 
 Agent workflows fail in a specific way. A job with five steps runs steps one and two, the agent makes a call in step three that looks reasonable, step four fails, and now nobody knows what state the repository is in. Re-running from the start repeats the work. Re-running by hand is error-prone. agent-spine exists to make that failure smaller and easier to read.

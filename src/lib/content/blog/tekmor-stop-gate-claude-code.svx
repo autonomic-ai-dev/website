@@ -4,7 +4,7 @@ date: "2026-11-05"
 excerpt: "How tekmor install configures Stop and Bash hooks in Claude Code settings, turning agent hallucinations into hard, non-negotiable process barriers."
 slug: "tekmor-stop-gate-claude-code"
 category: "Security"
-author: "Abhiuday Sharma"
+author: "Abhiuday"
 product: "tekmor"
 ---
 
