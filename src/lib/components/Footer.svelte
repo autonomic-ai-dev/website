@@ -7,8 +7,7 @@
 		Terminal,
 		FileCode2,
 		Sparkles,
-		ShieldCheck,
-		ArrowRight
+		ShieldCheck
 	} from 'lucide-svelte';
 	import { scrollReveal } from '#lib/actions/scrollReveal';
 	import type { Product } from '#lib/data/products';
@@ -26,6 +25,13 @@
 	const isOrg = $derived(brand === 'org');
 
 	const watermarkText = $derived(isTekmor ? 'Tekmor' : isThesmos ? 'Thesmos' : 'Autonomic AI');
+
+	// Dynamic font size class ensuring single-line rendering across all viewports
+	const watermarkClass = $derived(
+		isOrg
+			? 'text-[8.5vw] sm:text-[9vw] md:text-[9.5vw] lg:text-[116px] xl:text-[132px]'
+			: 'text-[13vw] sm:text-[15vw] md:text-[16vw] lg:text-[190px] xl:text-[220px]'
+	);
 
 	const ctaTitle = $derived(
 		isTekmor
@@ -83,7 +89,7 @@
 			</div>
 		</div>
 
-		<!-- Main 5-Column Navigation Grid -->
+		<!-- Main 5-Column Navigation Grid (Strictly Product-Specific, No Cross-Pollution) -->
 		<div
 			use:scrollReveal={{ delay: 80 }}
 			class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-6 py-12 border-b border-white/[0.06]"
@@ -94,25 +100,38 @@
 					<div
 						class="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.1] flex items-center justify-center"
 					>
-						<span class="font-mono text-xs font-bold text-[#5fd39a]">
+						<span class="font-mono text-xs font-bold {isTekmor ? 'text-[#5fd39a]' : isThesmos ? 'text-blue-400' : 'text-[#ff7a4a]'}">
 							{isTekmor ? 'T' : isThesmos ? 'S' : 'A'}
 						</span>
 					</div>
 					<span class="font-bold text-white text-base tracking-tight">{watermarkText}</span>
 				</div>
 				<p class="text-neutral-400 text-xs leading-relaxed">
-					Deterministic proof-of-evidence execution engine and workflow governor for coding agents.
-					Zero LLM calls.
+					{#if isTekmor}
+						Cryptographic proof evaluation engine and process stop gate for coding agents. Zero model calls.
+					{:else if isThesmos}
+						Deterministic Directed Acyclic Graph governor for coding agent workflows with append-only SQLite snapshots.
+					{:else}
+						Deterministic proof-of-evidence execution engine and workflow governor for coding agents. Zero LLM calls.
+					{/if}
 				</p>
 				<div
-					class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-[#5fd39a]"
+					class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full {isTekmor ? 'bg-emerald-500/10 border-emerald-500/20 text-[#5fd39a]' : isThesmos ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-emerald-500/10 border-emerald-500/20 text-[#5fd39a]'} border text-[11px] font-mono"
 				>
-					<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-beacon"></span>
-					<span>Deterministic Gates Active</span>
+					<span class="w-1.5 h-1.5 rounded-full {isTekmor ? 'bg-emerald-400' : isThesmos ? 'bg-blue-400' : 'bg-emerald-400'} live-beacon"></span>
+					<span>
+						{#if isTekmor}
+							Tree Receipts Verified
+						{:else if isThesmos}
+							DAG Governor Active
+						{:else}
+							Deterministic Gates Active
+						{/if}
+					</span>
 				</div>
 			</div>
 
-			<!-- Col 2: Guides & Documentation -->
+			<!-- Col 2: Guides & Docs -->
 			<div>
 				<h3 class="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono mb-4">
 					Guides & Docs
@@ -142,7 +161,7 @@
 							<a href="/thesmos/docs/installation" class="hover:text-white transition-colors">Installation</a>
 						</li>
 						<li>
-							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">CLI (agent-spine)</a>
+							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">CLI Reference (agent-spine)</a>
 						</li>
 						<li>
 							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">DAG Workflows Spec</a>
@@ -152,105 +171,245 @@
 						</li>
 					{:else}
 						<li>
+							<a href="/tekmor" class="hover:text-white transition-colors">Tekmor Proof Engine</a>
+						</li>
+						<li>
+							<a href="/thesmos" class="hover:text-white transition-colors">Thesmos DAG Governor</a>
+						</li>
+						<li>
 							<a href="/tekmor/docs" class="hover:text-white transition-colors">Tekmor Documentation</a>
 						</li>
 						<li>
 							<a href="/thesmos/docs" class="hover:text-white transition-colors">Thesmos Documentation</a>
 						</li>
 						<li>
-							<a href="/tekmor/docs/installation" class="hover:text-white transition-colors">Installation Guide</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors">Tree-Hashed Receipts</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">Deterministic DAGs</a>
+							<a href="/docs" class="hover:text-white transition-colors">Ecosystem Documentation</a>
 						</li>
 					{/if}
 				</ul>
 			</div>
 
-			<!-- Col 3: Architecture & Concepts -->
+			<!-- Col 3: Architecture & Concepts (Strictly Filtered) -->
 			<div>
 				<h3 class="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono mb-4">
 					Architecture
 				</h3>
 				<ul class="space-y-2.5 text-xs text-neutral-400">
-					<li>
-						<a href="/tekmor/docs/verification" class="hover:text-white transition-colors">
-							Tree-Hashed Receipts
-						</a>
-					</li>
-					<li>
-						<a href="/tekmor/docs/cli" class="hover:text-white transition-colors">
-							Claude Code Stop Hook
-						</a>
-					</li>
-					<li>
-						<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">
-							Prompt Loops vs DAGs
-						</a>
-					</li>
-					<li>
-						<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">
-							Append-Only SQLite Replay
-						</a>
-					</li>
-					<li>
-						<a href="/tekmor/docs/limits" class="hover:text-white transition-colors">
-							Honest Limits & Boundaries
-						</a>
-					</li>
+					{#if isTekmor}
+						<li>
+							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors">
+								Tree-Hashed Receipts
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors">
+								Process Stop Gates
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/installation" class="hover:text-white transition-colors">
+								Allowlisted Commands
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors">
+								Claude Code Stop Hook
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/limits" class="hover:text-white transition-colors">
+								Zero Model Calls (Rust)
+							</a>
+						</li>
+					{:else if isThesmos}
+						<li>
+							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">
+								Declarative YAML DAGs
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs" class="hover:text-white transition-colors">
+								Tokio Graph Walker
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">
+								Human Approval Gates
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">
+								Append-Only SQLite (state.db)
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs/decisions" class="hover:text-white transition-colors">
+								Zero-Token State Replay
+							</a>
+						</li>
+					{:else}
+						<li>
+							<a href="/#inspector" class="hover:text-white transition-colors">
+								Closed-Loop Governor Loop
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors">
+								Tree-Hashed Receipts
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">
+								Declarative YAML DAGs
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">
+								Append-Only SQLite Snapshots
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors">
+								Claude Code Process Stop Gate
+							</a>
+						</li>
+					{/if}
 				</ul>
 			</div>
 
-			<!-- Col 4: Developer Tools & CLI -->
+			<!-- Col 4: Developer Tools & CLI (Strictly Filtered) -->
 			<div>
 				<h3 class="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono mb-4">
 					Developer Tools
 				</h3>
 				<ul class="space-y-2.5 text-xs text-neutral-400">
-					<li>
-						<a
-							href="https://github.com/autonomic-ai-dev/homebrew-tap"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="hover:text-white transition-colors flex items-center gap-1.5"
-						>
-							<Terminal size={13} class="text-neutral-400" />
-							<span>brew tap autonomic-ai-dev</span>
-							<ExternalLink size={10} class="text-neutral-500 ml-auto" />
-						</a>
-					</li>
-					<li>
-						<a href="/tekmor/docs/cli" class="hover:text-white transition-colors flex items-center gap-1.5">
-							<ShieldCheck size={13} class="text-neutral-400" />
-							<span>tekmor verify CLI</span>
-						</a>
-					</li>
-					<li>
-						<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors flex items-center gap-1.5">
-							<Layers size={13} class="text-neutral-400" />
-							<span>agent-spine CLI</span>
-						</a>
-					</li>
-					<li>
-						<a href="/tekmor/docs/verification" class="hover:text-white transition-colors flex items-center gap-1.5">
-							<Sparkles size={13} class="text-neutral-400" />
-							<span>receipt.json Schema</span>
-						</a>
-					</li>
-					<li>
-						<a
-							href="https://github.com/autonomic-ai-dev"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="hover:text-white transition-colors flex items-center gap-1.5"
-						>
-							<span>GitHub Releases</span>
-							<ExternalLink size={10} class="text-neutral-500 ml-auto" />
-						</a>
-					</li>
+					{#if isTekmor}
+						<li>
+							<a
+								href="https://github.com/autonomic-ai-dev/homebrew-tap"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-white transition-colors flex items-center gap-1.5"
+							>
+								<Terminal size={13} class="text-neutral-400" />
+								<span>brew install tekmor</span>
+								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors flex items-center gap-1.5">
+								<ShieldCheck size={13} class="text-neutral-400" />
+								<span>tekmor verify -- &lt;cmd&gt;</span>
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors flex items-center gap-1.5">
+								<ShieldCheck size={13} class="text-neutral-400" />
+								<span>tekmor verify receipt</span>
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors flex items-center gap-1.5">
+								<Sparkles size={13} class="text-neutral-400" />
+								<span>receipt.json Schema</span>
+							</a>
+						</li>
+						<li>
+							<a
+								href="https://github.com/autonomic-ai-dev"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-white transition-colors flex items-center gap-1.5"
+							>
+								<span>GitHub Releases</span>
+								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
+							</a>
+						</li>
+					{:else if isThesmos}
+						<li>
+							<a
+								href="https://github.com/autonomic-ai-dev/homebrew-tap"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-white transition-colors flex items-center gap-1.5"
+							>
+								<Terminal size={13} class="text-neutral-400" />
+								<span>brew install agent-spine</span>
+								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors flex items-center gap-1.5">
+								<Layers size={13} class="text-neutral-400" />
+								<span>agent-spine run</span>
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors flex items-center gap-1.5">
+								<Layers size={13} class="text-neutral-400" />
+								<span>agent-spine replay</span>
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors flex items-center gap-1.5">
+								<Sparkles size={13} class="text-neutral-400" />
+								<span>workflow.yaml Spec</span>
+							</a>
+						</li>
+						<li>
+							<a
+								href="https://github.com/autonomic-ai-dev"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-white transition-colors flex items-center gap-1.5"
+							>
+								<span>GitHub Releases</span>
+								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
+							</a>
+						</li>
+					{:else}
+						<li>
+							<a
+								href="https://github.com/autonomic-ai-dev/homebrew-tap"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-white transition-colors flex items-center gap-1.5"
+							>
+								<Terminal size={13} class="text-neutral-400" />
+								<span>brew tap autonomic-ai-dev</span>
+								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors flex items-center gap-1.5">
+								<ShieldCheck size={13} class="text-neutral-400" />
+								<span>tekmor verify CLI</span>
+							</a>
+						</li>
+						<li>
+							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors flex items-center gap-1.5">
+								<Layers size={13} class="text-neutral-400" />
+								<span>agent-spine CLI</span>
+							</a>
+						</li>
+						<li>
+							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors flex items-center gap-1.5">
+								<Sparkles size={13} class="text-neutral-400" />
+								<span>receipt.json Schema</span>
+							</a>
+						</li>
+						<li>
+							<a
+								href="https://github.com/autonomic-ai-dev"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-white transition-colors flex items-center gap-1.5"
+							>
+								<span>GitHub Releases</span>
+								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
+							</a>
+						</li>
+					{/if}
 				</ul>
 			</div>
 
@@ -322,24 +481,24 @@
 			use:scrollReveal={{ delay: 120 }}
 			class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-400 font-mono"
 		>
-			<div>
-				© 2026 Autonomic AI. Open source under Apache 2.0 license.
+			<div class="whitespace-nowrap">
+				© 2026 Autonomic AI. {#if isTekmor}Tekmor{:else if isThesmos}Thesmos{:else}All products{/if} open source under Apache 2.0 license.
 			</div>
 			<div
-				class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.1] text-neutral-300 text-xs"
+				class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.05] border border-white/[0.1] text-neutral-300 text-xs whitespace-nowrap"
 			>
 				<span class="w-1.5 h-1.5 rounded-full bg-[#5fd39a] live-beacon"></span>
 				<span>Compiled with Rust 1.85+ • Bare-Metal Local-First Native • 0 LLM Calls</span>
 			</div>
 		</div>
 
-		<!-- Giant Watermark Logo -->
+		<!-- Giant Watermark Logo (Guaranteed Single Line Across All Viewports) -->
 		<div
 			id="watermark"
 			class="pt-16 sm:pt-20 pb-4 overflow-hidden select-none pointer-events-none text-center"
 		>
 			<span
-				class="text-[90px] sm:text-[150px] lg:text-[210px] xl:text-[240px] font-black tracking-tighter bg-gradient-to-b from-white/[0.22] via-white/[0.09] to-white/[0.02] bg-clip-text text-transparent leading-none block font-sans"
+				class="inline-block whitespace-nowrap font-black tracking-tighter bg-gradient-to-b from-white/[0.22] via-white/[0.09] to-white/[0.02] bg-clip-text text-transparent leading-none font-sans {watermarkClass}"
 			>
 				{watermarkText}
 			</span>

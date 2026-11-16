@@ -218,8 +218,10 @@
 				class="pointer-events-none absolute -top-32 left-1/2 -z-10 h-[480px] w-[750px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,83,26,0.12),transparent_70%)] blur-3xl"
 			></div>
 
-			<div class="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-				<div>
+			<!-- Top Hero Grid: Left Copy & Right Action Box -->
+			<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mb-12">
+				<!-- Left Column (span 7): Title, Mission & Invariant Bullets -->
+				<div class="lg:col-span-7 space-y-6">
 					<!-- YC Style Top Proof Pill -->
 					<div
 						class="inline-flex items-center gap-2.5 rounded-full border border-white/[0.12] bg-white/[0.03] py-1.5 pl-3 pr-4 text-xs font-medium text-neutral-300"
@@ -230,15 +232,17 @@
 						<span class="text-neutral-400">Autonomous Engineering Governor</span>
 					</div>
 
-					<!-- YC Headline with Negative Letter Spacing -->
+					<!-- Hero Headline with Balanced Line Breaks -->
 					<h1
-						class="mt-7 text-3xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-semibold leading-[1.1] tracking-[-0.035em] text-white max-w-xl"
+						class="text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] font-bold leading-[1.12] tracking-tight text-white"
 					>
 						Autonomous Engineering with Deterministic Boundaries.
-						<span class="text-neutral-500 block mt-1.5 font-normal">Orchestrate the workflow. Cryptographically verify the code.</span>
+						<span class="block text-neutral-400 font-normal text-lg sm:text-xl md:text-2xl mt-3 leading-snug">
+							Orchestrate the workflow. Cryptographically verify the code.
+						</span>
 					</h1>
 
-					<p class="mt-5 max-w-lg text-base leading-relaxed text-neutral-400 sm:text-lg">
+					<p class="max-w-xl text-sm sm:text-base leading-relaxed text-neutral-400">
 						Two local-first systems for coding agents.
 						<strong class="font-medium text-blue-400">Thesmos</strong> orchestrates multi-step DAG
 						workflows with append-only SQLite snapshots.
@@ -246,58 +250,58 @@
 						claims with cryptographic tree receipts.
 					</p>
 
-					<!-- YC Button Row -->
-					<div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-						<a
-							href="#how-it-works"
-							class="yc-btn yc-btn-primary w-full sm:w-auto text-center justify-center"
-						>
-							<span class="truncate">Explore Tekmor & Thesmos</span>
-							<span class="yc-btn-icon shrink-0">
-								<ArrowRight size={13} />
-							</span>
-						</a>
-						<a
-							href="#inspector"
-							class="yc-btn yc-btn-secondary w-full sm:w-auto text-center justify-center"
-						>
-							<span class="truncate">Inspect Governor Architecture</span>
-							<span class="yc-btn-icon shrink-0">
-								<ArrowRight size={13} />
-							</span>
-						</a>
+					<!-- Trust Checklist -->
+					<div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-mono text-neutral-400 pt-1">
+						<div class="flex items-center gap-1.5">
+							<span class="text-[#ff7a4a] font-bold">✓</span>
+							<span>0 Model Calls (100% Rust)</span>
+						</div>
+						<div class="flex items-center gap-1.5">
+							<span class="text-[#5fd39a] font-bold">✓</span>
+							<span>Tree-Hashed Receipts</span>
+						</div>
+						<div class="flex items-center gap-1.5">
+							<span class="text-blue-400 font-bold">✓</span>
+							<span>Append-Only SQLite</span>
+						</div>
 					</div>
+				</div>
 
+				<!-- Right Column (span 5): Quickstart Install Box & Action Buttons -->
+				<div class="lg:col-span-5 space-y-4 pt-1">
 					<!-- Command Quick-Copy Bar with Tab Switcher -->
-					<div class="mt-6 max-w-md rounded-xl border border-white/[0.08] bg-[#090a0d] p-1.5 text-xs">
-						<!-- Tabs -->
-						<div class="flex items-center gap-1 pb-1.5 mb-1.5 border-b border-white/[0.06] text-[11px] font-mono">
-							<button
-								type="button"
-								onclick={() => (installTab = 'tap')}
-								class="px-2.5 py-0.5 rounded transition-colors {installTab === 'tap' ? 'bg-white/[0.1] text-white font-medium' : 'text-neutral-400 hover:text-white'}"
-							>
-								Homebrew Tap
-							</button>
-							<button
-								type="button"
-								onclick={() => (installTab = 'tekmor')}
-								class="px-2.5 py-0.5 rounded transition-colors {installTab === 'tekmor' ? 'bg-[#5fd39a]/15 text-[#5fd39a] font-medium' : 'text-neutral-400 hover:text-white'}"
-							>
-								Tekmor
-							</button>
-							<button
-								type="button"
-								onclick={() => (installTab = 'thesmos')}
-								class="px-2.5 py-0.5 rounded transition-colors {installTab === 'thesmos' ? 'bg-blue-500/15 text-blue-400 font-medium' : 'text-neutral-400 hover:text-white'}"
-							>
-								Thesmos
-							</button>
+					<div class="rounded-2xl border border-white/[0.1] bg-[#0c0d10] p-3 text-xs shadow-xl">
+						<div class="flex items-center justify-between border-b border-white/[0.06] pb-2 mb-2">
+							<!-- Tabs -->
+							<div class="flex items-center gap-1 text-[11px] font-mono">
+								<button
+									type="button"
+									onclick={() => (installTab = 'tap')}
+									class="px-2.5 py-1 rounded transition-colors {installTab === 'tap' ? 'bg-white/[0.1] text-white font-medium' : 'text-neutral-400 hover:text-white'}"
+								>
+									Homebrew Tap
+								</button>
+								<button
+									type="button"
+									onclick={() => (installTab = 'tekmor')}
+									class="px-2.5 py-1 rounded transition-colors {installTab === 'tekmor' ? 'bg-[#5fd39a]/15 text-[#5fd39a] font-medium' : 'text-neutral-400 hover:text-white'}"
+								>
+									Tekmor
+								</button>
+								<button
+									type="button"
+									onclick={() => (installTab = 'thesmos')}
+									class="px-2.5 py-1 rounded transition-colors {installTab === 'thesmos' ? 'bg-blue-500/15 text-blue-400 font-medium' : 'text-neutral-400 hover:text-white'}"
+								>
+									Thesmos
+								</button>
+							</div>
+							<span class="text-[10px] font-mono text-neutral-500 hidden sm:inline">macOS arm64</span>
 						</div>
 
-						<div class="flex items-center justify-between px-2 py-0.5">
+						<div class="flex items-center justify-between px-2 py-1">
 							<div
-								class="flex items-center gap-2.5 min-w-0 flex-1 overflow-x-auto no-scrollbar font-mono text-neutral-300"
+								class="flex items-center gap-2.5 min-w-0 flex-1 overflow-x-auto no-scrollbar font-mono text-neutral-200"
 							>
 								<span class="select-none text-[#ff7a4a]">$</span>
 								<span class="truncate">{installCommands[installTab]}</span>
@@ -306,22 +310,45 @@
 								type="button"
 								onclick={copyCurrentInstall}
 								aria-label="Copy install command"
-								class="ml-3 inline-flex shrink-0 items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.03] px-2 py-1 text-[11px] font-medium text-neutral-300 transition-colors hover:bg-white/[0.1] hover:text-white"
+								class="ml-3 inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-xs font-mono text-neutral-300 transition-colors hover:bg-white/[0.1] hover:text-white"
 							>
 								{#if copiedInstall}
-									<Check size={11} class="text-[#ff7a4a]" />
+									<Check size={12} class="text-[#ff7a4a]" />
 									<span class="text-[#ff7a4a]">Copied</span>
 								{:else}
-									<Copy size={11} />
+									<Copy size={12} />
 									<span>Copy</span>
 								{/if}
 							</button>
 						</div>
 					</div>
-				</div>
 
-				<!-- Live Terminal Showcase with Interactive Tab Switching -->
-				<div class="relative">
+					<!-- Button Row -->
+					<div class="flex flex-col sm:flex-row gap-3 pt-1">
+						<a
+							href="#how-it-works"
+							class="yc-btn yc-btn-primary flex-1 text-center justify-center"
+						>
+							<span class="truncate">Explore Tekmor & Thesmos</span>
+							<span class="yc-btn-icon shrink-0">
+								<ArrowRight size={13} />
+							</span>
+						</a>
+						<a
+							href="#inspector"
+							class="yc-btn yc-btn-secondary flex-1 text-center justify-center"
+						>
+							<span class="truncate">Inspect Architecture</span>
+							<span class="yc-btn-icon shrink-0">
+								<ArrowRight size={13} />
+							</span>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<!-- Live Terminal Showcase Below Hero Grid -->
+			<div class="relative mt-4">
 					<div
 						class="pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-r from-[#ff531a]/15 via-blue-500/10 to-[#5fd39a]/10 blur-xl opacity-60"
 					></div>
@@ -474,7 +501,6 @@
 						</div>
 					</div>
 				</div>
-			</div>
 		</section>
 
 		<!-- The Four Invariants (YC Unified Bento Grid with 1px hairline dividers) -->
