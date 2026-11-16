@@ -122,10 +122,10 @@
 >
 	<!-- Constrained to .yc-container with deliberate exterior margin positioning -->
 	<div class="yc-container relative mx-auto h-full">
-		<!-- Continuous Thread Conduit positioned in the exterior margin with ample clearance from copy -->
+		<!-- Continuous Thread Conduit positioned securely in the container gutter with ample copy clearance -->
 		<div
 			bind:this={conduitRef}
-			class="absolute bottom-24 top-20 w-[2px] left-1 sm:left-2 md:-left-4 lg:-left-8 xl:-left-12 2xl:-left-16"
+			class="absolute bottom-24 top-20 w-[2px] left-2 sm:left-3.5 md:left-4 lg:left-5"
 		>
 			<!-- Top Source Knot (Origin Dock) -->
 			<div class="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center justify-center">
