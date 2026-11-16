@@ -118,14 +118,14 @@
 
 <div
 	aria-hidden="true"
-	class="pointer-events-none absolute inset-y-0 left-0 right-0 z-20 select-none overflow-hidden"
+	class="pointer-events-none absolute inset-y-0 left-0 right-0 z-20 select-none"
 >
 	<!-- Constrained to .yc-container with deliberate exterior margin positioning -->
 	<div class="yc-container relative mx-auto h-full">
 		<!-- Continuous Thread Conduit positioned securely in the container gutter with ample copy clearance -->
 		<div
 			bind:this={conduitRef}
-			class="absolute bottom-24 top-20 w-[2px] left-2 sm:left-3.5 md:left-4 lg:left-5"
+			class="absolute bottom-24 top-20 w-[2px] left-2 sm:left-3.5 md:left-4 xl:-left-4 2xl:-left-8"
 		>
 			<!-- Top Source Knot (Origin Dock) -->
 			<div class="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center justify-center">

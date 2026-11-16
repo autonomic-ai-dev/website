@@ -79,146 +79,162 @@
 	<!-- Continuous Dynamic Product Conduit (Emerald for Tekmor, Blue for Thesmos) with Ample Left Clearance -->
 	<ContinuousConduit color={accentColor} />
 
-	<div class="yc-container">
+	<div class="yc-container pl-10 sm:pl-14 md:pl-16 lg:pl-20">
 		<!-- Hero Section -->
-		<section class="yc-section yc-section-first dotgrid relative overflow-hidden text-center">
+		<section class="yc-section yc-section-first dotgrid relative overflow-hidden">
 			<!-- Subtle ambient glow -->
 			<div
 				class="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[480px] w-[750px] -translate-x-1/2 rounded-full {glowBg} blur-3xl"
 			></div>
 
-			<div class="mx-auto max-w-3xl">
-				<!-- Trust Badge -->
-				<span
-					class="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.04] px-3.5 py-1.5 font-mono text-[11px] text-neutral-300"
-				>
-					<span class="live-beacon"></span>
-					<span>{product.badge}</span>
-				</span>
-
-				<h1
-					class="mt-7 text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-semibold leading-[1.1] tracking-tight text-white"
-				>
-					{product.headline}
-				</h1>
-				<p class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-neutral-400 sm:text-lg">
-					{product.subline}
-				</p>
-
-				<!-- Install Box -->
-				<div
-					id="install"
-					class="mx-auto mt-9 max-w-lg scroll-mt-24 rounded-2xl border border-white/[0.1] bg-[#0c0d10] text-left shadow-2xl"
-				>
+			<!-- Top Hero Grid: Left Copy & Right Action Box -->
+			<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mb-12">
+				<!-- Left Column (span 7): Title, Mission & Invariant Bullets -->
+				<div class="lg:col-span-7 space-y-6">
+					<!-- Trust Badge -->
 					<div
-						class="flex items-center justify-between border-b border-white/[0.06] bg-[#07080a] px-4 py-2 font-mono text-xs"
+						class="inline-flex items-center gap-2.5 rounded-full border border-white/[0.12] bg-white/[0.03] py-1.5 pl-3 pr-4 text-xs font-medium text-neutral-300"
 					>
-						<div class="flex items-center gap-4">
-							<span class="text-white font-medium">brew tap</span>
-							<span class="text-neutral-500">curl</span>
-							<span class="text-neutral-500">source</span>
-						</div>
-						<span class="text-[11px] text-neutral-400 font-mono">macOS arm64</span>
+						<span class="live-beacon"></span>
+						<span class="text-white">{product.name}</span>
+						<span class="text-neutral-600">/</span>
+						<span class="text-neutral-400">{product.badge}</span>
 					</div>
-					<div class="flex items-center justify-between gap-3 px-4 py-3">
-						<div
-							class="flex items-center gap-2 overflow-x-auto font-mono text-xs sm:text-sm text-neutral-200 no-scrollbar"
-						>
-							<span class="select-none {accentText}">$</span>
-							<span>{product.install}</span>
-						</div>
-						<button
-							type="button"
-							onclick={copyInstall}
-							aria-label="Copy install command"
-							class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 font-mono text-xs text-neutral-300 transition-colors hover:bg-white/[0.1] hover:text-white"
-						>
-							{#if copied}
-								<Check size={12} class={accentText} />
-								<span class={accentText}>Copied</span>
-							{:else}
-								<Copy size={12} />
-								<span>Copy</span>
-							{/if}
-						</button>
+
+					<!-- Hero Headline with Balanced Line Breaks -->
+					<h1
+						class="text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] font-bold leading-[1.12] tracking-tight text-white"
+					>
+						{product.headline}
+					</h1>
+
+					<p class="max-w-xl text-sm sm:text-base leading-relaxed text-neutral-400">
+						{product.subline}
+					</p>
+
+					<!-- Trust Checklist / Chips -->
+					<div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-mono text-neutral-400 pt-1">
+						{#each product.chips as chip (chip)}
+							<div class="flex items-center gap-1.5">
+								<span class="{accentText} font-bold">✓</span>
+								<span>{chip}</span>
+							</div>
+						{/each}
 					</div>
 				</div>
 
-				<!-- Chips -->
-				<ul class="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-2.5 text-xs text-neutral-400">
-					{#each product.chips as chip (chip)}
-						<li class="inline-flex items-center gap-1.5">
-							<Check size={13} class={accentText} />
-							<span>{chip}</span>
-						</li>
-					{/each}
-				</ul>
+				<!-- Right Column (span 5): Quickstart Install Box & Action Buttons -->
+				<div class="lg:col-span-5 space-y-4 pt-1">
+					<!-- Dedicated Install Box -->
+					<div
+						id="install"
+						class="rounded-2xl border border-white/[0.1] bg-[#0c0d10] p-3 text-xs shadow-xl"
+					>
+						<div
+							class="flex items-center justify-between border-b border-white/[0.06] pb-2 mb-2 font-mono text-xs"
+						>
+							<div class="flex items-center gap-3 text-[11px]">
+								<span class="text-white font-medium">brew install</span>
+								<span class="text-neutral-500">curl</span>
+								<span class="text-neutral-500">source</span>
+							</div>
+							<span class="text-[10px] text-neutral-500 font-mono hidden sm:inline">macOS arm64</span>
+						</div>
+						<div class="flex items-center justify-between px-2 py-1">
+							<div
+								class="flex items-center gap-2.5 min-w-0 flex-1 overflow-x-auto no-scrollbar font-mono text-neutral-200"
+							>
+								<span class="select-none {accentText}">$</span>
+								<span class="truncate">{product.install}</span>
+							</div>
+							<button
+								type="button"
+								onclick={copyInstall}
+								aria-label="Copy install command"
+								class="ml-3 inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-xs font-mono text-neutral-300 transition-colors hover:bg-white/[0.1] hover:text-white"
+							>
+								{#if copied}
+									<Check size={12} class={accentText} />
+									<span class={accentText}>Copied</span>
+								{:else}
+									<Copy size={12} />
+									<span>Copy</span>
+								{/if}
+							</button>
+						</div>
+					</div>
 
-				<!-- Action Buttons -->
-				<div class="mt-8 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 text-sm">
-					<a href="/{product.id}/docs" class="yc-btn yc-btn-primary w-full sm:w-auto">
-						<span>Read {product.name} docs</span>
-						<span class="yc-btn-icon">
-							<ArrowRight size={13} />
-						</span>
-					</a>
-					<a href="/{product.id}/blog" class="yc-btn yc-btn-secondary w-full sm:w-auto">
-						<span>Read the blog</span>
-						<span class="yc-btn-icon">
-							<ArrowRight size={13} />
-						</span>
-					</a>
+					<!-- Button Row -->
+					<div class="flex flex-col sm:flex-row gap-3 pt-1">
+						<a href="/{product.id}/docs" class="yc-btn yc-btn-primary flex-1 text-center justify-center">
+							<span class="truncate">Read {product.name} docs</span>
+							<span class="yc-btn-icon shrink-0">
+								<ArrowRight size={13} />
+							</span>
+						</a>
+						<a href="/{product.id}/blog" class="yc-btn yc-btn-secondary flex-1 text-center justify-center">
+							<span class="truncate">Read the blog</span>
+							<span class="yc-btn-icon shrink-0">
+								<ArrowRight size={13} />
+							</span>
+						</a>
+					</div>
 				</div>
 			</div>
 
-			<!-- Interactive Evidence Inspector (Tactile Depth) -->
-			<div
-				use:scrollReveal={{ delay: 80 }}
-				class="mx-auto mt-14 max-w-3xl rounded-2xl border border-white/[0.12] bg-[#07080a] text-left shadow-2xl overflow-hidden"
-			>
+			<!-- Roomy Interactive Terminal Showcase Below Hero Grid -->
+			<div class="relative mt-4">
 				<div
-					class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] bg-[#0c0d10] px-4 py-2.5"
-				>
-					<div class="flex items-center gap-2">
-						<span class="h-3 w-3 rounded-full bg-[#ff5f56]"></span>
-						<span class="h-3 w-3 rounded-full bg-[#ffbd2e]"></span>
-						<span class="h-3 w-3 rounded-full bg-[#27c93f]"></span>
-						<span class="ml-2 font-mono text-xs text-neutral-400 hidden sm:inline">
-							{isTekmor ? '.verify / proof engine' : 'thesmos / execution engine'}
-						</span>
-					</div>
+					class="pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-r {isTekmor ? 'from-emerald-500/15 via-teal-500/10 to-[#5fd39a]/10' : 'from-blue-500/15 via-indigo-500/10 to-sky-500/10'} blur-xl opacity-60"
+				></div>
 
-					<!-- Tab Switches -->
-					<div class="flex items-center gap-1 text-xs">
-						<button
-							type="button"
-							onclick={() => (activeTab = 'config')}
-							class="rounded-md px-2.5 py-1 font-medium transition-colors {activeTab === 'config'
-								? `${accentBg} ${accentText} border ${accentBorder}`
-								: 'text-neutral-400 hover:text-white'}"
-						>
-							{isTekmor ? 'verify.toml' : 'workflow.yaml'}
-						</button>
-						<button
-							type="button"
-							onclick={() => (activeTab = 'receipt')}
-							class="rounded-md px-2.5 py-1 font-medium transition-colors {activeTab === 'receipt'
-								? `${accentBg} ${accentText} border ${accentBorder}`
-								: 'text-neutral-400 hover:text-white'}"
-						>
-							{isTekmor ? 'receipt.json' : 'state.db'}
-						</button>
-						<button
-							type="button"
-							onclick={() => (activeTab = 'gate')}
-							class="rounded-md px-2.5 py-1 font-medium transition-colors {activeTab === 'gate'
-								? `${accentBg} ${accentText} border ${accentBorder}`
-								: 'text-neutral-400 hover:text-white'}"
-						>
-							{isTekmor ? 'Stop Gate' : 'Replay'}
-						</button>
+				<div
+					use:scrollReveal={{ delay: 80 }}
+					class="rounded-2xl border border-white/[0.12] bg-[#07080a] text-left shadow-2xl overflow-hidden"
+				>
+					<div
+						class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] bg-[#0c0d10] px-4 py-2.5"
+					>
+						<div class="flex items-center gap-2">
+							<span class="h-3 w-3 rounded-full bg-[#ff5f56]"></span>
+							<span class="h-3 w-3 rounded-full bg-[#ffbd2e]"></span>
+							<span class="h-3 w-3 rounded-full bg-[#27c93f]"></span>
+							<span class="ml-2 font-mono text-xs text-neutral-400 hidden sm:inline">
+								{isTekmor ? '.verify / proof engine' : 'thesmos / execution engine'}
+							</span>
+						</div>
+
+						<!-- Tab Switches -->
+						<div class="flex items-center gap-1 text-xs">
+							<button
+								type="button"
+								onclick={() => (activeTab = 'config')}
+								class="rounded-md px-2.5 py-1 font-medium transition-colors {activeTab === 'config'
+									? `${accentBg} ${accentText} border ${accentBorder}`
+									: 'text-neutral-400 hover:text-white'}"
+							>
+								{isTekmor ? 'verify.toml' : 'workflow.yaml'}
+							</button>
+							<button
+								type="button"
+								onclick={() => (activeTab = 'receipt')}
+								class="rounded-md px-2.5 py-1 font-medium transition-colors {activeTab === 'receipt'
+									? `${accentBg} ${accentText} border ${accentBorder}`
+									: 'text-neutral-400 hover:text-white'}"
+							>
+								{isTekmor ? 'receipt.json' : 'state.db'}
+							</button>
+							<button
+								type="button"
+								onclick={() => (activeTab = 'gate')}
+								class="rounded-md px-2.5 py-1 font-medium transition-colors {activeTab === 'gate'
+									? `${accentBg} ${accentText} border ${accentBorder}`
+									: 'text-neutral-400 hover:text-white'}"
+							>
+								{isTekmor ? 'Stop Gate' : 'Replay'}
+							</button>
+						</div>
 					</div>
-				</div>
 
 				<!-- Tab Content -->
 				<div class="p-5 font-mono text-xs leading-relaxed text-neutral-300 overflow-x-auto">
@@ -322,7 +338,8 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 					{/if}
 				</div>
 			</div>
-		</section>
+		</div>
+	</section>
 
 		<!-- The Story (Redesigned Tactile Architecture Narrative) -->
 		<section use:scrollReveal class="yc-section yc-crosshair">
