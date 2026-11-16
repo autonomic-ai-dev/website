@@ -31,11 +31,13 @@
 
 		<div>
 			<span class="yc-label">Catalog <b>/</b> Standalone Tools</span>
-			<h1 class="mt-6 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">
-				Install one. Or both. <br />
-				<span class="text-neutral-500">Each stands alone.</span>
+			<h1 class="mt-6 max-w-3xl text-5xl sm:text-7xl font-black tracking-tight text-white leading-[1.02]">
+				Products.
+				<span class="block text-neutral-400 sm:text-neutral-500 font-bold mt-2 text-2xl sm:text-3xl md:text-4xl leading-[1.14]">
+					Install one. Or both. Each stands alone.
+				</span>
 			</h1>
-			<p class="mt-4 max-w-xl text-base text-neutral-400 sm:text-lg">
+			<p class="mt-4 max-w-xl text-base text-neutral-300 sm:text-lg leading-relaxed">
 				Pick the job you have today. Each product installs on its own with its own single-binary Homebrew tap.
 			</p>
 		</div>
@@ -51,7 +53,7 @@
 							<span class="rounded border border-white/[0.1] bg-white/[0.03] px-2 py-0.5 font-mono text-[11px] font-semibold text-[#5fd39a]">
 								0{index + 1}
 							</span>
-							<h2 class="text-2xl font-semibold text-white">{product.name}</h2>
+							<h2 class="text-2xl font-bold text-white capitalize">{product.name}</h2>
 							<span class="rounded-full border border-white/[0.08] px-2 py-0.5 font-mono text-xs text-neutral-400">
 								{product.version}
 							</span>

@@ -101,14 +101,19 @@
 						<span class="text-neutral-400">{product.badge}</span>
 					</div>
 
-					<!-- Hero Headline with Balanced Line Breaks -->
+					<!-- Hero Headline with Balanced Line Breaks (Anode Parity) -->
 					<h1
-						class="text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] font-bold leading-[1.12] tracking-tight text-white"
+						class="text-5xl sm:text-7xl xl:text-8xl font-black tracking-tight text-white leading-[1.02]"
 					>
-						{product.headline}
+						<span class="capitalize">{product.name}.</span>
+						<span
+							class="block text-neutral-400 sm:text-neutral-500 font-bold mt-2 text-2xl sm:text-3xl md:text-4xl lg:text-[2.2rem] xl:text-[2.6rem] leading-[1.14]"
+						>
+							{product.headline}
+						</span>
 					</h1>
 
-					<p class="max-w-xl text-sm sm:text-base leading-relaxed text-neutral-400">
+					<p class="max-w-xl text-sm sm:text-base leading-relaxed text-neutral-300">
 						{product.subline}
 					</p>
 
