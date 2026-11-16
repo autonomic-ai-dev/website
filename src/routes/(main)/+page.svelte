@@ -209,8 +209,8 @@
 <div class="relative w-full overflow-x-clip">
 	<ContinuousConduit color="orange" />
 
-	<!-- Constrained Width Container for the Entire Page -->
-	<div class="yc-container">
+	<!-- Constrained Width Container for the Entire Page with Ample Left Clearance from Vertical Conduit -->
+	<div class="yc-container pl-10 sm:pl-14 md:pl-16 lg:pl-20">
 		<!-- Hero Section with Ambient Glow -->
 		<section class="yc-section yc-section-first dotgrid relative overflow-hidden">
 			<!-- Subtle Top Radial Glow -->
