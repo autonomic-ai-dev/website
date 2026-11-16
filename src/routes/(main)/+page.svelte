@@ -240,11 +240,13 @@
 					</h1>
 
 					<p class="max-w-xl text-sm sm:text-base leading-relaxed text-neutral-300">
-						Orchestrate the workflow. Cryptographically verify the code. Two local-first systems for coding agents:
+						Orchestrate the workflow. Verify the code against a receipt. Two local-first systems for coding agents:
 						<strong class="font-medium text-blue-400">Thesmos</strong> orchestrates multi-step DAG
 						workflows with append-only SQLite snapshots, while
-						<strong class="font-medium text-[#5fd39a]">Tekmor</strong> blocks hallucinated pass
-						claims with cryptographic tree receipts.
+						<strong class="font-medium text-[#5fd39a]">Tekmor</strong> runs your allowlisted checks,
+						records a receipt tied to the code's tree hash, and stops a turn that claims a pass
+						without a matching receipt. A claim worded in a way the check does not match can still
+						slip through.
 					</p>
 
 					<!-- Trust Checklist -->
