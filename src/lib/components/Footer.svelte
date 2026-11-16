@@ -1,13 +1,9 @@
 <script lang="ts">
 	import {
-		Layers,
 		BookOpen,
-		Newspaper,
 		ExternalLink,
 		Terminal,
-		FileCode2,
-		Sparkles,
-		ShieldCheck
+		FileCode2
 	} from 'lucide-svelte';
 	import { scrollReveal } from '#lib/actions/scrollReveal';
 	import type { Product } from '#lib/data/products';
@@ -89,18 +85,24 @@
 			</div>
 		</div>
 
-		<!-- Main 5-Column Navigation Grid (Strictly Product-Specific, No Cross-Pollution) -->
+		<!-- Main Navigation Grid (Clean, Authentic, Zero Broken Links) -->
 		<div
 			use:scrollReveal={{ delay: 80 }}
-			class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-6 py-12 border-b border-white/[0.06]"
+			class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 py-12 border-b border-white/[0.06]"
 		>
 			<!-- Col 1: Brand & Status -->
-			<div class="col-span-2 md:col-span-4 lg:col-span-1 space-y-3.5">
+			<div class="space-y-3.5">
 				<div class="flex items-center gap-2.5">
 					<div
 						class="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.1] flex items-center justify-center"
 					>
-						<span class="font-mono text-xs font-bold {isTekmor ? 'text-[#5fd39a]' : isThesmos ? 'text-blue-400' : 'text-[#ff7a4a]'}">
+						<span
+							class="font-mono text-xs font-bold {isTekmor
+								? 'text-[#5fd39a]'
+								: isThesmos
+									? 'text-blue-400'
+									: 'text-[#ff7a4a]'}"
+						>
 							{isTekmor ? 'T' : isThesmos ? 'S' : 'A'}
 						</span>
 					</div>
@@ -116,9 +118,19 @@
 					{/if}
 				</p>
 				<div
-					class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full {isTekmor ? 'bg-emerald-500/10 border-emerald-500/20 text-[#5fd39a]' : isThesmos ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-emerald-500/10 border-emerald-500/20 text-[#5fd39a]'} border text-[11px] font-mono"
+					class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full {isTekmor
+						? 'bg-emerald-500/10 border-emerald-500/20 text-[#5fd39a]'
+						: isThesmos
+							? 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+							: 'bg-emerald-500/10 border-emerald-500/20 text-[#5fd39a]'} border text-[11px] font-mono"
 				>
-					<span class="w-1.5 h-1.5 rounded-full {isTekmor ? 'bg-emerald-400' : isThesmos ? 'bg-blue-400' : 'bg-emerald-400'} live-beacon"></span>
+					<span
+						class="w-1.5 h-1.5 rounded-full {isTekmor
+							? 'bg-emerald-400'
+							: isThesmos
+								? 'bg-blue-400'
+								: 'bg-emerald-400'} live-beacon"
+					></span>
 					<span>
 						{#if isTekmor}
 							Tree Receipts Verified
@@ -131,159 +143,44 @@
 				</div>
 			</div>
 
-			<!-- Col 2: Guides & Docs -->
+			<!-- Col 2: Documentation (Real working docs) -->
 			<div>
 				<h3 class="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono mb-4">
-					Guides & Docs
+					Documentation
 				</h3>
 				<ul class="space-y-2.5 text-xs text-neutral-400">
 					{#if isTekmor}
-						<li>
-							<a href="/tekmor/docs" class="hover:text-white transition-colors">Overview</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/installation" class="hover:text-white transition-colors">Installation</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors">CLI Reference</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors">Verification & Receipts</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/limits" class="hover:text-white transition-colors">Honest Boundaries</a>
-						</li>
+						<li><a href="/tekmor/docs" class="hover:text-white transition-colors">Overview</a></li>
+						<li><a href="/tekmor/docs/installation" class="hover:text-white transition-colors">Installation Guide</a></li>
+						<li><a href="/tekmor/docs/cli" class="hover:text-white transition-colors">CLI Reference</a></li>
+						<li><a href="/tekmor/docs/verification" class="hover:text-white transition-colors">Verification & Receipts</a></li>
+						<li><a href="/tekmor/docs/limits" class="hover:text-white transition-colors">Honest Boundaries</a></li>
 					{:else if isThesmos}
-						<li>
-							<a href="/thesmos/docs" class="hover:text-white transition-colors">Overview</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/installation" class="hover:text-white transition-colors">Installation</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">CLI Reference (agent-spine)</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">DAG Workflows Spec</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/decisions" class="hover:text-white transition-colors">Architecture Decisions</a>
-						</li>
+						<li><a href="/thesmos/docs" class="hover:text-white transition-colors">Overview</a></li>
+						<li><a href="/thesmos/docs/installation" class="hover:text-white transition-colors">Installation Guide</a></li>
+						<li><a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">CLI Reference (agent-spine)</a></li>
+						<li><a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">DAG Workflows Spec</a></li>
+						<li><a href="/thesmos/docs/decisions" class="hover:text-white transition-colors">Architecture Decisions</a></li>
 					{:else}
-						<li>
-							<a href="/tekmor" class="hover:text-white transition-colors">Tekmor Proof Engine</a>
-						</li>
-						<li>
-							<a href="/thesmos" class="hover:text-white transition-colors">Thesmos DAG Governor</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs" class="hover:text-white transition-colors">Tekmor Documentation</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs" class="hover:text-white transition-colors">Thesmos Documentation</a>
-						</li>
-						<li>
-							<a href="/docs" class="hover:text-white transition-colors">Ecosystem Documentation</a>
-						</li>
+						<li><a href="/tekmor/docs" class="hover:text-white transition-colors">Tekmor Documentation</a></li>
+						<li><a href="/thesmos/docs" class="hover:text-white transition-colors">Thesmos Documentation</a></li>
+						<li><a href="/docs" class="hover:text-white transition-colors">Ecosystem Overview</a></li>
+						<li><a href="/tekmor/docs/cli" class="hover:text-white transition-colors">Tekmor CLI Reference</a></li>
+						<li><a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">Thesmos CLI Reference</a></li>
 					{/if}
 				</ul>
 			</div>
 
-			<!-- Col 3: Architecture & Concepts (Strictly Filtered) -->
+			<!-- Col 3: Product & Resources -->
 			<div>
 				<h3 class="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono mb-4">
-					Architecture
+					Resources
 				</h3>
 				<ul class="space-y-2.5 text-xs text-neutral-400">
 					{#if isTekmor}
-						<li>
-							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors">
-								Tree-Hashed Receipts
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors">
-								Process Stop Gates
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/installation" class="hover:text-white transition-colors">
-								Allowlisted Commands
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors">
-								Claude Code Stop Hook
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/limits" class="hover:text-white transition-colors">
-								Zero Model Calls (Rust)
-							</a>
-						</li>
-					{:else if isThesmos}
-						<li>
-							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">
-								Declarative YAML DAGs
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs" class="hover:text-white transition-colors">
-								Tokio Graph Walker
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">
-								Human Approval Gates
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">
-								Append-Only SQLite (state.db)
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/decisions" class="hover:text-white transition-colors">
-								Zero-Token State Replay
-							</a>
-						</li>
-					{:else}
-						<li>
-							<a href="/#inspector" class="hover:text-white transition-colors">
-								Closed-Loop Governor Loop
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors">
-								Tree-Hashed Receipts
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors">
-								Declarative YAML DAGs
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">
-								Append-Only SQLite Snapshots
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors">
-								Claude Code Process Stop Gate
-							</a>
-						</li>
-					{/if}
-				</ul>
-			</div>
-
-			<!-- Col 4: Developer Tools & CLI (Strictly Filtered) -->
-			<div>
-				<h3 class="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono mb-4">
-					Developer Tools
-				</h3>
-				<ul class="space-y-2.5 text-xs text-neutral-400">
-					{#if isTekmor}
+						<li><a href="/tekmor" class="hover:text-white transition-colors">Product Overview</a></li>
+						<li><a href="/tekmor/blog" class="hover:text-white transition-colors">Engineering Blog</a></li>
+						<li><a href="/tekmor/changelog" class="hover:text-white transition-colors">Changelog & Releases</a></li>
 						<li>
 							<a
 								href="https://github.com/autonomic-ai-dev/homebrew-tap"
@@ -291,41 +188,14 @@
 								rel="noopener noreferrer"
 								class="hover:text-white transition-colors flex items-center gap-1.5"
 							>
-								<Terminal size={13} class="text-neutral-400" />
-								<span>brew install tekmor</span>
-								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors flex items-center gap-1.5">
-								<ShieldCheck size={13} class="text-neutral-400" />
-								<span>tekmor verify -- &lt;cmd&gt;</span>
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors flex items-center gap-1.5">
-								<ShieldCheck size={13} class="text-neutral-400" />
-								<span>tekmor verify receipt</span>
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors flex items-center gap-1.5">
-								<Sparkles size={13} class="text-neutral-400" />
-								<span>receipt.json Schema</span>
-							</a>
-						</li>
-						<li>
-							<a
-								href="https://github.com/autonomic-ai-dev"
-								target="_blank"
-								rel="noopener noreferrer"
-								class="hover:text-white transition-colors flex items-center gap-1.5"
-							>
-								<span>GitHub Releases</span>
+								<span>Homebrew Formula</span>
 								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
 							</a>
 						</li>
 					{:else if isThesmos}
+						<li><a href="/thesmos" class="hover:text-white transition-colors">Product Overview</a></li>
+						<li><a href="/thesmos/blog" class="hover:text-white transition-colors">Engineering Blog</a></li>
+						<li><a href="/thesmos/changelog" class="hover:text-white transition-colors">Changelog & Releases</a></li>
 						<li>
 							<a
 								href="https://github.com/autonomic-ai-dev/homebrew-tap"
@@ -333,110 +203,26 @@
 								rel="noopener noreferrer"
 								class="hover:text-white transition-colors flex items-center gap-1.5"
 							>
-								<Terminal size={13} class="text-neutral-400" />
-								<span>brew install agent-spine</span>
-								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors flex items-center gap-1.5">
-								<Layers size={13} class="text-neutral-400" />
-								<span>agent-spine run</span>
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors flex items-center gap-1.5">
-								<Layers size={13} class="text-neutral-400" />
-								<span>agent-spine replay</span>
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/workflows" class="hover:text-white transition-colors flex items-center gap-1.5">
-								<Sparkles size={13} class="text-neutral-400" />
-								<span>workflow.yaml Spec</span>
-							</a>
-						</li>
-						<li>
-							<a
-								href="https://github.com/autonomic-ai-dev"
-								target="_blank"
-								rel="noopener noreferrer"
-								class="hover:text-white transition-colors flex items-center gap-1.5"
-							>
-								<span>GitHub Releases</span>
+								<span>Homebrew Formula</span>
 								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
 							</a>
 						</li>
 					{:else}
-						<li>
-							<a
-								href="https://github.com/autonomic-ai-dev/homebrew-tap"
-								target="_blank"
-								rel="noopener noreferrer"
-								class="hover:text-white transition-colors flex items-center gap-1.5"
-							>
-								<Terminal size={13} class="text-neutral-400" />
-								<span>brew tap autonomic-ai-dev</span>
-								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/cli" class="hover:text-white transition-colors flex items-center gap-1.5">
-								<ShieldCheck size={13} class="text-neutral-400" />
-								<span>tekmor verify CLI</span>
-							</a>
-						</li>
-						<li>
-							<a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors flex items-center gap-1.5">
-								<Layers size={13} class="text-neutral-400" />
-								<span>agent-spine CLI</span>
-							</a>
-						</li>
-						<li>
-							<a href="/tekmor/docs/verification" class="hover:text-white transition-colors flex items-center gap-1.5">
-								<Sparkles size={13} class="text-neutral-400" />
-								<span>receipt.json Schema</span>
-							</a>
-						</li>
-						<li>
-							<a
-								href="https://github.com/autonomic-ai-dev"
-								target="_blank"
-								rel="noopener noreferrer"
-								class="hover:text-white transition-colors flex items-center gap-1.5"
-							>
-								<span>GitHub Releases</span>
-								<ExternalLink size={10} class="text-neutral-500 ml-auto" />
-							</a>
-						</li>
+						<li><a href="/tekmor" class="hover:text-white transition-colors">Tekmor Engine</a></li>
+						<li><a href="/thesmos" class="hover:text-white transition-colors">Thesmos Governor</a></li>
+						<li><a href="/products" class="hover:text-white transition-colors">Product Catalog</a></li>
+						<li><a href="/blog" class="hover:text-white transition-colors">Engineering Blog</a></li>
+						<li><a href="/changelog" class="hover:text-white transition-colors">Changelog & Releases</a></li>
 					{/if}
 				</ul>
 			</div>
 
-			<!-- Col 5: Context & Community -->
+			<!-- Col 4: Specs & Source -->
 			<div>
 				<h3 class="text-xs font-semibold uppercase tracking-wider text-neutral-300 font-mono mb-4">
-					Context & Specs
+					Specs & Code
 				</h3>
 				<ul class="space-y-2.5 text-xs text-neutral-400">
-					<li>
-						<a
-							href={isTekmor ? '/tekmor/changelog' : isThesmos ? '/thesmos/changelog' : '/changelog'}
-							class="hover:text-white transition-colors flex items-center gap-1.5"
-						>
-							<Sparkles size={13} class="text-neutral-400" />
-							<span>Changelog & Releases</span>
-						</a>
-					</li>
-					<li>
-						<a
-							href={isTekmor ? '/tekmor/blog' : isThesmos ? '/thesmos/blog' : '/blog'}
-							class="hover:text-white transition-colors flex items-center gap-1.5"
-						>
-							<Newspaper size={13} class="text-neutral-400" />
-							<span>Engineering Blog</span>
-						</a>
-					</li>
 					<li>
 						<a
 							href="https://github.com/autonomic-ai-dev"
@@ -445,19 +231,19 @@
 							class="hover:text-white transition-colors flex items-center gap-1.5"
 						>
 							<BookOpen size={13} class="text-neutral-400" />
-							<span>GitHub Repository</span>
+							<span>GitHub Organization</span>
 							<ExternalLink size={10} class="text-neutral-500 ml-auto" />
 						</a>
 					</li>
 					<li>
 						<a
-							href="https://autonomic-ai.openstatus.dev"
+							href="https://github.com/autonomic-ai-dev/homebrew-tap"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="hover:text-white transition-colors flex items-center gap-1.5"
 						>
-							<span class="live-beacon"></span>
-							<span>Live Systems Status</span>
+							<Terminal size={13} class="text-neutral-400" />
+							<span>Homebrew Tap</span>
 							<ExternalLink size={10} class="text-neutral-500 ml-auto" />
 						</a>
 					</li>

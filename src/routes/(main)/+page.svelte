@@ -232,20 +232,22 @@
 						<span class="text-neutral-400">Autonomous Engineering Governor</span>
 					</div>
 
-					<!-- Hero Headline with Balanced Line Breaks -->
+					<!-- Hero Headline with Balanced Line Breaks (Anode Parity) -->
 					<h1
-						class="text-3xl sm:text-4xl md:text-5xl lg:text-[3.2rem] font-bold leading-[1.12] tracking-tight text-white"
+						class="text-5xl sm:text-7xl xl:text-8xl font-black tracking-tight text-white leading-[1.02]"
 					>
-						Autonomous Engineering with Deterministic Boundaries.
-						<span class="block text-neutral-400 font-normal text-lg sm:text-xl md:text-2xl mt-3 leading-snug">
-							Orchestrate the workflow. Cryptographically verify the code.
+						Autonomic AI.
+						<span
+							class="block text-neutral-400 sm:text-neutral-500 font-bold mt-2 text-2xl sm:text-3xl md:text-4xl lg:text-[2.2rem] xl:text-[2.6rem] leading-[1.14]"
+						>
+							Autonomous Engineering with Deterministic Boundaries.
 						</span>
 					</h1>
 
-					<p class="max-w-xl text-sm sm:text-base leading-relaxed text-neutral-400">
-						Two local-first systems for coding agents.
+					<p class="max-w-xl text-sm sm:text-base leading-relaxed text-neutral-300">
+						Orchestrate the workflow. Cryptographically verify the code. Two local-first systems for coding agents:
 						<strong class="font-medium text-blue-400">Thesmos</strong> orchestrates multi-step DAG
-						workflows with append-only SQLite snapshots.
+						workflows with append-only SQLite snapshots, while
 						<strong class="font-medium text-[#5fd39a]">Tekmor</strong> blocks hallucinated pass
 						claims with cryptographic tree receipts.
 					</p>

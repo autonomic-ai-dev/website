@@ -10,61 +10,43 @@
 
 	const themes = {
 		orange: {
-			track: 'from-[#ff531a]/25 via-white/[0.08] to-[#ff531a]/30',
-			knotBorder: 'border-[#ff531a]/40',
-			knotDot: 'bg-[#ff7a4a] shadow-[0_0_6px_#ff531a]',
-			knotGlow: 'bg-[#ff531a]/15',
-			haloWide: 'bg-[#ff531a]',
-			haloMid: 'bg-[#ff531a]',
-			core: 'from-[#ffd9c7] via-[#ff7a4a] to-[#ff531a] shadow-[0_0_8px_#ff531a]',
-			radialAura:
-				'radial-gradient(circle, rgba(255, 83, 26, 0.35) 0%, rgba(255, 83, 26, 0.1) 45%, transparent 70%)',
-			pulseRing: 'bg-[#ff531a]/30',
-			badgeBorder: 'border-[#ffd9c7]/80',
-			badgeBg: 'bg-gradient-to-b from-[#ff8c5a] via-[#ff6a3a] to-[#ff4500]',
+			accent: '#ff531a',
+			track: 'linear-gradient(to bottom, rgba(255, 83, 26, 0.35), rgba(255, 255, 255, 0.15), rgba(255, 83, 26, 0.4))',
+			core: 'linear-gradient(to bottom, #ffd9c7, #ff7a4a, #ff531a)',
+			badgeBg: 'linear-gradient(to bottom, #ff8c5a, #ff6a3a, #ff4500)',
+			badgeBorder: 'rgba(255, 217, 199, 0.85)',
 			badgeShadow:
-				'0 0 14px 4px rgba(255, 83, 26, 0.8), 0 0 26px 8px rgba(255, 83, 26, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6)',
-			dockBorder: 'border-[#ff531a]/50',
-			dockDot: 'bg-[#ff7a4a] shadow-[0_0_8px_#ff531a]',
-			dockGlow: 'bg-[#ff531a]/20'
+				'0 0 16px 5px rgba(255, 83, 26, 0.85), 0 0 32px 10px rgba(255, 83, 26, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.6)',
+			pulseRing: 'rgba(255, 83, 26, 0.4)',
+			radialAura:
+				'radial-gradient(circle, rgba(255, 83, 26, 0.45) 0%, rgba(255, 83, 26, 0.12) 45%, transparent 70%)',
+			dotColor: '#ff7a4a'
 		},
 		emerald: {
-			track: 'from-[#10b981]/25 via-white/[0.08] to-[#10b981]/30',
-			knotBorder: 'border-[#10b981]/40',
-			knotDot: 'bg-[#5fd39a] shadow-[0_0_6px_#10b981]',
-			knotGlow: 'bg-[#10b981]/15',
-			haloWide: 'bg-[#10b981]',
-			haloMid: 'bg-[#10b981]',
-			core: 'from-[#d1fae5] via-[#5fd39a] to-[#10b981] shadow-[0_0_8px_#10b981]',
-			radialAura:
-				'radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(16, 185, 129, 0.1) 45%, transparent 70%)',
-			pulseRing: 'bg-[#10b981]/30',
-			badgeBorder: 'border-[#d1fae5]/80',
-			badgeBg: 'bg-gradient-to-b from-[#6ee7b7] via-[#34d399] to-[#059669]',
+			accent: '#10b981',
+			track: 'linear-gradient(to bottom, rgba(16, 185, 129, 0.4), rgba(255, 255, 255, 0.15), rgba(16, 185, 129, 0.45))',
+			core: 'linear-gradient(to bottom, #d1fae5, #5fd39a, #10b981)',
+			badgeBg: 'linear-gradient(to bottom, #6ee7b7, #34d399, #059669)',
+			badgeBorder: 'rgba(209, 250, 229, 0.85)',
 			badgeShadow:
-				'0 0 14px 4px rgba(16, 185, 129, 0.8), 0 0 26px 8px rgba(16, 185, 129, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6)',
-			dockBorder: 'border-[#10b981]/50',
-			dockDot: 'bg-[#5fd39a] shadow-[0_0_8px_#10b981]',
-			dockGlow: 'bg-[#10b981]/20'
+				'0 0 16px 5px rgba(16, 185, 129, 0.85), 0 0 32px 10px rgba(16, 185, 129, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.6)',
+			pulseRing: 'rgba(16, 185, 129, 0.4)',
+			radialAura:
+				'radial-gradient(circle, rgba(16, 185, 129, 0.45) 0%, rgba(16, 185, 129, 0.12) 45%, transparent 70%)',
+			dotColor: '#5fd39a'
 		},
 		blue: {
-			track: 'from-[#3b82f6]/25 via-white/[0.08] to-[#3b82f6]/30',
-			knotBorder: 'border-[#3b82f6]/40',
-			knotDot: 'bg-[#60a5fa] shadow-[0_0_6px_#3b82f6]',
-			knotGlow: 'bg-[#3b82f6]/15',
-			haloWide: 'bg-[#3b82f6]',
-			haloMid: 'bg-[#3b82f6]',
-			core: 'from-[#dbeafe] via-[#60a5fa] to-[#3b82f6] shadow-[0_0_8px_#3b82f6]',
-			radialAura:
-				'radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, rgba(59, 130, 246, 0.1) 45%, transparent 70%)',
-			pulseRing: 'bg-[#3b82f6]/30',
-			badgeBorder: 'border-[#dbeafe]/80',
-			badgeBg: 'bg-gradient-to-b from-[#93c5fd] via-[#3b82f6] to-[#1d4ed8]',
+			accent: '#3b82f6',
+			track: 'linear-gradient(to bottom, rgba(59, 130, 246, 0.4), rgba(255, 255, 255, 0.15), rgba(59, 130, 246, 0.45))',
+			core: 'linear-gradient(to bottom, #dbeafe, #60a5fa, #3b82f6)',
+			badgeBg: 'linear-gradient(to bottom, #93c5fd, #3b82f6, #1d4ed8)',
+			badgeBorder: 'rgba(219, 234, 254, 0.85)',
 			badgeShadow:
-				'0 0 14px 4px rgba(59, 130, 246, 0.8), 0 0 26px 8px rgba(59, 130, 246, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6)',
-			dockBorder: 'border-[#3b82f6]/50',
-			dockDot: 'bg-[#60a5fa] shadow-[0_0_8px_#3b82f6]',
-			dockGlow: 'bg-[#3b82f6]/20'
+				'0 0 16px 5px rgba(59, 130, 246, 0.85), 0 0 32px 10px rgba(59, 130, 246, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.6)',
+			pulseRing: 'rgba(59, 130, 246, 0.4)',
+			radialAura:
+				'radial-gradient(circle, rgba(59, 130, 246, 0.45) 0%, rgba(59, 130, 246, 0.12) 45%, transparent 70%)',
+			dotColor: '#60a5fa'
 		}
 	} as const;
 
@@ -130,17 +112,25 @@
 			<!-- Top Source Knot (Origin Dock) -->
 			<div class="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center justify-center">
 				<div
-					class="flex h-5 w-5 items-center justify-center rounded-full border {t.knotBorder} bg-[#070709]"
+					class="flex h-5 w-5 items-center justify-center rounded-full bg-[#070709]"
+					style="border: 1px solid {t.accent}66;"
 				>
-					<span class="h-1.5 w-1.5 rounded-full {t.knotDot}"></span>
+					<span
+						class="h-1.5 w-1.5 rounded-full"
+						style="background-color: {t.dotColor}; box-shadow: 0 0 6px {t.accent};"
+					></span>
 				</div>
 				<!-- Ambient Source Glow -->
-				<div class="absolute -z-10 h-10 w-10 rounded-full {t.knotGlow} blur-sm"></div>
+				<div
+					class="absolute -z-10 h-10 w-10 rounded-full blur-sm"
+					style="background-color: {t.accent}26;"
+				></div>
 			</div>
 
-			<!-- Background Static Guide Track -->
+			<!-- Background Static Guide Track (Always Crisp & Visible) -->
 			<div
-				class="absolute inset-0 w-[2px] rounded-full bg-gradient-to-b {t.track}"
+				class="absolute inset-0 w-[2px] rounded-full"
+				style="background: {t.track};"
 			></div>
 
 			<!-- Active Glowing High-Energy Thread -->
@@ -150,17 +140,20 @@
 			>
 				<!-- Multi-Tier Optical Glow 1: Wide Ambient Halo -->
 				<div
-					class="absolute -left-[6px] top-0 h-full w-[14px] rounded-full {t.haloWide} opacity-20 blur-[6px]"
+					class="absolute -left-[6px] top-0 h-full w-[14px] rounded-full opacity-25 blur-[6px]"
+					style="background-color: {t.accent};"
 				></div>
 
 				<!-- Multi-Tier Optical Glow 2: Mid Focused Halo -->
 				<div
-					class="absolute -left-[1.5px] top-0 h-full w-[5px] rounded-full {t.haloMid} opacity-55 blur-[2px]"
+					class="absolute -left-[1.5px] top-0 h-full w-[5px] rounded-full opacity-60 blur-[2px]"
+					style="background-color: {t.accent};"
 				></div>
 
 				<!-- Multi-Tier Optical Glow 3: Sharp Laser Core -->
 				<div
-					class="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b {t.core}"
+					class="absolute left-0 top-0 h-full w-[2px]"
+					style="background: {t.core}; box-shadow: 0 0 10px {t.accent};"
 				></div>
 			</div>
 
@@ -169,21 +162,24 @@
 				style="top: {percentHeight}"
 				class="absolute left-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
 			>
-				<!-- Compact Ambient Radial Glow Aura (scaled to 112px to guarantee zero text obstruction) -->
+				<!-- Compact Ambient Radial Glow Aura -->
 				<div
-					class="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full sm:h-28 sm:w-28"
+					class="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full sm:h-32 sm:w-32"
 					style="background: {t.radialAura};"
 				></div>
 
 				<!-- Main Arrow Badge -->
 				<div class="group relative flex items-center justify-center">
 					<!-- Outer Energy Pulse Ring -->
-					<div class="absolute -inset-1 animate-pulse rounded-full {t.pulseRing} blur-xs"></div>
+					<div
+						class="absolute -inset-1 animate-pulse rounded-full blur-xs"
+						style="background-color: {t.pulseRing};"
+					></div>
 
 					<!-- The Arrow Head -->
 					<div
-						class="relative flex h-7 w-7 items-center justify-center rounded-full border {t.badgeBorder} {t.badgeBg} sm:h-7.5 sm:w-7.5"
-						style="box-shadow: {t.badgeShadow};"
+						class="relative flex h-7 w-7 items-center justify-center rounded-full sm:h-7.5 sm:w-7.5"
+						style="background: {t.badgeBg}; border: 1px solid {t.badgeBorder}; box-shadow: {t.badgeShadow};"
 					>
 						<!-- Crisp Downward Arrow Icon -->
 						<svg
@@ -208,12 +204,19 @@
 			<!-- Bottom Destination Terminal Node (Landing Dock) -->
 			<div class="absolute -bottom-3 left-1/2 flex -translate-x-1/2 items-center justify-center">
 				<div
-					class="flex h-5 w-5 items-center justify-center rounded-full border {t.dockBorder} bg-[#070709]"
+					class="flex h-5 w-5 items-center justify-center rounded-full bg-[#070709]"
+					style="border: 1px solid {t.accent}80;"
 				>
-					<span class="h-2 w-2 rounded-full {t.dockDot}"></span>
+					<span
+						class="h-2 w-2 rounded-full"
+						style="background-color: {t.dotColor}; box-shadow: 0 0 8px {t.accent};"
+					></span>
 				</div>
 				<!-- Ambient Signoff Glow -->
-				<div class="absolute -z-10 h-14 w-14 rounded-full {t.dockGlow} blur-md"></div>
+				<div
+					class="absolute -z-10 h-14 w-14 rounded-full blur-md"
+					style="background-color: {t.accent}33;"
+				></div>
 			</div>
 		</div>
 	</div>

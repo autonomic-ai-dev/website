@@ -39,14 +39,17 @@
 <div class="yc-container py-12 md:py-20">
 	<!-- Hero Section -->
 	<header class="max-w-3xl">
-		<div class="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.04] px-3.5 py-1.5 font-mono text-xs text-neutral-300">
+		<div class="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-3.5 py-1.5 font-mono text-xs text-neutral-300">
 			<span class="live-beacon"></span>
 			<span>Autonomic AI Documentation</span>
 		</div>
-		<h1 class="mt-6 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-			Deterministic tools for coding agents.
+		<h1 class="mt-6 text-5xl sm:text-7xl font-black tracking-tight text-white leading-[1.02]">
+			Documentation.
+			<span class="block text-neutral-400 sm:text-neutral-500 font-bold mt-2 text-2xl sm:text-3xl md:text-4xl leading-[1.14]">
+				Deterministic tools for coding agents.
+			</span>
 		</h1>
-		<p class="mt-4 text-base leading-relaxed text-neutral-400 sm:text-lg">
+		<p class="mt-4 text-base leading-relaxed text-neutral-300 sm:text-lg">
 			Comprehensive architectural guides, CLI references, verification schemas, and reproducible examples for Tekmor and Thesmos.
 		</p>
 
