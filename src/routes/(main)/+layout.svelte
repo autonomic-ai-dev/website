@@ -4,6 +4,7 @@
 	import { page } from '$app/state';
 	import { MAIN_ORIGIN, mainProducts } from '#lib/data/products';
 	import Footer from '#lib/components/Footer.svelte';
+	import ContinuousConduit from '#lib/components/ContinuousConduit.svelte';
 
 	let { children }: { children: Snippet } = $props();
 
@@ -230,10 +231,14 @@
 		{/if}
 	</header>
 
-	<main>
-		{@render children()}
-	</main>
+	<main class="relative w-full overflow-x-clip">
+		{#if page.url.pathname === '/'}
+			<ContinuousConduit color="orange" />
+		{/if}
 
-	<!-- Architectural Footer -->
-	<Footer brand="org" />
+		{@render children()}
+
+		<!-- Architectural Footer -->
+		<Footer brand="org" withConduit={page.url.pathname === '/'} />
+	</main>
 </div>

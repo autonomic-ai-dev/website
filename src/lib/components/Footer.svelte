@@ -10,10 +10,12 @@
 
 	let {
 		brand = 'org',
-		product
+		product,
+		withConduit = false
 	}: {
 		brand?: 'org' | 'tekmor' | 'thesmos';
 		product?: Product;
+		withConduit?: boolean;
 	} = $props();
 
 	const isTekmor = $derived(brand === 'tekmor');
@@ -55,7 +57,7 @@
 </script>
 
 <footer id="footer" class="border-t border-white/[0.08] bg-[#070709] pt-4 pb-12">
-	<div class="yc-container">
+	<div class="yc-container {withConduit ? 'pl-10 sm:pl-14 md:pl-16 lg:pl-20' : ''}">
 		<!-- Pre-Footer CTA with Bidirectional Scroll Reveal -->
 		<div
 			use:scrollReveal={{ delay: 0 }}

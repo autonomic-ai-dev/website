@@ -13,7 +13,6 @@
 		RefreshCw
 	} from 'lucide-svelte';
 	import Icon from '#lib/components/ui/Icon.svelte';
-	import ContinuousConduit from '#lib/components/ContinuousConduit.svelte';
 	import AnimatedNumber from '#lib/components/AnimatedNumber.svelte';
 	import { scrollReveal } from '#lib/actions/scrollReveal';
 	import type { Product } from '#lib/data/products';
@@ -75,11 +74,7 @@
 	const pad = (index: number) => String(index + 1).padStart(2, '0');
 </script>
 
-<div class="relative w-full overflow-x-clip">
-	<!-- Continuous Dynamic Product Conduit (Emerald for Tekmor, Blue for Thesmos) with Ample Left Clearance -->
-	<ContinuousConduit color={accentColor} />
-
-	<div class="yc-container pl-10 sm:pl-14 md:pl-16 lg:pl-20">
+<div class="yc-container pl-10 sm:pl-14 md:pl-16 lg:pl-20">
 		<!-- Hero Section -->
 		<section class="yc-section yc-section-first dotgrid relative overflow-hidden">
 			<!-- Subtle ambient glow -->
@@ -720,4 +715,3 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 			</section>
 		{/if}
 	</div>
-</div>

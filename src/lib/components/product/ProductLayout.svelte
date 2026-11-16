@@ -4,6 +4,7 @@
 	import { page } from '$app/state';
 	import { products, productPath, type Product } from '#lib/data/products';
 	import Footer from '#lib/components/Footer.svelte';
+	import ContinuousConduit from '#lib/components/ContinuousConduit.svelte';
 
 	let { product, children }: { product: Product; children: Snippet } = $props();
 
@@ -141,9 +142,17 @@
 		{/if}
 	</header>
 
-	<main>
-		{@render children()}
-	</main>
+	<main class="relative w-full overflow-x-clip">
+		{#if path === '/'}
+			<ContinuousConduit color={product.id === 'thesmos' ? 'blue' : 'emerald'} />
+		{/if}
 
-	<Footer brand={product.id === 'thesmos' ? 'thesmos' : 'tekmor'} {product} />
+		{@render children()}
+
+		<Footer
+			brand={product.id === 'thesmos' ? 'thesmos' : 'tekmor'}
+			{product}
+			withConduit={path === '/'}
+		/>
+	</main>
 </div>
