@@ -71,31 +71,24 @@
 	const t = $derived(themes[color] ?? themes.orange);
 
 	function calculateScroll() {
-		if (!conduitRef) {
-			const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-			scrollProgress = docHeight > 0 ? Math.max(0, Math.min(1, window.scrollY / docHeight)) : 0;
-			return;
-		}
+		const currentY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+		const docHeight =
+			Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) - window.innerHeight;
 
-		if (window.scrollY <= 10) {
-			scrollProgress = 0;
-			return;
-		}
-
-		const docHeight = document.documentElement.scrollHeight - window.innerHeight;
 		if (docHeight <= 0) {
 			scrollProgress = 0;
 			return;
 		}
 
-		const rawProgress = window.scrollY / docHeight;
-		scrollProgress = Math.max(0, Math.min(1, rawProgress));
+		// Smooth normalized progression from 0 to 1 on both scroll down and scroll up
+		const rawProgress = Math.max(0, Math.min(1, currentY / docHeight));
+		scrollProgress = rawProgress;
 	}
 
 	function springLoop() {
-		// Physics spring simulation (stiffness: 0.15, damping: 0.85)
+		// Responsive physics spring simulation (stiffness: 0.18, damping: 0.82)
 		const diff = scrollProgress - smoothProgress;
-		smoothProgress += diff * 0.15;
+		smoothProgress += diff * 0.18;
 
 		if (Math.abs(diff) < 0.0001) {
 			smoothProgress = scrollProgress;
@@ -125,14 +118,14 @@
 
 <div
 	aria-hidden="true"
-	class="pointer-events-none absolute inset-y-0 left-0 right-0 z-20 hidden lg:block select-none overflow-hidden"
+	class="pointer-events-none absolute inset-y-0 left-0 right-0 z-20 select-none overflow-hidden"
 >
 	<!-- Constrained to .yc-container with deliberate exterior margin positioning -->
 	<div class="yc-container relative mx-auto h-full">
 		<!-- Continuous Thread Conduit positioned in the exterior margin with ample clearance from copy -->
 		<div
 			bind:this={conduitRef}
-			class="absolute bottom-24 top-20 w-[2px] -left-6 md:-left-8 lg:-left-10 xl:-left-12 2xl:-left-16"
+			class="absolute bottom-24 top-20 w-[2px] left-1 sm:left-2 md:-left-4 lg:-left-8 xl:-left-12 2xl:-left-16"
 		>
 			<!-- Top Source Knot (Origin Dock) -->
 			<div class="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center justify-center">

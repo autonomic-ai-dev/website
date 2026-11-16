@@ -13,7 +13,7 @@ group: Start
 `tekmor` is a single binary that makes autonomous coding agents follow your repository's rules and show verifiable proof of their work. When an agent like Claude Code or Cursor runs tests, `tekmor` records the exit status and git tree SHA into a tamper-proof cryptographic receipt. A process stop gate physically blocks the agent from completing its turn if it claims the tests pass without a valid receipt for the current code.
 
 ```mermaid
-flowchart TD
+flowchart LR
     Init["1. tekmor verify init<br/>Scaffolds .verify/verify.toml allowlist"] --> Run["2. tekmor verify -- &lt;cmd&gt;<br/>Executes allowlisted command under timeout"]
     Run --> Hash["3. Cryptographic Tree Hashing<br/>Calculates SHA of tracked files and commit"]
     Hash --> Receipt["4. .verify/receipt.json<br/>Stores exit code and status (PASSED/FAILED)"]
