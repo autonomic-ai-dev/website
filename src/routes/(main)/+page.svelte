@@ -270,7 +270,7 @@
 				</div>
 
 				<!-- Right Column (span 5): Quickstart Install Box & Action Buttons -->
-				<div class="lg:col-span-5 space-y-4 pt-1">
+				<div class="lg:col-span-5 flex flex-col gap-4 pt-1">
 					<!-- Command Quick-Copy Bar with Tab Switcher -->
 					<div class="rounded-2xl border border-white/[0.1] bg-[#0c0d10] p-3 text-xs shadow-xl">
 						<div class="flex items-center justify-between border-b border-white/[0.06] pb-2 mb-2">
@@ -325,20 +325,20 @@
 						</div>
 					</div>
 
-					<!-- Button Row -->
-					<div class="flex flex-col sm:flex-row gap-3 pt-1">
+					<!-- Button Row with Guaranteed Container Containment -->
+					<div class="flex flex-col sm:flex-row gap-3 pt-1 w-full overflow-visible">
 						<a
 							href="#how-it-works"
-							class="yc-btn yc-btn-primary flex-1 text-center justify-center"
+							class="yc-btn yc-btn-primary min-w-0 flex-1 text-center justify-center"
 						>
-							<span class="truncate">Explore Tekmor & Thesmos</span>
+							<span class="truncate">Explore Products</span>
 							<span class="yc-btn-icon shrink-0">
 								<ArrowRight size={13} />
 							</span>
 						</a>
 						<a
 							href="#inspector"
-							class="yc-btn yc-btn-secondary flex-1 text-center justify-center"
+							class="yc-btn yc-btn-secondary min-w-0 flex-1 text-center justify-center"
 						>
 							<span class="truncate">Inspect Architecture</span>
 							<span class="yc-btn-icon shrink-0">

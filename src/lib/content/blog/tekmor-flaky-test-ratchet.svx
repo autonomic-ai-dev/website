@@ -4,7 +4,7 @@ date: "2026-10-30"
 excerpt: "How tekmor verify --repeat N identifies nondeterministic tests, and tekmor verify ratchet locks baselines against codebase degradation."
 slug: "tekmor-flaky-test-ratchet"
 category: "Reliability"
-author: "Abhiuday Sharma"
+author: "Abhiuday"
 product: "tekmor"
 ---
 

@@ -54,23 +54,29 @@
 
 	function calculateScroll() {
 		const currentY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-		const docHeight =
+		const totalScrollable =
 			Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) - window.innerHeight;
 
-		if (docHeight <= 0) {
+		if (totalScrollable <= 0) {
 			scrollProgress = 0;
 			return;
 		}
 
-		// Smooth normalized progression from 0 to 1 on both scroll down and scroll up
-		const rawProgress = Math.max(0, Math.min(1, currentY / docHeight));
+		// Fill the conduit rail faster to match the active viewing area (middle of the screen at 50vh)
+		// Smoothly accelerates from origin knot and tracks viewport center as user scrolls
+		const viewportMiddleOffset = window.innerHeight * 0.5;
+		const leadFactor = Math.min(1, currentY / (window.innerHeight * 0.35));
+		const effectiveY = currentY + leadFactor * viewportMiddleOffset;
+		const effectiveMax = totalScrollable + viewportMiddleOffset;
+
+		const rawProgress = Math.max(0, Math.min(1, effectiveY / effectiveMax));
 		scrollProgress = rawProgress;
 	}
 
 	function springLoop() {
-		// Responsive physics spring simulation (stiffness: 0.18, damping: 0.82)
+		// Responsive physics spring simulation (stiffness: 0.24, damping: 0.76) for faster, responsive tracking
 		const diff = scrollProgress - smoothProgress;
-		smoothProgress += diff * 0.18;
+		smoothProgress += diff * 0.24;
 
 		if (Math.abs(diff) < 0.0001) {
 			smoothProgress = scrollProgress;

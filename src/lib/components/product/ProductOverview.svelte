@@ -129,7 +129,7 @@
 				</div>
 
 				<!-- Right Column (span 5): Quickstart Install Box & Action Buttons -->
-				<div class="lg:col-span-5 space-y-4 pt-1">
+				<div class="lg:col-span-5 flex flex-col gap-4 pt-1">
 					<!-- Dedicated Install Box -->
 					<div
 						id="install"
@@ -169,15 +169,15 @@
 						</div>
 					</div>
 
-					<!-- Button Row -->
-					<div class="flex flex-col sm:flex-row gap-3 pt-1">
-						<a href="/{product.id}/docs" class="yc-btn yc-btn-primary flex-1 text-center justify-center">
+					<!-- Button Row with Guaranteed Container Containment -->
+					<div class="flex flex-col sm:flex-row gap-3 pt-1 w-full overflow-visible">
+						<a href="/{product.id}/docs" class="yc-btn yc-btn-primary min-w-0 flex-1 text-center justify-center">
 							<span class="truncate">Read {product.name} docs</span>
 							<span class="yc-btn-icon shrink-0">
 								<ArrowRight size={13} />
 							</span>
 						</a>
-						<a href="/{product.id}/blog" class="yc-btn yc-btn-secondary flex-1 text-center justify-center">
+						<a href="/{product.id}/blog" class="yc-btn yc-btn-secondary min-w-0 flex-1 text-center justify-center">
 							<span class="truncate">Read the blog</span>
 							<span class="yc-btn-icon shrink-0">
 								<ArrowRight size={13} />
