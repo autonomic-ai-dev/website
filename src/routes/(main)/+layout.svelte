@@ -31,23 +31,34 @@
 </svelte:head>
 
 <div
-	class="min-h-screen bg-[#070709] text-neutral-100 font-sans selection:bg-[#5fd39a]/20 selection:text-white"
+	class="min-h-screen bg-[#000000] text-neutral-100 font-sans selection:bg-white/20 selection:text-white"
 >
-	<!-- Top Sticky Architectural Navbar -->
-	<header class="sticky top-0 z-50 border-b border-white/[0.08] bg-[#070709]/90 backdrop-blur-xl">
-		<div class="yc-container flex items-center justify-between py-3.5">
+	<!-- Top Sticky Architectural Navbar (Anode Parity) -->
+	<header class="sticky top-0 z-50 border-b border-white/[0.08] bg-[#000000]/95 backdrop-blur-2xl">
+		<!-- Top Announcement Banner -->
+		<div class="border-b border-white/[0.06] bg-[#050505] py-1.5 px-4 text-center text-xs text-neutral-400">
+			<a href="/changelog" class="inline-flex items-center gap-2 hover:text-white transition-colors">
+				<span class="font-mono-code text-[10px] px-1.5 py-0.2 rounded bg-white/[0.1] text-white font-medium uppercase tracking-wider">New</span>
+				<span>Tekmor v1.0 &amp; Thesmos v1.0-rc3 are out: Zero Model Calls &amp; Deterministic DAGs.</span>
+				<span class="underline underline-offset-4 text-white hover:text-neutral-300 font-medium">Read changelog →</span>
+			</a>
+		</div>
+
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-3 sm:py-3.5">
 			<!-- Brand Logo & Optional Badge -->
 			<div class="flex items-center gap-3">
 				<a
 					href="/"
 					class="group flex items-center gap-2.5 text-sm font-semibold tracking-tight text-white shrink-0"
 				>
-					<span
-						class="flex h-6 w-6 items-center justify-center rounded-lg border border-white/20 bg-white/[0.05] font-mono text-[11px] font-bold text-[#5fd39a] group-hover:border-[#5fd39a]/50 transition-colors"
+					<div
+						class="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.12] flex items-center justify-center transition-all duration-300 group-hover:border-white group-hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
 					>
-						A
+						<span class="font-mono font-bold text-sm text-[#ff7a4a]">A</span>
+					</div>
+					<span class="font-bold text-lg tracking-tight text-white group-hover:text-neutral-200 transition-colors">
+						Autonomic AI
 					</span>
-					<span class="font-medium text-[15px]">Autonomic AI</span>
 				</a>
 				<span
 					class="hidden xl:inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 font-mono text-[11px] text-neutral-400"
@@ -78,12 +89,12 @@
 			</nav>
 
 			<!-- Desktop Actions & Mobile Menu Toggle -->
-			<div class="flex items-center gap-2.5 sm:gap-3">
+			<div class="flex items-center gap-2 sm:gap-2.5 xl:gap-3 shrink-0">
 				<a
 					href="https://github.com/autonomic-ai-dev"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="hidden sm:inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.04] px-3.5 py-1.5 text-xs font-mono text-neutral-200 transition-all hover:border-white/30 hover:bg-white/[0.08]"
+					class="hidden sm:inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-mono-code text-neutral-300 transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
 				>
 					<svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
 						<path
@@ -96,10 +107,11 @@
 				</a>
 
 				<a
-					href="/#how-it-works"
-					class="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-black transition-all hover:bg-neutral-200"
+					href="/#quickstart"
+					class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-neutral-200 text-black text-xs font-semibold shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all whitespace-nowrap shrink-0 hover:scale-[1.02] active:scale-[0.98]"
 				>
-					<span>Get Started</span>
+					<span>Quickstart</span>
+					<ArrowRight size={13} />
 				</a>
 
 				<!-- Mobile Hamburger Menu Button -->
