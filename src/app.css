@@ -60,7 +60,6 @@
 		background-color: #070709;
 		color: #ededed;
 		font-family: var(--font-sans);
-		scroll-behavior: smooth;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 	}
@@ -527,11 +526,6 @@
 	height: auto !important;
 	min-width: fit-content !important;
 	font-family: var(--font-mono) !important;
-}
-
-/* Smooth anchor scrolling and fixed navbar offset */
-html {
-	scroll-behavior: smooth;
 }
 
 article h1,

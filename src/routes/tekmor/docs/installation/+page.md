@@ -29,7 +29,7 @@ group: Start
 
 ```bash
 brew tap autonomic-ai-dev/tap
-brew install tekmor
+brew install autonomic-ai-dev/tap/tekmor
 ```
 
 Verify the binary is installed:

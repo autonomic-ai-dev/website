@@ -416,10 +416,10 @@
 									</div>
 									<div class="text-neutral-300">
 										<span class="text-[#5fd39a] font-semibold">▶ [3/3] gate: verify_fix</span>
-										<div class="pl-4 text-neutral-400">tekmor verify -- .verify/run.sh</div>
+										<div class="pl-4 text-neutral-400">tekmor verify -- go test -count=1 ./...</div>
 										<div class="pl-4 text-[#5fd39a] font-medium flex items-center gap-1.5">
-											✔ <AnimatedNumber value={14} duration={0.8} /> checks passed in <AnimatedNumber
-												value={0.38}
+											✔ <AnimatedNumber value={1} duration={0.8} /> check passed in <AnimatedNumber
+												value={0.34}
 												decimals={2}
 												suffix="s"
 												duration={0.8}
@@ -488,7 +488,7 @@
 										<div class="text-neutral-400 mt-1">Files modified after test execution. Turn cannot finish without proof.</div>
 									</div>
 									<div class="pt-2 text-neutral-400">
-										<span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- .verify/run.sh
+										<span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- go test -count=1 ./...
 									</div>
 									<div class="text-[#5fd39a] font-medium flex items-center gap-1.5">
 										✔ <AnimatedNumber value={14} duration={0.8} /> checks passed · Fresh tree SHA signed · Turn Permitted
@@ -633,7 +633,7 @@
     <span class="text-neutral-400">enforce_gates:</span> <span class="text-emerald-400">[tekmor-stop-gate]</span>
   - <span class="text-blue-400">name:</span> verify_fix
     <span class="text-neutral-400">kind:</span> verify
-    <span class="text-neutral-400">command:</span> <span class="text-amber-300">"tekmor verify -- .verify/run.sh"</span>
+    <span class="text-neutral-400">command:</span> <span class="text-amber-300">"tekmor verify -- go test -count=1 ./..."</span>
   - <span class="text-blue-400">name:</span> snapshot
     <span class="text-neutral-400">storage:</span> <span class="text-blue-400">"sqlite://~/.autonomic/state.db"</span></pre>
 						{:else if inspectorState === 'thesmos'}
@@ -764,11 +764,11 @@
 								<span class="text-[10px] text-emerald-400 font-medium">signed</span>
 							</div>
 							<div class="text-neutral-400">
-								<span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- .verify/run.sh
+								<span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- go test -count=1 ./...
 							</div>
 							<div class="text-[#5fd39a] font-medium mt-1 flex items-center gap-1">
-								✔ <AnimatedNumber value={14} duration={0.8} /> checks passed in <AnimatedNumber
-									value={0.38}
+								✔ <AnimatedNumber value={1} duration={0.8} /> check passed in <AnimatedNumber
+									value={0.34}
 									decimals={2}
 									suffix="s"
 									duration={0.8}

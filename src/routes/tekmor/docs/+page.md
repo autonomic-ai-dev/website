@@ -35,7 +35,7 @@ flowchart LR
 
 ```bash
 brew tap autonomic-ai-dev/tap
-brew install tekmor
+brew install autonomic-ai-dev/tap/tekmor
 ```
 
 ### 2. Connect Claude Code hooks
