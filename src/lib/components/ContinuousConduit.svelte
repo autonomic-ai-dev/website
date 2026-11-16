@@ -62,21 +62,17 @@
 			return;
 		}
 
-		// Fill the conduit rail faster to match the active viewing area (middle of the screen at 50vh)
-		// Smoothly accelerates from origin knot and tracks viewport center as user scrolls
-		const viewportMiddleOffset = window.innerHeight * 0.5;
-		const leadFactor = Math.min(1, currentY / (window.innerHeight * 0.35));
-		const effectiveY = currentY + leadFactor * viewportMiddleOffset;
-		const effectiveMax = totalScrollable + viewportMiddleOffset;
-
-		const rawProgress = Math.max(0, Math.min(1, effectiveY / effectiveMax));
+		// Linear full-page scroll progress matching Anode architecture.
+		// When the rail spans the entire document through the footer, linear progress naturally
+		// tracks the viewing area (middle of the screen ~50vh) with completely uniform velocity.
+		const rawProgress = Math.max(0, Math.min(1, currentY / totalScrollable));
 		scrollProgress = rawProgress;
 	}
 
 	function springLoop() {
-		// Responsive physics spring simulation (stiffness: 0.24, damping: 0.76) for faster, responsive tracking
+		// Responsive physics spring simulation (stiffness: 0.22, damping: 0.78) for organic fluid tracking
 		const diff = scrollProgress - smoothProgress;
-		smoothProgress += diff * 0.24;
+		smoothProgress += diff * 0.22;
 
 		if (Math.abs(diff) < 0.0001) {
 			smoothProgress = scrollProgress;

@@ -18,7 +18,6 @@
 		GitBranch
 	} from 'lucide-svelte';
 	import Terminal from '#lib/components/ui/Terminal.svelte';
-	import ContinuousConduit from '#lib/components/ContinuousConduit.svelte';
 	import BenchmarkMetrics from '#lib/components/BenchmarkMetrics.svelte';
 	import AnimatedNumber from '#lib/components/AnimatedNumber.svelte';
 	import { scrollReveal } from '#lib/actions/scrollReveal';
@@ -205,12 +204,8 @@
 	{@html `<script type="application/ld+json">${JSON.stringify(schema)}</script>`}
 </svelte:head>
 
-<!-- Outer Relative Wrapper with Continuous Orange Conduit for Org Level -->
-<div class="relative w-full overflow-x-clip">
-	<ContinuousConduit color="orange" />
-
-	<!-- Constrained Width Container for the Entire Page with Ample Left Clearance from Vertical Conduit -->
-	<div class="yc-container pl-10 sm:pl-14 md:pl-16 lg:pl-20">
+<!-- Constrained Width Container for the Entire Page with Ample Left Clearance from Vertical Conduit -->
+<div class="yc-container pl-10 sm:pl-14 md:pl-16 lg:pl-20">
 		<!-- Hero Section with Ambient Glow -->
 		<section class="yc-section yc-section-first dotgrid relative overflow-hidden">
 			<!-- Subtle Top Radial Glow -->
@@ -1018,4 +1013,3 @@
 			</div>
 		</section>
 	</div>
-</div>
