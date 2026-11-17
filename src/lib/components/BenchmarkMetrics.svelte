@@ -67,7 +67,7 @@
 	const displayStats = $derived(stats && stats.length > 0 ? stats : defaultStats);
 </script>
 
-<section id="benchmarks" use:scrollReveal class="py-24 border-t border-white/[0.08] bg-[#000000]">
+<section id="benchmarks" use:scrollReveal={{ threshold: 0.05 }} class="py-24 border-t border-white/[0.08] bg-[#000000]">
 	<div class="max-w-6xl mx-auto px-5 sm:px-8">
 		<div class="max-w-2xl mx-auto text-center">
 			<span class="text-xs font-mono-code uppercase tracking-wider text-neutral-400">{badge}</span>
@@ -78,9 +78,8 @@
 		</div>
 
 		<div class="mt-14 grid grid-cols-1 sm:grid-cols-2 gap-5">
-			{#each displayStats as s, idx (s.label)}
+			{#each displayStats as s (s.label)}
 				<div
-					use:scrollReveal={{ delay: idx * 60 }}
 					class="rounded-2xl border border-white/[0.08] bg-[#0a0a0c] yc-card p-7 sm:p-8 hover:border-white/[0.22] hover:-translate-y-1 transition-all duration-200"
 				>
 					<div class="text-xs font-mono-code uppercase tracking-wider text-neutral-500">{s.label}</div>

@@ -353,6 +353,16 @@
 	word-wrap: normal !important;
 }
 
+/* Ensure Prism syntax highlighting tokens inside pre/code are always inline.
+   Prevents Tailwind utility classes (like .table { display: table }) from breaking
+   TOML table headers [verify], [[commands]], [ratchet.clippy], etc. across multiple lines. */
+pre code .token,
+pre .token,
+.prose pre code .token,
+.language-toml .token {
+	display: inline !important;
+}
+
 .prose code:not(pre code) {
 	color: #ededed !important;
 	background-color: rgba(255, 255, 255, 0.06) !important;

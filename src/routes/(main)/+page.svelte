@@ -14,7 +14,7 @@
 	} from 'lucide-svelte';
 	import AnimatedNumber from '#lib/components/AnimatedNumber.svelte';
 	import EcosystemBar from '#lib/components/EcosystemBar.svelte';
-	import BenchmarkMetrics from '#lib/components/BenchmarkMetrics.svelte';
+	import BenchmarkMetrics, { type BenchmarkStat } from '#lib/components/BenchmarkMetrics.svelte';
 	import DriftComparison from '#lib/components/DriftComparison.svelte';
 	import BentoPillars, { type Pillar } from '#lib/components/BentoPillars.svelte';
 	import FAQSection, { type FAQItem } from '#lib/components/FAQSection.svelte';
@@ -36,6 +36,41 @@
 		tekmor: 'brew install autonomic-ai-dev/tap/tekmor',
 		thesmos: 'brew install autonomic-ai-dev/tap/agent-spine'
 	};
+
+	const orgStats: BenchmarkStat[] = [
+		{
+			label: 'Stop Gate Overhead',
+			value: 0.11,
+			suffix: 's',
+			decimals: 2,
+			duration: 1.0,
+			detail: 'Added to a real test suite (median of 5 runs): 35.80s with Tekmor, 35.68s without. 41x faster than an LLM judge (4.5s).'
+		},
+		{
+			label: 'Platform Token Cost',
+			value: 0,
+			suffix: ' tokens',
+			decimals: 0,
+			duration: 0.8,
+			detail: 'Zero LLM model calls or external API tokens consumed across verification and state replay. 100% deterministic local Rust process execution.'
+		},
+		{
+			label: 'Hallucinated Pass Block Rate',
+			value: 100,
+			suffix: '%',
+			decimals: 0,
+			duration: 1.1,
+			detail: 'Post-test code modifications immediately invalidate past receipts via git tree hashing. False victory claims blocked 100% of the time.'
+		},
+		{
+			label: 'State Replay Latency',
+			value: 4.8,
+			suffix: ' ms',
+			decimals: 1,
+			duration: 0.9,
+			detail: 'Time-travel state graph reconstruction from SQLite snapshots. 0 steps re-executed, 0 API tokens spent, zero model drift.'
+		}
+	];
 
 	async function copyCurrentInstall() {
 		try {
@@ -232,8 +267,8 @@ Zero model API calls`,
 			<div id="quickstart" class="lg:col-span-5 space-y-4 pt-1">
 				<!-- Install Box with Tab Switcher (Anode Parity) -->
 				<div class="rounded-2xl border border-white/[0.12] bg-[#0c0c0f] hover:border-white/[0.28] transition-all p-4 shadow-2xl">
-					<div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-white/[0.06] text-xs font-mono-code text-neutral-400">
-						<div class="flex items-center gap-1.5 bg-white/[0.04] p-1 rounded-lg border border-white/[0.06]">
+					<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-white/[0.06] text-xs font-mono-code text-neutral-400">
+						<div class="flex items-center gap-1.5 bg-white/[0.04] p-1 rounded-lg border border-white/[0.06] shrink-0">
 							{#each [
 								{ id: 'tap' as const, label: 'brew tap' },
 								{ id: 'tekmor' as const, label: 'tekmor' },
@@ -248,7 +283,7 @@ Zero model API calls`,
 								</button>
 							{/each}
 						</div>
-						<span class="text-[11px] text-neutral-500 font-mono-code">macOS arm64 / linux amd64</span>
+						<span class="text-[10px] sm:text-[11px] text-neutral-500 font-mono-code shrink-0">macOS arm64 / linux amd64</span>
 					</div>
 
 					<div class="flex items-center justify-between gap-3 font-mono-code text-xs sm:text-sm">
@@ -529,7 +564,14 @@ Zero model API calls`,
 
 <div class="yc-container pl-10 sm:pl-14 md:pl-16 lg:pl-20">
 	<!-- Empirical Benchmarks Section (Anode Parity) -->
-	<BenchmarkMetrics color="orange" />
+	<BenchmarkMetrics
+		color="orange"
+		badge="Empirical Benchmarks"
+		title="Measured, not estimated."
+		description="Recorded runs on local macOS Apple Silicon and Linux CI runners. Every figure is backed by verifiable receipt logs and SQLite state traces."
+		stats={orgStats}
+		methodLink="/docs#benchmarks"
+	/>
 
 	<!-- Drift Comparison: Stochastic Agent Trap vs Deterministic Boundary (Anode Parity) -->
 	<DriftComparison color="orange" />

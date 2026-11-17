@@ -169,33 +169,33 @@
         <data.component />
       </div>
     {/if}
-
-    <!-- Bottom Action CTA Card (Anode Parity) -->
-    <div class="not-prose p-8 rounded-2xl bg-[#090a0d] border border-white/[0.1] mt-12 space-y-4 shadow-xl">
-      <h3 class="text-lg font-bold text-white flex items-center gap-2">
-        <Terminal size={18} class="text-[#5fd39a]" />
-        <span>Deploy {product.name} On Your Codebase</span>
-      </h3>
-      <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-        {product.subline}
-      </p>
-      <div class="flex flex-wrap items-center gap-3 pt-1">
-        <a
-          href="{prefix}/docs"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black font-semibold text-xs font-mono transition-colors"
-        >
-          <span>Read Documentation</span>
-          <ArrowRight size={13} />
-        </a>
-        <a
-          href="https://github.com/autonomic-ai-dev"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-mono text-white transition-colors"
-        >
-          <span>View on GitHub</span>
-        </a>
-      </div>
-    </div>
   </article>
+
+  <!-- Bottom Action CTA Card (Anode Parity) -->
+  <div class="p-8 rounded-2xl bg-[#090a0d] border border-white/[0.1] mt-12 space-y-4 shadow-xl">
+    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+      <Terminal size={18} class="text-[#5fd39a]" />
+      <span>Deploy {product.name} On Your Codebase</span>
+    </h3>
+    <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+      {product.subline}
+    </p>
+    <div class="flex flex-wrap items-center gap-3 pt-1">
+      <a
+        href="{prefix}/docs"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white hover:bg-neutral-200 !text-black font-semibold text-xs font-mono transition-colors shadow-sm"
+      >
+        <span class="!text-black text-black font-semibold">Read Documentation</span>
+        <ArrowRight size={13} class="!text-black text-black" />
+      </a>
+      <a
+        href="https://github.com/autonomic-ai-dev"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-mono text-white transition-colors"
+      >
+        <span>View on GitHub</span>
+      </a>
+    </div>
+  </div>
 </div>
