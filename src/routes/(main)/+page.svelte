@@ -560,7 +560,10 @@ Zero model API calls`,
 </div>
 
 <!-- Ecosystem Integration Bar (Anode Parity) -->
-<EcosystemBar />
+<EcosystemBar
+	color="orange"
+	label="Compatible with any standard coding agent stack. Claude Code, Cursor, and CI pipelines."
+/>
 
 <div class="yc-container pl-10 sm:pl-14 md:pl-16 lg:pl-20">
 	<!-- Empirical Benchmarks Section (Anode Parity) -->

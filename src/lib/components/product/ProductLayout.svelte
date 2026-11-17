@@ -22,6 +22,9 @@
 		{ label: 'Changelog', href: `${prefix}/changelog` }
 	]);
 
+	const installHref = $derived(path === '/' ? '#quickstart' : `${prefix}/docs/installation`);
+	const repoUrl = $derived(product.repoUrl || `https://github.com/autonomic-ai-dev/${product.id}`);
+
 	function isActive(href: string) {
 		const targetPath = href.replace(prefix, '') || '/';
 		if (targetPath === '/') return path === '/';
@@ -67,7 +70,14 @@
 					</span>
 				</a>
 				<span class="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 font-mono-code text-[11px] text-neutral-400">{product.version}</span>
-				<a href="/" class="hidden sm:inline-flex items-center gap-1 rounded-md border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-xs text-neutral-300 hover:bg-white/[0.08] hover:text-white transition-colors">← Ecosystem</a>
+				<a
+					href="/"
+					title="Autonomic AI Platform"
+					class="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/20 px-2.5 py-0.5 text-[11px] font-mono-code text-neutral-400 hover:text-white transition-all group"
+				>
+					<span class="w-1.5 h-1.5 rounded-full bg-[#ff531a] group-hover:shadow-[0_0_8px_#ff531a] transition-shadow"></span>
+					<span>autonomic-ai.dev</span>
+				</a>
 			</div>
 
 			<!-- Desktop Nav (Roomy gap-7) -->
@@ -79,7 +89,7 @@
 
 			<div class="flex items-center gap-2 sm:gap-2.5 xl:gap-3 shrink-0">
 				<a
-					href="https://github.com/autonomic-ai-dev"
+					href={repoUrl}
 					target="_blank"
 					rel="noopener noreferrer"
 					class="hidden sm:inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-mono-code text-neutral-300 transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
@@ -93,7 +103,7 @@
 					</svg>
 					<span>GitHub</span>
 				</a>
-				<a href="#quickstart" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-neutral-200 text-black text-xs font-semibold shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all whitespace-nowrap shrink-0 hover:scale-[1.02] active:scale-[0.98]">
+				<a href={installHref} class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-neutral-200 text-black text-xs font-semibold shadow-[0_0_15px_rgba(255,255,255,0.15)] transition-all whitespace-nowrap shrink-0 hover:scale-[1.02] active:scale-[0.98]">
 					<span>Install</span>
 					<ArrowRight size={13} />
 				</a>
@@ -130,15 +140,16 @@
 					<a
 						href="/"
 						onclick={() => (mobileMenuOpen = false)}
-						class="rounded-lg px-3 py-2 text-sm text-neutral-400 transition-colors hover:bg-white/[0.05] hover:text-white"
+						class="rounded-lg px-3 py-2 text-sm text-neutral-400 transition-colors hover:bg-white/[0.05] hover:text-white flex items-center gap-2"
 					>
-						← Back to Autonomic AI Ecosystem
+						<span class="w-1.5 h-1.5 rounded-full bg-[#ff531a]"></span>
+						<span>autonomic-ai.dev</span>
 					</a>
 				</div>
 
 				<div class="pt-3 border-t border-white/[0.06] flex items-center gap-3">
 					<a
-						href="https://github.com/autonomic-ai-dev"
+						href={repoUrl}
 						target="_blank"
 						rel="noopener noreferrer"
 						class="flex-1 text-center rounded-xl border border-white/[0.12] bg-white/[0.04] py-2 text-xs font-mono text-neutral-200"
@@ -146,7 +157,7 @@
 						GitHub
 					</a>
 					<a
-						href="#install"
+						href={installHref}
 						onclick={() => (mobileMenuOpen = false)}
 						class="flex-1 text-center rounded-xl bg-white py-2 text-xs font-semibold text-black"
 					>

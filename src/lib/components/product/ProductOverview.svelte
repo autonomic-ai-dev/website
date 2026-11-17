@@ -714,7 +714,13 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 </div>
 
 <!-- Ecosystem Integration Bar (Anode Parity) -->
-<EcosystemBar technologies={isTekmor ? tekmorTechs : thesmosTechs} />
+<EcosystemBar
+	color={accentColor}
+	technologies={isTekmor ? tekmorTechs : thesmosTechs}
+	label={isTekmor
+		? "Works with Claude Code, Git Merkle trees, and local test runners."
+		: "Governs Claude Code turns with append-only SQLite state snapshots."}
+/>
 
 <div class="yc-container pl-10 sm:pl-14 md:pl-16 lg:pl-20">
 	<!-- Empirical Benchmarks Section (Anode Parity) -->

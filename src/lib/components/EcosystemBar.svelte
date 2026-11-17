@@ -7,9 +7,11 @@
 	}
 
 	let {
+		color = 'orange',
 		technologies,
-		label = 'Works with any standard coding agent stack. From Claude Code to Cursor and CI pipelines.'
+		label = 'Works with any standard coding agent stack. Claude Code, Cursor, and CI pipelines.'
 	}: {
+		color?: 'orange' | 'emerald' | 'blue';
 		technologies?: Tech[];
 		label?: string;
 	} = $props();
@@ -25,14 +27,24 @@
 		{ name: 'Homebrew Tap', spec: 'Single binary install' }
 	];
 
+	const dotColors = {
+		orange: 'bg-[#ff531a] shadow-[0_0_8px_#ff531a]',
+		emerald: 'bg-[#5fd39a] shadow-[0_0_8px_#5fd39a]',
+		blue: 'bg-blue-400 shadow-[0_0_8px_#60a5fa]'
+	};
+
+	const dotClass = $derived(dotColors[color] ?? dotColors.orange);
 	const techs = $derived(technologies && technologies.length > 0 ? technologies : defaultTechs);
 </script>
 
 <section use:scrollReveal class="py-16 border-y border-white/[0.08] bg-[#000000]">
 	<div class="yc-container mx-auto px-4 pl-12 sm:pl-16 md:pl-20 lg:pl-24">
-		<p class="text-center text-xs font-mono-code text-neutral-500 uppercase tracking-wider mb-8">
-			{label}
-		</p>
+		<div class="flex justify-center mb-8">
+			<span class="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-3.5 py-1 text-xs text-neutral-300 font-mono-code text-center">
+				<span class="w-1.5 h-1.5 rounded-full {dotClass} shrink-0"></span>
+				<span>{label}</span>
+			</span>
+		</div>
 
 		<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 items-center">
 			{#each techs as tech, idx (tech.name)}

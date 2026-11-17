@@ -189,7 +189,7 @@
         <ArrowRight size={13} class="!text-black text-black" />
       </a>
       <a
-        href="https://github.com/autonomic-ai-dev"
+        href={product?.repoUrl || (product ? `https://github.com/autonomic-ai-dev/${product.id}` : "https://github.com/autonomic-ai-dev")}
         target="_blank"
         rel="noopener noreferrer"
         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-mono text-white transition-colors"
