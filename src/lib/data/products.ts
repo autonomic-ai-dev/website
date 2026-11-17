@@ -30,6 +30,7 @@ export type Product = {
 	finalCta: { headline: string; subline: string };
 	docsNav: { section: string; links: NavLink[] }[];
 	hasBlog: boolean;
+	repoUrl?: string;
 	story: { headline: string; chapters: { title: string; body: string; transcript: string[] }[] };
 };
 
@@ -107,6 +108,7 @@ export const products: Record<ProductId, Product> = {
 			]
 		},
 		name: 'tekmor',
+		repoUrl: 'https://github.com/autonomic-ai-dev/tekmor',
 		origin: 'https://tekmor.autonomic-ai.dev',
 		version: '1.0.0',
 		tagline: 'Proof eval for coding agents',
@@ -320,6 +322,7 @@ export const products: Record<ProductId, Product> = {
 			]
 		},
 		name: 'thesmos',
+		repoUrl: 'https://github.com/autonomic-ai-dev/thesmos',
 		origin: 'https://thesmos.autonomic-ai.dev',
 		version: '1.0.0-rc3',
 		tagline: 'Deterministic YAML workflows',

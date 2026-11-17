@@ -79,9 +79,10 @@
 				{#if !isOrg}
 					<a
 						href="/"
-						class="px-6 py-3 rounded-full border border-white/[0.12] bg-white/[0.03] text-neutral-300 hover:text-white hover:bg-white/[0.06] text-sm font-medium transition-all"
+						class="px-6 py-3 rounded-full border border-white/[0.12] bg-white/[0.03] text-neutral-300 hover:text-white hover:bg-white/[0.06] text-sm font-medium transition-all inline-flex items-center gap-2"
 					>
-						← Ecosystem Home
+						<span class="w-1.5 h-1.5 rounded-full bg-[#ff531a]"></span>
+						<span>autonomic-ai.dev</span>
 					</a>
 				{/if}
 			</div>
@@ -166,7 +167,7 @@
 					{:else}
 						<li><a href="/tekmor/docs" class="hover:text-white transition-colors">Tekmor Documentation</a></li>
 						<li><a href="/thesmos/docs" class="hover:text-white transition-colors">Thesmos Documentation</a></li>
-						<li><a href="/docs" class="hover:text-white transition-colors">Ecosystem Overview</a></li>
+						<li><a href="/docs" class="hover:text-white transition-colors">Documentation Index</a></li>
 						<li><a href="/tekmor/docs/cli" class="hover:text-white transition-colors">Tekmor CLI Reference</a></li>
 						<li><a href="/thesmos/docs/cli/agent-spine" class="hover:text-white transition-colors">Thesmos CLI Reference</a></li>
 					{/if}
