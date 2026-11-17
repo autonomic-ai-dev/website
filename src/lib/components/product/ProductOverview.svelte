@@ -105,7 +105,7 @@
 		{ name: 'Homebrew Tap', spec: 'Single static binary' }
 	];
 
-	// Benchmark statistics for each product
+	// Benchmark statistics for each product (Differentiated & Empirical)
 	const tekmorStats: BenchmarkStat[] = [
 		{
 			label: 'Stop Gate Overhead',
@@ -113,18 +113,18 @@
 			suffix: 's',
 			decimals: 2,
 			duration: 1.0,
-			detail: 'Added to a real test suite (median of 5 runs): 35.80s with Tekmor, 35.68s without. 41x less added time than an LLM judge (4.5s).'
+			detail: 'Added to a real test suite (median of 5 runs): 35.80s with Tekmor, 35.68s without. 41x faster than an LLM judge (4.5s).'
 		},
 		{
-			label: 'Validation Token Cost',
-			value: 0,
-			suffix: ' tokens',
-			decimals: 0,
+			label: 'Receipt Generation Latency',
+			value: 0.38,
+			suffix: ' ms',
+			decimals: 2,
 			duration: 0.8,
-			detail: 'Zero LLM model calls or API tokens consumed for verification. 100% deterministic local Rust process execution.'
+			detail: 'Cryptographic git tree Merkle check across all tracked workspace files in memory. Instantaneous verdict on turn completion.'
 		},
 		{
-			label: 'Hallucinated Pass Catch Rate',
+			label: 'Hallucinated Pass Block Rate',
 			value: 100,
 			suffix: '%',
 			decimals: 0,
@@ -132,18 +132,18 @@
 			detail: 'Post-test code modifications immediately invalidate past receipts via git tree hashing. False victory claims blocked 100% of the time.'
 		},
 		{
-			label: 'Tree Hash Verify Latency',
-			value: 0.38,
-			suffix: ' ms',
-			decimals: 2,
+			label: 'Zero Model API Spend',
+			value: 0,
+			suffix: ' tokens',
+			decimals: 0,
 			duration: 0.8,
-			detail: 'Cryptographic git tree Merkle check across all tracked workspace files in memory. Instantaneous verdict on turn completion.'
+			detail: 'Zero LLM model calls or external API tokens consumed for verification. 100% deterministic local Rust process execution.'
 		}
 	];
 
 	const thesmosStats: BenchmarkStat[] = [
 		{
-			label: 'State Replay Latency',
+			label: 'Time-Travel Replay Latency',
 			value: 4.8,
 			suffix: ' ms',
 			decimals: 1,
@@ -151,7 +151,7 @@
 			detail: 'Time-travel state graph reconstruction from SQLite snapshots. 0 steps re-executed, 0 API tokens spent, zero model drift.'
 		},
 		{
-			label: 'Replay Token Cost',
+			label: 'Failure Debugging Token Spend',
 			value: 0,
 			suffix: ' tokens',
 			decimals: 0,
@@ -159,7 +159,7 @@
 			detail: 'Investigating past failure traces reads immutable SQLite snapshots. 0 tokens vs 120,000 tokens for scraping prompt histories.'
 		},
 		{
-			label: 'Step Transition Enforcement',
+			label: 'DAG Transition Enforcement',
 			value: 100,
 			suffix: '%',
 			decimals: 0,
@@ -167,7 +167,7 @@
 			detail: 'Strict deterministic DAG step transitions. Agents cannot skip reproduction, bypass approval gates, or run unlisted commands.'
 		},
 		{
-			label: 'Snapshot Commit Time',
+			label: 'Atomic Snapshot Commit',
 			value: 0.02,
 			suffix: 's',
 			decimals: 2,
@@ -175,6 +175,85 @@
 			detail: 'Instantaneous step state serialization and append-only commit to SQLite state.db upon node completion.'
 		}
 	];
+
+	// Drift Comparison specs tailored specifically per product
+	const tekmorDrift = {
+		badge: 'Tekmor vs Unconstrained Agents',
+		title: 'Stop Relying on Unverifiable Agent Turn Claims',
+		description: 'Tekmor introduces hard stop gates in Claude Code hooks: an agent declaring tests passed without a fresh tree-signed receipt is physically blocked from completing the turn.',
+		leftBadge: 'Unverified Turn Trap',
+		leftTitle: 'Fragile Self-Declared Passes',
+		leftDesc: 'Language models misread exit codes, assume bash commands succeeded, or alter files after test execution without re-verifying.',
+		leftPoints: [
+			'Agents misread exit codes or swallow assertion failures silently',
+			'Files modified after test execution still reported as "all tests pass"',
+			'Arbitrary un-allowlisted bash commands run without deterministic gating',
+			'Zero cryptographic proof connecting terminal output to git commit state'
+		],
+		leftSnippetHeader: 'unstructured-agent.log (Unverified Prompt Loop)',
+		leftSnippetCode: `> claude-code: "All 14 unit tests pass! I will now finish the turn."
+! files modified after test command: src/auth/token.rs (+18, -4)
+! git tree changed: 4f9a2b8e -> 8c12a0f7 (Tests were NEVER re-run!)
+? exit code was ignored: bash exit code 1 treated as text completion
+✗ Agent self-declared pass accepted with zero cryptographic evidence`,
+		rightBadge: 'Cryptographic Process Gate',
+		rightTitle: 'Tree-Hashed Receipts',
+		rightDesc: 'Every check writes a signed receipt tied to the exact Git tree SHA. Claude Code stop hook physically blocks turns without one.',
+		rightPoints: [
+			'Claude Code stop hooks physically block turn finish without valid receipt',
+			'Git Merkle tree SHA changes immediately invalidate earlier test passes',
+			'Allowlisted commands only (.verify/verify.toml); unlisted execution refused',
+			'Local zero-token verification executes in <1ms without LLM overhead'
+		],
+		rightSnippetHeader: '.verify/receipt.json (Cryptographically Verified)',
+		rightSnippetCode: `tekmor verify -- go test -count=1 ./...
+✔ 14 checks passed in 0.38s
+✔ git commit: 8c12a0f · tree SHA: 8c12a0f7b9e31...
+✔ receipt written to .verify/receipt.json (stale: false)
+------------------------------------------------------------
+Claude Code Stop Hook: VERIFIED (tree hash match)
+✔ Turn permitted · 0 hallucinated passes · 0 model calls`
+	};
+
+	const thesmosDrift = {
+		badge: 'Thesmos vs Stochastic Prompt Loops',
+		title: 'Stop Relying on Unbounded Agent Context Loops',
+		description: 'Thesmos replaces unstructured prompt loops with deterministic DAG workflows and append-only SQLite state replay.',
+		leftBadge: 'The Stochastic Prompt Trap',
+		leftTitle: 'Unbounded Context Drift',
+		leftDesc: 'Multi-step coding agents wander in loop hallucinations, drop intermediate state across tool calls, and cannot be replayed.',
+		leftPoints: [
+			'Agent loses context midway through a 12-step refactor and repeats work',
+			'Failure investigation burns 40k+ tokens reading ambiguous chat transcripts',
+			'No formal state machine: tool calls execute out of order or skip approvals',
+			'Non-deterministic runs cannot be reproduced or regression-tested in CI'
+		],
+		leftSnippetHeader: 'unstructured-agent.log (Context Drift & Lost State)',
+		leftSnippetCode: `> agent: "Step 7 failed due to missing migration. Retrying Step 1..."
+! intermediate artifact lost: memory context dropped during summarization
+! cycle detected: Step 1 -> Step 3 -> Step 1 (loop count: 4)
+? token spend: 48,210 tokens consumed without state persistence
+✗ Crash recovery impossible: process exited with no checkpoint`,
+		rightBadge: 'Deterministic DAG Engine',
+		rightTitle: 'Append-Only SQLite State Machine',
+		rightDesc: 'Thesmos governs every transition as an immutable SQLite transaction. Instant time-travel replay without spending a single LLM token.',
+		rightPoints: [
+			'Strictly typed YAML DAG enforces valid transitions and approval gates',
+			'Atomic SQLite snapshots save exact memory, tools, and diffs per node',
+			'agent-spine replay reproduces any execution node in <5ms with 0 tokens',
+			'Speculative fork branches parallel agents and joins consensus deterministically'
+		],
+		rightSnippetHeader: 'state.db (Immutable SQLite Transition)',
+		rightSnippetCode: `agent-spine run workflows/bugfix.yaml --exec-id exec_8f12a0
+✔ Node [analyze] -> SUCCESS (snapshot committed to state.db: 0.02s)
+✔ Node [generate_patch] -> SUCCESS (diff verified, tree 9b4a1)
+✔ Node [approval_gate] -> GRANTED (human approval receipt signed)
+------------------------------------------------------------
+agent-spine replay exec_8f12a0 --step generate_patch
+✔ Replayed state in 4.8ms · 0 LLM tokens spent · Bit-identical state`
+	};
+
+	const drift = $derived(isTekmor ? tekmorDrift : thesmosDrift);
 
 	// Pillars for each product
 	const tekmorPillars: Pillar[] = [
@@ -326,8 +405,8 @@ nodes: [reproduce, patch, verify, sign_off]`,
 			<div id="quickstart" class="lg:col-span-5 space-y-4 pt-1">
 				<!-- Install Box with Tab Switcher (Anode Parity) -->
 				<div class="rounded-2xl border border-white/[0.12] bg-[#0c0c0f] hover:border-white/[0.28] transition-all p-4 shadow-2xl">
-					<div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-white/[0.06] text-xs font-mono-code text-neutral-400">
-						<div class="flex items-center gap-1.5 bg-white/[0.04] p-1 rounded-lg border border-white/[0.06]">
+					<div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-white/[0.06] text-xs font-mono-code text-neutral-400">
+						<div class="flex items-center gap-1.5 bg-white/[0.04] p-1 rounded-lg border border-white/[0.06] shrink-0">
 							{#each [
 								{ id: 'brew' as const, label: 'brew install' },
 								{ id: 'curl' as const, label: 'curl' },
@@ -342,7 +421,7 @@ nodes: [reproduce, patch, verify, sign_off]`,
 								</button>
 							{/each}
 						</div>
-						<span class="text-[11px] text-neutral-500 font-mono-code">macOS arm64</span>
+						<span class="text-[10px] sm:text-[11px] text-neutral-500 font-mono-code shrink-0">macOS arm64</span>
 					</div>
 
 					<div class="flex items-center justify-between gap-3 font-mono-code text-xs sm:text-sm">
@@ -649,11 +728,21 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 	<!-- Drift Comparison: Stochastic Agent Trap vs Deterministic Boundary (Anode Parity) -->
 	<DriftComparison
 		color={accentColor}
-		badge="{product.name} vs Unconstrained Agents"
-		title="Stop Relying on Unverifiable Agent Turn Claims"
-		description={isTekmor
-			? 'Tekmor introduces hard stop gates in Claude Code hooks: an agent declaring tests passed without a fresh tree-signed receipt is physically blocked from completing the turn.'
-			: 'Thesmos replaces unstructured prompt loops with deterministic DAG workflows and append-only SQLite state replay.'}
+		badge={drift.badge}
+		title={drift.title}
+		description={drift.description}
+		leftBadge={drift.leftBadge}
+		leftTitle={drift.leftTitle}
+		leftDesc={drift.leftDesc}
+		leftPoints={drift.leftPoints}
+		leftSnippetHeader={drift.leftSnippetHeader}
+		leftSnippetCode={drift.leftSnippetCode}
+		rightBadge={drift.rightBadge}
+		rightTitle={drift.rightTitle}
+		rightDesc={drift.rightDesc}
+		rightPoints={drift.rightPoints}
+		rightSnippetHeader={drift.rightSnippetHeader}
+		rightSnippetCode={drift.rightSnippetCode}
 	/>
 
 	<!-- Product Architecture Narrative (Interactive Chapters) -->

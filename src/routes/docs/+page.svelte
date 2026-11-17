@@ -79,7 +79,7 @@
 						<p class="text-xs text-neutral-400">Proof eval, cryptographic receipts, and Claude Code stop gates</p>
 					</div>
 				</div>
-				<a href="/tekmor" class="text-xs font-medium text-[#5fd39a] hover:underline flex items-center gap-1">
+				<a href="/tekmor" class="text-xs font-medium text-[#5fd39a] hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
 					Product site <ArrowRight size={11} />
 				</a>
 			</div>
@@ -114,7 +114,7 @@
 						<p class="text-xs text-neutral-400">Deterministic YAML DAG workflows and append-only SQLite snapshots</p>
 					</div>
 				</div>
-				<a href="/thesmos" class="text-xs font-medium text-blue-400 hover:underline flex items-center gap-1">
+				<a href="/thesmos" class="text-xs font-medium text-blue-400 hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
 					Product site <ArrowRight size={11} />
 				</a>
 			</div>

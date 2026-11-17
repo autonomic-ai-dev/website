@@ -29,7 +29,7 @@
 </script>
 
 <section use:scrollReveal class="py-16 border-y border-white/[0.08] bg-[#000000]">
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+	<div class="yc-container mx-auto px-4 pl-12 sm:pl-16 md:pl-20 lg:pl-24">
 		<p class="text-center text-xs font-mono-code text-neutral-500 uppercase tracking-wider mb-8">
 			{label}
 		</p>
