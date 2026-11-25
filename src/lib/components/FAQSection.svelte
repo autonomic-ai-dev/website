@@ -11,7 +11,7 @@
 		color = 'orange',
 		badge = 'Architecture & Verification FAQ',
 		title = 'Frequently Asked Questions',
-		description = 'Direct answers on deterministic DAGs, cryptographic tree receipts, and eliminating hallucinated test claims.',
+		description = 'Direct answers on deterministic DAGs, code-hashed receipts, and blocking unverified test claims.',
 		items
 	}: {
 		color?: 'orange' | 'emerald' | 'blue';

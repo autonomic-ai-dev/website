@@ -54,27 +54,24 @@ export const products: Record<ProductId, Product> = {
 					title: 'The claim is cheap',
 					body: 'A coding agent finishes a change and says the tests pass. The tests may have run once, earlier, on different code, and the chat does not show which. tekmor sits in Claude Code. When a turn ends with a pass claim and no receipt for the code on disk, the stop gate blocks the turn and says why.',
 					transcript: [
-						'$ echo \'{"transcript_path": "...", "cwd": "..."}\' | tekmor stop-gate',
-						'{"decision":"block","reason":"Repo is blocked: Verification is missing. Files changed in this repo have no passing `tekmor verify -- <cmd>` run recorded after the last edit. Run the project\'s checks, let them pass, then finish."}'
+						'$ printf \'{"cwd": "/repo/demo"}\' | tekmor stop-gate',
+						'Repo demo is blocked: Verification is missing. Files changed in this repo have no passing run recorded after the last edit.'
 					]
 				},
 				{
 					title: 'The receipt is for this code',
 					body: 'tekmor runs only the commands listed in .verify/verify.toml. Each result is stored with the commit and a hash of the code that ran. A receipt answers for the code on disk now, not for the last run anyone remembers.',
 					transcript: [
-						'$ tekmor verify -- sh check.sh',
-						'tests: 3 passed',
-						'  recorded: exit 0, source cli',
-						'',
+						'$ tekmor verify -- sh -c true',
 						'$ tekmor verify receipt',
 						'Verify receipt: PASSED',
-						'  command:   sh check.sh',
+						'  command:   sh -c true',
 						'  exit code: 0'
 					]
 				},
 				{
 					title: 'One edit makes it stale',
-					body: 'Change any file that counts toward the tree and the old pass stops counting. Documentation files, the artifacts folder, the feature maps and the knowledge base do not count. The allowlist itself does, so editing what the project is allowed to prove also needs a new run.',
+					body: 'Change any file that counts toward the code hash and the old pass stops counting. Documentation files, the artifacts folder, the feature maps and the knowledge base do not count. The allowlist itself does, so editing what the project is allowed to prove also needs a new run.',
 					transcript: [
 						'$ echo "x" >> check.sh',
 						'$ tekmor verify receipt',
@@ -84,25 +81,23 @@ export const products: Record<ProductId, Product> = {
 				},
 				{
 					title: 'A flaky run is not proof',
-					body: 'tekmor verify --repeat N runs one command N times on one tree. If the runs disagree, the command is flaky. The receipt and the stop gate leave flaky commands out, so a lucky pass cannot stand in for a check that fails half the time.',
+					body: 'tekmor verify --repeat N runs one command N times on the same code. If the runs disagree, the command is flaky. The receipt and the stop gate leave flaky commands out, so a lucky pass cannot stand in for a check that fails half the time.',
 					transcript: [
 						'$ tekmor verify --repeat 3 -- sh flaky.sh',
-						'  (three recorded runs, one per line of JSON)',
-						'$ tekmor verify summary',
-						'2/3 failed  last exit 1  sh flaky.sh'
+						'  (three recorded runs, one per line of JSON)'
 					]
 				},
 				{
 					title: 'Guardrails around the proof',
-					body: 'The allowlist decides what counts as proof. tekmor install adds a stop gate for claims and a bash gate that blocks commands reading the review key. A commit gate refuses commits that skip git hooks. A ratchet stops lint counts from rising. Drift flags feature maps that point at code or checks that no longer exist.',
+					body: 'The allowlist decides what counts as proof. tekmor install adds a stop gate for claims and a bash gate that blocks or warns on risky shell commands. A commit gate refuses commits that skip git hooks. A ratchet stops lint counts from rising. Drift flags feature maps that point at code or checks that no longer exist.',
 					transcript: [
 						'$ tekmor verify ratchet',
-						'no-unwrap-in-binary   309 / baseline 332   ok'
+						'no-unwrap-in-binary   0 / baseline 0   ok'
 					]
 				},
 				{
 					title: 'What it does not do',
-					body: 'A session that can read the review key can sign a review, because the Keychain blocks the shell path but not the Read tool. The claim check is a pattern match on the last assistant message, so it can miss a claim worded differently. Runs recorded before 1.0.0 are not valid receipts after the upgrade.',
+					body: 'A session that can read the review key can sign a review. The claim check is a pattern match on the last assistant message, so it can miss a claim worded differently. Runs recorded by 1.0.0 may not count after the upgrade, because generated output no longer counts toward the code hash. Run the checks again.',
 					transcript: []
 				}
 			]
@@ -110,14 +105,14 @@ export const products: Record<ProductId, Product> = {
 		name: 'tekmor',
 		repoUrl: 'https://github.com/autonomic-ai-dev/tekmor',
 		origin: 'https://tekmor.autonomic-ai.dev',
-		version: '1.0.0',
+		version: '2.0.0',
 		tagline: 'Proof eval for coding agents',
 		announce: {
-			text: 'tekmor 1.0.0 is out.',
+			text: 'tekmor 2.0.0 is out.',
 			label: 'Read the release notes',
 			href: '/tekmor/changelog'
 		},
-		badge: 'v1.0.0 · Runs locally · No model calls',
+		badge: 'v2.0.0 · Runs locally · No model calls',
 		headline: 'Your agent says the tests pass. Check the receipt.',
 		subline:
 			'tekmor runs the checks your project allows, records each result against the commit and code it ran on, and writes a receipt. A stop gate blocks a turn that claims a pass without one. It makes no model calls and opens no network connection on its own.',
@@ -143,8 +138,8 @@ export const products: Record<ProductId, Product> = {
 			},
 			{
 				icon: 'receipt',
-				title: 'Receipts tied to the tree',
-				body: 'Each run is stored with the commit and a hash of the code that ran. Changing a file that counts toward the tree makes an earlier pass stale.',
+				title: 'Receipts tied to the code',
+				body: 'Each run is stored with the commit and a hash of the code that ran. Changing a file that counts toward the code hash makes an earlier pass stop counting.',
 				command: 'tekmor verify receipt'
 			},
 			{
@@ -156,7 +151,7 @@ export const products: Record<ProductId, Product> = {
 			{
 				icon: 'check',
 				title: 'Flaky runs do not count',
-				body: 'tekmor verify --repeat N runs a command N times on one tree. If the runs disagree, the command is marked flaky and is not proof.',
+				body: 'tekmor verify --repeat N runs a command N times on the same code. If the runs disagree, the command is marked flaky and is not proof.',
 				command: 'tekmor verify --repeat 3 -- <cmd>'
 			}
 		],
@@ -192,35 +187,38 @@ export const products: Record<ProductId, Product> = {
 		],
 		facts: [
 			{ value: '0', label: 'model calls made by tekmor' },
-			{ value: '1', label: 'network path, used only for an extension install' },
+			{ value: '0', label: 'network connections opened by tekmor' },
 			{ value: 'PASSED', label: 'the only receipt verdict that counts as proof' }
 		],
 		limits: [
-			'A session that can read the review key can sign a review. The Keychain blocks the shell path, not the Read tool.',
-			'The claim check is a pattern match on the last assistant message. It can miss a claim worded differently.',
-			'Runs recorded before 1.0.0 are not valid receipts after upgrade, because the tree hash covers more files. Run the checks again.',
+			'A receipt proves the allowlisted command exited 0 on this exact code. It does not prove the change is correct.',
+			'Only Bash commands are gated. Write and Edit tool calls are not.',
+			'.claude/ and Markdown files are not part of the code hash.',
+			'A session that can read the review key can sign a review.',
+			'The claim check is a pattern match on the last assistant message.',
+			'Hooks embed the absolute path of the binary. Run tekmor install again after moving or reinstalling it.',
 			'The published binary is for arm64 macOS only.'
 		],
 		faqs: [
 			{
 				q: 'How does Tekmor physically block an agent turn in Claude Code?',
-				a: 'When you run tekmor install, it registers a Stop hook and a PreToolUse bash gate in .claude/settings.json. When Claude Code attempts to finalize an assistant response, the stop hook executes tekmor stop-gate. If the agent response claims that tests passed or the task is complete, the gate checks .verify/receipt.json. If no receipt exists, or if the current git tree hash does not match the receipt tree SHA, the process exits non-zero, returning a hard blocker message to Claude Code.'
+				a: 'When you run tekmor install, it registers a Stop hook and a PreToolUse bash gate in .claude/settings.json. When Claude Code attempts to finalize an assistant response, the stop hook executes tekmor stop-gate. If the agent response claims that tests passed or the task is complete, the gate asks for the receipt for the current commit and code. If the verdict is not PASSED, the process exits non-zero, returning a hard blocker message to Claude Code.'
 			},
 			{
-				q: 'What files count toward the cryptographic tree hash?',
-				a: 'Every tracked source file under your project (src/, crates/, tests/, hooks/, etc.) and configuration manifests (Cargo.*, package.json, verify.toml) contribute directly to the SHA. Documentation files (*.md, *.rst), .claude/ session state, and .verify/artifacts/ logs are explicitly excluded so that updating documentation or notes does not invalidate your test passes.'
+				q: 'What files count toward the code hash?',
+				a: 'The code hash is a SHA-256 over the paths and contents of the uncommitted changes reported by git status, untracked files included. Documentation (*.md, *.rst), .verify/artifacts/, .verify/features/, .verify/knowledge-base/, .claude/ and generated output (target/, node_modules/, caches) are excluded. A clean tree hashes empty input.'
 			},
 			{
 				q: 'Does Tekmor run or call an LLM during verification?',
-				a: 'No. Tekmor makes exactly 0 model calls and spends 0 API tokens. It is written in 100% deterministic local Rust. Verdicts are decided strictly by process exit codes and git tree hashing.'
+				a: 'No. Tekmor makes exactly 0 model calls and spends 0 API tokens. It is written in 100% deterministic local Rust. Verdicts are decided strictly by process exit codes and the code hash.'
 			},
 			{
 				q: 'How does flaky test detection work with --repeat N?',
-				a: 'Running tekmor verify --repeat 3 -- <cmd> executes the allowlisted test command 3 consecutive times against the identical git tree. If any run returns a different exit code from the others, the command is classified as FLAKY_DISAGREEMENT and will not produce a PASSED receipt.'
+				a: 'Running tekmor verify --repeat 3 -- <cmd> executes the allowlisted test command 3 consecutive times against the identical code state. If any run returns a different exit code from the others, the command is marked flaky and does not count toward a PASSED receipt.'
 			},
 			{
 				q: 'How do we prevent developers or CI from accepting forged local receipts?',
-				a: 'Under ADR 0004, CI does not trust local receipts produced on developer laptops. The .github/workflows/receipt.yml workflow runs tekmor verify -- .verify/run.sh in clean-room mode on the GitHub Actions runner, writes the receipt directly to $GITHUB_STEP_SUMMARY, and gates branch merges.'
+				a: 'Under ADR 0004, CI does not trust local receipts produced on developer laptops. The .github/workflows/receipt.yml workflow runs the allowlisted checks on the GitHub Actions runner and publishes the receipt in the job summary as the check "Verified receipt for this change". It blocks merges only if the repository makes that check required in branch protection.'
 			}
 		],
 		finalCta: {

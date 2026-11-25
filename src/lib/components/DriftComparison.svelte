@@ -6,13 +6,13 @@
 		color = 'orange',
 		badge = 'Architecture Without Drift',
 		title = 'Stop Letting Coding Agents Grade Their Own Homework',
-		description = 'When coding agents verify their own code with unrestricted bash commands, stochastic prompt completions declare victory even when tests fail. Autonomic AI enforces cryptographic proof at the OS and process boundary.',
+		description = 'When coding agents verify their own code with unrestricted bash commands, stochastic prompt completions declare victory even when tests fail. Autonomic AI enforces recorded proof at the OS and process boundary.',
 		leftBadge = 'The Stochastic Prompt Trap',
 		leftTitle = 'Fragile Self-Declared Passes',
 		leftDesc = 'Language models misread exit codes, assume bash commands succeeded, and alter files after running tests without re-verifying.',
 		rightBadge = 'Deterministic Boundary',
-		rightTitle = 'Process & Cryptographic Gates',
-		rightDesc = 'Thesmos governs the execution DAG in append-only SQLite. Tekmor physically blocks turns until allowlisted checks sign a matching git tree receipt.',
+		rightTitle = 'Process & Deterministic Gates',
+		rightDesc = 'Thesmos governs the execution DAG in append-only SQLite. Tekmor physically blocks turns until an allowlisted check records a PASSED receipt for the current code.',
 		leftPoints = [
 			'Agents misread exit codes or swallow assertion failures silently',
 			'Files modified after test execution still reported as "all tests pass"',
@@ -21,24 +21,25 @@
 		],
 		rightPoints = [
 			'Claude Code stop hooks physically block turn finish without valid receipt',
-			'Git Merkle tree SHA changes immediately invalidate earlier test passes',
+			'Any counted edit or a new commit makes earlier test passes stop counting',
 			'Allowlisted commands only (.verify/verify.toml); unlisted execution refused',
 			'Time-travel replay from immutable SQLite snapshots in <5ms with 0 tokens'
 		],
 		leftSnippetHeader = 'unstructured-agent.log (Unverified Prompt Loop)',
 		leftSnippetCode = `> claude-code: "All 14 unit tests pass! I will now finish the turn."
 ! files modified after test command: src/auth/token.rs (+18, -4)
-! git tree changed: 4f9a2b8e -> 8c12a0f7 (Tests were NEVER re-run!)
+! code changed after test run: 4f9a2b8e -> 8c12a0f7 (Tests were NEVER re-run!)
 ? exit code was ignored: bash exit code 1 treated as text completion
-✗ Agent self-declared pass accepted with zero cryptographic evidence`,
-		rightSnippetHeader = '.verify/receipt.json (Cryptographically Verified)',
-		rightSnippetCode = `tekmor verify -- go test -count=1 ./...
-✔ 14 checks passed in 0.38s
-✔ git commit: 8c12a0f · tree SHA: 8c12a0f7b9e31...
-✔ receipt written to .verify/receipt.json (stale: false)
+✗ Agent self-declared pass accepted with zero recorded evidence`,
+		rightSnippetHeader = 'tekmor verify receipt',
+		rightSnippetCode = `tekmor verify -- sh -c true
+tekmor verify receipt
+✔ Verify receipt: PASSED
+  commit:    2a424911d701
+  code hash: e3b0c44298fc
 ------------------------------------------------------------
-Claude Code Stop Hook: VERIFIED (tree hash match)
-✔ Turn permitted · 0 hallucinated passes · 0 model calls`
+Claude Code Stop Hook: receipt PASSED
+✔ Turn permitted · 0 model calls`
 	}: {
 		color?: 'orange' | 'emerald' | 'blue';
 		badge?: string;
@@ -167,7 +168,7 @@ Claude Code Stop Hook: VERIFIED (tree hash match)
 					<div class="rounded-xl bg-[#050507] p-4 border border-white/[0.06] font-mono-code text-xs text-neutral-300 space-y-1.5 overflow-x-auto">
 						<div class="text-neutral-500 pb-2 border-b border-white/[0.04] flex items-center justify-between">
 							<span>{rightSnippetHeader}</span>
-							<span class="{s.badgeText} font-semibold">100% Cryptographic Proof</span>
+							<span class="{s.badgeText} font-semibold">100% Deterministic Proof</span>
 						</div>
 						<pre class="{s.badgeText} leading-relaxed whitespace-pre-wrap">{rightSnippetCode}</pre>
 					</div>

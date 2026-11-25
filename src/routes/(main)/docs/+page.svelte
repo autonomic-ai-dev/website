@@ -10,7 +10,7 @@
 	const tekmorDocs = [
 		{ title: 'Installation', href: '/tekmor/docs/installation', desc: 'macOS Homebrew tap, crates.io, source build, and Claude Code hook registration.' },
 		{ title: 'CLI Reference', href: '/tekmor/docs/cli', desc: 'tekmor verify, receipt, ratchet, drift, check-checks, and stop/bash gates.' },
-		{ title: 'Verification & Receipts', href: '/tekmor/docs/verification', desc: 'Cryptographic tree hashes, exit code checks, verdicts (PASSED/FAILED/NOT VERIFIED).' },
+		{ title: 'Verification & Receipts', href: '/tekmor/docs/verification', desc: 'Commit and code-hash binding, exit code checks, verdicts (PASSED/FAILED/NOT VERIFIED).' },
 		{ title: 'Known Limits', href: '/tekmor/docs/limits', desc: 'Keychain access boundaries, assistant message pattern matching, and platform scope.' }
 	];
 
@@ -33,7 +33,7 @@
 
 <svelte:head>
 	<title>Documentation — Autonomic AI</title>
-	<meta name="description" content="Official documentation for tekmor (proof evals, tree receipts, stop gates) and thesmos (deterministic workflow DAGs)." />
+	<meta name="description" content="Official documentation for tekmor (proof evals, code-hashed receipts, stop gates) and thesmos (deterministic workflow DAGs)." />
 </svelte:head>
 
 <div class="yc-container py-12 md:py-20">
@@ -76,7 +76,7 @@
 					</span>
 					<div>
 						<h2 class="text-xl font-semibold text-white">tekmor</h2>
-						<p class="text-xs text-neutral-400">Proof eval, cryptographic receipts, and Claude Code stop gates</p>
+						<p class="text-xs text-neutral-400">Proof eval, code-hashed receipts, and Claude Code stop gates</p>
 					</div>
 				</div>
 				<a href="/tekmor" class="text-xs font-medium text-[#5fd39a] hover:underline flex items-center gap-1 shrink-0 whitespace-nowrap">
@@ -149,10 +149,10 @@
 				</p>
 			</div>
 			<div>
-				<span class="font-mono text-xs uppercase tracking-widest text-[#5fd39a]">Cryptographic Proof</span>
-				<h3 class="mt-2 text-base font-semibold text-white">Tree SHA Verification</h3>
+				<span class="font-mono text-xs uppercase tracking-widest text-[#5fd39a]">Verdict Binding</span>
+				<h3 class="mt-2 text-base font-semibold text-white">Commit + Code Hash</h3>
 				<p class="mt-2 text-xs leading-relaxed text-neutral-400">
-					Receipts bind test exit codes to git tree SHAs. Any code modification after a test immediately invalidates the receipt as STALE.
+					Receipts bind test exit codes to the commit and a hash of the uncommitted changes. Any counted edit after a test makes the receipt read NOT VERIFIED.
 				</p>
 			</div>
 			<div>

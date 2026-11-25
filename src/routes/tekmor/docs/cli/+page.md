@@ -4,33 +4,40 @@ title: tekmor CLI Reference
 
 # tekmor CLI Reference
 
-The complete reference for commands available in `tekmor 1.0.0`.
+The complete reference for commands available in `tekmor 2.0.0`.
 
 ## Verification Commands
 
 ### `tekmor verify -- <command>`
-Executes an allowlisted command on your machine, captures stdout and stderr to `.verify/artifacts/`, and writes a receipt if the exit code is valid.
+
+Runs an allowlisted command from `.verify/verify.toml`, captures its output to `.verify/artifacts/`, and records the outcome against the HEAD commit and the code hash of the uncommitted changes.
 
 ```bash
 tekmor verify -- cargo test
 tekmor verify -- .verify/run.sh
 ```
 
-- If the command is not in `.verify/verify.toml`, `tekmor` refuses to execute it and exits with code 1.
-- Results are recorded against the active git commit and the computed tree SHA.
+- If the command is not in `.verify/verify.toml`, `tekmor` refuses to run it and exits 1:
+  ```
+  Error: `cargo test --no-run` is not in the verify allowlist; add it to .verify/verify.toml
+  ```
+- A string entry matches the whole command exactly: `cargo test` does not match `cargo test --no-run`. A trailing ` ...` allows extra arguments (`"cargo test ..."`)—note that the wildcard also admits flags such as `--no-run` that run no tests, so prefer exact entries for proof commands.
+- An entry written as a shell command line (quotes, `$`, `VAR=value`, pipes) is the command `sh -c '<entry>'`; run it as `tekmor verify -- sh -c '<entry>'`.
+- With no allowlist, only built-in test runners and programs inside `.verify/` run; `.verify/../x` and symlinks that leave `.verify/` are refused.
 
 ### `tekmor verify --repeat <N> -- <command>`
-Runs `<command>` $N$ times consecutively on the identical git tree.
+
+Runs `<command>` $N$ times consecutively against the same commit and code state.
 
 ```bash
 tekmor verify --repeat 3 -- cargo test
 ```
 
-- If any of the $N$ runs disagrees (e.g., 2 pass and 1 fails), the command is classified as `FLAKY_DISAGREEMENT`.
-- Flaky commands **do not** generate a valid receipt and cannot satisfy the Claude Code stop gate.
+- If the $N$ runs disagree (e.g., 2 pass and 1 fails), the command is flaky and does not count as proof: the receipt reads `NOT VERIFIED`.
 
 ### `tekmor verify receipt`
-Displays the receipt verdict for the current git tree.
+
+Shows whether the current commit and code passed. Exits 0 only on `PASSED`.
 
 ```bash
 tekmor verify receipt
@@ -42,59 +49,63 @@ Example output:
 
 ```
 Verify receipt: PASSED
-  command:   cargo test --all-features
+  command:   sh -c true
   exit code: 0
-  recorded:  2026-11-10T14:22:01Z
+  recorded:  2026-11-25T05:33:22Z
   source:    cli
-  artifact:  .verify/artifacts/run-a8f3b12.log
-  commit:    a8f3b12c4
-  tree hash: 4f9a2b8e19c02d7e
+  artifact:  .verify/artifacts/4b021624-7012-4e46-be36-7266dc289fa1.log
+  commit:    2a424911d701
+  code hash: e3b0c44298fc
 ```
 
 ### `tekmor verify summary`
-Prints aggregate statistics for each allowlisted command across past runs.
+
+Per check: failed runs out of all runs. `--json` is available.
 
 ```bash
 tekmor verify summary
 tekmor verify summary --json
 ```
 
-### `tekmor verify ratchet`
-Enforces that metrics (such as lint warnings, coverage thresholds, or deprecated usages) do not regress past recorded baselines.
+### `tekmor verify init`
+
+Creates `.verify/` with an allowlist. `--force` overwrites; `--dir <DIR>` chooses the directory.
 
 ```bash
-tekmor verify ratchet             # Checks metrics against .verify/ratchet.toml
+tekmor verify init
+```
+
+### `tekmor verify ratchet`
+
+Keeps lint counts from rising above their recorded baselines.
+
+```bash
+tekmor verify ratchet             # Checks metrics against recorded baselines
 tekmor verify ratchet --update    # Lowers baselines when metrics improve; never raises them
 ```
 
 ### `tekmor verify drift`
-Audits the repository for drift: detects feature mappings whose file paths no longer exist on disk or checks that are missing from `.verify/verify.toml`.
+
+Reports feature maps that point at missing code or checks: file paths that no longer exist on disk or commands that are not in `.verify/verify.toml`.
 
 ### `tekmor verify check-checks`
-Mutation test for verification suites. Runs each allowlisted check against broken mock copies from `.verify/broken/`. If a check still passes against intentionally broken code, it is reported as an ineffectual check.
+
+Confirms each allowlisted check fails on a broken copy in `.verify/broken/`. A check that still passes is reported as not caught.
+
+### `tekmor verify review`
+
+Records a signed pass or fail review for the current tree. Changes under the paths in `.verify/review.toml` need a passing review.
 
 ---
 
 ## Gate & Hook Commands
 
-These commands are registered by `tekmor install` and are invoked automatically by host harnesses.
+These commands are registered by `tekmor install` and are invoked automatically by Claude Code.
 
-| Command | Purpose |
-| :--- | :--- |
-| `tekmor stop-gate` | Stop hook: inspects assistant message claims and blocks turns lacking a `PASSED` receipt for the current tree. |
-| `tekmor bash-gate` | PreToolUse hook: checks candidate shell commands against the `.verify/verify.toml` allowlist. |
-| `tekmor commit-gate` | Git hook: blocks commits that attempt to bypass verification. |
-| `tekmor install` | Registers `stop-gate` and `bash-gate` in `.claude/settings.json`. Supports `--global` for machine-wide enforcement. |
-| `tekmor doctor` | Diagnostics check validating hook paths, binary locations, and configuration syntax. |
-
----
-
-## Extension Commands
-
-```bash
-tekmor ext list
-tekmor ext add <name>
-tekmor ext remove <name>
-```
-
-Extensions are optional plugins. `ext add` is the only command in the entire `tekmor` binary that opens a network socket (to fetch the requested plugin binary and checksum).
+| Command              | Purpose                                                                                                                                               |
+| :------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tekmor stop-gate`   | Stop hook: blocks a turn that changed code or claims a pass without a `PASSED` receipt for the current code.                                          |
+| `tekmor bash-gate`   | PreToolUse hook for Bash: blocks or warns on risky commands.                                                                                          |
+| `tekmor commit-gate` | PreToolUse hook: refuses commits that skip git hooks. It is not a git hook.                                                                           |
+| `tekmor install`     | Registers the `stop-gate` and `bash-gate` hooks in `.claude/settings.json`; `--global` writes `~/.claude/settings.json`.                              |
+| `tekmor doctor`      | Checks the setup the gates depend on: hooks, git, the allowlist, scripts, the store and feature-map drift. Output is `ok\|warn\|fail` lines per area. |

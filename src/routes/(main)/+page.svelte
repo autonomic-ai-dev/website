@@ -55,12 +55,12 @@
 			detail: 'Zero LLM model calls or external API tokens consumed across verification and state replay. 100% deterministic local Rust process execution.'
 		},
 		{
-			label: 'Hallucinated Pass Block Rate',
-			value: 100,
-			suffix: '%',
+			label: 'Stop-Gate Blocks Without Proof',
+			value: 10,
+			suffix: ' of 14',
 			decimals: 0,
 			duration: 1.1,
-			detail: 'Post-test code modifications immediately invalidate past receipts via git tree hashing. False victory claims blocked 100% of the time.'
+			detail: 'SWE-bench-Live tekmor sessions where the stop gate blocked the first attempt to finish without a passing run.'
 		},
 		{
 			label: 'State Replay Latency',
@@ -112,9 +112,9 @@
 			desc: 'Validation never spends API tokens or calls an LLM judge. 100% deterministic local Rust execution with nanosecond latency.',
 			tag: 'Local Rust Engine',
 			icon: Shield,
-			snippet: `$ tekmor verify -- cargo test
-✔ 14 checks passed in 0.38s
-✔ Model calls made: 0 · Tokens consumed: 0`,
+			snippet: `$ tekmor verify -- sh -c true
+"exit_code": 0, "success": true
+Model calls made: 0 · Tokens consumed: 0`,
 			statusLabel: 'Zero token expenditure'
 		},
 		{
@@ -123,22 +123,20 @@
 			desc: 'Agents run only explicitly pre-approved commands defined in .verify/verify.toml. Hallucinated, unlisted, or dangerous bash commands are rejected.',
 			tag: '.verify/verify.toml',
 			icon: TerminalIcon,
-			snippet: `[[commands]]
-name = "test"
-run = "cargo test --test repro"
-timeout_seconds = 60`,
+			snippet: `[verify]
+commands = [".verify/run.sh ..."]`,
 			statusLabel: 'Strict command allowlist'
 		},
 		{
 			badge: '03',
-			title: 'Tree-Hashed Receipts',
-			desc: 'Every test run cryptographically binds to the git commit and directory tree SHA. Modifying any tracked file immediately invalidates past passes.',
-			tag: 'Merkle Tree SHA',
+			title: 'Receipts Bound to the Code',
+			desc: 'Every test run is recorded with the git commit and a hash of the counted changes. Any counted edit makes earlier runs stop counting.',
+			tag: 'Commit + code hash',
 			icon: CheckCircle2,
-			snippet: `Checking tree SHA: 4f9a2b8e...
-Status: PASSED · Stale: false
-Turn verdict: PERMITTED`,
-			statusLabel: 'Cryptographic proof contract'
+			snippet: `Verify receipt: PASSED
+  commit:    2a424911d701
+  code hash: e3b0c44298fc`,
+			statusLabel: 'Verdict computed on demand'
 		},
 		{
 			badge: '04',
@@ -156,19 +154,19 @@ Zero model API calls`,
 	const faqs: FAQItem[] = [
 		{
 			q: 'How do Thesmos and Tekmor work together in an agent development loop?',
-			a: 'Thesmos (agent-spine) defines the deterministic execution plan: a directed acyclic graph (DAG) specifying reproduction, agent repair, verification gates, and human sign-off steps. Tekmor provides cryptographic enforcement inside verification nodes and Claude Code stop hooks. An agent cannot wander off script or declare victory without a fresh, valid receipt signed for the exact files on disk.'
+			a: 'Thesmos (agent-spine) defines the deterministic execution plan: a directed acyclic graph (DAG) specifying reproduction, agent repair, verification gates, and human sign-off steps. Tekmor enforces verification inside verify nodes and Claude Code stop hooks. An agent cannot wander off script or declare victory without a fresh, valid receipt for the exact files on disk.'
 		},
 		{
 			q: 'Why do coding agents claim tests pass when they actually failed?',
-			a: 'Language models produce plausible-sounding completions. When an agent runs a complex test suite or bash command, it frequently misreads exit codes, hallucinated assertions, or assumes completion prematurely. Tekmor introduces a hard stop gate in Claude Code hooks: an agent saying the tests passed without a cryptographically verified receipt for the exact current code is physically blocked.'
+			a: 'Language models produce plausible-sounding completions. When an agent runs a complex test suite or bash command, it frequently misreads exit codes, hallucinated assertions, or assumes completion prematurely. Tekmor introduces a hard stop gate in Claude Code hooks: an agent saying the tests passed without a PASSED receipt for the exact current code is physically blocked.'
 		},
 		{
 			q: 'How does an immutable SQLite snapshot save LLM tokens during debugging?',
 			a: 'In unstructured agent loops, investigating a failure or reviewing past decisions requires re-running expensive LLM context windows or scraping chat logs. Thesmos appends an immutable row to SQLite after every node execution. Running `agent-spine replay` reads the snapshots and reconstructs the full state graph in under 5ms with zero token expenditure and zero model API calls.'
 		},
 		{
-			q: 'How does a cryptographic tree receipt work under the hood?',
-			a: 'When `tekmor verify` runs an allowlisted command, it records the exit status, stdout/stderr, git commit, and tree hash into a local receipt (.verify/receipt.json). If any tracked file is touched afterward, the tree hash changes and the receipt is immediately marked STALE.'
+			q: 'How does a tekmor receipt work under the hood?',
+			a: 'When `tekmor verify` runs an allowlisted command, it records the exit code, git commit, and a hash of the code on disk in the local store. `tekmor verify receipt` computes the verdict on demand: if any counted file is touched afterward, the code hash changes and the receipt reads NOT VERIFIED.'
 		},
 		{
 			q: 'Do either of these tools send telemetry or open network ports?',
@@ -194,7 +192,7 @@ Zero model API calls`,
 	<title>Autonomic AI — Autonomous Engineering with Deterministic Boundaries</title>
 	<meta
 		name="description"
-		content="Local-first deterministic orchestrator and cryptographic verification stop gates for coding agents. Zero unverified tool calls."
+		content="Local-first deterministic orchestrator and verification stop gates for coding agents. Zero unverified tool calls."
 	/>
 	<meta property="og:type" content="website" />
 	<meta
@@ -203,7 +201,7 @@ Zero model API calls`,
 	/>
 	<meta
 		property="og:description"
-		content="Local-first deterministic orchestrator and cryptographic verification stop gates for coding agents."
+		content="Local-first deterministic orchestrator and verification stop gates for coding agents."
 	/>
 	{@html `<script type="application/ld+json">${JSON.stringify(schema)}</script>`}
 </svelte:head>
@@ -239,11 +237,11 @@ Zero model API calls`,
 				</h1>
 
 				<p class="text-base sm:text-lg text-neutral-300 leading-relaxed font-normal max-w-xl">
-					Orchestrate the workflow. Cryptographically verify the code. Two local-first systems for coding agents:
+					Orchestrate the workflow. Verify the code. Two local-first systems for coding agents:
 					<strong class="font-medium text-blue-400">Thesmos</strong> orchestrates multi-step DAG
 					workflows with append-only SQLite snapshots, while
 					<strong class="font-medium text-[#5fd39a]">Tekmor</strong> blocks hallucinated pass claims
-					with cryptographic tree receipts.
+					with receipts bound to the code on disk.
 				</p>
 
 				<!-- Trust Checklist (Anode Parity) -->
@@ -254,7 +252,7 @@ Zero model API calls`,
 					</div>
 					<div class="flex items-center gap-1.5">
 						<span class="text-[#ff7a4a] font-bold">✓</span>
-						<span>Tree-Hashed Receipts</span>
+						<span>Code-Hash Receipts</span>
 					</div>
 					<div class="flex items-center gap-1.5">
 						<span class="text-[#ff7a4a] font-bold">✓</span>
@@ -402,11 +400,11 @@ Zero model API calls`,
 								<span class="text-[#5fd39a] font-semibold">▶ [3/3] gate: verify_fix</span>
 								<div class="pl-4 text-neutral-400">tekmor verify -- go test -count=1 ./...</div>
 								<div class="pl-4 text-[#5fd39a] font-medium flex items-center gap-1.5">
-									✔ 1 check passed in 0.38s · Cryptographic receipt signed (.verify/receipt.json)
+									✔ exit 0 · run recorded against commit and code hash (tekmor verify receipt: PASSED)
 								</div>
 							</div>
 							<div class="rounded-lg border border-emerald-500/20 bg-emerald-950/20 p-2.5 text-[11px] text-emerald-300">
-								<div>Workflow Verdict: PASSED · Tree SHA: 4f9a2b8e... · Snapshots: 4 committed</div>
+								<div>Workflow Verdict: PASSED · Code hash: e3b0c442... · Snapshots: 4 committed</div>
 								<div class="text-emerald-400 font-medium mt-1 flex items-center gap-1.5">
 									<CheckCircle size={13} /> Autonomic Governor: Execution permitted, zero hallucinated steps.
 								</div>
@@ -442,38 +440,32 @@ Zero model API calls`,
 							<div class="text-neutral-500 text-[11px]">
 								Hook Execution: tekmor stop-gate
 							</div>
-							<div class="text-amber-300">
-								Checking current git tree SHA: <span class="text-white">8c12a0f7...</span>
-							</div>
-							<div class="text-amber-300">
-								Checking last receipt tree SHA: <span class="text-white">4f9a2b8e...</span>
-							</div>
 							<div class="rounded-lg border border-red-500/20 bg-red-950/30 p-2.5 text-[11px] text-red-300">
-								<div>🛑 HOOK VERDICT: REJECTED (STALE_RECEIPT)</div>
-								<div class="text-neutral-400 mt-1">Files modified after test execution. Turn cannot finish without proof.</div>
+								<div>🛑 Repo demo is blocked: Verification is missing.</div>
+								<div class="text-neutral-400 mt-1">Files changed in this repo have no passing run recorded after the last edit. Run `tekmor verify -- sh -c true`, let it pass, then finish.</div>
 							</div>
 							<div class="pt-2 text-neutral-400">
-								<span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- go test -count=1 ./...
+								<span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- sh -c true
 							</div>
 							<div class="text-[#5fd39a] font-medium flex items-center gap-1.5">
-								✔ 14 checks passed · Fresh tree SHA signed · Turn Permitted
+								✔ Verify receipt: PASSED · Turn Permitted
 							</div>
 						</div>
 					{:else}
 						<div class="space-y-1 text-neutral-300">
 							<div class="text-neutral-500 pb-2 border-b border-white/[0.04] flex items-center justify-between">
-								<span>.verify/receipt.json (Cryptographic Evidence)</span>
-								<span class="text-emerald-400">Schema v1.0.0</span>
+								<span>tekmor verify receipt --json</span>
+								<span class="text-emerald-400">PASSED</span>
 							</div>
 							<pre class="text-[#5fd39a] leading-relaxed whitespace-pre">&#123;
-  "schema": "v1.0.0",
-  "command": ".verify/run.sh",
-  "exit_code": 0,
-  "git_commit": "a8f3b12",
-  "tree_sha": "4f9a2b8e19c02d...",
-  "verdict": "PASSED",
-  "checks_passed": 14,
-  "stale": false
+  "verdict": "passed",
+  "head_sha": "2a424911d7015dc3f08987aaf8fe39f7cca3bacd",
+  "code_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "evidence": &#123;
+    "cmd": "sh -c true",
+    "exit_code": 0,
+    "source": "cli"
+  &#125;
 &#125;</pre>
 						</div>
 					{/if}
@@ -544,14 +536,14 @@ Zero model API calls`,
 							<span class="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">03</span>
 							<span>Gate &amp; Sign</span>
 						</div>
-						<span class="text-[10px] font-mono-code text-neutral-400 uppercase">Cryptographic Proof</span>
+						<span class="text-[10px] font-mono-code text-neutral-400 uppercase">Receipt Check</span>
 					</div>
 					<p class="text-xs text-neutral-400 leading-relaxed">
-						Tekmor runs allowlisted verify script, validates tree hash, and writes signed receipt. Stop gate permits turn.
+						Tekmor runs the allowlisted verify script and records the result against the commit and code hash. Stop gate permits turn.
 					</p>
 				</div>
 				<div class="mt-3 pt-2.5 border-t border-white/[0.04] text-[11px] font-mono-code text-emerald-400 flex items-center gap-1.5">
-					<span>Tree SHA verified</span>
+					<span>Receipt: PASSED</span>
 					<span class="text-emerald-400">✓</span>
 				</div>
 			</div>
@@ -622,19 +614,19 @@ Zero model API calls`,
 								<span class="h-2 w-2 rounded-full bg-green-500/70"></span>
 								<span class="ml-1.5 text-[10px] text-neutral-400">tekmor proof</span>
 							</div>
-							<span class="text-[10px] text-emerald-400 font-medium">signed</span>
+							<span class="text-[10px] text-emerald-400 font-medium">PASSED</span>
 						</div>
 						<div class="text-neutral-400">
-							<span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- go test -count=1 ./...
-						</div>
-						<div class="text-[#5fd39a] font-medium mt-1 flex items-center gap-1">
-							✔ 1 check passed in 0.38s
+							<span class="text-[#5fd39a] select-none">$ </span>tekmor verify -- sh -c true
 						</div>
 						<div class="text-neutral-400 mt-1">
 							<span class="text-[#5fd39a] select-none">$ </span>tekmor verify receipt
 						</div>
+						<div class="text-[#5fd39a] font-medium mt-1 flex items-center gap-1">
+							✔ Verify receipt: PASSED
+						</div>
 						<div class="text-neutral-300 mt-1 text-[10px] flex items-center gap-1.5">
-							<span>Tree: <span class="text-[#5fd39a]">4f9a2b...</span></span>
+							<span>Code hash: <span class="text-[#5fd39a]">e3b0c44...</span></span>
 							<span>·</span>
 							<span class="rounded bg-emerald-950/80 border border-emerald-500/30 px-1 py-0.2 text-[9px] font-bold text-emerald-400 uppercase">PASSED</span>
 						</div>

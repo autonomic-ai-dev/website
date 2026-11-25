@@ -33,7 +33,7 @@
 			Research & Engineering
 		</h1>
 		<p class="mt-4 text-base leading-relaxed text-neutral-400 sm:text-lg">
-			Deep-dives into cryptographic tree receipts, Claude Code process hooks, append-only SQLite snapshots, and cognitive state machines.
+			Deep-dives into code-hashed receipts, Claude Code process hooks, append-only SQLite snapshots, and cognitive state machines.
 		</p>
 
 		<!-- Product Filter Tabs -->

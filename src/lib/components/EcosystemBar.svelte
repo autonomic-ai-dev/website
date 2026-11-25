@@ -21,7 +21,7 @@
 		{ name: 'Cursor / Codex', spec: 'Local terminal CLI' },
 		{ name: 'Rust Native', spec: 'Zero LLM token calls' },
 		{ name: 'SQLite 3', spec: 'Append-only audit trail' },
-		{ name: 'Git Tree SHA', spec: 'Merkle receipt hashing' },
+		{ name: 'Code Hash', spec: 'SHA-256 receipt binding' },
 		{ name: 'GitHub Actions', spec: 'CI gate enforcement' },
 		{ name: 'macOS & Linux', spec: 'Apple Silicon & amd64' },
 		{ name: 'Homebrew Tap', spec: 'Single binary install' }
