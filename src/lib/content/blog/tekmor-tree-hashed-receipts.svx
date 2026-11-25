@@ -1,7 +1,7 @@
 ---
-title: "Why Exit Codes Aren't Enough: The Architecture of Tree-Hashed Receipts"
+title: "Why Exit Codes Aren't Enough: The Architecture of Code-Hashed Receipts"
 date: "2026-11-10"
-excerpt: "Autonomous coding agents frequently touch files after running test suites, invalidating previous test results. Here is how tekmor binds verification verdicts directly to git tree SHAs."
+excerpt: "Autonomous coding agents frequently touch files after running test suites, invalidating previous test results. Here is how tekmor binds verification verdicts to the commit and a hash of the uncommitted changes."
 slug: "tekmor-tree-hashed-receipts"
 category: "Architecture"
 author: "Abhiuday"
@@ -26,55 +26,40 @@ sequenceDiagram
     Agent->>Tekmor: tekmor verify -- cargo test
     Tekmor->>Shell: executes allowlisted command
     Shell-->>Tekmor: exit code 0
-    Tekmor->>Tekmor: Compute Git Tree SHA (e.g. 4f9a2b)
-    Tekmor->>Tekmor: Write .verify/receipt.json
-    Agent->>Agent: Modifies file (Tree SHA -> 8c12a0)
+    Tekmor->>Tekmor: Record run (commit + code hash)
+    Agent->>Agent: Modifies file (code hash changes)
     Agent->>Hook: Claims "Task complete, tests pass"
-    Hook->>Tekmor: Check receipt for current tree
-    Tekmor-->>Hook: STALE_RECEIPT (4f9a2b != 8c12a0)
+    Hook->>Tekmor: Check receipt for current commit and code
+    Tekmor-->>Hook: NOT VERIFIED (no passing run for this code)
     Hook-->>Agent: TURN BLOCKED: Run tekmor verify again
 ```
 
-## How Tekmor Hashes the Tree
+## How Tekmor Hashes the Code
 
-Instead of checking filesystem modification timestamps (`mtime`), which are notoriously noisy and unstable, `tekmor` computes a cryptographic tree hash covering all project files that influence execution:
+Instead of checking filesystem modification timestamps (`mtime`), which are notoriously noisy and unstable, `tekmor` binds every recorded run to the HEAD commit plus a **code hash**: a SHA-256 over the paths and contents of the uncommitted changes reported by `git status`, untracked files included.
 
-```rust
-// From tekmor/src/receipt.rs
-pub struct Receipt {
-    pub schema_version: String,
-    pub command: String,
-    pub exit_code: i32,
-    pub git_commit: String,
-    pub tree_sha: String,
-    pub verdict: Verdict,
-    pub recorded_at: String,
-    pub artifact_path: Option<PathBuf>,
-}
-```
+Excluded from the code hash: documentation (`*.md`, `*.rst`), `.verify/artifacts/`, `.verify/features/`, `.verify/knowledge-base/`, `.claude/` state, and generated output (`target/`, `node_modules/`, caches). A clean tree hashes empty input.
 
-Files ignored by default include documentation (`*.md`, `*.rst`), `.claude/` state, and `.verify/artifacts`. Every other tracked file contributes directly to the tree hash.
+If an agent touches a single counted file after running `tekmor verify -- <cmd>` — or makes a new commit — the earlier runs stop counting. The receipt reads `NOT VERIFIED` with the reason until the check is run again.
 
-If an agent touches a single byte of source code after running `tekmor verify -- <cmd>`, the tree SHA on disk no longer matches the receipt. The receipt verdict transitions immediately from `PASSED` to `STALE_RECEIPT`.
+## The Receipt Output
 
-## The Cryptographic Receipt Format
-
-Receipts are persisted locally in `.verify/receipt.json`:
+Runs are stored in the local store; there is no `.verify/receipt.json` file. `tekmor verify receipt` computes the verdict on demand, including as JSON:
 
 ```json
 {
-  "schema": "v1.0.0",
-  "command": "cargo test --all-features",
-  "exit_code": 0,
-  "git_commit": "a8f3b12c4",
-  "tree_sha": "4f9a2b8e19c02d7e",
-  "verdict": "PASSED",
-  "source": "cli",
-  "recorded_at": "2026-11-10T14:22:01Z",
-  "artifact": ".verify/artifacts/run-a8f3b12c4.log"
+  "verdict": "passed",
+  "head_sha": "2a424911d7015dc3f08987aaf8fe39f7cca3bacd",
+  "code_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "evidence": {
+    "cmd": "sh -c true",
+    "exit_code": 0,
+    "source": "cli",
+    "artifact": ".verify/artifacts/4b021624-7012-4e46-be36-7266dc289fa1.log"
+  }
 }
 ```
 
 ## Determinism with Zero Model Calls
 
-Unlike "evaluator agents" that run expensive LLM prompts to decide if an agent solved a bug, `tekmor` makes **0 model calls**. It is written entirely in pure Rust, executes in milliseconds, and provides mathematical certainty.
+Unlike "evaluator agents" that run expensive LLM prompts to decide if an agent solved a bug, `tekmor` makes **0 model calls**. It is written entirely in pure Rust, executes in milliseconds, and provides a deterministic verdict.

@@ -23,28 +23,16 @@ When running tests with:
 tekmor verify --repeat 3 -- cargo test
 ```
 
-Tekmor runs the exact command $N$ times consecutively against the identical git tree. If any iteration returns a non-zero exit code while another returns 0, the check is marked `FLAKY_DISAGREEMENT`.
+Tekmor runs the exact command $N$ times consecutively against the same commit and code state. If any iteration returns a non-zero exit code while another returns 0, the check is flaky and does not count as proof.
 
-A flaky check **never** generates a `PASSED` receipt. It is recorded as untrusted, preventing the Claude Code stop gate from approving the turn until the flakiness is investigated and resolved.
+A flaky check **never** generates a `PASSED` receipt — the verdict reads `NOT VERIFIED` — preventing the Claude Code stop gate from approving the turn until the flakiness is investigated and resolved.
 
 ## The Ratchet Mechanism
 
 Code quality degrades through papercuts: an agent adds "just one more" ignored compiler warning, or skips a slow integration test suite.
 
-Tekmor provides a ratchet mechanism in `.verify/ratchet.toml`:
-
-```toml
-[ratchet.clippy]
-command = "cargo clippy --message-format=json"
-max_warnings = 0
-
-[ratchet.coverage]
-command = "cargo tarpaulin --print-summary"
-min_percentage = 85.0
-```
-
-Running `tekmor verify ratchet` checks whether metrics violate established baselines. When `--update` is passed:
-- Baselines are lowered if the code improved (e.g., warnings reduced from 4 to 0).
-- Baselines are never raised if warnings increased.
+Running `tekmor verify ratchet` keeps lint counts from rising above their recorded baselines. When `--update` is passed:
+- Baselines are lowered if the code improved.
+- Baselines are never raised.
 
 This prevents codebase drift and ensures autonomous coding agents leave repositories cleaner than they found them.

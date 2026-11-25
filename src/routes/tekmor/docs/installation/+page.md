@@ -1,25 +1,25 @@
 ---
-title: "Install tekmor: Homebrew, Cargo, source build, and hook matrix"
-description: "Install tekmor as a standalone binary on macOS, Linux, or CI. Covers Homebrew tap, crates.io, source compilation, Claude Code hook registration, and host support matrix."
+title: 'Install tekmor: Homebrew, Cargo, source build, and hook setup'
+description: 'Install tekmor as a standalone binary on macOS or any platform with Rust. Covers Homebrew tap, crates.io, source compilation, and Claude Code hook registration.'
 canonical: https://tekmor.autonomic-ai.dev/docs/installation
 product: tekmor
 group: Start
 ---
 
-# Install tekmor: Homebrew, Cargo, source build, and hook matrix
+# Install tekmor: Homebrew, Cargo, source build, and hook setup
 
-> Install tekmor as a standalone binary on macOS, Linux, or CI. Covers Homebrew tap, crates.io, source compilation, Claude Code hook registration, and host support matrix.
+> Install tekmor as a standalone binary on macOS or any platform with Rust. Covers Homebrew tap, crates.io, source compilation, and Claude Code hook registration.
 
-`tekmor` ships as a single compiled binary with zero external runtime dependencies. Pre-built binaries cover macOS on Apple Silicon (arm64). Source builds work on any platform supported by Rust.
+`tekmor` ships as a single compiled binary. The published binary is arm64 macOS; `cargo install` builds on any platform supported by Rust.
 
 ## Requirements
 
-| Surface | Requirement | Details |
-| :--- | :--- | :--- |
-| **Homebrew binary** | macOS 13+ (Apple Silicon) | Published via `autonomic-ai-dev/tap` |
-| **Cargo install** | Rust 1.80+ | Standard crates.io build |
-| **Source build** | Rust 1.80+, Git | `cargo build --release -p tekmor` |
-| **Git repository** | Git 2.30+ | Required for tree SHA calculation and receipt signing |
+| Surface             | Requirement                  | Details                                                  |
+| :------------------ | :--------------------------- | :------------------------------------------------------- |
+| **Homebrew binary** | macOS (Apple Silicon, arm64) | Published via `autonomic-ai-dev/tap`                     |
+| **Cargo install**   | Rust toolchain               | Standard crates.io build                                 |
+| **Source build**    | Rust toolchain, Git          | `cargo build --release -p tekmor`                        |
+| **Git repository**  | Git                          | Receipts bind to the HEAD commit and uncommitted changes |
 
 ---
 
@@ -28,7 +28,6 @@ group: Start
 ### macOS (Apple Silicon — Recommended)
 
 ```bash
-brew tap autonomic-ai-dev/tap
 brew install autonomic-ai-dev/tap/tekmor
 ```
 
@@ -36,13 +35,14 @@ Verify the binary is installed:
 
 ```bash
 tekmor --version
-# Output: tekmor 1.0.0
+# Output: 2.0.0
 ```
 
 To update when a new version is released:
 
 ```bash
 brew update && brew upgrade tekmor
+tekmor install   # hooks embed the binary path; re-run after upgrading
 ```
 
 ### crates.io (Any Platform)
@@ -62,45 +62,54 @@ cp target/release/tekmor /usr/local/bin/
 
 ---
 
-## Host Integration Matrix
+## Host Integration
 
-`tekmor` integrates directly into coding agents to intercept tool calls and block unverified turn completions.
-
-| Agent / Host | Command | Protection Mode | Behavior |
-| :--- | :--- | :---: | :--- |
-| **Claude Code** | `tekmor install` | **Active Gates** | Registers `Stop` gate and `PreToolUse` bash gate in `.claude/settings.json`. |
-| **Claude Code (Global)** | `tekmor install --global` | **Active Gates** | Configures machine-wide hooks in `~/.claude/settings.json`. |
-| **Cursor** | `tekmor install --cursor` | **Instructions + CLI** | Generates `.cursorrules` with allowlist constraints; receipts checked via terminal. |
-| **Codex CLI** | `tekmor install --codex` | **Instructions + CLI** | Wires session startup prompt to enforce `tekmor verify`. |
-| **Gemini CLI** | `tekmor install --gemini` | **Instructions + CLI** | Generates extension rule configuration. |
-| **GitHub Actions CI** | Included in `.github/workflows/receipt.yml` | **CI Hard Gate** | Executes in clean room; blocks PR merges without a passing receipt. |
+| Agent / Host             | Command                             |  Protection Mode  | Behavior                                                                              |
+| :----------------------- | :---------------------------------- | :---------------: | :------------------------------------------------------------------------------------ |
+| **Claude Code**          | `tekmor install`                    | **Active Gates**  | Registers `Stop` and `PreToolUse` (matcher `Bash`) hooks in `.claude/settings.json`.  |
+| **Claude Code (Global)** | `tekmor install --global`           | **Active Gates**  | Writes machine-wide hooks to `~/.claude/settings.json`.                               |
+| **Other agents**         | Call `tekmor verify` from any shell | **Receipts only** | Runs and receipts work anywhere; their gates need host hooks tekmor does not install. |
+| **GitHub Actions CI**    | `.github/workflows/receipt.yml`     |   **CI Check**    | Reruns the allowlisted checks and publishes the receipt in the job summary.           |
 
 ---
 
 ## What `tekmor install` Configures
 
-Running `tekmor install` edits `.claude/settings.json` (or `~/.claude/settings.json` with `--global`) to register two native hooks:
+Running `tekmor install` writes two hook entries into `.claude/settings.json` (or `~/.claude/settings.json` with `--global`):
 
 ```json
 {
-  "hooks": {
-    "Stop": [
-      {
-        "command": "/opt/homebrew/bin/tekmor stop-gate"
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "command": "/opt/homebrew/bin/tekmor bash-gate"
-      }
-    ]
-  }
+	"hooks": {
+		"PreToolUse": [
+			{
+				"hooks": [
+					{
+						"command": "'/opt/homebrew/bin/tekmor' bash-gate",
+						"timeout": 30,
+						"type": "command"
+					}
+				],
+				"matcher": "Bash"
+			}
+		],
+		"Stop": [
+			{
+				"hooks": [
+					{
+						"command": "'/opt/homebrew/bin/tekmor' stop-gate",
+						"timeout": 660,
+						"type": "command"
+					}
+				]
+			}
+		]
+	}
 }
 ```
 
-- **Stop Hook (`tekmor stop-gate`)**: Fires before Claude Code returns control to the user. If the assistant claims tests passed, but `.verify/receipt.json` lacks a `PASSED` receipt for the current tree SHA, the turn is blocked.
-- **Bash Gate (`tekmor bash-gate`)**: Fires before the agent executes a shell command. It verifies that the candidate command is declared in `.verify/verify.toml`.
+- **Stop Hook (`tekmor stop-gate`)**: Fires before Claude Code returns control to the user. A turn that changed code or claims a pass without a `PASSED` receipt for the current code is blocked.
+- **Bash Gate (`tekmor bash-gate`)**: Fires before the agent executes a shell command. Blocks or warns on risky commands, and nudges a bare allowlisted command toward `tekmor verify`.
+- **Commit Gate (`tekmor commit-gate`)**: A PreToolUse hook that refuses commits that skip git hooks.
 
 > **Important**: The registered hooks record the absolute path of the `tekmor` binary. If you move, upgrade, or rebuild the binary, run `tekmor install` again to update the paths.
 
@@ -114,54 +123,61 @@ From the root of any git repository:
 tekmor verify init
 ```
 
-This generates `.verify/verify.toml`. `tekmor` auto-detects your repository tooling and populates initial trusted commands:
+Output:
+
+```
+Initialized verification suite in /path/to/repo/.verify
+```
+
+`tekmor` detects your repository tooling and writes `.verify/verify.toml`. A Rust repository gets:
 
 ```toml
 [verify]
-version = "1.0.0"
-timeout_seconds = 60
+commands = [
+  "cargo test",
+  "cargo clippy",
+  "cargo check",
+  ".verify/run.sh ...",
+]
 
-[[commands]]
-name = "test"
-run = "cargo test --all-features"
-flaky_repeat = 3
-
-[[commands]]
-name = "lint"
-run = "cargo clippy -- -D warnings"
+[verify.default]
+command = ["cargo", "test"]
+timeout_secs = 300
 ```
 
 ---
 
 ## Diagnostics with `tekmor doctor`
 
-Run `tekmor doctor` to verify your environment setup:
+Run `tekmor doctor` to check the setup the gates depend on—hooks, git, the allowlist, the store and feature-map drift:
 
 ```bash
 tekmor doctor
 ```
 
 Output:
+
 ```
-✔ tekmor binary: /opt/homebrew/bin/tekmor (v1.0.0)
-✔ Git repository detected: branch 'main' (commit a8f3b12)
-✔ .verify/ directory exists with valid verify.toml
-✔ Claude Code hooks registered in .claude/settings.json
-✔ Zero network listeners active
+ok   hooks      /Users/you/.claude/settings.json runs /opt/homebrew/bin/tekmor
+ok   hooks      /Users/you/.claude/settings.json runs /opt/homebrew/bin/tekmor
+ok   git        repository /path/to/repo
+ok   git        HEAD 2a424911d7015dc3f08987aaf8fe39f7cca3bacd
+ok   allowlist  `sh -c true` resolves to `sh`
+ok   allowlist  `cargo test` resolves to `cargo`
+ok   store      writable /Users/you/.autonomic/memory/data/brain.db
+ok   drift      feature maps match the code and the allowlist
 ```
 
 ---
 
-## Uninstalling tekmor
+## Removing tekmor
 
-To remove `tekmor` and its registered hooks:
+There is no `tekmor uninstall` command. To remove tekmor:
 
-```bash
-tekmor uninstall          # Removes hooks from .claude/settings.json
-brew uninstall tekmor     # Removes the binary via Homebrew
-rm -rf .verify/           # Optional: removes repository verification config and receipts
-```
+1. Delete the `stop-gate` and `bash-gate` hook entries from `.claude/settings.json` (and `~/.claude/settings.json` if you installed with `--global`).
+2. Remove the binary: `brew uninstall tekmor`, or `cargo uninstall tekmor` if installed via Cargo.
+3. Optionally delete `.verify/` in your repository to remove the allowlist and stored artifacts.
 
 ## Next Step
 
-- Read [Verification and Receipts](verification) to understand cryptographic tree hashing and proof verdicts.
+- Read [Verification and Receipts](verification) to understand how receipts bind to the commit and code hash.
