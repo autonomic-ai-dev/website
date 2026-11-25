@@ -85,10 +85,10 @@
 	// Ecosystem technologies for each product
 	const tekmorTechs = [
 		{ name: 'Claude Code', spec: 'Pre-compact & stop hooks' },
-		{ name: 'Git Tree SHA', spec: 'Merkle tree verification' },
+		{ name: 'Code Hash', spec: 'SHA-256 receipt binding' },
 		{ name: 'Rust 2024', spec: 'Zero model API calls' },
 		{ name: 'Bash & Zsh', spec: 'Local CLI stop gate' },
-		{ name: 'receipt.json', spec: 'Cryptographic evidence' },
+		{ name: 'verify receipt', spec: 'On-demand verdicts' },
 		{ name: 'verify.toml', spec: 'Allowlist enforcement' },
 		{ name: 'GitHub Actions', spec: 'Deterministic exit gates' },
 		{ name: 'Homebrew Tap', spec: 'Single static binary' }
@@ -121,15 +121,15 @@
 			suffix: ' ms',
 			decimals: 2,
 			duration: 0.8,
-			detail: 'Cryptographic git tree Merkle check across all tracked workspace files in memory. Instantaneous verdict on turn completion.'
+			detail: 'SHA-256 code hash check over the counted workspace changes in memory. Instantaneous verdict on turn completion.'
 		},
 		{
-			label: 'Hallucinated Pass Block Rate',
-			value: 100,
-			suffix: '%',
+			label: 'Stop-Gate Blocks Without Proof',
+			value: 10,
+			suffix: ' of 14',
 			decimals: 0,
 			duration: 1.1,
-			detail: 'Post-test code modifications immediately invalidate past receipts via git tree hashing. False victory claims blocked 100% of the time.'
+			detail: 'SWE-bench-Live tekmor sessions where the stop gate blocked the first attempt to finish without a passing run.'
 		},
 		{
 			label: 'Zero Model API Spend',
@@ -180,7 +180,7 @@
 	const tekmorDrift = {
 		badge: 'Tekmor vs Unconstrained Agents',
 		title: 'Stop Relying on Unverifiable Agent Turn Claims',
-		description: 'Tekmor introduces hard stop gates in Claude Code hooks: an agent declaring tests passed without a fresh tree-signed receipt is physically blocked from completing the turn.',
+		description: 'Tekmor introduces hard stop gates in Claude Code hooks: an agent declaring tests passed without a PASSED receipt for the current code is physically blocked from completing the turn.',
 		leftBadge: 'Unverified Turn Trap',
 		leftTitle: 'Fragile Self-Declared Passes',
 		leftDesc: 'Language models misread exit codes, assume bash commands succeeded, or alter files after test execution without re-verifying.',
@@ -188,31 +188,32 @@
 			'Agents misread exit codes or swallow assertion failures silently',
 			'Files modified after test execution still reported as "all tests pass"',
 			'Arbitrary un-allowlisted bash commands run without deterministic gating',
-			'Zero cryptographic proof connecting terminal output to git commit state'
+			'Zero recorded proof connecting terminal output to git commit state'
 		],
 		leftSnippetHeader: 'unstructured-agent.log (Unverified Prompt Loop)',
 		leftSnippetCode: `> claude-code: "All 14 unit tests pass! I will now finish the turn."
 ! files modified after test command: src/auth/token.rs (+18, -4)
-! git tree changed: 4f9a2b8e -> 8c12a0f7 (Tests were NEVER re-run!)
+! code changed after test run: 4f9a2b8e -> 8c12a0f7 (Tests were NEVER re-run!)
 ? exit code was ignored: bash exit code 1 treated as text completion
-✗ Agent self-declared pass accepted with zero cryptographic evidence`,
-		rightBadge: 'Cryptographic Process Gate',
-		rightTitle: 'Tree-Hashed Receipts',
-		rightDesc: 'Every check writes a signed receipt tied to the exact Git tree SHA. Claude Code stop hook physically blocks turns without one.',
+✗ Agent self-declared pass accepted with zero recorded evidence`,
+		rightBadge: 'Deterministic Process Gate',
+		rightTitle: 'Receipts Bound to the Code',
+		rightDesc: 'Every run is recorded against the commit and a hash of the counted changes. Claude Code stop hook physically blocks turns without a PASSED receipt.',
 		rightPoints: [
 			'Claude Code stop hooks physically block turn finish without valid receipt',
-			'Git Merkle tree SHA changes immediately invalidate earlier test passes',
+			'Any counted edit or a new commit makes earlier test passes stop counting',
 			'Allowlisted commands only (.verify/verify.toml); unlisted execution refused',
 			'Local zero-token verification executes in <1ms without LLM overhead'
 		],
-		rightSnippetHeader: '.verify/receipt.json (Cryptographically Verified)',
-		rightSnippetCode: `tekmor verify -- go test -count=1 ./...
-✔ 14 checks passed in 0.38s
-✔ git commit: 8c12a0f · tree SHA: 8c12a0f7b9e31...
-✔ receipt written to .verify/receipt.json (stale: false)
+		rightSnippetHeader: 'tekmor verify receipt',
+		rightSnippetCode: `tekmor verify -- sh -c true
+tekmor verify receipt
+✔ Verify receipt: PASSED
+  commit:    2a424911d701
+  code hash: e3b0c44298fc
 ------------------------------------------------------------
-Claude Code Stop Hook: VERIFIED (tree hash match)
-✔ Turn permitted · 0 hallucinated passes · 0 model calls`
+Claude Code Stop Hook: receipt PASSED
+✔ Turn permitted · 0 model calls`
 	};
 
 	const thesmosDrift = {
@@ -263,9 +264,9 @@ agent-spine replay exec_8f12a0 --step generate_patch
 			desc: 'Validation is 100% deterministic local Rust execution. Neither tool calls an LLM or spends your API tokens.',
 			tag: 'Local Rust Engine',
 			icon: Shield,
-			snippet: `$ tekmor verify -- go test -count=1 ./...
-✔ 14 checks passed in 0.38s
-✔ Model calls: 0 · Network connections: 0`,
+			snippet: `$ tekmor verify -- sh -c true
+"exit_code": 0, "success": true
+Model calls: 0 · Network connections: 0`,
 			statusLabel: 'Deterministic Rust'
 		},
 		{
@@ -274,22 +275,20 @@ agent-spine replay exec_8f12a0 --step generate_patch
 			desc: 'Agents run only what you specify in .verify/verify.toml. Hallucinated, unlisted, or dangerous bash commands are refused.',
 			tag: '.verify/verify.toml',
 			icon: TerminalIcon,
-			snippet: `[[commands]]
-name = "test"
-run = ".verify/run.sh"
-flaky_repeat = 3`,
+			snippet: `[verify]
+commands = [".verify/run.sh ..."]`,
 			statusLabel: 'Command allowlist'
 		},
 		{
 			badge: '03',
-			title: 'Tree-Hashed Receipts',
-			desc: 'Every test run records git commit SHA and directory tree SHA. Modifying any tracked file immediately marks past passes stale.',
-			tag: 'Git Merkle Tree',
+			title: 'Receipts Bound to the Code',
+			desc: 'Every run is recorded with the git commit and a hash of the counted changes. Any counted edit makes earlier runs stop counting.',
+			tag: 'Commit + code hash',
 			icon: CheckCircle2,
-			snippet: `Checking tree SHA: 4f9a2b8e...
-Status: PASSED · Stale: false
-Turn verdict: PERMITTED`,
-			statusLabel: 'Cryptographic binding'
+			snippet: `Verify receipt: PASSED
+  commit:    2a424911d701
+  code hash: e3b0c44298fc`,
+			statusLabel: 'Verdict computed on demand'
 		},
 		{
 			badge: '04',
@@ -299,7 +298,7 @@ Turn verdict: PERMITTED`,
 			icon: Lock,
 			snippet: `Claude Code: "All tests pass!"
 Hook Execution: tekmor stop-gate
-🛑 HOOK VERDICT: REJECTED (STALE_RECEIPT)`,
+🛑 Repo demo is blocked: Verification is missing.`,
 			statusLabel: 'Stop gate enforcement'
 		}
 	];
@@ -498,7 +497,7 @@ nodes: [reproduce, patch, verify, sign_off]`,
 									? 'bg-[#5fd39a]/15 text-[#5fd39a] border border-[#5fd39a]/30'
 									: 'text-neutral-400 hover:text-white'}"
 							>
-								receipt.json
+								receipt
 							</button>
 							<button
 								type="button"
@@ -547,28 +546,22 @@ nodes: [reproduce, patch, verify, sign_off]`,
 						{#if activeTab === 'config'}
 							<div class="text-neutral-500 mb-2"># .verify/verify.toml — Allowlist of trusted commands</div>
 							<pre class="overflow-x-auto text-neutral-200"><span class="text-[#5fd39a]">[verify]</span>
-version = <span class="text-amber-300">"1.0.0"</span>
-timeout_seconds = <span class="text-amber-300">60</span>
+commands = [<span class="text-amber-300">".verify/run.sh ..."</span>, <span class="text-amber-300">"cargo clippy -- -D warnings"</span>]
 
-<span class="text-[#5fd39a]">[[commands]]</span>
-name = <span class="text-amber-300">"test"</span>
-run = <span class="text-amber-300">".verify/run.sh"</span>
-flaky_repeat = <span class="text-amber-300">3</span>
-
-<span class="text-[#5fd39a]">[[commands]]</span>
-name = <span class="text-amber-300">"lint"</span>
-run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
+<span class="text-[#5fd39a]">[verify.default]</span>
+command = [<span class="text-amber-300">".verify/run.sh"</span>]
+timeout_secs = <span class="text-amber-300">300</span></pre>
 						{:else if activeTab === 'receipt'}
-							<div class="text-neutral-500 mb-2">// .verify/receipt.json — Cryptographic proof of execution</div>
+							<div class="text-neutral-500 mb-2">// tekmor verify receipt --json — verdict computed on demand</div>
 							<pre class="overflow-x-auto text-[#5fd39a]">&#123;
-  <span class="text-neutral-400">"schema":</span> <span class="text-amber-300">"v1.0.0"</span>,
-  <span class="text-neutral-400">"command":</span> <span class="text-amber-300">".verify/run.sh"</span>,
-  <span class="text-neutral-400">"exit_code":</span> <span class="text-white">0</span>,
-  <span class="text-neutral-400">"git_commit":</span> <span class="text-amber-300">"1a2b3c4d5e6f"</span>,
-  <span class="text-neutral-400">"tree_sha":</span> <span class="text-amber-300">"4f9a2b8e19c02d7e"</span>,
-  <span class="text-neutral-400">"verdict":</span> <span class="text-emerald-400 font-bold">"PASSED"</span>,
-  <span class="text-neutral-400">"source":</span> <span class="text-amber-300">"cli"</span>,
-  <span class="text-neutral-400">"stale":</span> <span class="text-emerald-400">false</span>
+  <span class="text-neutral-400">"verdict":</span> <span class="text-emerald-400 font-bold">"passed"</span>,
+  <span class="text-neutral-400">"head_sha":</span> <span class="text-amber-300">"2a424911d7015dc3f08987aaf8fe39f7cca3bacd"</span>,
+  <span class="text-neutral-400">"code_hash":</span> <span class="text-amber-300">"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"</span>,
+  <span class="text-neutral-400">"evidence":</span> &#123;
+    <span class="text-neutral-400">"cmd":</span> <span class="text-amber-300">"sh -c true"</span>,
+    <span class="text-neutral-400">"exit_code":</span> <span class="text-white">0</span>,
+    <span class="text-neutral-400">"source":</span> <span class="text-amber-300">"cli"</span>
+  &#125;
 &#125;</pre>
 						{:else}
 							<div class="text-neutral-500 mb-2"># Claude Code Stop Gate Hook Interception</div>
@@ -577,11 +570,9 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 									<span class="text-blue-400">Claude Code:</span> "I fixed the issue. All test assertions pass!"
 								</div>
 								<div class="text-neutral-500">▶ Executing Hook: tekmor stop-gate</div>
-								<div class="text-amber-300">Checking current git tree SHA: <span class="text-white">8c12a0f7...</span></div>
-								<div class="text-amber-300">Checking last receipt tree SHA: <span class="text-white">4f9a2b8e...</span></div>
 								<div class="rounded-lg border border-red-500/20 bg-red-950/30 p-2.5 text-[11px] text-red-300">
-									<div>🛑 HOOK VERDICT: REJECTED (STALE_RECEIPT)</div>
-									<div class="text-neutral-400 mt-1">Reason: Code modified after test completed. Turn cannot end without fresh proof.</div>
+									<div>🛑 Repo demo is blocked: Verification is missing.</div>
+									<div class="text-neutral-400 mt-1">Files changed in this repo have no passing run recorded after the last edit. Run `tekmor verify -- sh -c true`, let it pass, then finish.</div>
 								</div>
 							</div>
 						{/if}
@@ -678,7 +669,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 					</div>
 					<p class="text-xs text-neutral-400 leading-relaxed">
 						{isTekmor
-							? 'Runs allowlisted checks in isolated process. Records exit codes and git tree hash.'
+							? 'Runs allowlisted checks in isolated process. Records exit codes with commit and code hash.'
 							: 'Executes node by node, committing an immutable snapshot to SQLite after every step.'}
 					</p>
 				</div>
@@ -696,16 +687,16 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 							<span class="px-1.5 py-0.5 rounded {accentBadgeBg} border {accentBorder} {accentText}">03</span>
 							<span>{isTekmor ? 'Stop Gate' : 'Replay'}</span>
 						</div>
-						<span class="text-[10px] font-mono-code text-neutral-400 uppercase">{isTekmor ? 'receipt.json' : 'state.db'}</span>
+						<span class="text-[10px] font-mono-code text-neutral-400 uppercase">{isTekmor ? 'verify receipt' : 'state.db'}</span>
 					</div>
 					<p class="text-xs text-neutral-400 leading-relaxed">
 						{isTekmor
-							? 'Blocks agent turn completion if code changed after test or without signed receipt.'
+							? 'Blocks agent turn completion if code changed after the last passing run or no receipt exists.'
 							: 'Reconstructs entire historical execution state in 4.8ms with zero token expenditure.'}
 					</p>
 				</div>
 				<div class="mt-3 pt-2.5 border-t border-white/[0.04] text-[11px] font-mono-code {accentText} flex items-center gap-1.5">
-					<span>Cryptographic verdict</span>
+					<span>Deterministic verdict</span>
 					<span class="{accentText}">✓</span>
 				</div>
 			</div>
@@ -718,7 +709,7 @@ run = <span class="text-amber-300">"cargo clippy -- -D warnings"</span></pre>
 	color={accentColor}
 	technologies={isTekmor ? tekmorTechs : thesmosTechs}
 	label={isTekmor
-		? "Works with Claude Code, Git Merkle trees, and local test runners."
+		? "Works with Claude Code, code-hashed receipts, and local test runners."
 		: "Governs Claude Code turns with append-only SQLite state snapshots."}
 />
 

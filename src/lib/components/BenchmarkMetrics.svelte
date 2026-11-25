@@ -47,12 +47,12 @@
 			detail: 'Zero LLM model calls or API tokens consumed for verification. 100% deterministic local Rust process execution.'
 		},
 		{
-			label: 'Hallucinated Pass Catch Rate',
-			value: 100,
-			suffix: '%',
+			label: 'Stop-Gate Blocks Without Proof',
+			value: 10,
+			suffix: ' of 14',
 			decimals: 0,
 			duration: 1.1,
-			detail: 'Post-test code modifications immediately invalidate past receipts via git tree hashing. False victory claims blocked 100% of the time.'
+			detail: 'SWE-bench-Live tekmor sessions where the stop gate blocked the first attempt to finish without a passing run.'
 		},
 		{
 			label: 'State Replay Latency',

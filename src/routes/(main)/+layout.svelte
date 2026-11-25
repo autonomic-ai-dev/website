@@ -39,7 +39,7 @@
 		<div class="border-b border-white/[0.06] bg-[#050505] py-1.5 px-4 text-center text-xs text-neutral-400">
 			<a href="/changelog" class="inline-flex items-center gap-2 hover:text-white transition-colors">
 				<span class="font-mono-code text-[10px] px-1.5 py-0.2 rounded bg-white/[0.1] text-white font-medium uppercase tracking-wider">New</span>
-				<span>Tekmor v1.0 &amp; Thesmos v1.0-rc3 are out: Zero Model Calls &amp; Deterministic DAGs.</span>
+				<span>Tekmor v2.0 &amp; Thesmos v1.0-rc3 are out: Zero Model Calls &amp; Deterministic DAGs.</span>
 				<span class="underline underline-offset-4 text-white hover:text-neutral-300 font-medium">Read changelog →</span>
 			</a>
 		</div>
@@ -148,7 +148,7 @@
 								<span class="font-semibold text-white text-sm">{tool.name}</span>
 								<span
 									class="rounded bg-[#5fd39a]/15 px-1.5 py-0.5 font-mono text-[10px] text-[#5fd39a]"
-									>v1.0.0</span
+									>v2.0.0</span
 								>
 							</div>
 							<p class="mt-1 text-[11px] text-neutral-400">Proof evals & stop gates</p>

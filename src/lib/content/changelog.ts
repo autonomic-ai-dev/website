@@ -21,6 +21,60 @@ export type ChangelogEntry = {
 
 export const changelogEntries: ChangelogEntry[] = [
 	{
+		version: '2.0.0',
+		product: 'tekmor',
+		productName: 'tekmor',
+		date: '2026-11-25',
+		title: 'Tighter Proof, Smaller Binary: Exact Command Matching & Zero Network',
+		summary: 'A run now counts only when the exact allowlisted command ran, the stop gate and CI read the same receipt, and tekmor makes no network connection.',
+		gitTag: 'v2.0.0',
+		codeSnippet: {
+			lang: 'json',
+			title: 'tekmor verify receipt --json — Verdict computed on demand',
+			code: `{
+  "verdict": "passed",
+  "head_sha": "2a424911d7015dc3f08987aaf8fe39f7cca3bacd",
+  "code_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "evidence": {
+    "cmd": "sh -c true",
+    "exit_code": 0,
+    "source": "cli"
+  }
+}`
+		},
+		sections: [
+			{
+				category: 'Migration',
+				items: [
+					'Allowlist entries match the whole command: cargo test no longer matches cargo test --no-run. End an entry with ` ...` to allow extra arguments, or list each command exactly.',
+					'Entries written as shell command lines run through sh -c: a string entry with quotes, $, or VAR=value is the command sh -c \'<entry>\' and is run as tekmor verify -- sh -c \'<entry>\'.',
+					'Removed commands and flags: tekmor ext, tekmor verify record, and the verify flags --route-log-id, --cause, --config, --scenarios and the spine source alias.',
+					'A receipt needs a commit: a repository with no commits cannot reach PASSED.',
+					'Runs recorded by 1.0.0 may not count: generated output (target/, node_modules/, caches) no longer counts toward the code hash, so run the checks again after upgrading.'
+				]
+			},
+			{
+				category: 'Added',
+				items: [
+					'tekmor doctor checks the setup the gates depend on: hooks, the allowlist, scripts, the store and feature-map drift.',
+					'The receipt refuses PASSED when the uncommitted change removes or disables tests, unless a pass review accepts it.',
+					'The stop gate logs every decision to gate-events.jsonl with a reason code, the repository and the session.',
+					'The bash gate nudges a bare allowlisted command toward tekmor verify.',
+					'Mutation tests for the proof core: cargo-mutants catches 305 of 308 viable mutants in receipt.rs, stop_gate.rs and verify.rs.'
+				]
+			},
+			{
+				category: 'Changed',
+				items: [
+					'The stop gate uses the receipt verdict, so a change that needs a review or removes tests is blocked locally, as in CI.',
+					'The stop gate names the allowlisted command to run, and names a failing run instead of reporting a missing one.',
+					'Without an allowlist, only built-in test runners and programs inside .verify/ run; .verify/../x and symlinks out of .verify/ are refused.',
+					'tokio, ureq and a duplicate dev-dependency are gone; unique crates in the dependency tree fell from 125 to 91.'
+				]
+			}
+		]
+	},
+	{
 		version: '1.0.0-rc3',
 		product: 'thesmos',
 		productName: 'thesmos (agent-spine)',
@@ -75,23 +129,21 @@ export const changelogEntries: ChangelogEntry[] = [
 		product: 'tekmor',
 		productName: 'tekmor',
 		date: '2026-10-27',
-		title: 'First Stable Release: Cryptographic Tree Receipts & Claude Code Stop Gates',
-		summary: 'Initial production release of tekmor. Enforces allowlisted verification checks in .verify/verify.toml, binds results to git tree SHAs, registers native Stop and Bash hooks in Claude Code, eliminates flaky proofs via --repeat N, and introduces baseline ratchets.',
+		title: 'First Stable Release: Verified Receipts & Claude Code Stop Gates',
+		summary: 'Initial production release of tekmor. Enforces allowlisted verification checks in .verify/verify.toml, binds results to the commit and code hash, registers native Stop and Bash hooks in Claude Code, detects flaky proofs via --repeat N, and introduces baseline ratchets.',
 		gitTag: 'v1.0.0',
 		codeSnippet: {
 			lang: 'json',
-			title: '.verify/receipt.json — Cryptographic Tree Receipt Schema',
+			title: 'tekmor verify receipt --json — Verdict computed on demand',
 			code: `{
-  "schema": "v1.0.0",
-  "command": "cargo test --all-features",
-  "exit_code": 0,
-  "git_commit": "a8f3b12c4",
-  "tree_sha": "4f9a2b8e19c02d7e",
-  "verdict": "PASSED",
-  "source": "cli",
-  "recorded_at": "2026-10-27T14:22:01Z",
-  "artifact": ".verify/artifacts/run-a8f3b12c4.log",
-  "stale": false
+  "verdict": "passed",
+  "head_sha": "2a424911d7015dc3f08987aaf8fe39f7cca3bacd",
+  "code_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "evidence": {
+    "cmd": "sh -c true",
+    "exit_code": 0,
+    "source": "cli"
+  }
 }`
 		},
 		sections: [
@@ -99,10 +151,10 @@ export const changelogEntries: ChangelogEntry[] = [
 				category: 'Added',
 				items: [
 					'Allowlisted Verification Engine: tekmor verify -- <cmd> runs only commands explicitly authorized in .verify/verify.toml. Arbitrary or unreviewed commands are refused.',
-					'Cryptographic Tree-Hashed Receipts: Stores exit code, commit SHA, and exact tree SHA in .verify/receipt.json. Modifying any tracked source file immediately invalidates past passes as STALE.',
-					'Claude Code Stop Gate: tekmor install registers a Stop hook in .claude/settings.json, intercepting turn completions and blocking claims that tests pass without a PASSED receipt for the current tree SHA.',
+					'Receipts Bound to the Code: Records each run with the commit SHA and code hash in the local store; tekmor verify receipt computes the verdict on demand. Modifying a counted file makes earlier runs stop counting.',
+					'Claude Code Stop Gate: tekmor install registers a Stop hook in .claude/settings.json, intercepting turn completions and blocking claims that tests pass without a PASSED receipt for the current code.',
 					'Bash Gate PreToolUse Hook: Intercepts shell execution in Claude Code to terminate unauthorized or dangerous bash invocations.',
-					'Flaky Command Detection: tekmor verify --repeat N runs checks N times on one tree; conflicting results are marked FLAKY_DISAGREEMENT and rejected.',
+					'Flaky Command Detection: tekmor verify --repeat N runs checks N times on one tree; disagreeing runs are flaky and do not count as proof.',
 					'Quality Ratchet: tekmor verify ratchet locks baselines for lint warnings and coverage, allowing metrics to improve while preventing regressions.',
 					'Repository Drift Auditor: tekmor verify drift reports feature mappings whose code paths or verification commands no longer exist on disk.',
 					'Mutation Checker: tekmor verify check-checks tests the test suite against intentionally broken copies in .verify/broken/ to ensure failures are caught.',

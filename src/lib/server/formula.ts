@@ -58,7 +58,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 			};
 
 			const stack = readVer('tekmor.rb') || '1.0.0-rc2';
-			const brain = readVer('tekmor.rb') || stack;
+			const brain = readVer('tekmor.rb') || '2.0.0';
 			const spine = readVer('agent-spine.rb') || stack;
 
 			cached = {
@@ -109,7 +109,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 		]);
 
 		const stackVer = brain || '1.0.0-rc2';
-		const brainVer = brain || stackVer;
+		const brainVer = brain || '2.0.0';
 		const spineVer = spine || stackVer;
 
 		cached = {
@@ -133,7 +133,7 @@ export async function getAutonomicFormulae(): Promise<AutonomicFormulae> {
 			ecosystemVersion: 'v1.0.0-rc2',
 			stackVersion: 'v1.0.0-rc2',
 			organs: {
-				'tekmor': 'v1.0.0-rc2',
+				'tekmor': 'v2.0.0',
 				'agent-spine': 'v1.0.0-rc2',
 				'agstack': 'v1.0.0-rc2'
 			}
