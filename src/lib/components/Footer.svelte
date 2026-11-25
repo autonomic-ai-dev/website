@@ -41,7 +41,7 @@
 
 	const ctaDesc = $derived(
 		isTekmor
-			? 'Zero-overhead proof gates for coding agents. Catch most unverified pass claims, with code-hashed receipts.'
+			? 'Proof gates for coding agents. Block a turn that ends without a passing run on the current code, with code-hashed receipts.'
 			: isThesmos
 				? 'Replace chaotic prompt loops with deterministic YAML DAGs, approval gates, and SQLite state replay.'
 				: 'Deterministic proof evaluation, stop gates, and workflow governors for coding agents. Zero unverified tool calls.'
